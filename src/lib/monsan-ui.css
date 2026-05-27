@@ -1,0 +1,311 @@
+@import './variables.css';
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	background-color: var(--bg-primary);
+	color: var(--text-primary);
+	transition:
+		background-color 0.3s var(--ease-out),
+		color 0.3s var(--ease-out);
+	min-height: 100vh;
+	isolation: isolate;
+}
+
+/* Physical Fonts Configuration */
+@font-face {
+	font-family: 'Fredoka';
+	src: url('./assets/fonts/fredoka.woff2') format('woff2');
+	font-weight: 300 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Plus Jakarta Sans';
+	src: url('./assets/fonts/plus-jakarta-sans.woff2') format('woff2');
+	font-weight: 200 800;
+	font-display: swap;
+}
+
+/* Neubrutalist Core Global Resets & Styles */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+button:focus-visible,
+a:focus-visible {
+	outline: 3px solid var(--accent-primary);
+	outline-offset: 2px;
+}
+
+.panel {
+	background: var(--bg-primary);
+	border: var(--border-width) solid var(--border-color);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md);
+	padding: var(--space-md);
+	transition:
+		background-color 0.3s var(--ease-out),
+		border-color 0.3s var(--ease-out);
+}
+
+.glass-panel {
+	background: var(--bg-primary);
+	border: var(--border-width) solid var(--border-color);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md);
+	transition:
+		background-color 0.3s var(--ease-out),
+		border-color 0.3s var(--ease-out);
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--font-display);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+}
+
+h1.hero-title {
+	font-weight: 600;
+	letter-spacing: 0.025em;
+	text-transform: uppercase;
+}
+
+/* Neubrutalist Button Transitions & Defaults */
+button {
+	font-family: var(--font-body);
+	font-weight: 700;
+	cursor: pointer;
+	border: var(--border-width) solid var(--border-color);
+	background: none;
+	outline: none;
+	transition:
+		transform 0.1s var(--ease-out),
+		box-shadow 0.2s var(--ease-out),
+		background-color 0.2s var(--ease-out),
+		color 0.2s var(--ease-out);
+}
+
+button:active {
+	transform: translate(1px, 1px);
+	box-shadow: 0px 0px 0px var(--border-color) !important;
+}
+
+button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+	transform: none !important;
+	box-shadow: none !important;
+}
+
+/* Consistency Rules for Dark Theme */
+:root[data-theme='dark'] .monsan-button,
+:root[data-theme='dark'] button {
+	color: var(--text-primary) !important;
+}
+
+:root[data-theme='dark'] .monsan-button svg,
+:root[data-theme='dark'] button svg {
+	stroke: currentColor;
+}
+
+/* Darken colored backgrounds in dark theme to maintain contrast */
+:root[data-theme='dark'] .monsan-button.primary {
+	background-color: color-mix(in srgb, var(--accent-primary) 75%, black) !important;
+}
+
+/* Deck/Theme Variations in Dark Mode (Dark tinted backgrounds) */
+:root[data-theme='dark'] [data-deck-theme='blue'],
+:root[data-theme='dark'] [data-theme='blue'] {
+	--bg-primary: #2e2f36 !important;
+	--bg-secondary: #323a48 !important;
+	--text-primary: #fdfbf7 !important;
+	--text-secondary: #e2e8f0 !important;
+	--border-color: #fdfbf7 !important;
+}
+
+:root[data-theme='dark'] [data-deck-theme='green'],
+:root[data-theme='dark'] [data-theme='green'] {
+	--bg-primary: #2b322c !important;
+	--bg-secondary: #2b4035 !important;
+	--text-primary: #fdfbf7 !important;
+	--text-secondary: #e2e8f0 !important;
+	--border-color: #fdfbf7 !important;
+}
+
+:root[data-theme='dark'] [data-deck-theme='yellow'],
+:root[data-theme='dark'] [data-theme='yellow'] {
+	--bg-primary: #504431 !important;
+	--bg-secondary: #76643f !important;
+	--text-primary: #fdfbf7 !important;
+	--text-secondary: #e2e8f0 !important;
+	--border-color: #fdfbf7 !important;
+}
+
+:root[data-theme='dark'] [data-deck-theme='purple'],
+:root[data-theme='dark'] [data-theme='purple'] {
+	--bg-primary: #412c48 !important;
+	--bg-secondary: #58356d !important;
+	--text-primary: #fdfbf7 !important;
+	--text-secondary: #e2e8f0 !important;
+	--border-color: #fdfbf7 !important;
+}
+
+:root[data-theme='dark'] [data-deck-theme='orange'],
+:root[data-theme='dark'] [data-theme='orange'] {
+	--bg-primary: #523d2f !important;
+	--bg-secondary: #7b563c !important;
+	--text-primary: #fdfbf7 !important;
+	--text-secondary: #e2e8f0 !important;
+	--border-color: #fdfbf7 !important;
+}
+
+:root[data-theme='dark'] [data-deck-theme='red'],
+:root[data-theme='dark'] [data-theme='red'] {
+	--bg-primary: #50282a !important;
+	--bg-secondary: #752c31 !important;
+	--text-primary: #fdfbf7 !important;
+	--text-secondary: #e2e8f0 !important;
+	--border-color: #fdfbf7 !important;
+}
+
+/* Global back-btn styling for consistent neubrutalist shadows and transitions */
+.back-btn {
+	background: var(--bg-secondary);
+	border: var(--border-width) solid var(--border-color);
+	width: 36px;
+	height: 36px;
+	border-radius: var(--radius-md);
+	font-weight: 900;
+	cursor: pointer;
+	box-shadow: var(--shadow-sm);
+	color: var(--text-primary);
+	transition:
+		transform 0.1s var(--ease-out),
+		box-shadow 0.1s var(--ease-out);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.back-btn:hover {
+	transform: translate(-1px, -1px);
+	box-shadow: 3px 3px 0px var(--text-primary);
+}
+
+.back-btn:active {
+	transform: translate(2px, 2px);
+	box-shadow: none !important;
+}
+
+/* Dynamic folder/deck color styles with contrast awareness */
+.folder-chip[data-deck-theme],
+.folder-btn[data-deck-theme],
+.monsan-button[data-deck-theme] {
+	background-color: var(--bg-secondary) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+.folder-chip[data-deck-theme] svg,
+.folder-btn[data-deck-theme] svg,
+.monsan-button[data-deck-theme] svg {
+	stroke: var(--text-primary) !important;
+}
+
+.folder-chip[data-deck-theme]:hover,
+.folder-btn[data-deck-theme]:hover,
+.monsan-button[data-deck-theme]:hover:not(:disabled) {
+	background-color: var(--bg-primary) !important;
+	box-shadow: 3px 3px 0px var(--border-color) !important;
+}
+
+/* Active state for folder-chips in modal */
+:root[data-theme='dark'] .folder-chip[data-deck-theme].active,
+.folder-chip[data-deck-theme].active {
+	background-color: var(--accent-primary) !important;
+	color: var(--bg-primary) !important;
+	border-color: var(--border-color) !important;
+	box-shadow: none !important;
+	transform: translate(2px, 2px);
+}
+
+:root[data-theme='dark'] .folder-chip[data-deck-theme].active svg,
+.folder-chip[data-deck-theme].active svg {
+	stroke: var(--bg-primary) !important;
+}
+
+/* Neubrutalist Standard Animations */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes popIn {
+	0% {
+		opacity: 0;
+		transform: scale(0.92);
+	}
+	70% {
+		transform: scale(1.02);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	20%,
+	60% {
+		transform: translateX(-6px);
+	}
+	40%,
+	80% {
+		transform: translateX(6px);
+	}
+}
+
+@keyframes scrollGrid {
+	0% {
+		background-position: 0 0;
+	}
+	100% {
+		background-position: 40px 40px;
+	}
+}
+
+.animate-fade-in {
+	animation: fadeIn 0.4s var(--ease-out) forwards;
+}
+
+.animate-pop-in {
+	animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-shake {
+	animation: shake 0.35s ease-in-out;
+}
+
+.animate-scroll-grid {
+	animation: scrollGrid 12s linear infinite;
+}
