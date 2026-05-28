@@ -508,6 +508,7 @@
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		cursor: grab;
+		font-family: var(--font-body);
 		font-size: var(--text-md);
 		color: var(--text-primary);
 		box-shadow: var(--shadow-sm);
@@ -590,37 +591,40 @@
 		}
 
 		.items-grid {
-			flex-wrap: nowrap;
-			justify-content: flex-start;
-			overflow-x: auto;
-			overscroll-behavior-x: contain;
-			scroll-snap-type: x proximity;
-			padding-bottom: var(--space-xs);
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: var(--space-sm);
 		}
 
 		.items-grid .dnd-chip {
-			flex: 0 0 auto;
-			scroll-snap-align: start;
+			flex: 1 1 auto;
+			min-width: min(100%, 120px);
+			text-align: center;
 		}
 
 		.buckets-grid {
-			display: flex;
+			display: grid;
+			grid-template-columns: 1fr;
 			gap: var(--space-md);
 			margin-top: 0;
-			overflow-x: auto;
-			overscroll-behavior-x: contain;
-			scroll-snap-type: x mandatory;
-			padding-bottom: var(--space-xs);
 		}
 
 		.bucket-area {
-			flex: 0 0 min(78vw, 320px);
-			min-height: 168px;
-			scroll-snap-align: start;
+			min-height: 104px;
 		}
 
 		.bucket-content {
-			min-height: 96px;
+			min-height: 48px;
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-content: flex-start;
+			align-items: flex-start;
+		}
+
+		.bucket-chip {
+			flex: 0 1 auto;
+			font-size: var(--text-sm);
+			padding: var(--space-xs) var(--space-sm);
 		}
 	}
 </style>
