@@ -37,7 +37,6 @@
 				<span>
 					{activeMadeWithText}
 					{#if authorLink}
-						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 						<a href={authorLink} target="_blank" rel="noopener noreferrer" class="credits-author"
 							>{authorName}</a
 						>
@@ -47,7 +46,7 @@
 				</span>
 				<span
 					>{activeCreatedWithText}
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><a
+					<a
 						href="https://svelte.dev"
 						target="_blank"
 						rel="noopener noreferrer"

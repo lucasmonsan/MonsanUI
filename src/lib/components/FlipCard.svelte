@@ -50,7 +50,6 @@
 	const offset = spring({ x: 0, y: 0 }, { stiffness: 0.15, damping: 0.8 });
 	const tilt = spring({ x: 0, y: 0 }, { stiffness: 0.1, damping: 0.7 });
 
-	// Dispara o callback ondrag quando o offset muda durante o arrasto
 	$effect(() => {
 		if (isDragging && ondrag) {
 			ondrag({ x: $offset.x, y: $offset.y });
@@ -58,7 +57,6 @@
 	});
 
 	function handleFlip() {
-		// Só gira se o clique for curto/sem arrasto
 		if (Math.abs($offset.x) < 15 && Math.abs($offset.y) < 15) {
 			flipped = !flipped;
 			onFlip?.();
@@ -70,7 +68,6 @@
 		isDragging = true;
 		startX = e.clientX;
 		startY = e.clientY;
-		// Impede seleção e comportamentos padrões do browser
 		e.preventDefault();
 	}
 
@@ -102,7 +99,7 @@
 		}
 
 		if (dist > threshold && onswipe) {
-			const angle = Math.atan2($offset.y, $offset.x) * (180 / Math.PI); // -180 a 180
+			const angle = Math.atan2($offset.y, $offset.x) * (180 / Math.PI);
 			let direction:
 				| 'up'
 				| 'down'
@@ -113,7 +110,6 @@
 				| 'down-left'
 				| 'down-right';
 
-			// Mapeando 8 direções (setores de 45 graus)
 			if (angle > -22.5 && angle <= 22.5) {
 				direction = 'right';
 			} else if (angle > 22.5 && angle <= 67.5) {
@@ -144,7 +140,6 @@
 	);
 	let tiltEffect = $derived(`rotateX(${$tilt.y}deg) rotateY(${$tilt.x}deg)`);
 
-	// Visual neubrutalist de sombra dinâmica baseado no arrasto
 	let vignetteBaseColor = $derived(
 		$offset.x > 20
 			? 'var(--success-rgb, 46, 204, 113)'
@@ -240,9 +235,12 @@
 
 	.face {
 		position: absolute;
+		inset: 0;
 		width: 100%;
 		height: 100%;
+		-webkit-backface-visibility: hidden;
 		backface-visibility: hidden;
+		transform-style: preserve-3d;
 		display: flex;
 		flex-direction: column;
 		border: var(--border-width) solid var(--border-color);
@@ -263,7 +261,7 @@
 	}
 
 	.back {
-		transform: rotateY(180deg);
+		transform: rotateY(180deg) translateZ(1px);
 		background: var(--bg-secondary);
 	}
 
@@ -271,6 +269,7 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -278,5 +277,8 @@
 		padding: var(--space-lg);
 		box-sizing: border-box;
 		z-index: 2;
+		overflow: auto;
+		overflow-wrap: anywhere;
+		transform: translateZ(1px);
 	}
 </style>

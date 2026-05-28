@@ -6,7 +6,10 @@
 		onclick?: (e: MouseEvent) => void;
 		type?: 'button' | 'submit' | 'reset';
 		variant?: 'primary' | 'secondary' | 'success' | 'error' | 'neutral';
+		size?: 'sm' | 'md';
+		shape?: 'default' | 'pill';
 		disabled?: boolean;
+		block?: boolean;
 		class?: string;
 		title?: string;
 		'aria-label'?: string;
@@ -18,7 +21,10 @@
 		onclick,
 		type = 'button',
 		variant = 'primary',
+		size = 'md',
+		shape = 'default',
 		disabled = false,
+		block = false,
 		class: className = '',
 		title,
 		'aria-label': ariaLabel,
@@ -32,7 +38,7 @@
 	{onclick}
 	{title}
 	aria-label={ariaLabel}
-	class="monsan-button {variant} {className}"
+	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} {className}"
 	{...restProps}
 >
 	{@render children?.()}
@@ -43,7 +49,7 @@
 		font-family: inherit;
 		font-weight: 800;
 		text-transform: uppercase;
-		letter-spacing: -0.01em;
+		letter-spacing: 0;
 		height: var(--control-height);
 		padding: 0 var(--space-md);
 		border: var(--border-width) solid var(--border-color);
@@ -56,6 +62,20 @@
 		justify-content: center;
 		gap: var(--space-sm);
 		font-size: var(--text-md);
+	}
+
+	.block {
+		width: 100%;
+	}
+
+	.size-sm {
+		height: calc(var(--control-height) * 0.8);
+		padding: 0 var(--space-sm);
+		font-size: var(--text-sm);
+	}
+
+	.shape-pill {
+		border-radius: var(--radius-full);
 	}
 
 	/* Variantes de cores */

@@ -257,7 +257,7 @@
 		font-weight: 800;
 		text-transform: uppercase;
 		font-size: var(--text-xs);
-		letter-spacing: 0.05em;
+		letter-spacing: 0;
 	}
 
 	.chevron-wrapper {

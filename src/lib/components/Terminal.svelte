@@ -35,8 +35,8 @@
 
 	interface Props {
 		initialVFS?: Record<string, VFSNode>;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		value?: any;
+		filesystem?: Record<string, VFSNode>;
+		onCommand?: (command: string) => void;
 		disabled?: boolean;
 		osMode?: 'linux' | 'windows' | 'both';
 		messages?: TerminalMessages;
@@ -44,7 +44,8 @@
 
 	let {
 		initialVFS = {},
-		value = $bindable(),
+		filesystem = $bindable(),
+		onCommand,
 		disabled = false,
 		osMode = 'both',
 		messages = {}
@@ -94,8 +95,7 @@
 	let activeTab = $state<'terminal' | 'explorer'>('terminal');
 
 	function createInitialVFS(): Record<string, VFSNode> {
-		const source =
-			value && typeof value === 'object' && Object.keys(value).length > 0 ? value : initialVFS;
+		const source = filesystem && Object.keys(filesystem).length > 0 ? filesystem : initialVFS;
 		if (source && Object.keys(source).length > 0)
 			return JSON.parse(JSON.stringify(source)) as Record<string, VFSNode>;
 		return { home: { type: 'dir', children: {} } };
@@ -104,7 +104,7 @@
 	let pathString = $derived('/' + currentPath.join('/'));
 
 	$effect(() => {
-		value = JSON.parse(JSON.stringify(vfs));
+		filesystem = JSON.parse(JSON.stringify(vfs)) as Record<string, VFSNode>;
 	});
 
 	function getDir(path: string[]): Record<string, VFSNode> | null {
@@ -135,6 +135,7 @@
 				type: 'cmd',
 				text: `${pathString}$ ${rawInput}`
 			});
+			onCommand?.(rawInput);
 
 			try {
 				if (rawInput.includes('>')) {
@@ -528,7 +529,7 @@
 		font-size: calc(var(--base) * 0.75);
 		font-weight: 800;
 		color: var(--text-secondary);
-		letter-spacing: 0.05em;
+		letter-spacing: 0;
 		border-bottom: var(--border-width) solid var(--border-color);
 	}
 

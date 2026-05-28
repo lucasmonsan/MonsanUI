@@ -32,6 +32,8 @@
 
 	let draggedIndex = $state<number | null>(null);
 	let isTouchDragging = $state(false);
+	let lastReorderTime = $state(0);
+	const REORDER_COOLDOWN = 120;
 
 	function handleDragStart(e: DragEvent, index: number) {
 		if (disabled) {
@@ -39,6 +41,7 @@
 			return;
 		}
 		draggedIndex = index;
+		lastReorderTime = 0;
 		if (e.dataTransfer) {
 			e.dataTransfer.effectAllowed = 'move';
 			e.dataTransfer.setData('text/plain', index.toString());
@@ -54,6 +57,9 @@
 
 		if (draggedIndex === null || draggedIndex === index) return;
 
+		const now = Date.now();
+		if (now - lastReorderTime < REORDER_COOLDOWN) return;
+
 		const target = e.currentTarget as HTMLElement;
 		const rect = target.getBoundingClientRect();
 		const centerX = rect.left + rect.width / 2;
@@ -63,12 +69,24 @@
 
 		const draggingForward = draggedIndex < index;
 
-		// Reorder if dragging forward and cursor has passed midpoint, or dragging backward and cursor is before midpoint
-		const passedVertical = draggingForward ? cursorY > centerY : cursorY < centerY;
-		const passedHorizontal = draggingForward ? cursorX > centerX : cursorX < centerX;
+		let shouldReorder = draggingForward ? cursorY > centerY : cursorY < centerY;
 
-		// In grid layouts, we check either axis intersection depending on the movement direction
-		if (columns > 1 ? passedVertical || passedHorizontal : passedVertical) {
+		if (columns > 1) {
+			const activeColumns = Math.max(1, columns);
+			const draggedRow = Math.floor(draggedIndex / activeColumns);
+			const targetRow = Math.floor(index / activeColumns);
+			const sameRow = draggedRow === targetRow;
+			shouldReorder = sameRow
+				? draggingForward
+					? cursorX > centerX
+					: cursorX < centerX
+				: draggingForward
+					? cursorY > centerY
+					: cursorY < centerY;
+		}
+
+		if (shouldReorder) {
+			lastReorderTime = now;
 			const newItems = [...items];
 			const [removed] = newItems.splice(draggedIndex, 1);
 			newItems.splice(index, 0, removed);
@@ -81,22 +99,24 @@
 		if (disabled) return;
 		e.preventDefault();
 		draggedIndex = null;
+		lastReorderTime = 0;
 	}
 
 	function handleDragEnd() {
 		draggedIndex = null;
+		lastReorderTime = 0;
 	}
 
 	function handleTouchStart(e: TouchEvent, index: number) {
 		if (disabled) return;
 		draggedIndex = index;
+		lastReorderTime = 0;
 		isTouchDragging = true;
 	}
 
 	function handleTouchMove(e: TouchEvent) {
 		if (disabled || !isTouchDragging) return;
 
-		// Evita scroll da página durante o arraste no mobile
 		e.preventDefault();
 
 		const touch = e.touches[0];
@@ -126,6 +146,7 @@
 		if (isTouchDragging) {
 			isTouchDragging = false;
 			draggedIndex = null;
+			lastReorderTime = 0;
 		}
 	}
 

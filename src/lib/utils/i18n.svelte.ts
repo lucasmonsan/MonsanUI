@@ -38,6 +38,12 @@ class I18n {
 			loading: {
 				message: 'Carregando...'
 			},
+			alert: {
+				close: 'Fechar alerta'
+			},
+			quickActions: {
+				open: 'Abrir ações'
+			},
 			mediaDialog: {
 				closeAriaLabel: 'Fechar',
 				imageAlt: 'Mídia',
@@ -83,6 +89,12 @@ class I18n {
 			loading: {
 				message: 'Loading...'
 			},
+			alert: {
+				close: 'Close alert'
+			},
+			quickActions: {
+				open: 'Open actions'
+			},
 			mediaDialog: {
 				closeAriaLabel: 'Close',
 				imageAlt: 'Media',
@@ -127,6 +139,12 @@ class I18n {
 			},
 			loading: {
 				message: 'Cargando...'
+			},
+			alert: {
+				close: 'Cerrar alerta'
+			},
+			quickActions: {
+				open: 'Abrir acciones'
 			},
 			mediaDialog: {
 				closeAriaLabel: 'Cerrar',

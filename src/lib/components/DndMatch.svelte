@@ -432,7 +432,7 @@
 	.bucket-title {
 		font-size: var(--text-sm);
 		text-transform: uppercase;
-		letter-spacing: 1px;
+		letter-spacing: 0;
 		color: var(--text-secondary);
 		margin-bottom: var(--space-md);
 		text-align: center;

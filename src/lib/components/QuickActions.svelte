@@ -2,6 +2,7 @@
 	import { fly, scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	let {
 		open = $bindable(false),
@@ -9,6 +10,7 @@
 		align = 'right',
 		width = variant === 'dropdown' ? 'max-content' : '70%',
 		class: className = '',
+		triggerLabel,
 		trigger,
 		children
 	} = $props<{
@@ -17,6 +19,7 @@
 		align?: 'left' | 'right';
 		width?: string;
 		class?: string;
+		triggerLabel?: string;
 		trigger?: import('svelte').Snippet;
 		children?: import('svelte').Snippet;
 	}>();
@@ -38,6 +41,7 @@
 	}
 
 	let panelEl = $state<HTMLDivElement>();
+	let activeTriggerLabel = $derived(triggerLabel ?? i18n.t('quickActions.open'));
 
 	onMount(() => {
 		document.addEventListener('click', handleOutsideClick, { capture: true });
@@ -57,15 +61,16 @@
 		}
 	});
 
-	// Programmatic click handler for panel buttons
+	// Let child handlers run first, then close the panel after actionable clicks.
 	$effect(() => {
 		if (open && panelEl) {
 			const listener = (e: MouseEvent) => {
-				e.stopPropagation();
 				const target = e.target as HTMLElement;
 				const clickedButton = target.closest('button, a');
 				if (clickedButton) {
-					open = false;
+					queueMicrotask(() => {
+						open = false;
+					});
 				}
 			};
 			panelEl.addEventListener('click', listener);
@@ -87,11 +92,25 @@
 	class="monsan-quick-actions-wrapper {className}"
 	class:is-reveal={variant === 'reveal'}
 >
-	<div class="quick-actions-trigger" onclick={toggle} role="none">
-		{#if trigger}
+	{#if trigger}
+		<div
+			class="quick-actions-trigger"
+			onclick={toggle}
+			onkeydown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					open = !open;
+				}
+			}}
+			role="button"
+			tabindex="0"
+			aria-label={activeTriggerLabel}
+			aria-haspopup="menu"
+			aria-expanded={open}
+		>
 			{@render trigger()}
-		{/if}
-	</div>
+		</div>
+	{/if}
 
 	{#if open}
 		<div
@@ -123,6 +142,13 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
+		padding: 0;
+	}
+
+	.quick-actions-trigger:hover,
+	.quick-actions-trigger:active {
+		transform: none;
+		box-shadow: none;
 	}
 
 	.quick-actions-panel {

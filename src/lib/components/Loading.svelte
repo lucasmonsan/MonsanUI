@@ -150,6 +150,6 @@
 		font-weight: 800;
 		color: var(--text-primary);
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0;
 	}
 </style>

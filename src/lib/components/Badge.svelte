@@ -21,6 +21,7 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+		gap: var(--space-xs);
 		padding: 2px 6px;
 		border-radius: var(--radius-sm, 4px);
 		font-family: var(--font-body);
@@ -32,7 +33,7 @@
 		width: fit-content;
 		box-sizing: border-box;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0;
 	}
 
 	.monsan-badge.variant-default {

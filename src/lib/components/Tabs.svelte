@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import type { Component, Snippet } from 'svelte';
+
+	type IconComponent = Component<{ size?: number; class?: string }>;
 
 	interface TabItem {
 		id: string;
 		label: string;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		icon?: any;
+		icon?: IconComponent;
 	}
 
 	let {
@@ -25,7 +27,7 @@
 		scrollable?: boolean;
 		showNavButtons?: boolean;
 		onchange?: (value: string) => void;
-		item?: import('svelte').Snippet<[TabItem, number]>;
+		item?: Snippet<[TabItem, number]>;
 	}>();
 
 	let containerEl = $state<HTMLElement | null>(null);
