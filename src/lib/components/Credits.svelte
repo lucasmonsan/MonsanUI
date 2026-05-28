@@ -9,7 +9,8 @@
 		class: className = '',
 		madeWithText,
 		createdWithText,
-		copyright = ''
+		copyright = '',
+		placement = 'inline'
 	} = $props<{
 		authorName?: string;
 		svelteVersion?: string;
@@ -19,13 +20,14 @@
 		madeWithText?: string;
 		createdWithText?: string;
 		copyright?: string;
+		placement?: 'inline' | 'page-bottom';
 	}>();
 
 	let activeMadeWithText = $derived(madeWithText ?? i18n.t('credits.madeWithText'));
 	let activeCreatedWithText = $derived(createdWithText ?? i18n.t('credits.createdWithText'));
 </script>
 
-<footer class="monsan-credits {className}">
+<footer class="monsan-credits placement-{placement} {className}">
 	<div class="credits-inner">
 		{#if copyright}
 			<div class="credits-copyright">{copyright}</div>
@@ -60,14 +62,15 @@
 
 <style>
 	.monsan-credits {
-		width: auto;
+		width: fit-content;
+		max-width: calc(100% - var(--space-lg));
 		margin: var(--space-md) auto var(--space-md) auto;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: var(--space-sm) var(--space-lg);
 		font-family: var(--font-display);
-		font-weight: 800;
+		font-weight: 700;
 		font-size: var(--text-sm);
 		color: var(--text-secondary);
 		border: var(--border-width) solid var(--border-color);
@@ -75,6 +78,11 @@
 		background-color: var(--bg-primary);
 		box-shadow: var(--shadow-sm);
 		box-sizing: border-box;
+	}
+
+	.placement-page-bottom {
+		margin-top: auto;
+		margin-bottom: var(--space-md);
 	}
 
 	.credits-inner {
@@ -105,7 +113,7 @@
 	.credits-author {
 		color: var(--accent-primary);
 		text-decoration: none;
-		font-weight: 800;
+		font-weight: 700;
 		border-bottom: 2px solid transparent;
 		transition: border-color 0.2s ease;
 	}
@@ -116,12 +124,12 @@
 
 	.credits-tech {
 		color: var(--text-primary);
-		font-weight: 800;
+		font-weight: 700;
 	}
 
 	.credits-tech-link {
 		color: var(--text-primary);
-		font-weight: 800;
+		font-weight: 700;
 		text-decoration: none;
 		border-bottom: 2px solid transparent;
 		transition: border-color 0.2s ease;

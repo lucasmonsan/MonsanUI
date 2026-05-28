@@ -8,6 +8,8 @@
 		logoAlt?: string;
 		layout?: 'stacked' | 'inline';
 		compact?: boolean;
+		titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
+		adaptiveLogo?: boolean;
 		logoButtonLabel?: string;
 		onLogoClick?: () => void;
 	}
@@ -19,6 +21,8 @@
 		logoAlt = '',
 		layout = 'stacked',
 		compact = false,
+		titleWeight = 'semibold',
+		adaptiveLogo = true,
 		logoButtonLabel,
 		onLogoClick
 	}: Props = $props();
@@ -28,14 +32,20 @@
 	{#if logoSrc}
 		{#if onLogoClick && logoButtonLabel}
 			<button type="button" class="logo-button" aria-label={logoButtonLabel} onclick={onLogoClick}>
-				<img class="brand-logo" src={logoSrc} alt="" />
+				<img class="brand-logo" class:is-logo-adaptive={adaptiveLogo} src={logoSrc} alt="" />
 			</button>
 		{:else}
-			<img class="brand-logo" src={logoSrc} alt={logoAlt} />
+			<img class="brand-logo" class:is-logo-adaptive={adaptiveLogo} src={logoSrc} alt={logoAlt} />
 		{/if}
 	{/if}
 	<div class="brand-copy">
-		<Text tag="h1" size={compact ? '2xl' : '3xl'} weight="bold" family="display" variant="accent">
+		<Text
+			tag="h1"
+			size={compact ? '2xl' : '3xl'}
+			weight={titleWeight}
+			family="display"
+			variant="accent"
+		>
 			{brand}
 		</Text>
 		{#if subtitle}
@@ -74,6 +84,14 @@
 		width: calc(var(--base) * 5);
 		height: calc(var(--base) * 5);
 		object-fit: contain;
+	}
+
+	.is-logo-adaptive {
+		transition: filter 0.2s var(--ease-out);
+	}
+
+	:global([data-theme='dark']) .is-logo-adaptive {
+		filter: invert(1);
 	}
 
 	.logo-button {
