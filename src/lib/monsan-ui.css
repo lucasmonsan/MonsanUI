@@ -95,153 +95,15 @@ button {
 
 button:active {
 	transform: translate(1px, 1px);
-	box-shadow: 0px 0px 0px var(--border-color) !important;
+	box-shadow: 0px 0px 0px var(--border-color);
 }
 
 button:disabled {
 	opacity: 0.5;
 	cursor: not-allowed;
 	pointer-events: none;
-	transform: none !important;
-	box-shadow: none !important;
-}
-
-/* Consistency Rules for Dark Theme */
-:root[data-theme='dark'] .monsan-button,
-:root[data-theme='dark'] button {
-	color: var(--text-primary) !important;
-}
-
-:root[data-theme='dark'] .monsan-button svg,
-:root[data-theme='dark'] button svg {
-	stroke: currentColor;
-}
-
-/* Darken colored backgrounds in dark theme to maintain contrast */
-:root[data-theme='dark'] .monsan-button.primary {
-	background-color: color-mix(in srgb, var(--accent-primary) 75%, black) !important;
-}
-
-/* Deck/Theme Variations in Dark Mode (Dark tinted backgrounds) */
-:root[data-theme='dark'] [data-deck-theme='blue'],
-:root[data-theme='dark'] [data-theme='blue'] {
-	--bg-primary: #2e2f36 !important;
-	--bg-secondary: #323a48 !important;
-	--text-primary: #fdfbf7 !important;
-	--text-secondary: #e2e8f0 !important;
-	--border-color: #fdfbf7 !important;
-}
-
-:root[data-theme='dark'] [data-deck-theme='green'],
-:root[data-theme='dark'] [data-theme='green'] {
-	--bg-primary: #2b322c !important;
-	--bg-secondary: #2b4035 !important;
-	--text-primary: #fdfbf7 !important;
-	--text-secondary: #e2e8f0 !important;
-	--border-color: #fdfbf7 !important;
-}
-
-:root[data-theme='dark'] [data-deck-theme='yellow'],
-:root[data-theme='dark'] [data-theme='yellow'] {
-	--bg-primary: #504431 !important;
-	--bg-secondary: #76643f !important;
-	--text-primary: #fdfbf7 !important;
-	--text-secondary: #e2e8f0 !important;
-	--border-color: #fdfbf7 !important;
-}
-
-:root[data-theme='dark'] [data-deck-theme='purple'],
-:root[data-theme='dark'] [data-theme='purple'] {
-	--bg-primary: #412c48 !important;
-	--bg-secondary: #58356d !important;
-	--text-primary: #fdfbf7 !important;
-	--text-secondary: #e2e8f0 !important;
-	--border-color: #fdfbf7 !important;
-}
-
-:root[data-theme='dark'] [data-deck-theme='orange'],
-:root[data-theme='dark'] [data-theme='orange'] {
-	--bg-primary: #523d2f !important;
-	--bg-secondary: #7b563c !important;
-	--text-primary: #fdfbf7 !important;
-	--text-secondary: #e2e8f0 !important;
-	--border-color: #fdfbf7 !important;
-}
-
-:root[data-theme='dark'] [data-deck-theme='red'],
-:root[data-theme='dark'] [data-theme='red'] {
-	--bg-primary: #50282a !important;
-	--bg-secondary: #752c31 !important;
-	--text-primary: #fdfbf7 !important;
-	--text-secondary: #e2e8f0 !important;
-	--border-color: #fdfbf7 !important;
-}
-
-/* Global back-btn styling for consistent neubrutalist shadows and transitions */
-.back-btn {
-	background: var(--bg-secondary);
-	border: var(--border-width) solid var(--border-color);
-	width: 36px;
-	height: 36px;
-	border-radius: var(--radius-md);
-	font-weight: 900;
-	cursor: pointer;
-	box-shadow: var(--shadow-sm);
-	color: var(--text-primary);
-	transition:
-		transform 0.1s var(--ease-out),
-		box-shadow 0.1s var(--ease-out);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-}
-
-.back-btn:hover {
-	transform: translate(-1px, -1px);
-	box-shadow: 3px 3px 0px var(--text-primary);
-}
-
-.back-btn:active {
-	transform: translate(2px, 2px);
-	box-shadow: none !important;
-}
-
-/* Dynamic folder/deck color styles with contrast awareness */
-.folder-chip[data-deck-theme],
-.folder-btn[data-deck-theme],
-.monsan-button[data-deck-theme] {
-	background-color: var(--bg-secondary) !important;
-	color: var(--text-primary) !important;
-	border-color: var(--border-color) !important;
-}
-
-.folder-chip[data-deck-theme] svg,
-.folder-btn[data-deck-theme] svg,
-.monsan-button[data-deck-theme] svg {
-	stroke: var(--text-primary) !important;
-}
-
-.folder-chip[data-deck-theme]:hover,
-.folder-btn[data-deck-theme]:hover,
-.monsan-button[data-deck-theme]:hover:not(:disabled) {
-	background-color: var(--bg-primary) !important;
-	box-shadow: 3px 3px 0px var(--border-color) !important;
-}
-
-/* Active state for folder-chips in modal */
-:root[data-theme='dark'] .folder-chip[data-deck-theme].active,
-.folder-chip[data-deck-theme].active {
-	background-color: var(--accent-primary) !important;
-	color: var(--bg-primary) !important;
-	border-color: var(--border-color) !important;
-	box-shadow: none !important;
-	transform: translate(2px, 2px);
-}
-
-:root[data-theme='dark'] .folder-chip[data-deck-theme].active svg,
-.folder-chip[data-deck-theme].active svg {
-	stroke: var(--bg-primary) !important;
+	transform: none;
+	box-shadow: none;
 }
 
 /* Neubrutalist Standard Animations */

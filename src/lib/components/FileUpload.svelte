@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { onMount, type Snippet } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props extends Omit<HTMLInputAttributes, 'value' | 'type' | 'files'> {
@@ -10,9 +10,9 @@
 		disabled?: boolean;
 		placeholder?: string;
 		variant?: 'default' | 'invisible' | 'compact' | 'overlay';
-		/** Slot do gatilho para variant="invisible" */
+		/** Trigger snippet for variant="invisible". */
 		trigger?: Snippet<[{ open: () => void }]>;
-		/** Texto do botão para variant="compact" */
+		/** Button text for variants that show a browse button. */
 		buttonLabel?: string;
 		class?: string;
 	}
@@ -101,7 +101,6 @@
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 	}
 
-	// Compact: nome do primeiro arquivo selecionado
 	let compactLabel = $derived(
 		files && files.length > 0
 			? files.length === 1
@@ -110,8 +109,7 @@
 			: null
 	);
 
-	// Overlay: listener global de dragover/drop
-	onMount(() => {
+	$effect(() => {
 		if (variant !== 'overlay') return;
 
 		function onWindowDragEnter(e: DragEvent) {
@@ -126,9 +124,12 @@
 			if (windowDragCounter === 0) isWindowDragOver = false;
 		}
 		function onWindowDragOver(e: DragEvent) {
-			e.preventDefault();
+			if (e.dataTransfer?.types.includes('Files')) {
+				e.preventDefault();
+			}
 		}
 		function onWindowDrop(e: DragEvent) {
+			if (!e.dataTransfer?.types.includes('Files')) return;
 			e.preventDefault();
 			isWindowDragOver = false;
 			windowDragCounter = 0;
@@ -149,7 +150,6 @@
 	});
 </script>
 
-<!-- Input oculto — presente em todos os variants -->
 <input
 	bind:this={fileInputEl}
 	id={inputId}
@@ -163,12 +163,10 @@
 />
 
 {#if variant === 'invisible'}
-	<!-- ===== INVISIBLE: renderiza apenas o trigger passado pelo usuário ===== -->
 	{#if trigger}
 		{@render trigger({ open })}
 	{/if}
 {:else if variant === 'compact'}
-	<!-- ===== COMPACT: botão inline + label do arquivo ===== -->
 	<div class="monsan-file-upload-container monsan-file-compact {className}">
 		<div class="compact-row">
 			<button
@@ -232,9 +230,7 @@
 		{/if}
 	</div>
 {:else if variant === 'overlay'}
-	<!-- ===== OVERLAY: drag global na window ===== -->
 	<div class="monsan-file-upload-container {className}">
-		<!-- Área de indicação estática -->
 		<div class="overlay-hint" class:disabled>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -256,7 +252,6 @@
 			</button>
 		</div>
 
-		<!-- Overlay fullscreen ao arrastar -->
 		{#if isWindowDragOver && !disabled}
 			<div class="overlay-fullscreen" role="region" aria-live="polite">
 				<div class="overlay-drop-zone">
@@ -311,7 +306,6 @@
 		{/if}
 	</div>
 {:else}
-	<!-- ===== DEFAULT: dropzone original ===== -->
 	<div class="monsan-file-upload-container {className}">
 		<label
 			for={inputId}

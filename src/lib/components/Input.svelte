@@ -6,6 +6,8 @@
 		size?: 'sm' | 'md';
 		variant?: 'default' | 'unstyled' | 'title';
 		showPasswordToggle?: boolean;
+		showPasswordLabel?: string;
+		hidePasswordLabel?: string;
 		containerClass?: string;
 		containerStyle?: string;
 	}
@@ -15,6 +17,8 @@
 		size = 'md',
 		variant = 'default',
 		showPasswordToggle = false,
+		showPasswordLabel = 'Show password',
+		hidePasswordLabel = 'Hide password',
 		type = 'text',
 		class: className = '',
 		containerClass = '',
@@ -53,7 +57,7 @@
 			class="password-toggle-btn"
 			class:size-sm={size === 'sm'}
 			onclick={() => (isPasswordVisible = !isPasswordVisible)}
-			aria-label={isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'}
+			aria-label={isPasswordVisible ? hidePasswordLabel : showPasswordLabel}
 		>
 			{#if !isPasswordVisible}
 				<svg

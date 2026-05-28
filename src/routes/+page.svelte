@@ -4550,6 +4550,22 @@
 														: 'Actualizó carpeta a: ') + name;
 											addToast(folderLog, 'info');
 										}}
+										onAction={(mode, folderId) => {
+											if (mode === 'delete') {
+												const folder = mockFolders.find((f) => f.id === folderId);
+												mockFolders = mockFolders.filter((f) => f.id !== folderId);
+												if (activeFolderId === folderId) {
+													activeFolderId = null;
+												}
+												folderLog =
+													(i18n.locale === 'pt'
+														? 'Excluiu pasta: '
+														: i18n.locale === 'en'
+															? 'Deleted folder: '
+															: 'Eliminó carpeta: ') + (folder?.name ?? '');
+												addToast(folderLog, 'error');
+											}
+										}}
 									/>
 								</div>
 							</div>
@@ -5188,15 +5204,17 @@
 										<Button
 											variant="secondary"
 											onclick={() => {
-												const t = new Date();
+												const t = calendarSelectedDate
+													? new Date(calendarSelectedDate + 'T12:00:00')
+													: new Date();
 												const dateStr = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
 												studyLogs = { ...studyLogs, [dateStr]: (studyLogs[dateStr] || 0) + 2 };
 												addToast(
 													i18n.locale === 'pt'
-														? 'Atividade adicionada!'
+														? `Atividade adicionada em ${dateStr}!`
 														: i18n.locale === 'en'
-															? 'Activity added!'
-															: '¡Actividad añadida!',
+															? `Activity added on ${dateStr}!`
+															: `¡Actividad añadida el ${dateStr}!`,
 													'success'
 												);
 											}}

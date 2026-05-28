@@ -61,15 +61,16 @@
 		}
 	});
 
-	// Programmatic click handler for panel buttons
+	// Let child handlers run first, then close the panel after actionable clicks.
 	$effect(() => {
 		if (open && panelEl) {
 			const listener = (e: MouseEvent) => {
-				e.stopPropagation();
 				const target = e.target as HTMLElement;
 				const clickedButton = target.closest('button, a');
 				if (clickedButton) {
-					open = false;
+					queueMicrotask(() => {
+						open = false;
+					});
 				}
 			};
 			panelEl.addEventListener('click', listener);
@@ -91,18 +92,25 @@
 	class="monsan-quick-actions-wrapper {className}"
 	class:is-reveal={variant === 'reveal'}
 >
-	<button
-		type="button"
-		class="quick-actions-trigger"
-		onclick={toggle}
-		aria-label={activeTriggerLabel}
-		aria-haspopup="menu"
-		aria-expanded={open}
-	>
-		{#if trigger}
+	{#if trigger}
+		<div
+			class="quick-actions-trigger"
+			onclick={toggle}
+			onkeydown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					open = !open;
+				}
+			}}
+			role="button"
+			tabindex="0"
+			aria-label={activeTriggerLabel}
+			aria-haspopup="menu"
+			aria-expanded={open}
+		>
 			{@render trigger()}
-		{/if}
-	</button>
+		</div>
+	{/if}
 
 	{#if open}
 		<div
@@ -135,9 +143,6 @@
 		justify-content: center;
 		cursor: pointer;
 		padding: 0;
-		border: none;
-		box-shadow: none;
-		background: transparent;
 	}
 
 	.quick-actions-trigger:hover,
