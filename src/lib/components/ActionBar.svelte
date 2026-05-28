@@ -1,9 +1,12 @@
 <script lang="ts">
+	import type { Component, Snippet } from 'svelte';
+
+	type IconComponent = Component<{ size?: number; class?: string }>;
+
 	interface ActionItem {
 		id: string;
 		label: string;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		icon?: any; // Svelte component for the icon
+		icon?: IconComponent;
 		flex?: number | string;
 		onlyIcon?: boolean;
 		folderTheme?: string;
@@ -19,7 +22,7 @@
 	} = $props<{
 		items: ActionItem[];
 		class?: string;
-		item?: import('svelte').Snippet<[ActionItem, number]>;
+		item?: Snippet<[ActionItem, number]>;
 	}>();
 
 	let containerEl = $state<HTMLElement>();

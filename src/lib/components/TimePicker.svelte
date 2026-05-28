@@ -188,7 +188,7 @@
 	.time-display {
 		font-size: var(--text-md);
 		font-weight: bold;
-		letter-spacing: 0.5px;
+		letter-spacing: 0;
 	}
 
 	/* Dropdown Popover */
@@ -213,7 +213,7 @@
 		font-weight: bold;
 		color: var(--text-secondary);
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0;
 		text-align: center;
 		border-bottom: 2px solid var(--border-color);
 		padding-bottom: var(--space-xs);

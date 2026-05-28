@@ -187,7 +187,7 @@
 	.color-hex {
 		font-size: var(--text-sm);
 		font-weight: bold;
-		letter-spacing: 0.5px;
+		letter-spacing: 0;
 	}
 
 	/* Hidden native color input */
@@ -225,7 +225,7 @@
 		font-weight: bold;
 		color: var(--text-secondary);
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0;
 	}
 
 	/* Preset Grid */

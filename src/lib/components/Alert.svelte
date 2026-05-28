@@ -4,12 +4,15 @@
 	import CircleAlert from './icons/CircleAlert.svelte';
 	import TriangleAlert from './icons/TriangleAlert.svelte';
 	import X from './icons/X.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
 		type?: 'success' | 'error' | 'warning' | 'info';
 		title?: string;
 		dismissible?: boolean;
 		ondismiss?: () => void;
+		closeLabel?: string;
+		focusOnMount?: boolean;
 		showIcon?: boolean;
 		role?: string;
 		class?: string;
@@ -22,12 +25,17 @@
 		title,
 		dismissible = false,
 		ondismiss,
+		closeLabel,
+		focusOnMount = false,
 		showIcon = true,
 		role,
 		class: className = '',
 		children,
 		...restProps
 	}: Props = $props();
+
+	let alertElement = $state<HTMLDivElement>();
+	let activeCloseLabel = $derived(closeLabel ?? i18n.t('alert.close'));
 
 	// Color configurations consistent with variables.css and Toast
 	const colors = {
@@ -45,11 +53,19 @@
 	};
 
 	let defaultRole = $derived(type === 'error' || type === 'warning' ? 'alert' : 'status');
+
+	$effect(() => {
+		if (focusOnMount) {
+			alertElement?.focus();
+		}
+	});
 </script>
 
 <div
+	bind:this={alertElement}
 	class="monsan-alert {type} {className}"
 	role={role ?? defaultRole}
+	tabindex="-1"
 	style="--alert-color: {colors[type]}; --alert-bg: {bgColors[type]};"
 	{...restProps}
 >
@@ -64,6 +80,7 @@
 			{:else}
 				<!-- Info SVG icon -->
 				<svg
+					aria-hidden="true"
 					width="20"
 					height="20"
 					viewBox="0 0 24 24"
@@ -93,7 +110,7 @@
 	</div>
 
 	{#if dismissible}
-		<button type="button" class="alert-close-btn" onclick={ondismiss} aria-label="Fechar alerta">
+		<button type="button" class="alert-close-btn" onclick={ondismiss} aria-label={activeCloseLabel}>
 			<X size={16} />
 		</button>
 	{/if}
@@ -140,7 +157,7 @@
 		font-weight: 800;
 		text-transform: uppercase;
 		margin: 0;
-		letter-spacing: 0.5px;
+		letter-spacing: 0;
 	}
 
 	.alert-description {

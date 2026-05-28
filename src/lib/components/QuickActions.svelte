@@ -2,6 +2,7 @@
 	import { fly, scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	let {
 		open = $bindable(false),
@@ -9,6 +10,7 @@
 		align = 'right',
 		width = variant === 'dropdown' ? 'max-content' : '70%',
 		class: className = '',
+		triggerLabel,
 		trigger,
 		children
 	} = $props<{
@@ -17,6 +19,7 @@
 		align?: 'left' | 'right';
 		width?: string;
 		class?: string;
+		triggerLabel?: string;
 		trigger?: import('svelte').Snippet;
 		children?: import('svelte').Snippet;
 	}>();
@@ -38,6 +41,7 @@
 	}
 
 	let panelEl = $state<HTMLDivElement>();
+	let activeTriggerLabel = $derived(triggerLabel ?? i18n.t('quickActions.open'));
 
 	onMount(() => {
 		document.addEventListener('click', handleOutsideClick, { capture: true });
@@ -87,11 +91,18 @@
 	class="monsan-quick-actions-wrapper {className}"
 	class:is-reveal={variant === 'reveal'}
 >
-	<div class="quick-actions-trigger" onclick={toggle} role="none">
+	<button
+		type="button"
+		class="quick-actions-trigger"
+		onclick={toggle}
+		aria-label={activeTriggerLabel}
+		aria-haspopup="menu"
+		aria-expanded={open}
+	>
 		{#if trigger}
 			{@render trigger()}
 		{/if}
-	</div>
+	</button>
 
 	{#if open}
 		<div
@@ -123,6 +134,16 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
+		padding: 0;
+		border: none;
+		box-shadow: none;
+		background: transparent;
+	}
+
+	.quick-actions-trigger:hover,
+	.quick-actions-trigger:active {
+		transform: none;
+		box-shadow: none;
 	}
 
 	.quick-actions-panel {

@@ -21,7 +21,7 @@
 	import Deck from '$lib/components/Deck.svelte';
 	import Folders from '$lib/components/Folders.svelte';
 	import CardEditor from '$lib/components/CardEditor.svelte';
-	import Terminal from '$lib/components/Terminal.svelte';
+	import Terminal, { type VFSNode } from '$lib/components/Terminal.svelte';
 	import DndOrder from '$lib/components/DndOrder.svelte';
 	import DndMatch from '$lib/components/DndMatch.svelte';
 	import ActionBar from '$lib/components/ActionBar.svelte';
@@ -890,7 +890,7 @@
 	}
 
 	// 5. Interactive State
-	let terminalValue = $state('');
+	let terminalFilesystem = $state<Record<string, VFSNode>>({});
 	const initialVFS = {
 		home: {
 			type: 'dir' as const,
@@ -4609,14 +4609,15 @@
 								<div
 									class="editor-items-list editor-scroll-container"
 									class:grid-cols-2={editorGridMode}
+									role="list"
 									style="width: 100%; padding: var(--space-sm) 0; min-height: 650px; max-height: 850px; overflow-y: auto;"
 								>
 									{#each editorCards as card, idx (card.id)}
-										<!-- svelte-ignore a11y_no_static_element_interactions -->
 										<div
 											animate:flip={{ duration: 250, easing: quintOut }}
 											class="card-editor-wrapper"
 											draggable={true}
+											role="listitem"
 											class:dragging={draggedCardIndex === idx}
 											ondragstart={(e) => {
 												if (e.dataTransfer) {
@@ -4693,7 +4694,7 @@
 							<div class="preview-box" style="min-height: 380px;">
 								<span class="box-label">{i18n.t('common.preview')}</span>
 								<div class="preview-render full-width-render">
-									<Terminal {initialVFS} bind:value={terminalValue} osMode="both" />
+									<Terminal {initialVFS} bind:filesystem={terminalFilesystem} osMode="both" />
 								</div>
 							</div>
 							<div class="knobs-box">
@@ -4717,8 +4718,10 @@
 										>
 										<pre
 											class="status-badge"
-											style="font-family: monospace; white-space: pre-wrap; font-size: var(--text-sm); text-align: left; width: 100%; max-height: 200px; overflow-y: auto; padding: var(--space-sm);">{terminalValue
-												? JSON.stringify(terminalValue, null, 2)
+											style="font-family: monospace; white-space: pre-wrap; font-size: var(--text-sm); text-align: left; width: 100%; max-height: 200px; overflow-y: auto; padding: var(--space-sm);">{Object.keys(
+												terminalFilesystem
+											).length > 0
+												? JSON.stringify(terminalFilesystem, null, 2)
 												: i18n.locale === 'pt'
 													? '(vazio)'
 													: i18n.locale === 'en'
@@ -4734,7 +4737,7 @@
 								<button
 									onclick={() =>
 										copyToClipboard(
-											`import Terminal from '$lib/components/Terminal.svelte';\n\n<Terminal initialVFS={vfs} bind:value={terminalValue} osMode="both" />`,
+											`import Terminal from '$lib/components/Terminal.svelte';\n\n<Terminal initialVFS={vfs} bind:filesystem={terminalFilesystem} osMode="both" />`,
 											17
 										)}
 								>
@@ -4742,7 +4745,7 @@
 								</button>
 							</div>
 							<pre><code
-									>{`import Terminal from '$lib/components/Terminal.svelte';\n\n<Terminal initialVFS={vfs} bind:value={terminalValue} osMode="both" />`}</code
+									>{`import Terminal from '$lib/components/Terminal.svelte';\n\n<Terminal initialVFS={vfs} bind:filesystem={terminalFilesystem} osMode="both" />`}</code
 								></pre>
 						</div>
 					</div>
@@ -6123,7 +6126,7 @@
 		font-size: calc(var(--base) * 0.7);
 		font-weight: bold;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0;
 		color: var(--text-secondary);
 		z-index: 10;
 	}

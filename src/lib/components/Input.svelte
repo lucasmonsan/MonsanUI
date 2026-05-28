@@ -4,7 +4,7 @@
 	interface Props extends Omit<HTMLInputAttributes, 'size' | 'value'> {
 		value?: string | number | null;
 		size?: 'sm' | 'md';
-		variant?: 'default' | 'unstyled';
+		variant?: 'default' | 'unstyled' | 'title';
 		showPasswordToggle?: boolean;
 		containerClass?: string;
 		containerStyle?: string;
@@ -130,6 +130,12 @@
 		border-color: var(--accent-primary);
 		box-shadow: 3px 3px 0px var(--accent-primary);
 		transform: translate(-1px, -1px);
+	}
+
+	.monsan-input.variant-title {
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: 700;
 	}
 
 	/* Unstyled Variant */

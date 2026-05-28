@@ -181,7 +181,7 @@
 
 	.datepicker-text {
 		font-size: var(--text-md);
-		letter-spacing: 0.2px;
+		letter-spacing: 0;
 	}
 
 	/* Dropdown Popover */

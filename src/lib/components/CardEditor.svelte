@@ -20,8 +20,7 @@
 	}
 
 	interface Props {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		value: Record<string, any>;
+		value: Record<string, unknown>;
 		index: number;
 		totalCards: number;
 		onMove: (index: number, direction: -1 | 1) => void;
@@ -163,10 +162,26 @@
 
 	function toggleFieldVisibility(field: Field) {
 		const key = getVisibilityKey(field);
-		value[key] = !value[key];
-		if (!value[key]) {
-			value[field.id] = '';
-		}
+		const isVisible = !value[key];
+		value = {
+			...value,
+			[key]: isVisible,
+			...(isVisible ? {} : { [field.id]: '' })
+		};
+	}
+
+	function getFieldValue(fieldId: string) {
+		const fieldValue = value[fieldId];
+		return typeof fieldValue === 'string' ? fieldValue : '';
+	}
+
+	function setFieldValue(fieldId: string, nextValue: string) {
+		value = { ...value, [fieldId]: nextValue };
+	}
+
+	function handleFieldInput(fieldId: string, event: Event) {
+		const target = event.currentTarget as HTMLInputElement | HTMLTextAreaElement;
+		setFieldValue(fieldId, target.value);
 	}
 
 	let headerEl = $state<HTMLDivElement>();
@@ -275,7 +290,8 @@
 									<Textarea
 										id="{field.id}-{index}"
 										class="hint-input"
-										bind:value={value[field.id]}
+										value={getFieldValue(field.id)}
+										oninput={(event) => handleFieldInput(field.id, event)}
 										placeholder={field.placeholder}
 										rows={field.rows ?? 1}
 										use={autoResizeAction}
@@ -286,7 +302,8 @@
 										id="{field.id}-{index}"
 										type="text"
 										class="hint-input"
-										bind:value={value[field.id]}
+										value={getFieldValue(field.id)}
+										oninput={(event) => handleFieldInput(field.id, event)}
 										placeholder={field.placeholder}
 										size="sm"
 									/>
@@ -301,7 +318,8 @@
 					{#if field.type === 'textarea'}
 						<Textarea
 							id="{field.id}-{index}"
-							bind:value={value[field.id]}
+							value={getFieldValue(field.id)}
+							oninput={(event) => handleFieldInput(field.id, event)}
 							placeholder={field.placeholder}
 							rows={field.rows ?? 1}
 							use={autoResizeAction}
@@ -311,7 +329,8 @@
 						<Input
 							id="{field.id}-{index}"
 							type="text"
-							bind:value={value[field.id]}
+							value={getFieldValue(field.id)}
+							oninput={(event) => handleFieldInput(field.id, event)}
 							placeholder={field.placeholder}
 							size="sm"
 						/>

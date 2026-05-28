@@ -127,11 +127,10 @@
 	}
 
 	$effect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		items;
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		activeId;
-		setTimeout(checkScroll, 0);
+		const dependencyKey = `${items.length}:${activeId ?? ''}`;
+		if (dependencyKey) {
+			queueMicrotask(checkScroll);
+		}
 	});
 
 	$effect(() => {
