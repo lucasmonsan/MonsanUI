@@ -20,7 +20,8 @@
 		value = $bindable(),
 		locales = [
 			{ id: 'en', label: 'EN', name: 'English' },
-			{ id: 'pt', label: 'PT', name: 'Português' }
+			{ id: 'pt', label: 'PT', name: 'Português' },
+			{ id: 'es', label: 'ES', name: 'Español' }
 		],
 		onChange,
 		ariaLabel = 'Alternar idioma / Toggle language / Cambiar idioma',

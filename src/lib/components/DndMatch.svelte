@@ -656,18 +656,18 @@
 		}
 
 		.bucket-area {
-			flex-direction: row;
-			align-items: center;
+			flex-direction: column;
+			align-items: stretch;
 			min-height: auto;
 			padding: var(--space-sm);
-			gap: var(--space-sm);
+			gap: var(--space-xs);
 			text-align: left;
 		}
 
 		.bucket-title {
-			margin-bottom: 0;
-			min-width: 80px;
-			max-width: 110px;
+			margin-bottom: var(--space-xs);
+			width: 100%;
+			max-width: none;
 			flex-shrink: 0;
 			text-align: left;
 			font-size: var(--text-sm);
@@ -675,15 +675,15 @@
 		}
 
 		.bucket-content {
-			flex: 1;
-			min-height: 38px;
+			width: 100%;
+			min-height: 48px;
 			display: flex;
 			flex-direction: row;
 			flex-wrap: wrap;
-			gap: var(--space-xs);
+			gap: var(--space-sm);
 			align-items: center;
 			align-content: center;
-			padding: var(--space-xs);
+			padding: var(--space-sm);
 			border: 1px dashed var(--border-color);
 			border-radius: var(--radius-sm);
 			background: rgba(0, 0, 0, 0.02);

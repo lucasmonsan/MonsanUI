@@ -73,6 +73,10 @@
 		text-align: start;
 	}
 
+	.inline .brand-copy {
+		align-items: flex-start;
+	}
+
 	.brand-copy {
 		display: flex;
 		flex-direction: column;
