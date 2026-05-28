@@ -52,7 +52,7 @@
 		letter-spacing: 0;
 		min-height: var(--control-height);
 		height: auto;
-		padding: var(--space-xs) var(--space-md);
+		padding: var(--space-sm) var(--space-md);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		cursor: pointer;
@@ -71,7 +71,7 @@
 
 	.size-sm {
 		min-height: calc(var(--control-height) * 0.8);
-		padding: var(--space-xs) var(--space-sm);
+		padding: var(--space-sm) var(--space-sm);
 		font-size: var(--text-sm);
 	}
 
