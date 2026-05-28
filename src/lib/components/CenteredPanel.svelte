@@ -7,17 +7,19 @@
 		maxWidth?: string;
 		align?: 'center' | 'start';
 		animate?: boolean;
+		fullHeight?: boolean;
 	}
 
 	let {
 		children,
 		maxWidth = 'var(--centered-panel-max-width, 512px)',
 		align = 'center',
-		animate = true
+		animate = true,
+		fullHeight = true
 	}: Props = $props();
 </script>
 
-<div class="monsan-centered-panel" class:is-animated={animate}>
+<div class="monsan-centered-panel" class:is-animated={animate} class:is-full-height={fullHeight}>
 	<Panel tag="section" {maxWidth} class="centered-panel-surface">
 		<div class="centered-panel-content align-{align}">
 			{@render children()}
@@ -30,10 +32,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		min-height: 100dvh;
 		padding: var(--space-lg);
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	.is-full-height {
+		min-height: 100dvh;
 	}
 
 	.monsan-centered-panel :global(.centered-panel-surface) {
