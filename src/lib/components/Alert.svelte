@@ -37,21 +37,6 @@
 	let alertElement = $state<HTMLDivElement>();
 	let activeCloseLabel = $derived(closeLabel ?? i18n.t('alert.close'));
 
-	// Color configurations consistent with variables.css and Toast
-	const colors = {
-		success: 'var(--success)',
-		error: 'var(--error)',
-		warning: '#eab308', // Amber Warning
-		info: 'var(--info)'
-	};
-
-	const bgColors = {
-		success: 'color-mix(in srgb, var(--success) 10%, var(--bg-primary))',
-		error: 'color-mix(in srgb, var(--error) 10%, var(--bg-primary))',
-		warning: 'color-mix(in srgb, #eab308 12%, var(--bg-primary))',
-		info: 'color-mix(in srgb, var(--info) 10%, var(--bg-primary))'
-	};
-
 	let defaultRole = $derived(type === 'error' || type === 'warning' ? 'alert' : 'status');
 
 	$effect(() => {
@@ -66,7 +51,6 @@
 	class="monsan-alert {type} {className}"
 	role={role ?? defaultRole}
 	tabindex="-1"
-	style="--alert-color: {colors[type]}; --alert-bg: {bgColors[type]};"
 	{...restProps}
 >
 	{#if showIcon}
@@ -133,6 +117,26 @@
 		width: 100%;
 		border-left-width: 6px;
 		border-left-color: var(--alert-color);
+	}
+
+	.monsan-alert.success {
+		--alert-color: var(--success);
+		--alert-bg: color-mix(in srgb, var(--success) 10%, var(--bg-primary));
+	}
+
+	.monsan-alert.error {
+		--alert-color: var(--error);
+		--alert-bg: color-mix(in srgb, var(--error) 10%, var(--bg-primary));
+	}
+
+	.monsan-alert.warning {
+		--alert-color: #eab308;
+		--alert-bg: color-mix(in srgb, #eab308 12%, var(--bg-primary));
+	}
+
+	.monsan-alert.info {
+		--alert-color: var(--info);
+		--alert-bg: color-mix(in srgb, var(--info) 10%, var(--bg-primary));
 	}
 
 	.alert-icon {
