@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n } from '../utils/i18n.svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { scale } from 'svelte/transition';
 
@@ -65,6 +66,39 @@
 	let draggedItem = $state<{ item: string; source: string | 'pool' } | null>(null);
 	let dropTarget = $state<string | 'pool' | null>(null);
 	let isTouchDragging = $state(false);
+	let selectedItem = $state<{ item: string; source: string | 'pool' } | null>(null);
+
+	function moveItem(item: string, source: string | 'pool', target: string | 'pool') {
+		if (source === target) return;
+
+		const newValue = { ...value };
+
+		if (source !== 'pool') {
+			newValue[source] = (newValue[source] || []).filter((i: string) => i !== item);
+		}
+
+		if (target !== 'pool') {
+			if (!newValue[target]) newValue[target] = [];
+			if (!newValue[target].includes(item)) {
+				newValue[target] = [...newValue[target], item];
+			}
+		}
+
+		value = newValue;
+		announceMove(item, source, target);
+	}
+
+	function handleItemClick(item: string, source: string | 'pool') {
+		if (disabled || isTouchDragging) return;
+		selectedItem =
+			selectedItem?.item === item && selectedItem?.source === source ? null : { item, source };
+	}
+
+	function handleAreaClick(target: string | 'pool') {
+		if (disabled || !selectedItem) return;
+		moveItem(selectedItem.item, selectedItem.source, target);
+		selectedItem = null;
+	}
 
 	function handleDragStart(e: DragEvent, item: string, source: string | 'pool') {
 		if (disabled) {
@@ -108,23 +142,7 @@
 				return;
 			}
 
-			const newValue = { ...value };
-
-			// 1. Remover da origem (se for um bucket)
-			if (source !== 'pool') {
-				newValue[source] = (newValue[source] || []).filter((i: string) => i !== item);
-			}
-
-			// 2. Adicionar ao destino (se for um bucket)
-			if (target !== 'pool') {
-				if (!newValue[target]) newValue[target] = [];
-				// Garante que não duplique (embora a lógica de remoção já trate isso)
-				if (!newValue[target].includes(item)) {
-					newValue[target] = [...newValue[target], item];
-				}
-			}
-
-			value = newValue;
+			moveItem(item, source, target);
 		}
 		draggedItem = null;
 	}
@@ -134,66 +152,69 @@
 		dropTarget = null;
 	}
 
+	let touchStartX = 0;
+	let touchStartY = 0;
+	let touchHasMoved = false;
+
 	function handleTouchStart(e: TouchEvent, item: string, source: string | 'pool') {
 		if (disabled) return;
+		const touch = e.touches[0];
+		touchStartX = touch.clientX;
+		touchStartY = touch.clientY;
+		touchHasMoved = false;
 		draggedItem = { item, source };
-		isTouchDragging = true;
 	}
 
 	function handleTouchMove(e: TouchEvent) {
-		if (disabled || !isTouchDragging) return;
-
-		// Evita scroll da página durante o arraste no mobile
-		e.preventDefault();
+		if (disabled || !draggedItem) return;
 
 		const touch = e.touches[0];
-		const element = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
-		if (element) {
-			const targetArea = element.closest('.bucket-area, .pool-area') as HTMLElement;
-			if (targetArea) {
-				const targetBucket = targetArea.getAttribute('data-bucket');
-				if (targetBucket) {
-					dropTarget = targetBucket;
+		const diffX = Math.abs(touch.clientX - touchStartX);
+		const diffY = Math.abs(touch.clientY - touchStartY);
+
+		if (!isTouchDragging && (diffX > 6 || diffY > 6)) {
+			isTouchDragging = true;
+			touchHasMoved = true;
+		}
+
+		if (isTouchDragging) {
+			// Evita scroll da página durante o arraste no mobile
+			if (e.cancelable) e.preventDefault();
+
+			const element = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
+			if (element) {
+				const targetArea = element.closest('.bucket-area, .pool-area') as HTMLElement;
+				if (targetArea) {
+					const targetBucket = targetArea.getAttribute('data-bucket');
+					if (targetBucket) {
+						dropTarget = targetBucket;
+					}
+				} else {
+					dropTarget = null;
 				}
-			} else {
-				dropTarget = null;
 			}
 		}
 	}
 
 	function handleTouchEnd() {
-		if (!isTouchDragging) return;
-		isTouchDragging = false;
+		if (!draggedItem) return;
 
-		if (draggedItem && dropTarget) {
+		if (isTouchDragging && dropTarget) {
 			const { item, source } = draggedItem;
 			const target = dropTarget;
 
 			if (source !== target) {
-				const newValue = { ...value };
-
-				// 1. Remover da origem
-				if (source !== 'pool') {
-					newValue[source] = (newValue[source] || []).filter((i: string) => i !== item);
-				}
-
-				// 2. Adicionar ao destino
-				if (target !== 'pool') {
-					if (!newValue[target]) newValue[target] = [];
-					if (!newValue[target].includes(item)) {
-						newValue[target] = [...newValue[target], item];
-					}
-				}
-
-				value = newValue;
+				moveItem(item, source, target);
 			}
+		} else if (!touchHasMoved) {
+			const { item, source } = draggedItem;
+			handleItemClick(item, source);
 		}
 
+		isTouchDragging = false;
 		draggedItem = null;
 		dropTarget = null;
 	}
-
-	import { i18n } from '../utils/i18n.svelte';
 
 	let srAnnouncement = $state('');
 
@@ -322,6 +343,13 @@
 		ondragover={(e) => handleDragOver(e, 'pool')}
 		ondragleave={(e) => handleDragLeave(e, 'pool')}
 		ondrop={(e) => handleDrop(e, 'pool')}
+		onclick={() => handleAreaClick('pool')}
+		onkeydown={(e) => {
+			if ((e.key === 'Enter' || e.key === ' ') && selectedItem) {
+				e.preventDefault();
+				handleAreaClick('pool');
+			}
+		}}
 		role="listbox"
 		aria-label={mergedLabels.poolTitle}
 		tabindex="-1"
@@ -339,7 +367,12 @@
 					class="dnd-chip glass-panel"
 					class:dragging={draggedItem?.item === item && !isTouchDragging}
 					class:touch-dragging={draggedItem?.item === item && isTouchDragging}
+					class:selected={selectedItem?.item === item && selectedItem?.source === 'pool'}
 					draggable={!disabled && !isTouchDragging}
+					onclick={(e) => {
+						e.stopPropagation();
+						handleItemClick(item, 'pool');
+					}}
 					ondragstart={(e) => handleDragStart(e, item, 'pool')}
 					ondragend={handleDragEnd}
 					ontouchstart={(e) => handleTouchStart(e, item, 'pool')}
@@ -372,6 +405,13 @@
 				ondragover={(e) => handleDragOver(e, bucket)}
 				ondragleave={(e) => handleDragLeave(e, bucket)}
 				ondrop={(e) => handleDrop(e, bucket)}
+				onclick={() => handleAreaClick(bucket)}
+				onkeydown={(e) => {
+					if ((e.key === 'Enter' || e.key === ' ') && selectedItem) {
+						e.preventDefault();
+						handleAreaClick(bucket);
+					}
+				}}
 				role="listbox"
 				aria-label={bucket}
 				tabindex="-1"
@@ -389,7 +429,12 @@
 							class="dnd-chip bucket-chip"
 							class:dragging={draggedItem?.item === item && !isTouchDragging}
 							class:touch-dragging={draggedItem?.item === item && isTouchDragging}
+							class:selected={selectedItem?.item === item && selectedItem?.source === bucket}
 							draggable={!disabled && !isTouchDragging}
+							onclick={(e) => {
+								e.stopPropagation();
+								handleItemClick(item, bucket);
+							}}
 							ondragstart={(e) => handleDragStart(e, item, bucket)}
 							ondragend={handleDragEnd}
 							ontouchstart={(e) => handleTouchStart(e, item, bucket)}
@@ -539,6 +584,12 @@
 		pointer-events: none;
 	}
 
+	.dnd-chip.selected {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+		transform: translate(-1px, -1px);
+	}
+
 	.bucket-chip {
 		border-radius: var(--radius-sm);
 		background: var(--bg-secondary);
@@ -576,17 +627,12 @@
 			gap: var(--space-md);
 		}
 
-		.pool-area,
-		.bucket-area {
-			padding: var(--space-sm);
-		}
-
 		.pool-area {
+			padding: var(--space-sm);
 			min-height: 88px;
 		}
 
-		.area-title,
-		.bucket-title {
+		.area-title {
 			margin-bottom: var(--space-sm);
 		}
 
@@ -603,28 +649,61 @@
 		}
 
 		.buckets-grid {
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: var(--space-md);
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-sm);
 			margin-top: 0;
 		}
 
 		.bucket-area {
-			min-height: 104px;
+			flex-direction: row;
+			align-items: center;
+			min-height: auto;
+			padding: var(--space-sm);
+			gap: var(--space-sm);
+			text-align: left;
+		}
+
+		.bucket-title {
+			margin-bottom: 0;
+			min-width: 80px;
+			max-width: 110px;
+			flex-shrink: 0;
+			text-align: left;
+			font-size: var(--text-sm);
+			word-break: break-word;
 		}
 
 		.bucket-content {
-			min-height: 48px;
+			flex: 1;
+			min-height: 38px;
+			display: flex;
 			flex-direction: row;
 			flex-wrap: wrap;
-			align-content: flex-start;
-			align-items: flex-start;
+			gap: var(--space-xs);
+			align-items: center;
+			align-content: center;
+			padding: var(--space-xs);
+			border: 1px dashed var(--border-color);
+			border-radius: var(--radius-sm);
+			background: rgba(0, 0, 0, 0.02);
 		}
 
 		.bucket-chip {
 			flex: 0 1 auto;
 			font-size: var(--text-sm);
 			padding: var(--space-xs) var(--space-sm);
+			margin: 0;
+		}
+
+		.empty-msg {
+			position: static;
+			transform: none;
+			text-align: left;
+			font-size: var(--text-xs);
+			color: var(--text-secondary);
+			width: auto;
+			padding: 0 var(--space-xs);
 		}
 	}
 </style>

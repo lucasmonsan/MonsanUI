@@ -571,6 +571,8 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+		max-width: 480px;
+		margin: 0 auto;
 		box-sizing: border-box;
 	}
 

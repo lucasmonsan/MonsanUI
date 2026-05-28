@@ -36,6 +36,13 @@ body {
 	box-sizing: border-box;
 }
 
+input,
+select,
+textarea,
+button {
+	font-family: inherit;
+}
+
 button:focus-visible,
 a:focus-visible {
 	outline: 3px solid var(--accent-primary);

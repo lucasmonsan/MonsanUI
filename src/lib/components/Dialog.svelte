@@ -298,4 +298,10 @@
 			transform: scale(1);
 		}
 	}
+
+	@media (max-width: 600px) {
+		.dialog-wrapper {
+			padding: var(--space-md);
+		}
+	}
 </style>

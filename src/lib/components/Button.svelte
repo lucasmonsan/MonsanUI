@@ -50,8 +50,9 @@
 		font-weight: 800;
 		text-transform: uppercase;
 		letter-spacing: 0;
-		height: var(--control-height);
-		padding: 0 var(--space-md);
+		min-height: var(--control-height);
+		height: auto;
+		padding: var(--space-xs) var(--space-md);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		cursor: pointer;
@@ -69,8 +70,8 @@
 	}
 
 	.size-sm {
-		height: calc(var(--control-height) * 0.8);
-		padding: 0 var(--space-sm);
+		min-height: calc(var(--control-height) * 0.8);
+		padding: var(--space-xs) var(--space-sm);
 		font-size: var(--text-sm);
 	}
 
