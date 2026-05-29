@@ -123,7 +123,6 @@
 	{/if}
 </div>
 
-
 <style>
 	.monsan-expandable-card {
 		background: var(--bg-primary);
@@ -224,12 +223,11 @@
 		color: var(--text-secondary);
 		transition: background-color 0.15s ease;
 	}
- 
+
 	.card-indicator-footer:hover {
 		background: var(--bg-secondary);
 		color: var(--text-primary);
 	}
-
 
 	.indicator-container {
 		display: flex;
