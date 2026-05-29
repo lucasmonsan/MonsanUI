@@ -4,7 +4,7 @@
 		class: className = '',
 		children
 	} = $props<{
-		variant?: 'default' | 'primary' | 'secondary' | 'due' | 'new';
+		variant?: 'default' | 'primary' | 'secondary' | 'due' | 'new' | 'warning';
 		class?: string;
 		children?: import('svelte').Snippet;
 	}>();
@@ -78,4 +78,15 @@
 		background: #8ecae6;
 		color: #2a2423;
 	}
+
+	.monsan-badge.variant-warning {
+		background: #eab308;
+		color: #2a2423;
+	}
+
+	:global([data-theme='dark']) .monsan-badge.variant-warning {
+		background: #facc15;
+		color: #2a2423;
+	}
 </style>
+
