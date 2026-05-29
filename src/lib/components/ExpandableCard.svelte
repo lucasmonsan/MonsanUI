@@ -41,14 +41,8 @@
 	}
 
 	function handleIndicatorClick(e: MouseEvent) {
-		if (expandOn !== 'indicator' && expandOn !== 'card') {
-			e.stopPropagation();
-			return;
-		}
-		if (expandOn === 'indicator') {
-			e.stopPropagation();
-			expanded = !expanded;
-		}
+		e.stopPropagation();
+		expanded = !expanded;
 	}
 
 	let cardEl = $state<HTMLDivElement>();
@@ -110,9 +104,7 @@
 	{#if showIndicator && (showText || showChevron)}
 		<button
 			type="button"
-			class="card-indicator-footer"
-			class:clickable-indicator={expandOn === 'indicator'}
-			class:disabled-indicator={expandOn !== 'indicator' && expandOn !== 'card'}
+			class="card-indicator-footer clickable-indicator"
 			onclick={handleIndicatorClick}
 		>
 			<div class="indicator-container">
@@ -130,6 +122,7 @@
 		</button>
 	{/if}
 </div>
+
 
 <style>
 	.monsan-expandable-card {
@@ -227,24 +220,16 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		cursor: default;
+		cursor: pointer;
 		color: var(--text-secondary);
 		transition: background-color 0.15s ease;
 	}
-
-	.card-indicator-footer:not(.disabled-indicator) {
-		cursor: pointer;
-	}
-
-	.card-indicator-footer:not(.disabled-indicator):hover {
+ 
+	.card-indicator-footer:hover {
 		background: var(--bg-secondary);
 		color: var(--text-primary);
 	}
 
-	.card-indicator-footer.disabled-indicator {
-		opacity: 0.7;
-		cursor: default;
-	}
 
 	.indicator-container {
 		display: flex;
