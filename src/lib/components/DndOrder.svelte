@@ -332,12 +332,16 @@
 		font-family: var(--font-display);
 		font-weight: bold;
 		color: var(--accent-primary);
-		font-size: var(--text-lg);
+		font-size: var(--text-md);
 		background: rgba(46, 196, 182, 0.1);
-		padding: var(--space-xs) var(--space-sm);
+		padding: 2px var(--space-sm);
 		border-radius: var(--radius-sm);
-		min-width: 40px;
-		text-align: center;
+		min-width: 32px;
+		height: 24px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 1;
 	}
 
 	.sr-only {

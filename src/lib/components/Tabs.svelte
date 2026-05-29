@@ -327,7 +327,7 @@
 
 	:global([data-theme='dark']) .monsan-tab-item.active {
 		color: var(--text-primary);
-		background-color: color-mix(in srgb, var(--accent-primary) 75%, black);
+		background-color: var(--accent-primary);
 	}
 
 	/* Underline Variant */

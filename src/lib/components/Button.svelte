@@ -106,7 +106,7 @@
 		color: var(--text-primary);
 	}
 	:global([data-theme='dark']) .primary {
-		background-color: color-mix(in srgb, var(--accent-primary) 75%, black);
+		background-color: var(--accent-primary);
 	}
 	:global([data-theme='dark']) .success {
 		background-color: color-mix(in srgb, var(--success) 75%, black);

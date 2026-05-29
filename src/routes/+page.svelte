@@ -5974,7 +5974,7 @@
 			</Dialog>
 		</div>
 		<Credits
-			authorName="Lucas Monsan"
+			authorName="Monsan"
 			authorLink="https://github.com/lucasmonsan"
 			copyright={i18n.locale === 'pt'
 				? '© 2026 MonsanUI. Todos os direitos reservados.'

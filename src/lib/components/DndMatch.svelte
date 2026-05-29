@@ -464,7 +464,7 @@
 	.dnd-match-container {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-xl);
+		gap: var(--space-md);
 		width: 100%;
 	}
 
@@ -475,23 +475,28 @@
 
 	.area-title,
 	.bucket-title {
-		font-size: var(--text-sm);
+		font-size: calc(var(--text-sm) * 0.9);
 		text-transform: uppercase;
 		letter-spacing: 0;
 		color: var(--text-secondary);
-		margin-bottom: var(--space-md);
+		height: calc(var(--text-sm) * 1.8);
+		margin-bottom: var(--space-xs);
 		text-align: center;
+		line-height: 1.15;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.pool-area {
 		border: var(--border-width) dashed var(--border-color);
 		border-radius: var(--radius-md);
-		padding: var(--space-md);
+		padding: calc(var(--space-xs) * 0.25) var(--space-sm) var(--space-sm);
 		background: rgba(0, 0, 0, 0.02);
 		transition:
 			background-color 0.2s ease,
 			border-color 0.2s ease;
-		min-height: 100px;
+		min-height: 82px;
 		display: flex;
 		flex-direction: column;
 		position: relative;
@@ -505,7 +510,7 @@
 	.items-grid {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 		justify-content: center;
 		position: relative;
 		flex: 1;
@@ -514,9 +519,15 @@
 
 	.buckets-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: var(--space-lg);
-		margin-top: var(--space-md);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-sm);
+		margin-top: 0;
+	}
+
+	.bucket-area:last-child:nth-child(odd) {
+		grid-column: 1 / -1;
+		justify-self: center;
+		width: calc(50% - var(--space-sm) / 2);
 	}
 
 	.bucket-area {
@@ -525,8 +536,8 @@
 		background: var(--bg-secondary);
 		border: var(--border-width) dashed var(--border-color);
 		border-radius: var(--radius-md);
-		padding: var(--space-md);
-		min-height: 200px;
+		padding: calc(var(--space-xs) * 0.25) var(--space-sm) var(--space-sm);
+		min-height: 104px;
 		transition:
 			background-color 0.2s ease,
 			border-color 0.2s ease,
@@ -540,11 +551,19 @@
 	}
 
 	.bucket-content {
-		flex: 1;
+		flex: 1 1 auto;
 		display: flex;
-		flex-direction: column;
-		gap: var(--space-sm);
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: var(--space-xs);
 		position: relative;
+		align-items: flex-start;
+		align-content: flex-start;
+		min-height: 42px;
+		padding: var(--space-xs);
+		border: 1px dashed var(--border-color);
+		border-radius: var(--radius-sm);
+		background: rgba(0, 0, 0, 0.02);
 	}
 
 	.dnd-chip {
@@ -595,6 +614,15 @@
 		background: var(--bg-secondary);
 		text-align: center;
 		pointer-events: auto;
+		flex: 1 1 90px;
+		max-width: 100%;
+	}
+
+	.bucket-content .empty-msg {
+		position: static;
+		transform: none;
+		width: 100%;
+		padding: var(--space-xs) 0;
 	}
 
 	.empty-msg {
@@ -627,12 +655,8 @@
 			gap: var(--space-md);
 		}
 
-		.pool-area {
-			padding: var(--space-sm);
-			min-height: 88px;
-		}
-
-		.area-title {
+		.area-title,
+		.bucket-title {
 			margin-bottom: var(--space-sm);
 		}
 
@@ -643,8 +667,8 @@
 		}
 
 		.items-grid .dnd-chip {
-			flex: 1 1 auto;
-			min-width: min(100%, 120px);
+			flex: 0 1 auto;
+			min-width: auto;
 			text-align: center;
 		}
 
@@ -655,55 +679,48 @@
 			margin-top: 0;
 		}
 
+		.bucket-area:last-child:nth-child(odd) {
+			width: 100%;
+		}
+
 		.bucket-area {
-			flex-direction: column;
-			align-items: stretch;
 			min-height: auto;
-			padding: var(--space-sm);
-			gap: var(--space-xs);
 			text-align: left;
 		}
 
 		.bucket-title {
+			margin-top: 0;
 			margin-bottom: var(--space-xs);
 			width: 100%;
 			max-width: none;
 			flex-shrink: 0;
-			text-align: left;
-			font-size: var(--text-sm);
+			font-size: calc(var(--text-sm) * 0.85);
 			word-break: break-word;
 		}
 
 		.bucket-content {
-			width: 100%;
-			min-height: 48px;
-			display: flex;
-			flex-direction: row;
-			flex-wrap: wrap;
-			gap: var(--space-sm);
+			min-height: 38px;
 			align-items: center;
 			align-content: center;
-			padding: var(--space-sm);
-			border: 1px dashed var(--border-color);
-			border-radius: var(--radius-sm);
-			background: rgba(0, 0, 0, 0.02);
 		}
 
 		.bucket-chip {
-			flex: 0 1 auto;
-			font-size: var(--text-sm);
-			padding: var(--space-xs) var(--space-sm);
+			flex: 1 1 100px;
+			max-width: 100%;
+			font-size: var(--text-xs);
+			padding: calc(var(--space-xs) * 0.8) var(--space-sm);
 			margin: 0;
+			text-align: center;
 		}
 
 		.empty-msg {
 			position: static;
 			transform: none;
-			text-align: left;
-			font-size: var(--text-xs);
+			text-align: center;
+			font-size: calc(var(--text-xs) * 0.9);
 			color: var(--text-secondary);
-			width: auto;
-			padding: 0 var(--space-xs);
+			width: 100%;
+			padding: 0;
 		}
 	}
 </style>

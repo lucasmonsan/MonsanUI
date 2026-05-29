@@ -32,20 +32,24 @@
 	{#if logoSrc}
 		{#if onLogoClick && logoButtonLabel}
 			<button type="button" class="logo-button" aria-label={logoButtonLabel} onclick={onLogoClick}>
-				<img class="brand-logo" class:is-logo-adaptive={adaptiveLogo} src={logoSrc} alt="" />
+				<span
+					class="brand-logo"
+					class:adaptive={adaptiveLogo}
+					style="mask: url({logoSrc}) no-repeat center / contain; -webkit-mask: url({logoSrc}) no-repeat center / contain; background-color: var(--text-primary);"
+					aria-hidden="true"
+				></span>
 			</button>
 		{:else}
-			<img class="brand-logo" class:is-logo-adaptive={adaptiveLogo} src={logoSrc} alt={logoAlt} />
+			<span
+				class="brand-logo"
+				class:adaptive={adaptiveLogo}
+				style="mask: url({logoSrc}) no-repeat center / contain; -webkit-mask: url({logoSrc}) no-repeat center / contain; background-color: var(--text-primary);"
+				aria-label={logoAlt}
+			></span>
 		{/if}
 	{/if}
 	<div class="brand-copy">
-		<Text
-			tag="h1"
-			size={compact ? '2xl' : '3xl'}
-			weight={titleWeight}
-			family="display"
-			variant="accent"
-		>
+		<Text tag="h1" class="brand-title" weight={titleWeight} family="display" variant="accent">
 			{brand}
 		</Text>
 		{#if subtitle}
@@ -60,12 +64,16 @@
 	.monsan-brand-header {
 		display: flex;
 		align-items: center;
-		gap: var(--space-xs);
+		gap: var(--space-sm);
 	}
 
 	.stacked {
 		flex-direction: column;
 		text-align: center;
+	}
+
+	.stacked .brand-logo {
+		margin-bottom: var(--space-xs);
 	}
 
 	.inline {
@@ -87,15 +95,13 @@
 	.brand-logo {
 		width: calc(var(--base) * 5);
 		height: calc(var(--base) * 5);
-		object-fit: contain;
+		display: inline-block;
+		opacity: 1;
+		transition: opacity 0.3s var(--ease-out);
 	}
 
-	.is-logo-adaptive {
-		transition: filter 0.2s var(--ease-out);
-	}
-
-	:global([data-theme='dark']) .is-logo-adaptive {
-		filter: invert(1);
+	.brand-logo.adaptive {
+		opacity: 1;
 	}
 
 	.logo-button {
@@ -114,7 +120,19 @@
 
 	.inline .brand-logo,
 	.compact .brand-logo {
-		width: calc(var(--base) * 3.5);
-		height: calc(var(--base) * 3.5);
+		width: calc(var(--base) * 2.25);
+		height: calc(var(--base) * 2.25);
+	}
+
+	:global(.brand-title) {
+		font-size: calc(var(--base) * 2.85) !important;
+		line-height: 1.1;
+		color: var(--accent-primary) !important;
+	}
+
+	.compact :global(.brand-title) {
+		font-size: calc(var(--base) * 2.6) !important;
+		line-height: 1.1;
+		color: var(--accent-primary) !important;
 	}
 </style>

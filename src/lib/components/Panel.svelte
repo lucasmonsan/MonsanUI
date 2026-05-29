@@ -111,7 +111,7 @@
 
 	/* Adjustments for Dark Theme */
 	:global([data-theme='dark']) .accent {
-		background-color: color-mix(in srgb, var(--accent-primary) 75%, black);
+		background-color: var(--accent-primary);
 		color: var(--text-primary);
 	}
 	:global([data-theme='dark']) .success {

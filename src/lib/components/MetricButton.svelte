@@ -20,14 +20,14 @@
 
 <style>
 	.monsan-metric-button {
-		min-width: calc(var(--control-height) * 1.25);
-		height: calc(var(--control-height) * 1.25);
-		padding: var(--space-xs);
+		min-width: var(--control-height);
+		height: var(--control-height);
+		padding: var(--space-xs) var(--space-sm);
 		display: inline-flex;
-		flex-direction: column;
+		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		gap: 2px;
+		gap: var(--space-xs);
 		background: var(--accent-primary);
 		color: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
@@ -35,9 +35,14 @@
 		box-shadow: var(--shadow-sm);
 	}
 
+	:global([data-theme='dark']) .monsan-metric-button {
+		background-color: var(--accent-primary);
+		color: var(--text-primary);
+	}
+
 	.metric-value {
 		font-family: var(--font-display);
-		font-size: var(--text-2xl);
+		font-size: var(--text-md);
 		font-weight: 800;
 		line-height: 1;
 	}

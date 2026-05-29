@@ -35,6 +35,8 @@
 		padding: var(--space-lg);
 		width: 100%;
 		box-sizing: border-box;
+		position: relative;
+		z-index: 10;
 	}
 
 	.is-full-height {

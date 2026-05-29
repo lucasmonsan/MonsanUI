@@ -78,6 +78,7 @@
 		background-color: var(--bg-primary);
 		box-shadow: var(--shadow-sm);
 		box-sizing: border-box;
+		line-height: 1.3;
 	}
 
 	.placement-page-bottom {
