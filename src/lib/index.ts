@@ -24,6 +24,7 @@ export { default as Panel } from './components/Panel.svelte';
 export { default as Badge } from './components/Badge.svelte';
 export { default as QuickActions } from './components/QuickActions.svelte';
 export { default as Credits } from './components/Credits.svelte';
+export { default as SplashScreen } from './components/SplashScreen.svelte';
 export { default as ActionBar } from './components/ActionBar.svelte';
 export { default as SingleChoice } from './components/questions/SingleChoice.svelte';
 export { default as MultipleChoice } from './components/questions/MultipleChoice.svelte';

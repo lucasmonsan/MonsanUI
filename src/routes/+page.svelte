@@ -32,6 +32,7 @@
 	import Panel from '$lib/components/Panel.svelte';
 	import QuickActions from '$lib/components/QuickActions.svelte';
 	import Credits from '$lib/components/Credits.svelte';
+	import SplashScreen from '$lib/components/SplashScreen.svelte';
 	import Text from '$lib/components/Text.svelte';
 
 	// Novos Componentes
@@ -1059,6 +1060,8 @@
 	let panelPadding = $state('var(--space-lg)');
 	let panelMaxWidth = $state('512px');
 	let creditsCopyright = $state('© 2026 Examster. Todos os direitos reservados.');
+	let creditsVariant = $state<'default' | 'compact'>('default');
+	let showSplashPreview = $state(false);
 
 	let textTag = $state<
 		'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div' | 'label' | 'small'
@@ -1362,6 +1365,18 @@
 			`  authorName="MonsanUI"\n` +
 			`  authorLink="https://github.com/lucasmonsan"\n` +
 			(creditsCopyright ? `  copyright="${creditsCopyright}"\n` : '') +
+			(creditsVariant !== 'default' ? `  variant="${creditsVariant}"\n` : '') +
+			`/>`
+	);
+
+	let splashScreenCode = $derived(
+		`import SplashScreen from '$lib/components/SplashScreen.svelte';\n\n` +
+			`<SplashScreen\n` +
+			`  appName="Meu App"\n` +
+			`  logoSrc="/favicon.svg"\n` +
+			`  sessionKey="meu-app-splash-shown"\n` +
+			`  copyright="© 2026 Meu App"\n` +
+			(creditsVariant !== 'default' ? `  creditsVariant="${creditsVariant}"\n` : '') +
 			`/>`
 	);
 
@@ -2276,7 +2291,7 @@
 										authorName="MonsanUI"
 										authorLink="https://github.com/lucasmonsan"
 										copyright={creditsCopyright}
-										variant="compact"
+										variant={creditsVariant}
 									/>
 								</div>
 							</div>
@@ -2292,6 +2307,18 @@
 											style="width: 160px;"
 										/>
 									</div>
+									<div class="knob-row">
+										<label for="credits-variant-select" class="knob-label">Variant:</label>
+										<select
+											id="credits-variant-select"
+											bind:value={creditsVariant}
+											class="select-knob"
+											style="width: 160px;"
+										>
+											<option value="default">Default</option>
+											<option value="compact">Compact</option>
+										</select>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -2303,6 +2330,51 @@
 								</button>
 							</div>
 							<pre><code>{creditsCode}</code></pre>
+						</div>
+					</div>
+
+					<!-- SplashScreen Showcase -->
+					<div class="component-card panel">
+						<div class="component-info">
+							<h3>SplashScreen</h3>
+							<p>
+								Uma tela de carregamento inicial (Splash Screen) estilizada que persiste no
+								sessionStorage para ser exibida apenas uma vez por sessão.
+							</p>
+						</div>
+						<div class="component-showcase-grid">
+							<div class="preview-box">
+								<span class="box-label">{i18n.t('common.preview')}</span>
+								<div
+									class="preview-render"
+									style="display: flex; align-items: center; justify-content: center; min-height: 100px; width: 100%;"
+								>
+									<Button variant="primary" onclick={() => (showSplashPreview = true)}>
+										Testar SplashScreen (2s)
+									</Button>
+								</div>
+							</div>
+							<div class="knobs-box">
+								<span class="box-label">{i18n.t('common.controls')}</span>
+								<div class="knobs-content">
+									<div
+										class="knob-row"
+										style="color: var(--text-secondary); font-size: var(--text-xs); line-height: 1.4;"
+									>
+										A Splash Screen abrirá em tela cheia com duração mínima de 2 segundos, depois
+										sumirá suavemente.
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="code-container">
+							<div class="code-header">
+								<span>Svelte 5</span>
+								<button onclick={() => copyToClipboard(splashScreenCode, 33)}>
+									{copiedIndex === 33 ? i18n.t('common.copied') : i18n.t('common.copy')}
+								</button>
+							</div>
+							<pre><code>{splashScreenCode}</code></pre>
 						</div>
 					</div>
 
@@ -5986,6 +6058,50 @@
 			variant="compact"
 		/>
 		<Loading active={isDemoLoadingActive} message={demoLoadingMessage} />
+
+		{#if showSplashPreview}
+			<SplashScreen
+				appName="Showcase App"
+				logoSrc="/favicon.svg"
+				copyright="© 2026 Showcase App. Todos os direitos reservados."
+				{creditsVariant}
+				forceVisible={true}
+			>
+				<div
+					style="display: flex; flex-direction: column; align-items: center; gap: var(--space-xl); text-align: center;"
+				>
+					<div
+						style="display: flex; align-items: center; justify-content: center; background-color: var(--bg-secondary); border: var(--border-width) solid var(--border-color); box-shadow: var(--shadow-sm); padding: var(--space-sm); border-radius: var(--radius-md); width: 80px; height: 80px;"
+					>
+						<svg
+							viewBox="0 0 24 24"
+							width="48"
+							height="48"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							style="color: var(--accent-primary);"
+						>
+							<polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
+							<line x1="12" y1="22" x2="12" y2="15.5"></line>
+							<polyline points="22 8.5 12 15.5 2 8.5"></polyline>
+							<polyline points="2 15.5 12 8.5 22 15.5"></polyline>
+							<line x1="12" y1="2" x2="12" y2="8.5"></line>
+						</svg>
+					</div>
+					<h1
+						style="font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: -0.02em; color: var(--text-primary);"
+					>
+						Showcase App
+					</h1>
+					<Button variant="primary" onclick={() => (showSplashPreview = false)}>
+						Fechar Preview
+					</Button>
+				</div>
+			</SplashScreen>
+		{/if}
 	</div>
 </main>
 
