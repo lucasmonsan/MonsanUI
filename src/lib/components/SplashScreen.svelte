@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import Credits from './Credits.svelte';
 
@@ -39,21 +40,28 @@
 		creditsVariant = 'default'
 	}: Props = $props();
 
-	let visible = $state(true); // Starts true so SSR renders it visible immediately
+	// Starts false — only enters the DOM after the 2s delay,
+	// so transition:fade plays correctly (both fade-in and fade-out).
+	let mounted = $state(false);
 	let timePassed = $state(false);
 
-	$effect(() => {
-		// Minimum visibility duration of 2 seconds
-		timePassed = false;
-		const timer = setTimeout(() => {
-			timePassed = true;
+	onMount(() => {
+		let hideTimer: ReturnType<typeof setTimeout>;
+
+		const showTimer = setTimeout(() => {
+			mounted = true;
+			hideTimer = setTimeout(() => {
+				timePassed = true;
+			}, 2000);
 		}, 2000);
 
-		return () => clearTimeout(timer);
+		return () => {
+			clearTimeout(showTimer);
+			clearTimeout(hideTimer);
+		};
 	});
 
-	// Remains visible if visibility is active AND (loading is true OR 2 seconds haven't passed yet)
-	let active = $derived(visible && (loading || !timePassed));
+	let active = $derived(mounted && (loading || !timePassed));
 </script>
 
 {#if active}
