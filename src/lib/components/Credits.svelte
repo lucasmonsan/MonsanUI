@@ -10,7 +10,8 @@
 		madeWithText,
 		createdWithText,
 		copyright = '',
-		placement = 'inline'
+		placement = 'inline',
+		variant = 'default'
 	} = $props<{
 		authorName?: string;
 		svelteVersion?: string;
@@ -21,13 +22,14 @@
 		createdWithText?: string;
 		copyright?: string;
 		placement?: 'inline' | 'page-bottom';
+		variant?: 'default' | 'compact';
 	}>();
 
 	let activeMadeWithText = $derived(madeWithText ?? i18n.t('credits.madeWithText'));
 	let activeCreatedWithText = $derived(createdWithText ?? i18n.t('credits.createdWithText'));
 </script>
 
-<footer class="monsan-credits placement-{placement} {className}">
+<footer class="monsan-credits placement-{placement} variant-{variant} {className}">
 	<div class="credits-inner">
 		{#if copyright}
 			<div class="credits-copyright">{copyright}</div>
@@ -138,5 +140,25 @@
 
 	a.credits-tech-link:hover {
 		border-bottom-color: var(--text-primary);
+	}
+
+	.variant-compact {
+		max-width: calc(100% - var(--space-md));
+		margin-top: var(--space-sm);
+		margin-bottom: var(--space-sm);
+		padding: calc(var(--space-xs) * 0.75) var(--space-md);
+		font-size: calc(var(--base) * 0.72);
+		font-weight: 600;
+	}
+
+	.variant-compact .credits-inner,
+	.variant-compact .credits-main {
+		flex-direction: row;
+		gap: var(--space-xs);
+	}
+
+	.variant-compact .credits-copyright {
+		font-size: inherit;
+		opacity: 0.68;
 	}
 </style>

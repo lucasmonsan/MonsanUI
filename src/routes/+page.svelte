@@ -2276,6 +2276,7 @@
 										authorName="MonsanUI"
 										authorLink="https://github.com/lucasmonsan"
 										copyright={creditsCopyright}
+										variant="compact"
 									/>
 								</div>
 							</div>
@@ -5981,6 +5982,8 @@
 				: i18n.locale === 'en'
 					? '© 2026 MonsanUI. All rights reserved.'
 					: '© 2026 MonsanUI. Todos los derechos reservados.'}
+			placement="page-bottom"
+			variant="compact"
 		/>
 		<Loading active={isDemoLoadingActive} message={demoLoadingMessage} />
 	</div>
