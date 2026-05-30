@@ -1374,7 +1374,6 @@
 			`<SplashScreen\n` +
 			`  appName="Meu App"\n` +
 			`  logoSrc="/favicon.svg"\n` +
-			`  sessionKey="meu-app-splash-shown"\n` +
 			`  copyright="© 2026 Meu App"\n` +
 			(creditsVariant !== 'default' ? `  creditsVariant="${creditsVariant}"\n` : '') +
 			`/>`
@@ -6064,7 +6063,6 @@
 				logoSrc="/favicon.svg"
 				copyright="© 2026 Showcase App. Todos os direitos reservados."
 				{creditsVariant}
-				forceVisible={true}
 			>
 				<div
 					style="display: flex; flex-direction: column; align-items: center; gap: var(--space-xl); text-align: center;"

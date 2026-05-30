@@ -10,8 +10,6 @@
 		logoSrc?: string;
 		/** Alt text for the logo image */
 		logoAlt?: string;
-		/** sessionStorage key name to track if splash has been shown in this session */
-		sessionKey?: string;
 		/** If true, holds the splash screen visible regardless of timeout (e.g. while loading data) */
 		loading?: boolean;
 		/** Author name for the Credits component */
@@ -26,51 +24,27 @@
 		children?: Snippet;
 		/** Variant of the Credits component to render. Defaults to 'default' */
 		creditsVariant?: 'default' | 'compact';
-		/** Force visibility for development preview in the Showcase */
-		forceVisible?: boolean;
 	}
 
 	let {
 		appName,
 		logoSrc,
 		logoAlt = 'App Logo',
-		sessionKey = 'monsan-splash-shown',
 		loading = false,
 		authorName = 'Monsan',
 		authorLink = 'https://github.com/lucasmonsan',
 		copyright = '',
 		logoSnippet,
 		children,
-		creditsVariant = 'default',
-		forceVisible = false
+		creditsVariant = 'default'
 	}: Props = $props();
 
-	let visible = $state(false);
+	let visible = $state(true); // Starts true so SSR renders it visible immediately
 	let timePassed = $state(false);
 
 	$effect(() => {
-		// Bypass session check if forced (for Showcase preview)
-		if (forceVisible) {
-			visible = true;
-			timePassed = false;
-			const timer = setTimeout(() => {
-				timePassed = true;
-			}, 2000);
-			return () => clearTimeout(timer);
-		}
-
-		if (typeof window === 'undefined') return;
-
-		const hasBeenShown = sessionStorage.getItem(sessionKey);
-		if (hasBeenShown) {
-			visible = false;
-			return;
-		}
-
-		// Show splash screen and flag it as shown
-		visible = true;
-		sessionStorage.setItem(sessionKey, 'true');
-
+		// Minimum visibility duration of 2 seconds
+		timePassed = false;
 		const timer = setTimeout(() => {
 			timePassed = true;
 		}, 2000);
@@ -151,11 +125,6 @@
 		width: 80px;
 		height: 80px;
 		object-fit: contain;
-		border: var(--border-width) solid var(--border-color);
-		box-shadow: var(--shadow-sm);
-		background-color: var(--bg-secondary);
-		padding: var(--space-sm);
-		border-radius: var(--radius-md);
 	}
 
 	.splash-logo-custom {
