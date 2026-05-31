@@ -59,10 +59,8 @@
 		class:open={isOpen}
 		class:has-chevron={showChevron}
 		onclick={(e) => {
-			console.log('Select clicked, disabled:', disabled, 'current isOpen:', isOpen);
 			if (disabled) return;
 			isOpen = !isOpen;
-			console.log('Select isOpen changed to:', isOpen);
 			e.stopPropagation();
 		}}
 		type="button"
@@ -81,7 +79,7 @@
 			class="monsan-select-dropdown"
 			transition:scale={{ duration: 150, start: 0.95, easing: backOut }}
 		>
-			{#each options as option (option.value)}
+			{#each options as option, i (option.value + '-' + i)}
 				<button
 					class="monsan-select-option"
 					class:selected={option.value === value}
