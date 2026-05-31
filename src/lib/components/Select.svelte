@@ -59,8 +59,10 @@
 		class:open={isOpen}
 		class:has-chevron={showChevron}
 		onclick={(e) => {
+			console.log('Select clicked, disabled:', disabled, 'current isOpen:', isOpen);
 			if (disabled) return;
 			isOpen = !isOpen;
+			console.log('Select isOpen changed to:', isOpen);
 			e.stopPropagation();
 		}}
 		type="button"
