@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import Credits from './Credits.svelte';
@@ -40,32 +39,31 @@
 		creditsVariant = 'default'
 	}: Props = $props();
 
-	// Starts false — only enters the DOM after the 2s delay,
-	// so transition:fade plays correctly (both fade-in and fade-out).
-	let mounted = $state(false);
-	let timePassed = $state(false);
+	// Always rendered from SSR — covers the app immediately.
+	// CSS animation handles fade-in. After 2s, adds 'hiding' class for fade-out.
+	// After fade-out completes, removes from DOM entirely.
+	let hiding = $state(false);
+	let hidden = $state(false);
 
 	onMount(() => {
-		let hideTimer: ReturnType<typeof setTimeout>;
+		const VISIBLE_DURATION = 2000;
+		const FADE_DURATION = 400;
 
-		const showTimer = setTimeout(() => {
-			mounted = true;
-			hideTimer = setTimeout(() => {
-				timePassed = true;
-			}, 2000);
-		}, 2000);
+		const hideTimer = setTimeout(() => {
+			if (!loading) {
+				hiding = true;
+				setTimeout(() => {
+					hidden = true;
+				}, FADE_DURATION);
+			}
+		}, VISIBLE_DURATION);
 
-		return () => {
-			clearTimeout(showTimer);
-			clearTimeout(hideTimer);
-		};
+		return () => clearTimeout(hideTimer);
 	});
-
-	let active = $derived(mounted && (loading || !timePassed));
 </script>
 
-{#if active}
-	<div class="monsan-splash-screen" transition:fade={{ duration: 400 }}>
+{#if !hidden}
+	<div class="monsan-splash-screen" class:hiding>
 		<div class="splash-content">
 			{#if children}
 				{@render children()}
@@ -102,7 +100,7 @@
 		bottom: 0;
 		width: 100vw;
 		height: 100dvh;
-		background-color: var(--bg-primary);
+		background-color: var(--bg-primary, #fff);
 		color: var(--text-primary);
 		z-index: 9999;
 		display: flex;
@@ -111,6 +109,29 @@
 		align-items: center;
 		box-sizing: border-box;
 		padding: var(--space-xl);
+		animation: splashIn 0.4s ease forwards;
+	}
+
+	.monsan-splash-screen.hiding {
+		animation: splashOut 0.4s ease forwards;
+	}
+
+	@keyframes splashIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes splashOut {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
 	}
 
 	.splash-content {
