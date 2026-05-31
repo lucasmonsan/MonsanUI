@@ -2,6 +2,8 @@
 	import { fly, scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
+	import type { ActionPanelWidthPreset } from '$lib/utils/layout.js';
+	import { resolveActionPanelWidth } from '$lib/utils/layout.js';
 	import { i18n } from '../utils/i18n.svelte';
 
 	let {
@@ -16,11 +18,13 @@
 		open?: boolean;
 		variant?: 'dropdown' | 'reveal';
 		align?: 'left' | 'right';
-		width?: string;
+		width?: ActionPanelWidthPreset;
 		triggerLabel?: string;
 		trigger?: import('svelte').Snippet;
 		children?: import('svelte').Snippet;
 	}>();
+
+	let resolvedWidth = $derived(resolveActionPanelWidth(width));
 
 	let containerEl = $state<HTMLElement>();
 
@@ -114,7 +118,7 @@
 		<div
 			bind:this={panelEl}
 			class="quick-actions-panel variant-{variant} align-{align}"
-			style="--panel-width: {width};"
+			style="--panel-width: {resolvedWidth};"
 			role="menu"
 			transition:menuTransition
 		>

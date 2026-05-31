@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
+	import { resolveMaxWidth, resolvePadding } from '$lib/utils/layout.js';
 
 	interface Props {
 		children?: Snippet;
@@ -9,11 +11,11 @@
 		/**
 		 * Largura máxima do container. Por padrão usa a variável CSS global `--container-max-width`.
 		 */
-		maxWidth?: string;
+		maxWidth?: MaxWidthPreset;
 		/**
 		 * Padding interno do container. Por padrão é 0, mas você pode passar `var(--space-md)` etc.
 		 */
-		padding?: string;
+		padding?: PaddingPreset;
 		/**
 		 * Applies the shared MonsanUI page entrance motion.
 		 */
@@ -26,12 +28,15 @@
 		padding = '0',
 		animate = true
 	}: Props = $props();
+
+	let resolvedMaxWidth = $derived(resolveMaxWidth(maxWidth));
+	let resolvedPadding = $derived(resolvePadding(padding));
 </script>
 
 <div
 	class="monsan-page-container"
 	class:is-animated={animate}
-	style="--page-container-max-width: {maxWidth}; --page-container-padding: {padding};"
+	style="--page-container-max-width: {resolvedMaxWidth}; --page-container-padding: {resolvedPadding};"
 >
 	{@render children?.()}
 </div>

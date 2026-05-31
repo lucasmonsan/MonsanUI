@@ -3,7 +3,7 @@
 		src?: string;
 		name?: string;
 		alt?: string;
-		size?: 'sm' | 'md' | 'lg' | number; // pre-sets or pixel value
+		size?: 'sm' | 'md' | 'lg';
 		shape?: 'circle' | 'square';
 		onclick?: (e: MouseEvent) => void;
 		title?: string;
@@ -39,7 +39,7 @@
 		lg: '64px'
 	};
 
-	let finalSize = $derived(typeof size === 'number' ? `${size}px` : (sizeMap[size] ?? '48px'));
+	let finalSize = $derived(sizeMap[size] ?? '48px');
 
 	function handleImageError() {
 		imageFailed = true;

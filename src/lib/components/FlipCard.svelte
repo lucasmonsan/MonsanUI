@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { spring } from 'svelte/motion';
+	import type { HeightPreset } from '$lib/utils/layout.js';
+	import { resolveHeight } from '$lib/utils/layout.js';
 
 	let {
 		flipped = $bindable(false),
@@ -30,8 +32,10 @@
 		front: import('svelte').Snippet;
 		back: import('svelte').Snippet;
 		draggable?: boolean;
-		height?: string;
+		height?: HeightPreset;
 	}>();
+
+	let resolvedHeight = $derived(resolveHeight(height));
 
 	let isDragging = $state(false);
 	let startX = $state(0);
@@ -153,7 +157,7 @@
 
 <div
 	class="monsan-flipcard-container"
-	style="--flipcard-height: {height};"
+	style="--flipcard-height: {resolvedHeight};"
 	class:flipped
 	onpointerdown={onPointerDown}
 	onpointermove={onPointerMoveLocal}

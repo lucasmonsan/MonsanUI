@@ -1,7 +1,10 @@
 <script lang="ts">
+	import type { HeightPreset } from '$lib/utils/layout.js';
+	import { resolveHeight } from '$lib/utils/layout.js';
+
 	interface Props {
 		value?: number; // 0 to 100
-		height?: string;
+		height?: HeightPreset;
 		showLabel?: boolean;
 		variant?: 'primary' | 'success' | 'warning' | 'error' | 'info';
 		striped?: boolean;
@@ -21,6 +24,7 @@
 
 	// Clamp the value between 0 and 100
 	let clampedValue = $derived(Math.min(Math.max(value, 0), 100));
+	let resolvedHeight = $derived(resolveHeight(height));
 
 	const colors = {
 		primary: 'var(--accent-primary)',
@@ -33,7 +37,7 @@
 
 <div
 	class="monsan-progress-container"
-	style="--progress-height: {height};"
+	style="--progress-height: {resolvedHeight};"
 	role="progressbar"
 	aria-valuenow={clampedValue}
 	aria-valuemin="0"

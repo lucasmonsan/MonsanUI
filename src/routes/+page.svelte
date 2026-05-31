@@ -50,6 +50,7 @@
 	import ProgressBar from '$lib/components/ProgressBar.svelte';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import Separator from '$lib/components/Separator.svelte';
+	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
 
 	// Icon Imports
 	import BarChart from '$lib/components/icons/BarChart.svelte';
@@ -1051,14 +1052,39 @@
 	});
 	let calendarMode = $state<'calendar' | 'heatmap'>('calendar');
 	let calendarSelectedDate = $state<string | null>(null);
-	let pageContainerMaxWidth = $state('var(--container-max-width)');
-	let pageContainerPadding = $state('var(--space-md)');
+	const maxWidthPresetOptions: MaxWidthPreset[] = [
+		'content',
+		'centered',
+		'panel',
+		'xs',
+		'sm',
+		'md',
+		'lg',
+		'xl',
+		'2xl',
+		'full',
+		'none'
+	];
+	const paddingPresetOptions: PaddingPreset[] = [
+		'none',
+		'xs',
+		'sm',
+		'md',
+		'lg',
+		'xl',
+		'page',
+		'page-wide',
+		'page-compact'
+	];
+
+	let pageContainerMaxWidth = $state<MaxWidthPreset>('content');
+	let pageContainerPadding = $state<PaddingPreset>('md');
 	let panelInteractive = $state(false);
 	let panelVariant = $state<'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral'>(
 		'primary'
 	);
-	let panelPadding = $state('var(--space-lg)');
-	let panelMaxWidth = $state('512px');
+	let panelPadding = $state<PaddingPreset>('lg');
+	let panelMaxWidth = $state<MaxWidthPreset>('panel');
 	let creditsCopyright = $state('© 2026 Examster. Todos os direitos reservados.');
 	let creditsVariant = $state<'default' | 'compact'>('default');
 	let showSplashPreview = $state(false);
@@ -2555,12 +2581,11 @@
 									</div>
 									<div class="knob-row">
 										<span class="knob-label">{i18n.t('panel.padding')}</span>
-										<input
-											type="text"
-											class="monsan-input"
-											bind:value={panelPadding}
-											style="width: 140px;"
-										/>
+										<select class="select-knob" bind:value={panelPadding}>
+											{#each paddingPresetOptions as option (option)}
+												<option value={option}>{option}</option>
+											{/each}
+										</select>
 									</div>
 									<div class="knob-row">
 										<span class="knob-label">
@@ -2570,12 +2595,11 @@
 													? 'Max Width'
 													: 'Ancho Máximo'}
 										</span>
-										<input
-											type="text"
-											class="monsan-input"
-											bind:value={panelMaxWidth}
-											style="width: 140px;"
-										/>
+										<select class="select-knob" bind:value={panelMaxWidth}>
+											{#each maxWidthPresetOptions as option (option)}
+												<option value={option}>{option}</option>
+											{/each}
+										</select>
 									</div>
 								</div>
 							</div>
@@ -2620,21 +2644,19 @@
 								<div class="knobs-content">
 									<div class="knob-row">
 										<span class="knob-label">{i18n.t('pagecontainer.maxWidth')}</span>
-										<input
-											type="text"
-											class="monsan-input"
-											bind:value={pageContainerMaxWidth}
-											style="width: 140px;"
-										/>
+										<select class="select-knob" bind:value={pageContainerMaxWidth}>
+											{#each maxWidthPresetOptions as option (option)}
+												<option value={option}>{option}</option>
+											{/each}
+										</select>
 									</div>
 									<div class="knob-row">
 										<span class="knob-label">{i18n.t('pagecontainer.padding')}</span>
-										<input
-											type="text"
-											class="monsan-input"
-											bind:value={pageContainerPadding}
-											style="width: 140px;"
-										/>
+										<select class="select-knob" bind:value={pageContainerPadding}>
+											{#each paddingPresetOptions as option (option)}
+												<option value={option}>{option}</option>
+											{/each}
+										</select>
 									</div>
 								</div>
 							</div>

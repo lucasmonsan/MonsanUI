@@ -1,14 +1,16 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
+	import { resolvePadding } from '$lib/utils/layout.js';
 	import Panel from './Panel.svelte';
 
 	interface Props {
 		children: Snippet;
-		maxWidth?: string;
+		maxWidth?: MaxWidthPreset;
 		align?: 'center' | 'start';
 		animate?: boolean;
 		fullHeight?: boolean;
-		padding?: string;
+		padding?: PaddingPreset;
 	}
 
 	let {
@@ -19,13 +21,15 @@
 		fullHeight = true,
 		padding = 'var(--space-lg)'
 	}: Props = $props();
+
+	let resolvedPadding = $derived(resolvePadding(padding));
 </script>
 
 <div
 	class="monsan-centered-panel"
 	class:is-animated={animate}
 	class:is-full-height={fullHeight}
-	style="padding: {padding}"
+	style="padding: {resolvedPadding}"
 >
 	<Panel tag="section" {maxWidth}>
 		<div class="centered-panel-content align-{align}">

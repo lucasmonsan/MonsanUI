@@ -1,5 +1,7 @@
 <script lang="ts">
 	import X from '$lib/components/icons/X.svelte';
+	import type { PaddingPreset } from '$lib/utils/layout.js';
+	import { resolvePadding } from '$lib/utils/layout.js';
 	import { pushDialog, popDialog } from '../utils/dialogStack.js';
 
 	let {
@@ -23,8 +25,10 @@
 		closeOnBackNavigation?: boolean;
 		size?: 'sm' | 'md' | 'lg';
 		animation?: 'pop' | 'slide' | 'fade' | 'scale';
-		padding?: string;
+		padding?: PaddingPreset;
 	}>();
+
+	let resolvedPadding = $derived(resolvePadding(padding));
 
 	const dialogId = Math.random().toString(36).substring(2, 9);
 	let dialogRef = $state<HTMLDialogElement>();
@@ -113,7 +117,7 @@
 			</header>
 
 			<!-- Content -->
-			<div class="modal-content" style="padding: {padding}">
+			<div class="modal-content" style="padding: {resolvedPadding}">
 				{@render children()}
 			</div>
 		</div>

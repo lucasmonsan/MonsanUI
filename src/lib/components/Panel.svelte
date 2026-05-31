@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
+	import { resolveMaxWidth, resolvePadding } from '$lib/utils/layout.js';
 
 	interface Props {
 		children: Snippet;
@@ -8,9 +10,9 @@
 		/** Enables hover and click neubrutalist micro-interactions */
 		interactive?: boolean;
 		/** Customizable inner padding. Defaults to 'var(--space-lg)' */
-		padding?: string;
+		padding?: PaddingPreset;
 		/** Max width of the panel. Defaults to '512px' */
-		maxWidth?: string;
+		maxWidth?: MaxWidthPreset;
 		/** Expand to fill parent height */
 		fullHeight?: boolean;
 		/** Neubrutalist color theme variant. Defaults to 'primary' */
@@ -36,6 +38,9 @@
 		onkeydown
 	}: Props = $props();
 
+	let resolvedPadding = $derived(resolvePadding(padding));
+	let resolvedMaxWidth = $derived(resolveMaxWidth(maxWidth));
+
 	function handleKeyDown(event: KeyboardEvent) {
 		if (onkeydown) {
 			onkeydown(event);
@@ -49,7 +54,7 @@
 <svelte:element
 	this={tag}
 	class="monsan-panel {variant} overflow-{overflow} {interactive ? 'is-interactive' : ''}"
-	style="padding: {padding}; max-width: {maxWidth}; width: 100%; {fullHeight
+	style="padding: {resolvedPadding}; max-width: {resolvedMaxWidth}; width: 100%; {fullHeight
 		? 'height: 100%;'
 		: ''}"
 	{onclick}

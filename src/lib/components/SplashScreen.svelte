@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
+	import type { LayerPreset } from '$lib/utils/layout.js';
+	import { resolveLayer } from '$lib/utils/layout.js';
 	import Credits from './Credits.svelte';
 
 	interface Props {
@@ -18,8 +20,8 @@
 		authorLink?: string;
 		/** Copyright text for the Credits component */
 		copyright?: string;
-		/** z-index of the splash container. Defaults to 9999. */
-		zIndex?: number;
+		/** Layer preset of the splash container. Defaults to 'splash'. */
+		layer?: LayerPreset;
 		/** Svelte 5 snippet for custom logo rendering */
 		logoSnippet?: Snippet;
 		/** Custom children snippet, takes precedence over default content */
@@ -36,11 +38,13 @@
 		authorName = 'Monsan',
 		authorLink = 'https://github.com/lucasmonsan',
 		copyright = '',
-		zIndex = 9999,
+		layer = 'splash',
 		logoSnippet,
 		children,
 		creditsVariant = 'default'
 	}: Props = $props();
+
+	let zIndex = $derived(resolveLayer(layer));
 
 	// Container is always rendered from SSR (opacity 1, covers everything).
 	// After mount, content fades in. After 2s, container fades out then is removed.
