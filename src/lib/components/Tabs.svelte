@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { Component, Snippet } from 'svelte';
 
-	type IconComponent = Component<{ size?: number; class?: string }>;
+	type IconComponent = Component<{ size?: number }>;
 
 	interface TabItem {
 		id: string;

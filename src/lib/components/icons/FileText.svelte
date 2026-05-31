@@ -3,13 +3,11 @@
 		size = 24,
 		color = 'currentColor',
 		strokeWidth = 2.5,
-		class: className = '',
 		...restProps
 	} = $props<{
 		size?: number;
 		color?: string;
 		strokeWidth?: number;
-		class?: string;
 		[key: string]: unknown;
 	}>();
 </script>
@@ -23,7 +21,6 @@
 	stroke-width={strokeWidth}
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	class={className}
 	{...restProps}
 >
 	<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />

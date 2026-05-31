@@ -15,10 +15,6 @@
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
 		/** Optional overflow handling for content that can exceed the panel width. */
 		overflow?: 'visible' | 'x' | 'hidden';
-		/** Optional extra CSS classes */
-		class?: string;
-		/** Optional extra inline styles */
-		style?: string;
 		/** Click event handler */
 		onclick?: (event: MouseEvent) => void;
 		/** Keydown event handler */
@@ -33,8 +29,6 @@
 		maxWidth = '512px',
 		variant = 'primary',
 		overflow = 'visible',
-		class: customClass = '',
-		style = '',
 		onclick,
 		onkeydown
 	}: Props = $props();
@@ -51,10 +45,8 @@
 
 <svelte:element
 	this={tag}
-	class="monsan-panel {variant} overflow-{overflow} {interactive
-		? 'is-interactive'
-		: ''} {customClass}"
-	style="padding: {padding}; max-width: {maxWidth}; width: 100%; {style}"
+	class="monsan-panel {variant} overflow-{overflow} {interactive ? 'is-interactive' : ''}"
+	style="padding: {padding}; max-width: {maxWidth}; width: 100%;"
 	{onclick}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}

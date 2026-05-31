@@ -12,7 +12,7 @@
 		showChevron = true,
 		showText = true,
 		expandOn = 'card', // 'card' | 'header' | 'indicator'
-		class: className = ''
+		compact = false
 	} = $props<{
 		expanded?: boolean;
 		title?: string;
@@ -24,7 +24,7 @@
 		showChevron?: boolean;
 		showText?: boolean;
 		expandOn?: 'card' | 'header' | 'indicator';
-		class?: string;
+		compact?: boolean;
 	}>();
 
 	function handleCardClick(e: MouseEvent) {
@@ -59,9 +59,10 @@
 
 <div
 	bind:this={cardEl}
-	class="monsan-expandable-card {className}"
+	class="monsan-expandable-card"
 	class:is-expanded={expanded}
 	class:clickable-card={expandOn === 'card'}
+	class:compact
 >
 	<!-- Cabeçalho -->
 	<header class="card-header">
@@ -206,6 +207,10 @@
 		font-family: var(--font-body);
 		font-size: var(--text-md);
 		line-height: 1.6;
+	}
+
+	.compact .card-body {
+		padding: var(--space-sm);
 	}
 
 	/* Rodapé Indicador */

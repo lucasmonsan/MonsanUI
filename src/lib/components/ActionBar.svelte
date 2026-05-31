@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
 
-	type IconComponent = Component<{ size?: number; class?: string }>;
+	type IconComponent = Component<{ size?: number }>;
 
 	interface ActionItem {
 		id: string;
@@ -15,13 +15,8 @@
 		onclick?: (e: MouseEvent) => void;
 	}
 
-	let {
-		items = [],
-		class: className = '',
-		item: itemSnippet
-	} = $props<{
+	let { items = [], item: itemSnippet } = $props<{
 		items: ActionItem[];
-		class?: string;
 		item?: Snippet<[ActionItem, number]>;
 	}>();
 
@@ -53,7 +48,7 @@
 
 <div
 	bind:this={containerEl}
-	class="monsan-action-bar {className}"
+	class="monsan-action-bar"
 	role="toolbar"
 	tabindex="-1"
 	aria-label="Barra de Ações"

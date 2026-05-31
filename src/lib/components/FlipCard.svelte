@@ -9,13 +9,8 @@
 		ondragend,
 		front,
 		back,
-		class: className = '',
 		draggable = true,
-		height = '256px',
-		cardClass = '',
-		faceClass = '',
-		frontClass = '',
-		backClass = ''
+		height = '256px'
 	} = $props<{
 		flipped?: boolean;
 		onFlip?: () => void;
@@ -34,13 +29,8 @@
 		ondragend?: (offset: { x: number; y: number }) => void;
 		front: import('svelte').Snippet;
 		back: import('svelte').Snippet;
-		class?: string;
 		draggable?: boolean;
 		height?: string;
-		cardClass?: string;
-		faceClass?: string;
-		frontClass?: string;
-		backClass?: string;
 	}>();
 
 	let isDragging = $state(false);
@@ -162,7 +152,7 @@
 />
 
 <div
-	class="monsan-flipcard-container {className}"
+	class="monsan-flipcard-container"
 	style="--flipcard-height: {height};"
 	class:flipped
 	onpointerdown={onPointerDown}
@@ -181,17 +171,17 @@
 >
 	<div class="card-wrapper" style:transform={`${translation} ${tiltEffect}`}>
 		<div
-			class="card {cardClass}"
+			class="card"
 			class:flipped
 			style:box-shadow={`0 0 30px rgba(${vignetteBaseColor}, ${vignetteOpacity}), var(--shadow-md)`}
 		>
-			<div class="face front {faceClass} {frontClass}">
+			<div class="face front">
 				<div class="pattern"></div>
 				<div class="face-content">
 					{@render front()}
 				</div>
 			</div>
-			<div class="face back {faceClass} {backClass}">
+			<div class="face back">
 				<div class="face-content">
 					{@render back()}
 				</div>

@@ -7,13 +7,11 @@
 	interface Props extends Omit<HTMLButtonAttributes, 'value' | 'type'> {
 		value?: string;
 		disabled?: boolean;
-		class?: string;
 	}
 
 	let {
 		value = $bindable('12:00'),
 		disabled = false,
-		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -64,7 +62,7 @@
 	}
 </script>
 
-<div bind:this={containerEl} class="monsan-time-picker-container {className}">
+<div bind:this={containerEl} class="monsan-time-picker-container ">
 	<button
 		type="button"
 		class="time-picker-trigger"

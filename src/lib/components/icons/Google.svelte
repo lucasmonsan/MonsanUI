@@ -2,12 +2,10 @@
 	let {
 		size = 24,
 		color = 'currentColor',
-		class: className = '',
 		...restProps
 	} = $props<{
 		size?: number;
 		color?: string;
-		class?: string;
 		[key: string]: unknown;
 	}>();
 </script>
@@ -17,7 +15,6 @@
 	height={size}
 	viewBox="0 0 24 24"
 	fill={color}
-	class={className}
 	aria-hidden="true"
 	focusable="false"
 	{...restProps}

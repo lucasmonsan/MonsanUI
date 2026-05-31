@@ -10,7 +10,6 @@
 		shape?: 'default' | 'pill';
 		disabled?: boolean;
 		block?: boolean;
-		class?: string;
 		title?: string;
 		'aria-label'?: string;
 		[key: string]: unknown;
@@ -25,7 +24,6 @@
 		shape = 'default',
 		disabled = false,
 		block = false,
-		class: className = '',
 		title,
 		'aria-label': ariaLabel,
 		...restProps
@@ -38,7 +36,7 @@
 	{onclick}
 	{title}
 	aria-label={ariaLabel}
-	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} {className}"
+	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''}"
 	{...restProps}
 >
 	{@render children?.()}
