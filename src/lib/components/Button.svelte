@@ -13,6 +13,7 @@
 		square?: boolean;
 		title?: string;
 		'aria-label'?: string;
+		'aria-busy'?: boolean;
 	}
 
 	let {
@@ -26,7 +27,8 @@
 		block = false,
 		square = false,
 		title,
-		'aria-label': ariaLabel
+		'aria-label': ariaLabel,
+		'aria-busy': ariaBusy
 	}: Props = $props();
 </script>
 
@@ -36,6 +38,7 @@
 	{onclick}
 	{title}
 	aria-label={ariaLabel}
+	aria-busy={ariaBusy}
 	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} {square
 		? 'square'
 		: ''}"
