@@ -8,6 +8,7 @@
 		placeholder?: string;
 		disabled?: boolean;
 		suggestions?: string[];
+		class?: string;
 	}
 
 	let {
@@ -15,6 +16,7 @@
 		placeholder = 'Pesquisar...',
 		disabled = false,
 		suggestions = [],
+		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -53,7 +55,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-searchbar-container ">
+<div bind:this={containerEl} class="monsan-searchbar-container {className}">
 	<div class="searchbar-wrapper" class:focused={isFocused} class:disabled>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"

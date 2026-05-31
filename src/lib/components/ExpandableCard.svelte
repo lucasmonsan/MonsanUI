@@ -60,9 +60,9 @@
 <div
 	bind:this={cardEl}
 	class="monsan-expandable-card"
+	class:compact
 	class:is-expanded={expanded}
 	class:clickable-card={expandOn === 'card'}
-	class:compact
 >
 	<!-- Cabeçalho -->
 	<header class="card-header">
@@ -209,10 +209,6 @@
 		line-height: 1.6;
 	}
 
-	.compact .card-body {
-		padding: var(--space-sm);
-	}
-
 	/* Rodapé Indicador */
 	.card-indicator-footer {
 		background: var(--bg-primary);
@@ -257,5 +253,8 @@
 
 	.chevron-wrapper.rotated {
 		transform: rotate(180deg);
+	}
+	.compact .card-body {
+		padding: var(--space-sm);
 	}
 </style>

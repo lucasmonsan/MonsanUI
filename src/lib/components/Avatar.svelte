@@ -5,6 +5,7 @@
 		alt?: string;
 		size?: 'sm' | 'md' | 'lg' | number; // pre-sets or pixel value
 		shape?: 'circle' | 'square';
+		class?: string;
 		[key: string]: unknown;
 	}
 
@@ -14,6 +15,7 @@
 		alt = '',
 		size = 'md',
 		shape = 'circle',
+		class: className = '',
 		...restProps
 	}: Props = $props();
 
@@ -50,7 +52,7 @@
 </script>
 
 <div
-	class="monsan-avatar {shape} "
+	class="monsan-avatar {shape} {className}"
 	style="width: {finalSize}; height: {finalSize}; font-size: calc({finalSize} * 0.38);"
 	{...restProps}
 >

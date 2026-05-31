@@ -14,7 +14,6 @@
 		weight?: 'normal' | 'medium' | 'semibold' | 'bold';
 		/** Variante de cor do MonsanUI. Padrão: 'primary' */
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
-		/** Trunca o texto com reticências se não couber */
 		truncate?: boolean;
 	}
 
@@ -110,12 +109,6 @@
 		color: var(--neutral);
 	}
 
-	.truncate {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
 	/* Ajustes finos de cores no Dark Mode */
 	:global([data-theme='dark']) .color-accent {
 		color: var(--accent-primary);
@@ -125,5 +118,10 @@
 	}
 	:global([data-theme='dark']) .color-error {
 		color: var(--error);
+	}
+	.truncate {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 </style>

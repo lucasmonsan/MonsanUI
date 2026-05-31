@@ -7,6 +7,7 @@
 		disabled?: boolean;
 		label?: string;
 		size?: 'sm' | 'md';
+		class?: string;
 	}
 
 	let {
@@ -15,6 +16,7 @@
 		disabled = false,
 		label = '',
 		size = 'md',
+		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -24,7 +26,7 @@
 <label
 	class="monsan-radio-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled
 		? 'disabled'
-		: ''} "
+		: ''} {className}"
 >
 	<input type="radio" bind:group {value} {disabled} class="sr-only" {...rest} />
 	<div class="radio-circle" class:checked>

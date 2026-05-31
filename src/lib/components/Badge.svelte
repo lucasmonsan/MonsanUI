@@ -88,7 +88,6 @@
 		background: #facc15;
 		color: #2a2423;
 	}
-
 	.no-shrink {
 		flex-shrink: 0;
 	}
