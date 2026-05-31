@@ -131,7 +131,6 @@
 		height: 32px;
 		background-color: var(--accent-primary);
 		border: var(--border-width) solid var(--border-color);
-		box-shadow: var(--shadow-sm);
 		animation: brutalistRotate 1s infinite steps(8);
 	}
 

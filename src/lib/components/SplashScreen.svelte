@@ -10,7 +10,7 @@
 		logoSrc?: string;
 		/** Alt text for the logo image */
 		logoAlt?: string;
-		/** If true, holds the splash screen visible regardless of timeout (e.g. while loading data) */
+		/** If true, holds the splash screen visible beyond the 2s minimum */
 		loading?: boolean;
 		/** Author name for the Credits component */
 		authorName?: string;
@@ -18,11 +18,13 @@
 		authorLink?: string;
 		/** Copyright text for the Credits component */
 		copyright?: string;
+		/** z-index of the splash container. Defaults to 9999. */
+		zIndex?: number;
 		/** Svelte 5 snippet for custom logo rendering */
 		logoSnippet?: Snippet;
-		/** Custom children snippet, takes precedence for logo/title content */
+		/** Custom children snippet, takes precedence over default content */
 		children?: Snippet;
-		/** Variant of the Credits component to render. Defaults to 'default' */
+		/** Variant of the Credits component. Defaults to 'default' */
 		creditsVariant?: 'default' | 'compact';
 	}
 
@@ -34,20 +36,26 @@
 		authorName = 'Monsan',
 		authorLink = 'https://github.com/lucasmonsan',
 		copyright = '',
+		zIndex = 9999,
 		logoSnippet,
 		children,
 		creditsVariant = 'default'
 	}: Props = $props();
 
-	// Always rendered from SSR — covers the app immediately.
-	// CSS animation handles fade-in. After 2s, adds 'hiding' class for fade-out.
-	// After fade-out completes, removes from DOM entirely.
+	// Container is always rendered from SSR (opacity 1, covers everything).
+	// After mount, content fades in. After 2s, container fades out then is removed.
+	let contentVisible = $state(false);
 	let hiding = $state(false);
 	let hidden = $state(false);
 
+	const FADE_DURATION = 400;
+	const MIN_VISIBLE = 2000;
+
 	onMount(() => {
-		const VISIBLE_DURATION = 2000;
-		const FADE_DURATION = 400;
+		// Fade content in after first paint
+		requestAnimationFrame(() => {
+			contentVisible = true;
+		});
 
 		const hideTimer = setTimeout(() => {
 			if (!loading) {
@@ -56,15 +64,15 @@
 					hidden = true;
 				}, FADE_DURATION);
 			}
-		}, VISIBLE_DURATION);
+		}, MIN_VISIBLE);
 
 		return () => clearTimeout(hideTimer);
 	});
 </script>
 
 {#if !hidden}
-	<div class="monsan-splash-screen" class:hiding>
-		<div class="splash-content">
+	<div class="monsan-splash-screen" class:hiding style="z-index: {zIndex}">
+		<div class="splash-content" class:visible={contentVisible}>
 			{#if children}
 				{@render children()}
 			{:else}
@@ -78,20 +86,21 @@
 					{/if}
 					<h1 class="splash-title">{appName}</h1>
 				</div>
-			{/if}
 
-			<div class="splash-loader">
-				<div class="spinner-cube"></div>
-			</div>
+				<div class="splash-loader">
+					<div class="spinner-cube"></div>
+				</div>
+			{/if}
 		</div>
 
-		<div class="splash-footer">
+		<div class="splash-footer" class:visible={contentVisible}>
 			<Credits {authorName} {authorLink} {copyright} placement="inline" variant={creditsVariant} />
 		</div>
 	</div>
 {/if}
 
 <style>
+	/* ── Container ── always opaque from SSR, fades out on exit */
 	.monsan-splash-screen {
 		position: fixed;
 		top: 0;
@@ -102,46 +111,55 @@
 		height: 100dvh;
 		background-color: var(--bg-primary, #fff);
 		color: var(--text-primary);
-		z-index: 9999;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		box-sizing: border-box;
 		padding: var(--space-xl);
-		animation: splashIn 0.4s ease forwards;
 	}
 
 	.monsan-splash-screen.hiding {
 		animation: splashOut 0.4s ease forwards;
 	}
 
-	@keyframes splashIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-
 	@keyframes splashOut {
-		from {
-			opacity: 1;
-		}
-		to {
-			opacity: 0;
-		}
+		from { opacity: 1; }
+		to   { opacity: 0; }
 	}
 
+	/* ── Content ── fades in after mount */
 	.splash-content {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: var(--space-xl);
 		margin-bottom: var(--space-2xl);
+		opacity: 0;
+		transition: opacity 0.4s ease;
 	}
 
+	.splash-content.visible {
+		opacity: 1;
+	}
+
+	.splash-footer {
+		position: absolute;
+		bottom: var(--space-xl);
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		box-sizing: border-box;
+		padding: 0 var(--space-xl);
+		opacity: 0;
+		transition: opacity 0.4s ease;
+	}
+
+	.splash-footer.visible {
+		opacity: 1;
+	}
+
+	/* ── Brand ── */
 	.splash-brand {
 		display: flex;
 		flex-direction: column;
@@ -172,44 +190,25 @@
 		color: var(--text-primary);
 	}
 
+	/* ── Loader ── */
 	.splash-loader {
-		margin-top: var(--space-md);
 		display: flex;
 		justify-content: center;
 		align-items: center;
 	}
 
-	/* Neubrutalist Spinning Cube Loader */
+	/* Neubrutalist cube — symmetric border, no shadow (looks correct when spinning) */
 	.spinner-cube {
 		width: 24px;
 		height: 24px;
 		background-color: var(--accent-primary);
 		border: 3px solid var(--border-color);
-		box-shadow: 3px 3px 0px var(--border-color);
 		animation: spinCube 1.2s infinite ease-in-out;
 	}
 
 	@keyframes spinCube {
-		0% {
-			transform: rotate(0deg);
-		}
-		50% {
-			transform: rotate(180deg);
-			background-color: var(--success);
-		}
-		100% {
-			transform: rotate(360deg);
-			background-color: var(--accent-primary);
-		}
-	}
-
-	.splash-footer {
-		position: absolute;
-		bottom: var(--space-xl);
-		width: 100%;
-		display: flex;
-		justify-content: center;
-		box-sizing: border-box;
-		padding: 0 var(--space-xl);
+		0%   { transform: rotate(0deg);   background-color: var(--accent-primary); }
+		50%  { transform: rotate(180deg); background-color: var(--success); }
+		100% { transform: rotate(360deg); background-color: var(--accent-primary); }
 	}
 </style>
