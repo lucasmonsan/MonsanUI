@@ -15,9 +15,7 @@
 		focusOnMount?: boolean;
 		showIcon?: boolean;
 		role?: string;
-		class?: string;
 		children?: Snippet;
-		[key: string]: unknown;
 	}
 
 	let {
@@ -29,9 +27,7 @@
 		focusOnMount = false,
 		showIcon = true,
 		role,
-		class: className = '',
-		children,
-		...restProps
+		children
 	}: Props = $props();
 
 	let alertElement = $state<HTMLDivElement>();
@@ -46,13 +42,7 @@
 	});
 </script>
 
-<div
-	bind:this={alertElement}
-	class="monsan-alert {type} {className}"
-	role={role ?? defaultRole}
-	tabindex="-1"
-	{...restProps}
->
+<div bind:this={alertElement} class="monsan-alert {type}" role={role ?? defaultRole} tabindex="-1">
 	{#if showIcon}
 		<div class="alert-icon">
 			{#if type === 'success'}

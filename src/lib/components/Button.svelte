@@ -13,7 +13,6 @@
 		square?: boolean;
 		title?: string;
 		'aria-label'?: string;
-		[key: string]: unknown;
 	}
 
 	let {
@@ -27,8 +26,7 @@
 		block = false,
 		square = false,
 		title,
-		'aria-label': ariaLabel,
-		...restProps
+		'aria-label': ariaLabel
 	}: Props = $props();
 </script>
 
@@ -41,7 +39,6 @@
 	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} {square
 		? 'square'
 		: ''}"
-	{...restProps}
 >
 	{@render children?.()}
 </button>

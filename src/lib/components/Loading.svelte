@@ -6,10 +6,9 @@
 		active?: boolean;
 		/** Mensagem customizada. Se não fornecida, usa o i18n padrão */
 		message?: string;
-		[key: string]: unknown;
 	}
 
-	let { active = false, message, ...restProps }: Props = $props();
+	let { active = false, message }: Props = $props();
 
 	let containerEl = $state<HTMLDivElement>();
 	let previousActiveElement = $state<HTMLElement | null>(null);
@@ -52,7 +51,6 @@
 		aria-busy={active ? 'true' : 'false'}
 		aria-live="polite"
 		tabindex="-1"
-		{...restProps}
 	>
 		<div class="loading-card">
 			<div class="spinner-box">
