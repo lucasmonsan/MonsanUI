@@ -58,8 +58,10 @@
 		class="monsan-select-trigger align-{textAlign}"
 		class:open={isOpen}
 		class:has-chevron={showChevron}
-		onclick={() => {
-			if (!disabled) isOpen = !isOpen;
+		onclick={(e) => {
+			if (disabled) return;
+			isOpen = !isOpen;
+			e.stopPropagation();
 		}}
 		type="button"
 		{disabled}
