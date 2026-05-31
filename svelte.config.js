@@ -11,10 +11,10 @@ const config = {
 			pages: 'build',
 			assets: 'build',
 			fallback: '200.html'
-		}),
-		package: {
-			dir: 'dist'
-		}
+		})
+	},
+	package: {
+		dir: 'dist'
 	}
 };
 
