@@ -124,8 +124,8 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		display: block;
-		min-width: 0;
-		flex: 1 1 0;
+		display: inline-block;
+		max-width: 100%;
+		vertical-align: bottom;
 	}
 </style>
