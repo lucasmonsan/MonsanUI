@@ -125,5 +125,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		display: block;
+		min-width: 0;
+		flex: 1 1 0;
 	}
 </style>
