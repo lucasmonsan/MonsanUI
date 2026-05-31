@@ -6,7 +6,6 @@
 		svelteVersion = '5',
 		customText = '',
 		authorLink = '',
-		class: className = '',
 		madeWithText,
 		createdWithText,
 		copyright = '',
@@ -17,7 +16,6 @@
 		svelteVersion?: string;
 		customText?: string;
 		authorLink?: string;
-		class?: string;
 		madeWithText?: string;
 		createdWithText?: string;
 		copyright?: string;
@@ -29,7 +27,7 @@
 	let activeCreatedWithText = $derived(createdWithText ?? i18n.t('credits.createdWithText'));
 </script>
 
-<footer class="monsan-credits placement-{placement} variant-{variant} {className}">
+<footer class="monsan-credits placement-{placement} variant-{variant}">
 	<div class="credits-inner">
 		{#if copyright}
 			<div class="credits-copyright">{copyright}</div>

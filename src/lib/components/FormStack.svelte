@@ -1,15 +1,17 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLFormAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLFormAttributes {
+	interface Props {
 		children: Snippet;
+		method?: 'GET' | 'POST' | 'dialog';
+		action?: string;
+		onsubmit?: (event: SubmitEvent) => void;
 	}
 
-	let { children, ...restProps }: Props = $props();
+	let { children, method, action, onsubmit }: Props = $props();
 </script>
 
-<form class="monsan-form-stack" {...restProps}>
+<form class="monsan-form-stack" {method} {action} {onsubmit}>
 	{@render children()}
 </form>
 

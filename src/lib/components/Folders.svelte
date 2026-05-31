@@ -63,6 +63,8 @@
 	let showModal = $state(false);
 	let newFolderName = $state('');
 	let newFolderColor = $state('default');
+	let folderNameInput = $state<{ focus: () => void }>();
+	let wasModalOpen = false;
 
 	const l = $derived({
 		allFolders: labels?.allFolders ?? 'Todas',
@@ -150,6 +152,13 @@
 			newFolderColor = 'default';
 			showModal = true;
 		}
+	});
+
+	$effect(() => {
+		if (showModal && !wasModalOpen) {
+			queueMicrotask(() => folderNameInput?.focus());
+		}
+		wasModalOpen = showModal;
 	});
 </script>
 
@@ -288,11 +297,11 @@
 		<div class="form-group">
 			<label for="folder-name">{l.folderNameLabel}</label>
 			<Input
+				bind:this={folderNameInput}
 				id="folder-name"
 				type="text"
 				bind:value={newFolderName}
 				placeholder={l.folderNamePlaceholder}
-				autofocus
 			/>
 		</div>
 		<div class="form-group">

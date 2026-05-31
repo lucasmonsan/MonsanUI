@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLAttributes<HTMLElement> {
+	interface Props {
 		children: Snippet;
 		/** Tag HTML a ser renderizada. Padrão: 'p' */
 		tag?: 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div' | 'label' | 'small';
@@ -15,6 +14,11 @@
 		/** Variante de cor do MonsanUI. Padrão: 'primary' */
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
 		truncate?: boolean;
+		align?: 'left' | 'center' | 'right';
+		transform?: 'none' | 'uppercase' | 'capitalize';
+		id?: string;
+		forId?: string;
+		title?: string;
 	}
 
 	let {
@@ -25,16 +29,21 @@
 		weight = 'normal',
 		variant = 'primary',
 		truncate = false,
-		class: className = '',
-		...restProps
+		align = 'left',
+		transform = 'none',
+		id,
+		forId,
+		title
 	}: Props = $props();
 </script>
 
 <svelte:element
 	this={tag}
-	class="monsan-text {family} size-{size} weight-{weight} color-{variant} {className}"
+	{id}
+	for={tag === 'label' ? forId : undefined}
+	{title}
+	class="monsan-text {family} size-{size} weight-{weight} color-{variant} align-{align} transform-{transform}"
 	class:truncate
-	{...restProps}
 >
 	{@render children()}
 </svelte:element>
@@ -108,6 +117,21 @@
 	}
 	.color-neutral {
 		color: var(--neutral);
+	}
+	.align-left {
+		text-align: left;
+	}
+	.align-center {
+		text-align: center;
+	}
+	.align-right {
+		text-align: right;
+	}
+	.transform-uppercase {
+		text-transform: uppercase;
+	}
+	.transform-capitalize {
+		text-transform: capitalize;
 	}
 
 	/* Ajustes finos de cores no Dark Mode */

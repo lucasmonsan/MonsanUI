@@ -1,13 +1,16 @@
 <script lang="ts" generics="T">
-	import type { HTMLInputAttributes } from 'svelte/elements';
-
-	interface Props extends Omit<HTMLInputAttributes, 'size' | 'group' | 'value'> {
+	interface Props {
 		group?: T;
 		value: T;
 		disabled?: boolean;
 		label?: string;
 		size?: 'sm' | 'md';
-		class?: string;
+		id?: string;
+		name?: string;
+		required?: boolean;
+		ariaLabel?: string;
+		ariaDescribedby?: string;
+		onchange?: (event: Event) => void;
 	}
 
 	let {
@@ -16,19 +19,31 @@
 		disabled = false,
 		label = '',
 		size = 'md',
-		class: className = '',
-		...rest
+		id,
+		name,
+		required = false,
+		ariaLabel,
+		ariaDescribedby,
+		onchange
 	}: Props = $props();
 
 	let checked = $derived(group === value);
 </script>
 
-<label
-	class="monsan-radio-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled
-		? 'disabled'
-		: ''} {className}"
->
-	<input type="radio" bind:group {value} {disabled} class="sr-only" {...rest} />
+<label class="monsan-radio-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled ? 'disabled' : ''}">
+	<input
+		type="radio"
+		bind:group
+		{value}
+		{id}
+		{name}
+		{disabled}
+		{required}
+		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		{onchange}
+		class="sr-only"
+	/>
 	<div class="radio-circle" class:checked>
 		<div class="radio-inner-dot" class:checked></div>
 	</div>

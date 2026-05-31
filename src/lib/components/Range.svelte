@@ -1,13 +1,16 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
-
-	interface Props extends Omit<HTMLInputAttributes, 'value' | 'type'> {
+	interface Props {
 		value?: number;
 		min?: number;
 		max?: number;
 		step?: number;
 		disabled?: boolean;
-		class?: string;
+		id?: string;
+		name?: string;
+		ariaLabel?: string;
+		ariaDescribedby?: string;
+		oninput?: (event: Event) => void;
+		onchange?: (event: Event) => void;
 	}
 
 	let {
@@ -16,8 +19,12 @@
 		max = 100,
 		step = 1,
 		disabled = false,
-		class: className = '',
-		...rest
+		id,
+		name,
+		ariaLabel,
+		ariaDescribedby,
+		oninput,
+		onchange
 	}: Props = $props();
 
 	// Calcula a porcentagem para preencher o trilho dinamicamente
@@ -25,10 +32,24 @@
 </script>
 
 <div
-	class="monsan-range-container {disabled ? 'disabled' : ''} {className}"
+	class="monsan-range-container {disabled ? 'disabled' : ''}"
 	style="--range-percentage: {percentage}%"
 >
-	<input type="range" bind:value {min} {max} {step} {disabled} class="monsan-range" {...rest} />
+	<input
+		type="range"
+		bind:value
+		{id}
+		{name}
+		{min}
+		{max}
+		{step}
+		{disabled}
+		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		{oninput}
+		{onchange}
+		class="monsan-range"
+	/>
 </div>
 
 <style>

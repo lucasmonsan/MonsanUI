@@ -68,8 +68,8 @@
 	>
 		<span class="trigger-label">{selectedLabel}</span>
 		{#if showChevron}
-			<span class="chevron-wrapper">
-				<ChevronDown size={16} class="chevron-icon {isOpen ? 'rotated' : ''}" />
+			<span class="chevron-wrapper" class:rotated={isOpen}>
+				<ChevronDown size={16} />
 			</span>
 		{/if}
 	</button>
@@ -173,14 +173,11 @@
 		display: flex;
 		align-items: center;
 		pointer-events: none;
-	}
-
-	.chevron-icon {
 		transition: transform 0.2s ease;
 	}
 
-	.chevron-icon.rotated {
-		transform: rotate(180deg);
+	.chevron-wrapper.rotated {
+		transform: translateY(-50%) rotate(180deg);
 	}
 
 	.monsan-select-dropdown {

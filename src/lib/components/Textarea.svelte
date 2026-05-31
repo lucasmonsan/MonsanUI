@@ -1,7 +1,5 @@
 <script lang="ts">
-	import type { HTMLTextareaAttributes } from 'svelte/elements';
-
-	interface Props extends HTMLTextareaAttributes {
+	interface Props {
 		value?: string;
 		use?: (
 			node: HTMLTextAreaElement,
@@ -12,34 +10,98 @@
 		};
 		size?: 'sm' | 'md';
 		rows?: number;
+		id?: string;
+		name?: string;
+		placeholder?: string;
+		required?: boolean;
+		disabled?: boolean;
+		readonly?: boolean;
+		minlength?: number;
+		maxlength?: number;
+		title?: string;
+		ariaLabel?: string;
+		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+		oninput?: (event: Event) => void;
+		onchange?: (event: Event) => void;
+		onkeydown?: (event: KeyboardEvent) => void;
+		onfocus?: (event: FocusEvent) => void;
+		onblur?: (event: FocusEvent) => void;
 	}
 
 	let {
 		value = $bindable(''),
 		use,
 		size = 'md',
-		class: className = '',
 		rows = 2,
-		...rest
+		id,
+		name,
+		placeholder,
+		required = false,
+		disabled = false,
+		readonly = false,
+		minlength,
+		maxlength,
+		title,
+		ariaLabel,
+		ariaDescribedby,
+		ariaInvalid,
+		oninput,
+		onchange,
+		onkeydown,
+		onfocus,
+		onblur
 	}: Props = $props();
 </script>
 
 {#if use}
 	<textarea
 		bind:value
-		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''} {className}"
+		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''}"
 		use:use={value}
 		{rows}
+		{id}
+		{name}
+		{placeholder}
+		{required}
+		{disabled}
+		{readonly}
+		{minlength}
+		{maxlength}
+		{title}
+		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		aria-invalid={ariaInvalid}
+		{oninput}
+		{onchange}
+		{onkeydown}
+		{onfocus}
+		{onblur}
 		style="--rows: {rows};"
-		{...rest}
 	></textarea>
 {:else}
 	<textarea
 		bind:value
-		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''} {className}"
+		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''}"
 		{rows}
+		{id}
+		{name}
+		{placeholder}
+		{required}
+		{disabled}
+		{readonly}
+		{minlength}
+		{maxlength}
+		{title}
+		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		aria-invalid={ariaInvalid}
+		{oninput}
+		{onchange}
+		{onkeydown}
+		{onfocus}
+		{onblur}
 		style="--rows: {rows};"
-		{...rest}
 	></textarea>
 {/if}
 

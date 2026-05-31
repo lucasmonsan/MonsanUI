@@ -1,19 +1,26 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
-
-	interface Props extends Omit<HTMLInputAttributes, 'value' | 'type'> {
+	interface Props {
 		value?: string[];
 		placeholder?: string;
 		disabled?: boolean;
-		class?: string;
+		id?: string;
+		name?: string;
+		ariaLabel?: string;
+		ariaDescribedby?: string;
+		removeLabel?: (tag: string) => string;
+		oninput?: (event: Event) => void;
 	}
 
 	let {
 		value = $bindable([]),
 		placeholder = 'Adicionar tag...',
 		disabled = false,
-		class: className = '',
-		...rest
+		id,
+		name,
+		ariaLabel,
+		ariaDescribedby,
+		removeLabel = (tag: string) => `Remover tag ${tag}`,
+		oninput
 	}: Props = $props();
 
 	let inputValue = $state('');
@@ -50,7 +57,7 @@
 <div
 	bind:this={containerEl}
 	role="presentation"
-	class="monsan-chips-input-container {className}"
+	class="monsan-chips-input-container"
 	class:focused={isFocused}
 	class:disabled
 	onclick={() => !disabled && inputEl?.focus()}
@@ -64,7 +71,7 @@
 					class="chip-remove-btn"
 					{disabled}
 					onclick={(e) => removeTag(index, e)}
-					aria-label="Remover tag {tag}"
+					aria-label={removeLabel(tag)}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -84,8 +91,12 @@
 			bind:this={inputEl}
 			type="text"
 			bind:value={inputValue}
+			{id}
+			{name}
 			placeholder={value.length === 0 ? placeholder : ''}
 			{disabled}
+			aria-label={ariaLabel}
+			aria-describedby={ariaDescribedby}
 			class="chips-input"
 			onfocus={() => (isFocused = true)}
 			onblur={() => {
@@ -93,7 +104,7 @@
 				addTag(); // Adiciona se o usuário desfocar com texto digitado
 			}}
 			onkeydown={handleKeyDown}
-			{...rest}
+			{oninput}
 		/>
 	</div>
 </div>

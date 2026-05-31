@@ -289,7 +289,6 @@
 								{#if field.type === 'textarea'}
 									<Textarea
 										id="{field.id}-{index}"
-										class="hint-input"
 										value={getFieldValue(field.id)}
 										oninput={(event) => handleFieldInput(field.id, event)}
 										placeholder={field.placeholder}
@@ -301,7 +300,6 @@
 									<Input
 										id="{field.id}-{index}"
 										type="text"
-										class="hint-input"
 										value={getFieldValue(field.id)}
 										oninput={(event) => handleFieldInput(field.id, event)}
 										placeholder={field.placeholder}

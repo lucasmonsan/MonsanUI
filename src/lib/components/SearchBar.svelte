@@ -3,12 +3,20 @@
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 
-	interface Props extends Omit<HTMLInputAttributes, 'value' | 'size'> {
+	interface Props {
 		value?: string;
 		placeholder?: string;
 		disabled?: boolean;
 		suggestions?: string[];
-		class?: string;
+		id?: string;
+		name?: string;
+		autocomplete?: HTMLInputAttributes['autocomplete'];
+		ariaLabel?: string;
+		ariaDescribedby?: string;
+		clearLabel?: string;
+		oninput?: (event: Event) => void;
+		onfocus?: (event: FocusEvent) => void;
+		onblur?: (event: FocusEvent) => void;
 	}
 
 	let {
@@ -16,8 +24,15 @@
 		placeholder = 'Pesquisar...',
 		disabled = false,
 		suggestions = [],
-		class: className = '',
-		...rest
+		id,
+		name,
+		autocomplete,
+		ariaLabel,
+		ariaDescribedby,
+		clearLabel = 'Limpar pesquisa',
+		oninput,
+		onfocus,
+		onblur
 	}: Props = $props();
 
 	let inputEl = $state<HTMLInputElement>();
@@ -45,6 +60,22 @@
 		inputEl?.focus();
 	}
 
+	function handleFocus(event: FocusEvent) {
+		isFocused = true;
+		showSuggestions = true;
+		onfocus?.(event);
+	}
+
+	function handleBlur(event: FocusEvent) {
+		isFocused = false;
+		onblur?.(event);
+	}
+
+	function handleInput(event: Event) {
+		showSuggestions = true;
+		oninput?.(event);
+	}
+
 	$effect(() => {
 		if (showSuggestions) {
 			document.addEventListener('click', handleOutsideClick, { capture: true });
@@ -55,7 +86,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-searchbar-container {className}">
+<div bind:this={containerEl} class="monsan-searchbar-container">
 	<div class="searchbar-wrapper" class:focused={isFocused} class:disabled>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -76,16 +107,17 @@
 			bind:this={inputEl}
 			type="text"
 			bind:value
+			{id}
+			{name}
 			{placeholder}
 			{disabled}
+			{autocomplete}
+			aria-label={ariaLabel}
+			aria-describedby={ariaDescribedby}
 			class="search-input"
-			onfocus={() => {
-				isFocused = true;
-				showSuggestions = true;
-			}}
-			onblur={() => (isFocused = false)}
-			oninput={() => (showSuggestions = true)}
-			{...rest}
+			onfocus={handleFocus}
+			onblur={handleBlur}
+			oninput={handleInput}
 		/>
 
 		{#if value}
@@ -98,7 +130,7 @@
 					showSuggestions = true;
 					inputEl?.focus();
 				}}
-				aria-label="Limpar pesquisa"
+				aria-label={clearLabel}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

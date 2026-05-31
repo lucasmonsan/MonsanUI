@@ -79,7 +79,6 @@
 			bind:this={inputEl}
 			onkeydown={handleKeyDown}
 			{placeholder}
-			class="search-input"
 		/>
 
 		{#if results.length > 0}

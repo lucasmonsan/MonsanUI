@@ -1,12 +1,14 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
 	import type { Snippet } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
-	interface Props extends Omit<HTMLInputAttributes, 'value' | 'type' | 'files'> {
+	interface Props {
 		files?: FileList | null;
+		id?: string;
+		name?: string;
 		accept?: string;
 		multiple?: boolean;
+		required?: boolean;
 		disabled?: boolean;
 		placeholder?: string;
 		variant?: 'default' | 'invisible' | 'compact' | 'overlay';
@@ -14,27 +16,31 @@
 		trigger?: Snippet<[{ open: () => void }]>;
 		/** Button text for variants that show a browse button. */
 		buttonLabel?: string;
-		class?: string;
+		ariaLabel?: string;
+		ariaDescribedby?: string;
 	}
 
 	let {
 		files = $bindable(null),
+		id,
+		name,
 		accept = '',
 		multiple = false,
+		required = false,
 		disabled = false,
 		placeholder,
 		variant = 'default',
 		trigger,
 		buttonLabel,
-		class: className = '',
-		...rest
+		ariaLabel,
+		ariaDescribedby
 	}: Props = $props();
 
 	let activePlaceholder = $derived(placeholder ?? i18n.t('fileUpload.placeholder'));
 	let activeButtonLabel = $derived(buttonLabel ?? i18n.t('fileUpload.buttonLabel'));
 
 	const fallbackId = `file-input-${Math.random().toString(36).slice(2, 11)}`;
-	const inputId = $derived(rest.id || fallbackId);
+	const inputId = $derived(id || fallbackId);
 
 	let fileInputEl = $state<HTMLInputElement>();
 	let isDragOver = $state(false);
@@ -153,13 +159,16 @@
 <input
 	bind:this={fileInputEl}
 	id={inputId}
+	{name}
 	type="file"
 	{accept}
 	{multiple}
+	{required}
 	{disabled}
+	aria-label={ariaLabel}
+	aria-describedby={ariaDescribedby}
 	class="sr-only"
 	onchange={handleFileChange}
-	{...rest}
 />
 
 {#if variant === 'invisible'}
@@ -167,7 +176,7 @@
 		{@render trigger({ open })}
 	{/if}
 {:else if variant === 'compact'}
-	<div class="monsan-file-upload-container monsan-file-compact {className}">
+	<div class="monsan-file-upload-container monsan-file-compact">
 		<div class="compact-row">
 			<button
 				type="button"
@@ -230,7 +239,7 @@
 		{/if}
 	</div>
 {:else if variant === 'overlay'}
-	<div class="monsan-file-upload-container {className}">
+	<div class="monsan-file-upload-container">
 		<div class="overlay-hint" class:disabled>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -306,7 +315,7 @@
 		{/if}
 	</div>
 {:else}
-	<div class="monsan-file-upload-container {className}">
+	<div class="monsan-file-upload-container">
 		<label
 			for={inputId}
 			class="monsan-file-dropzone"

@@ -3,12 +3,14 @@
 		size = 24,
 		color = 'currentColor',
 		strokeWidth = 2.5,
-		...restProps
+		decorative = true,
+		ariaLabel
 	} = $props<{
 		size?: number;
 		color?: string;
 		strokeWidth?: number;
-		[key: string]: unknown;
+		decorative?: boolean;
+		ariaLabel?: string;
 	}>();
 </script>
 
@@ -21,7 +23,10 @@
 	stroke-width={strokeWidth}
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	{...restProps}
+	aria-hidden={decorative}
+	aria-label={decorative ? undefined : ariaLabel}
+	focusable="false"
+	role={decorative ? undefined : 'img'}
 >
 	<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
 </svg>

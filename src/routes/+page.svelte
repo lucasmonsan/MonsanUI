@@ -1483,7 +1483,7 @@
 										}}
 									>
 										{#if buttonShowIcon}
-											<Sparkles size={16} style="margin-right: 6px;" />
+											<Sparkles size={16} />
 										{/if}
 										{i18n.t('button.click_here')} ({buttonCount})
 									</Button>

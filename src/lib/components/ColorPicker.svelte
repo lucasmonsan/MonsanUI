@@ -1,20 +1,15 @@
 <script lang="ts">
-	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 
-	interface Props extends Omit<HTMLButtonAttributes, 'value' | 'type'> {
+	interface Props {
 		value?: string;
 		disabled?: boolean;
-		class?: string;
+		title?: string;
+		ariaLabel?: string;
 	}
 
-	let {
-		value = $bindable('#c44933'),
-		disabled = false,
-		class: className = '',
-		...rest
-	}: Props = $props();
+	let { value = $bindable('#c44933'), disabled = false, title, ariaLabel }: Props = $props();
 
 	let isOpen = $state(false);
 	let colorInputEl = $state<HTMLInputElement>();
@@ -89,15 +84,15 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-color-picker-container {className}">
+<div bind:this={containerEl} class="monsan-color-picker-container">
 	<button
 		type="button"
 		class="color-picker-trigger"
 		{disabled}
+		{title}
 		onclick={() => !disabled && (isOpen = !isOpen)}
-		aria-label={triggerAriaLabel}
+		aria-label={ariaLabel ?? triggerAriaLabel}
 		aria-expanded={isOpen}
-		{...rest}
 	>
 		<div class="color-preview" style="background-color: {value};"></div>
 		<span class="color-hex">{value.toUpperCase()}</span>

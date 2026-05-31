@@ -1,12 +1,16 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
-
-	interface Props extends Omit<HTMLInputAttributes, 'size' | 'checked'> {
+	interface Props {
 		checked?: boolean;
 		disabled?: boolean;
 		label?: string;
 		size?: 'sm' | 'md';
-		class?: string;
+		id?: string;
+		name?: string;
+		value?: string;
+		required?: boolean;
+		ariaLabel?: string;
+		ariaDescribedby?: string;
+		onchange?: (event: Event) => void;
 	}
 
 	let {
@@ -14,17 +18,32 @@
 		disabled = false,
 		label = '',
 		size = 'md',
-		class: className = '',
-		...rest
+		id,
+		name,
+		value,
+		required = false,
+		ariaLabel,
+		ariaDescribedby,
+		onchange
 	}: Props = $props();
 </script>
 
 <label
-	class="monsan-checkbox-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled
-		? 'disabled'
-		: ''} {className}"
+	class="monsan-checkbox-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled ? 'disabled' : ''}"
 >
-	<input type="checkbox" bind:checked {disabled} class="sr-only" {...rest} />
+	<input
+		type="checkbox"
+		bind:checked
+		{id}
+		{name}
+		{value}
+		{disabled}
+		{required}
+		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		{onchange}
+		class="sr-only"
+	/>
 	<div class="checkbox-box" class:checked>
 		{#if checked}
 			<svg

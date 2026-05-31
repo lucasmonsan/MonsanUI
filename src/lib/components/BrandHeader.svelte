@@ -49,7 +49,13 @@
 		{/if}
 	{/if}
 	<div class="brand-copy">
-		<Text tag="h1" class="brand-title" weight={titleWeight} family="display" variant="accent">
+		<Text
+			tag="h1"
+			size={compact ? '2xl' : '3xl'}
+			weight={titleWeight}
+			family="display"
+			variant="accent"
+		>
 			{brand}
 		</Text>
 		{#if subtitle}
@@ -122,17 +128,5 @@
 	.compact .brand-logo {
 		width: calc(var(--base) * 2.25);
 		height: calc(var(--base) * 2.25);
-	}
-
-	:global(.brand-title) {
-		font-size: calc(var(--base) * 2.85) !important;
-		line-height: 1.1;
-		color: var(--accent-primary) !important;
-	}
-
-	.compact :global(.brand-title) {
-		font-size: calc(var(--base) * 2.6) !important;
-		line-height: 1.1;
-		color: var(--accent-primary) !important;
 	}
 </style>

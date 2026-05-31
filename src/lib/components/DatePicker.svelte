@@ -1,23 +1,25 @@
 <script lang="ts">
-	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 	import Calendar from './Calendar.svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
-	interface Props extends Omit<HTMLButtonAttributes, 'value' | 'type'> {
+	interface Props {
 		value?: Date | null;
 		placeholder?: string;
 		disabled?: boolean;
-		class?: string;
+		id?: string;
+		title?: string;
+		ariaLabel?: string;
 	}
 
 	let {
 		value = $bindable(null),
 		placeholder,
 		disabled = false,
-		class: className = '',
-		...rest
+		id,
+		title,
+		ariaLabel
 	}: Props = $props();
 
 	let activePlaceholder = $derived(placeholder ?? i18n.t('datePicker.placeholder'));
@@ -89,14 +91,17 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-datepicker-container {className}">
+<div bind:this={containerEl} class="monsan-datepicker-container">
 	<button
 		type="button"
 		class="datepicker-trigger"
 		class:has-value={value !== null}
+		{id}
 		{disabled}
+		{title}
+		aria-label={ariaLabel}
+		aria-expanded={isOpen}
 		onclick={() => !disabled && (isOpen = !isOpen)}
-		{...rest}
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"

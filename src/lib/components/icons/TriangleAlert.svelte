@@ -3,12 +3,14 @@
 		size = 24,
 		color = 'currentColor',
 		strokeWidth = 2.5,
-		...restProps
+		decorative = true,
+		ariaLabel
 	} = $props<{
 		size?: number;
 		color?: string;
 		strokeWidth?: number;
-		[key: string]: unknown;
+		decorative?: boolean;
+		ariaLabel?: string;
 	}>();
 </script>
 
@@ -21,7 +23,10 @@
 	stroke-width={strokeWidth}
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	{...restProps}
+	aria-hidden={decorative}
+	aria-label={decorative ? undefined : ariaLabel}
+	focusable="false"
+	role={decorative ? undefined : 'img'}
 >
 	<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
 	<path d="M12 9v4" />

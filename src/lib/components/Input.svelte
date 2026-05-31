@@ -1,13 +1,37 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	interface Props extends Omit<HTMLInputAttributes, 'size' | 'value'> {
+	interface Props {
 		value?: string | number | null;
 		size?: 'sm' | 'md';
 		variant?: 'default' | 'unstyled' | 'title';
 		showPasswordToggle?: boolean;
 		showPasswordLabel?: string;
 		hidePasswordLabel?: string;
+		id?: string;
+		name?: string;
+		type?: string;
+		placeholder?: string;
+		required?: boolean;
+		disabled?: boolean;
+		readonly?: boolean;
+		autocomplete?: HTMLInputAttributes['autocomplete'];
+		inputmode?: HTMLInputAttributes['inputmode'];
+		min?: string | number;
+		max?: string | number;
+		step?: string | number;
+		minlength?: number;
+		maxlength?: number;
+		pattern?: string;
+		title?: string;
+		ariaLabel?: string;
+		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+		oninput?: (event: Event) => void;
+		onchange?: (event: Event) => void;
+		onkeydown?: (event: KeyboardEvent) => void;
+		onfocus?: (event: FocusEvent) => void;
+		onblur?: (event: FocusEvent) => void;
 	}
 
 	let {
@@ -18,7 +42,29 @@
 		showPasswordLabel = 'Show password',
 		hidePasswordLabel = 'Hide password',
 		type = 'text',
-		...rest
+		id,
+		name,
+		placeholder,
+		required = false,
+		disabled = false,
+		readonly = false,
+		autocomplete,
+		inputmode,
+		min,
+		max,
+		step,
+		minlength,
+		maxlength,
+		pattern,
+		title,
+		ariaLabel,
+		ariaDescribedby,
+		ariaInvalid,
+		oninput,
+		onchange,
+		onkeydown,
+		onfocus,
+		onblur
 	}: Props = $props();
 
 	let inputEl = $state<HTMLInputElement>();
@@ -39,8 +85,30 @@
 		bind:this={inputEl}
 		bind:value
 		type={currentType}
+		{id}
+		{name}
+		{placeholder}
+		{required}
+		{disabled}
+		{readonly}
+		{autocomplete}
+		{inputmode}
+		{min}
+		{max}
+		{step}
+		{minlength}
+		{maxlength}
+		{pattern}
+		{title}
+		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		aria-invalid={ariaInvalid}
+		{oninput}
+		{onchange}
+		{onkeydown}
+		{onfocus}
+		{onblur}
 		class="monsan-input {size === 'sm' ? 'size-sm' : ''} variant-{variant}"
-		{...rest}
 	/>
 	{#if type === 'password' && showPasswordToggle}
 		<button
