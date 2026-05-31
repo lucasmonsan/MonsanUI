@@ -9,7 +9,7 @@
 		variant?: 'default' | 'accent';
 		disabled?: boolean;
 		onclick?: () => void;
-		icon?: Component<{ size?: number; class?: string }>;
+		icon?: Component<{ size?: number }>;
 	}
 
 	let {

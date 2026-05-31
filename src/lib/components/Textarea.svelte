@@ -18,7 +18,6 @@
 		value = $bindable(''),
 		use,
 		size = 'md',
-		class: className = '',
 		rows = 2,
 		...rest
 	}: Props = $props();
@@ -27,7 +26,7 @@
 {#if use}
 	<textarea
 		bind:value
-		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''} {className}"
+		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''} "
 		use:use={value}
 		{rows}
 		style="--rows: {rows};"
@@ -36,7 +35,7 @@
 {:else}
 	<textarea
 		bind:value
-		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''} {className}"
+		class="monsan-textarea {size === 'sm' ? 'size-sm' : ''} "
 		{rows}
 		style="--rows: {rows};"
 		{...rest}

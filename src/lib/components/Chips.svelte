@@ -5,14 +5,12 @@
 		value?: string[];
 		placeholder?: string;
 		disabled?: boolean;
-		class?: string;
 	}
 
 	let {
 		value = $bindable([]),
 		placeholder = 'Adicionar tag...',
 		disabled = false,
-		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -50,7 +48,7 @@
 <div
 	bind:this={containerEl}
 	role="presentation"
-	class="monsan-chips-input-container {className}"
+	class="monsan-chips-input-container "
 	class:focused={isFocused}
 	class:disabled
 	onclick={() => !disabled && inputEl?.focus()}

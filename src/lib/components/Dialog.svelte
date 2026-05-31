@@ -11,7 +11,8 @@
 		closeLabel = 'Fechar',
 		closeOnBackNavigation = true,
 		size = 'md',
-		animation = 'pop'
+		animation = 'pop',
+		padding = 'var(--space-md)'
 	} = $props<{
 		open: boolean;
 		title: string;
@@ -22,6 +23,7 @@
 		closeOnBackNavigation?: boolean;
 		size?: 'sm' | 'md' | 'lg';
 		animation?: 'pop' | 'slide' | 'fade' | 'scale';
+		padding?: string;
 	}>();
 
 	const dialogId = Math.random().toString(36).substring(2, 9);
@@ -111,7 +113,7 @@
 			</header>
 
 			<!-- Content -->
-			<div class="modal-content">
+			<div class="modal-content" style="padding: {padding}">
 				{@render children()}
 			</div>
 		</div>

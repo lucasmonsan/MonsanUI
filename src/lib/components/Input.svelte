@@ -8,8 +8,6 @@
 		showPasswordToggle?: boolean;
 		showPasswordLabel?: string;
 		hidePasswordLabel?: string;
-		containerClass?: string;
-		containerStyle?: string;
 	}
 
 	let {
@@ -20,9 +18,6 @@
 		showPasswordLabel = 'Show password',
 		hidePasswordLabel = 'Hide password',
 		type = 'text',
-		class: className = '',
-		containerClass = '',
-		containerStyle = '',
 		...rest
 	}: Props = $props();
 
@@ -39,16 +34,12 @@
 	}
 </script>
 
-<div
-	class="monsan-input-container {containerClass}"
-	style={containerStyle || undefined}
-	class:with-toggle={type === 'password' && showPasswordToggle}
->
+<div class="monsan-input-container" class:with-toggle={type === 'password' && showPasswordToggle}>
 	<input
 		bind:this={inputEl}
 		bind:value
 		type={currentType}
-		class="monsan-input {size === 'sm' ? 'size-sm' : ''} variant-{variant} {className}"
+		class="monsan-input {size === 'sm' ? 'size-sm' : ''} variant-{variant}"
 		{...rest}
 	/>
 	{#if type === 'password' && showPasswordToggle}

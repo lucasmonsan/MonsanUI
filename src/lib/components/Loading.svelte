@@ -6,12 +6,10 @@
 		active?: boolean;
 		/** Mensagem customizada. Se não fornecida, usa o i18n padrão */
 		message?: string;
-		/** Permite customizar a classe CSS do container */
-		class?: string;
 		[key: string]: unknown;
 	}
 
-	let { active = false, message, class: className = '', ...restProps }: Props = $props();
+	let { active = false, message, ...restProps }: Props = $props();
 
 	let containerEl = $state<HTMLDivElement>();
 	let previousActiveElement = $state<HTMLElement | null>(null);
@@ -49,7 +47,7 @@
 {#if active}
 	<div
 		bind:this={containerEl}
-		class="monsan-loading-overlay {className}"
+		class="monsan-loading-overlay"
 		role="status"
 		aria-busy={active ? 'true' : 'false'}
 		aria-live="polite"

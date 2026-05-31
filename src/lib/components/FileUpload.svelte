@@ -14,7 +14,6 @@
 		trigger?: Snippet<[{ open: () => void }]>;
 		/** Button text for variants that show a browse button. */
 		buttonLabel?: string;
-		class?: string;
 	}
 
 	let {
@@ -26,7 +25,6 @@
 		variant = 'default',
 		trigger,
 		buttonLabel,
-		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -167,7 +165,7 @@
 		{@render trigger({ open })}
 	{/if}
 {:else if variant === 'compact'}
-	<div class="monsan-file-upload-container monsan-file-compact {className}">
+	<div class="monsan-file-upload-container monsan-file-compact ">
 		<div class="compact-row">
 			<button
 				type="button"
@@ -230,7 +228,7 @@
 		{/if}
 	</div>
 {:else if variant === 'overlay'}
-	<div class="monsan-file-upload-container {className}">
+	<div class="monsan-file-upload-container ">
 		<div class="overlay-hint" class:disabled>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -306,7 +304,7 @@
 		{/if}
 	</div>
 {:else}
-	<div class="monsan-file-upload-container {className}">
+	<div class="monsan-file-upload-container ">
 		<label
 			for={inputId}
 			class="monsan-file-dropzone"

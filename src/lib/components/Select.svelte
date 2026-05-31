@@ -13,7 +13,6 @@
 		value = $bindable(),
 		options = [],
 		placeholder = 'Selecione...',
-		class: className = '',
 		id = '',
 		showChevron = true,
 		textAlign = 'left',
@@ -22,7 +21,6 @@
 		value: string | number;
 		options: Option[];
 		placeholder?: string;
-		class?: string;
 		id?: string;
 		showChevron?: boolean;
 		textAlign?: 'left' | 'center' | 'right';
@@ -54,7 +52,7 @@
 	});
 </script>
 
-<div class="monsan-select-container {className}" bind:this={selectEl}>
+<div class="monsan-select-container" bind:this={selectEl}>
 	<button
 		{id}
 		class="monsan-select-trigger align-{textAlign}"

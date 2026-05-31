@@ -14,10 +14,8 @@
 		weight?: 'normal' | 'medium' | 'semibold' | 'bold';
 		/** Variante de cor do MonsanUI. Padrão: 'primary' */
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
-		/** Classes CSS adicionais */
-		class?: string;
-		/** Estilos inline adicionais */
-		style?: string;
+		/** Trunca o texto com reticências se não couber */
+		truncate?: boolean;
 	}
 
 	let {
@@ -27,16 +25,15 @@
 		size = 'md',
 		weight = 'normal',
 		variant = 'primary',
-		class: customClass = '',
-		style = '',
+		truncate = false,
 		...restProps
 	}: Props = $props();
 </script>
 
 <svelte:element
 	this={tag}
-	class="monsan-text {family} size-{size} weight-{weight} color-{variant} {customClass}"
-	{style}
+	class="monsan-text {family} size-{size} weight-{weight} color-{variant}"
+	class:truncate
 	{...restProps}
 >
 	{@render children()}
@@ -111,6 +108,12 @@
 	}
 	.color-neutral {
 		color: var(--neutral);
+	}
+
+	.truncate {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	/* Ajustes finos de cores no Dark Mode */

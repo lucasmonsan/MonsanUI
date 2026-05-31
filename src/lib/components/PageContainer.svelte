@@ -4,10 +4,6 @@
 	interface Props {
 		children?: Snippet;
 		/**
-		 * Classes adicionais para customização
-		 */
-		class?: string;
-		/**
 		 * Largura máxima do container. Por padrão usa a variável CSS global `--container-max-width`.
 		 */
 		maxWidth?: string;
@@ -23,7 +19,6 @@
 
 	let {
 		children,
-		class: className = '',
 		maxWidth = 'var(--container-max-width)',
 		padding = '0',
 		animate = true
@@ -31,7 +26,7 @@
 </script>
 
 <div
-	class="monsan-page-container {className}"
+	class="monsan-page-container"
 	class:is-animated={animate}
 	style="--page-container-max-width: {maxWidth}; --page-container-padding: {padding};"
 >

@@ -1,11 +1,10 @@
 <script lang="ts">
-	let { class: className = '', ...restProps } = $props<{
-		class?: string;
+	let { ...restProps } = $props<{
 		[key: string]: unknown;
 	}>();
 </script>
 
-<hr class="monsan-separator {className}" {...restProps} />
+<hr class="monsan-separator" {...restProps} />
 
 <style>
 	.monsan-separator {

@@ -1,16 +1,16 @@
 <script lang="ts">
 	let {
 		variant = 'default',
-		class: className = '',
+		noShrink = false,
 		children
 	} = $props<{
 		variant?: 'default' | 'primary' | 'secondary' | 'due' | 'new' | 'warning';
-		class?: string;
+		noShrink?: boolean;
 		children?: import('svelte').Snippet;
 	}>();
 </script>
 
-<span class="monsan-badge variant-{variant} {className}">
+<span class="monsan-badge variant-{variant}" class:no-shrink={noShrink}>
 	{#if children}
 		{@render children()}
 	{/if}
@@ -87,5 +87,9 @@
 	:global([data-theme='dark']) .monsan-badge.variant-warning {
 		background: #facc15;
 		color: #2a2423;
+	}
+
+	.no-shrink {
+		flex-shrink: 0;
 	}
 </style>
