@@ -12,9 +12,6 @@ const config = {
 			assets: 'build',
 			fallback: '200.html'
 		})
-	},
-	package: {
-		dir: 'dist'
 	}
 };
 
