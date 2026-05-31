@@ -580,7 +580,7 @@
 	.terminal-wrapper {
 		background: var(--bg-secondary);
 		color: var(--success);
-		font-family: 'JetBrains Mono', monospace;
+		font-family: var(--font-mono);
 		padding: var(--space-md);
 		display: flex;
 		flex-direction: column;
