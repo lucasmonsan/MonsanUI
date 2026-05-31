@@ -11,7 +11,7 @@
 		"build": "vite build",
 		"build:package": "svelte-kit sync && svelte-package",
 		"preview": "vite preview",
-		"prepare": "svelte-kit sync && svelte-package",
+		"prepare": "svelte-kit sync",
 		"prepare:local": "svelte-kit sync && svelte-package",
 		"prepack:local": "svelte-kit sync && svelte-package && publint",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
