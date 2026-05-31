@@ -124,8 +124,12 @@
 	}
 
 	@keyframes splashOut {
-		from { opacity: 1; }
-		to   { opacity: 0; }
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
 	}
 
 	/* ── Content ── fades in after mount */
@@ -207,8 +211,17 @@
 	}
 
 	@keyframes spinCube {
-		0%   { transform: rotate(0deg);   background-color: var(--accent-primary); }
-		50%  { transform: rotate(180deg); background-color: var(--success); }
-		100% { transform: rotate(360deg); background-color: var(--accent-primary); }
+		0% {
+			transform: rotate(0deg);
+			background-color: var(--accent-primary);
+		}
+		50% {
+			transform: rotate(180deg);
+			background-color: var(--success);
+		}
+		100% {
+			transform: rotate(360deg);
+			background-color: var(--accent-primary);
+		}
 	}
 </style>

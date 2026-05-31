@@ -1062,6 +1062,7 @@
 	let creditsCopyright = $state('© 2026 Examster. Todos os direitos reservados.');
 	let creditsVariant = $state<'default' | 'compact'>('default');
 	let showSplashPreview = $state(false);
+	let splashKey = $state(0);
 
 	let textTag = $state<
 		'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div' | 'label' | 'small'
@@ -2348,7 +2349,13 @@
 									class="preview-render"
 									style="display: flex; align-items: center; justify-content: center; min-height: 100px; width: 100%;"
 								>
-									<Button variant="primary" onclick={() => (showSplashPreview = true)}>
+									<Button
+										variant="primary"
+										onclick={() => {
+											showSplashPreview = true;
+											splashKey++;
+										}}
+									>
 										Testar SplashScreen (2s)
 									</Button>
 								</div>
@@ -6057,48 +6064,16 @@
 		/>
 		<Loading active={isDemoLoadingActive} message={demoLoadingMessage} />
 
-		{#if showSplashPreview}
-			<SplashScreen
-				appName="Showcase App"
-				logoSrc="/favicon.svg"
-				copyright="© 2026 Showcase App. Todos os direitos reservados."
-				{creditsVariant}
-			>
-				<div
-					style="display: flex; flex-direction: column; align-items: center; gap: var(--space-xl); text-align: center;"
-				>
-					<div
-						style="display: flex; align-items: center; justify-content: center; background-color: var(--bg-secondary); border: var(--border-width) solid var(--border-color); box-shadow: var(--shadow-sm); padding: var(--space-sm); border-radius: var(--radius-md); width: 80px; height: 80px;"
-					>
-						<svg
-							viewBox="0 0 24 24"
-							width="48"
-							height="48"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							style="color: var(--accent-primary);"
-						>
-							<polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-							<line x1="12" y1="22" x2="12" y2="15.5"></line>
-							<polyline points="22 8.5 12 15.5 2 8.5"></polyline>
-							<polyline points="2 15.5 12 8.5 22 15.5"></polyline>
-							<line x1="12" y1="2" x2="12" y2="8.5"></line>
-						</svg>
-					</div>
-					<h1
-						style="font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: -0.02em; color: var(--text-primary);"
-					>
-						Showcase App
-					</h1>
-					<Button variant="primary" onclick={() => (showSplashPreview = false)}>
-						Fechar Preview
-					</Button>
-				</div>
-			</SplashScreen>
-		{/if}
+		{#key splashKey}
+			{#if showSplashPreview}
+				<SplashScreen
+					appName="Showcase App"
+					logoSrc="/favicon.svg"
+					copyright="© 2026 Showcase App. Todos os direitos reservados."
+					{creditsVariant}
+				/>
+			{/if}
+		{/key}
 	</div>
 </main>
 
