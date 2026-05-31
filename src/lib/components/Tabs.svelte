@@ -17,6 +17,7 @@
 		variant = 'default',
 		scrollable = false,
 		showNavButtons = false,
+		hideLabels = false,
 		onchange,
 		item: itemSnippet
 	} = $props<{
@@ -26,6 +27,7 @@
 		variant?: 'default' | 'underline';
 		scrollable?: boolean;
 		showNavButtons?: boolean;
+		hideLabels?: boolean;
 		onchange?: (value: string) => void;
 		item?: Snippet<[TabItem, number]>;
 	}>();
@@ -142,6 +144,7 @@
 		class:wrap-tabs={wrap}
 		class:scrollable
 		class:has-nav-buttons={scrollable && showNavButtons}
+		class:hide-labels={hideLabels}
 		role="tablist"
 		style="--mask-left: {showLeftGradient ? '48px' : '0px'}; --mask-right: {showRightGradient
 			? '48px'
@@ -426,6 +429,12 @@
 
 	:global([data-theme='dark']) .monsan-tabs-nav-btn {
 		color: var(--text-primary);
+	}
+
+	@media (max-width: 600px) {
+		.monsan-tabs-container.hide-labels .monsan-tab-text {
+			display: none;
+		}
 	}
 
 	.monsan-tabs-container.variant-underline {
