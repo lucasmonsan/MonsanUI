@@ -48,13 +48,7 @@
 
 <div class="locale-dropdown-wrapper">
 	{#if locales.length <= 2}
-		<Button
-			variant="secondary"
-			class="locale-trigger"
-			onclick={handleTriggerClick}
-			aria-label={ariaLabel}
-			{title}
-		>
+		<Button variant="secondary" square onclick={handleTriggerClick} aria-label={ariaLabel} {title}>
 			<span class="trigger-label">
 				{value.toUpperCase()}
 			</span>
@@ -62,13 +56,7 @@
 	{:else}
 		<QuickActions bind:open={isOpen} variant="dropdown" align="right">
 			{#snippet trigger()}
-				<Button
-					variant="secondary"
-					class="locale-trigger"
-					aria-label={ariaLabel}
-					aria-expanded={isOpen}
-					{title}
-				>
+				<Button variant="secondary" square aria-label={ariaLabel} aria-expanded={isOpen} {title}>
 					<span class="trigger-label">
 						{value.toUpperCase()}
 					</span>
@@ -97,15 +85,6 @@
 	.locale-dropdown-wrapper {
 		position: relative;
 		display: inline-flex;
-	}
-
-	:global(.locale-trigger) {
-		padding: 0 !important;
-		width: var(--control-height) !important;
-		height: var(--control-height) !important;
-		background-color: var(--bg-secondary) !important;
-		color: var(--text-primary) !important;
-		-webkit-tap-highlight-color: transparent;
 	}
 
 	.trigger-label {

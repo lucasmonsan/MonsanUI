@@ -10,6 +10,7 @@
 		shape?: 'default' | 'pill';
 		disabled?: boolean;
 		block?: boolean;
+		square?: boolean;
 		title?: string;
 		'aria-label'?: string;
 		[key: string]: unknown;
@@ -24,6 +25,7 @@
 		shape = 'default',
 		disabled = false,
 		block = false,
+		square = false,
 		title,
 		'aria-label': ariaLabel,
 		...restProps
@@ -36,7 +38,9 @@
 	{onclick}
 	{title}
 	aria-label={ariaLabel}
-	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} "
+	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} {square
+		? 'square'
+		: ''}"
 	{...restProps}
 >
 	{@render children?.()}
@@ -65,6 +69,12 @@
 
 	.block {
 		width: 100%;
+	}
+
+	.square {
+		padding: 0;
+		width: var(--control-height);
+		height: var(--control-height);
 	}
 
 	.size-sm {
