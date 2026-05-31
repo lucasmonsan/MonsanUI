@@ -102,8 +102,9 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-xs);
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
 		justify-content: center;
+		white-space: nowrap;
 	}
 
 	.credits-copyright {

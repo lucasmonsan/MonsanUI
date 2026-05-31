@@ -14,7 +14,7 @@
 		name = '',
 		alt = '',
 		size = 'md',
-		shape = 'circle',
+		shape = 'square',
 		class: className = '',
 		...restProps
 	}: Props = $props();

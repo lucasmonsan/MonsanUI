@@ -190,7 +190,7 @@
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
-		z-index: 50;
+		z-index: 100;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;

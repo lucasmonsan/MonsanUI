@@ -4,7 +4,7 @@
 		noShrink = false,
 		children
 	} = $props<{
-		variant?: 'default' | 'primary' | 'secondary' | 'due' | 'new' | 'warning';
+		variant?: 'default' | 'primary' | 'secondary' | 'success' | 'due' | 'new' | 'warning';
 		noShrink?: boolean;
 		children?: import('svelte').Snippet;
 	}>();
@@ -60,6 +60,15 @@
 		color: #2a2423;
 	}
 
+	.monsan-badge.variant-success {
+		background: var(--success);
+		color: var(--bg-primary);
+	}
+
+	:global([data-theme='dark']) .monsan-badge.variant-success {
+		color: var(--text-primary);
+	}
+
 	.monsan-badge.variant-due {
 		background: var(--error);
 		color: var(--bg-primary);
@@ -80,13 +89,13 @@
 	}
 
 	.monsan-badge.variant-warning {
-		background: #eab308;
-		color: #2a2423;
+		background: var(--warning);
+		color: var(--bg-primary);
 	}
 
 	:global([data-theme='dark']) .monsan-badge.variant-warning {
-		background: #facc15;
-		color: #2a2423;
+		background: color-mix(in srgb, var(--warning) 75%, black);
+		color: var(--text-primary);
 	}
 	.no-shrink {
 		flex-shrink: 0;

@@ -5,7 +5,7 @@
 		children?: Snippet;
 		onclick?: (e: MouseEvent) => void;
 		type?: 'button' | 'submit' | 'reset';
-		variant?: 'primary' | 'secondary' | 'success' | 'error' | 'neutral';
+		variant?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'neutral';
 		size?: 'sm' | 'md';
 		shape?: 'default' | 'pill';
 		disabled?: boolean;
@@ -94,6 +94,10 @@
 		background-color: var(--error);
 		color: var(--bg-primary);
 	}
+	.warning {
+		background-color: var(--warning);
+		color: var(--bg-primary);
+	}
 	.neutral {
 		background-color: var(--neutral);
 		color: var(--bg-primary);
@@ -111,6 +115,9 @@
 	}
 	:global([data-theme='dark']) .error {
 		background-color: color-mix(in srgb, var(--error) 75%, black);
+	}
+	:global([data-theme='dark']) .warning {
+		background-color: color-mix(in srgb, var(--warning) 75%, black);
 	}
 	:global([data-theme='dark']) .neutral {
 		background-color: color-mix(in srgb, var(--neutral) 75%, black);

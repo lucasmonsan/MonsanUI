@@ -25,13 +25,14 @@
 		weight = 'normal',
 		variant = 'primary',
 		truncate = false,
+		class: className = '',
 		...restProps
 	}: Props = $props();
 </script>
 
 <svelte:element
 	this={tag}
-	class="monsan-text {family} size-{size} weight-{weight} color-{variant}"
+	class="monsan-text {family} size-{size} weight-{weight} color-{variant} {className}"
 	class:truncate
 	{...restProps}
 >
@@ -123,5 +124,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		display: block;
 	}
 </style>
