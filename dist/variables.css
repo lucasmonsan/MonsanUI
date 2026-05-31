@@ -1,0 +1,229 @@
+:root {
+	/* Fluid Base */
+	--base: clamp(0.875rem, 1vw + 0.5rem, 1.125rem);
+	--control-height: calc(var(--base) * 2.25 + 2 * var(--border-width));
+
+	/* Spacing Scale */
+	--space-xs: calc(var(--base) * 0.25);
+	--space-sm: calc(var(--base) * 0.5);
+	--space-md: var(--base);
+	--space-lg: calc(var(--base) * 1.5);
+	--space-xl: calc(var(--base) * 2);
+	--space-2xl: calc(var(--base) * 3);
+
+	/* Typography Scale */
+	--text-sm: calc(var(--base) * 0.875);
+	--text-md: var(--base);
+	--text-lg: calc(var(--base) * 1.125);
+	--text-xl: calc(var(--base) * 1.5);
+	--text-2xl: calc(var(--base) * 2);
+	--text-3xl: calc(var(--base) * 3);
+
+	/* MonsanUI Classic Premium Palette */
+	--bg-primary: #fdfbf7;
+	--bg-secondary: #f4efe6;
+	--text-primary: #2d2422;
+	--text-secondary: #5e544f;
+	--brand-color: #ff8c75;
+	--accent-primary: #b94b38;
+	--accent-hover: #9c3b2a;
+	--success: #2d6a4f;
+	--success-hover: #1b4332;
+	--error: #9b2226;
+	--error-hover: #7b1a1d;
+	--warning: #e07b39;
+	--warning-hover: #c45a26;
+	--neutral: #3d5a80;
+	--info: #3d5a80;
+
+	/* Heatmap Rust Scale */
+	--heatmap-0: #f4efe6;
+	--heatmap-1: #f0c2b8;
+	--heatmap-2: #e08c7a;
+	--heatmap-3: #b94b38;
+	--heatmap-4: #8a3222;
+
+	/* Font Variables */
+	--font-display: 'Fredoka', sans-serif;
+	--font-body: 'Plus Jakarta Sans', sans-serif;
+	--font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+	/* Brutalist Structure */
+	--container-max-width: 1200px;
+	--radius-sm: 1px;
+	--radius-md: 2px;
+	--radius-lg: 4px;
+	--radius-full: 9999px;
+	--border-width: 2px;
+	--border-color: var(--text-primary);
+	--grid-color: rgba(45, 36, 34, 0.18);
+
+	/* Hard Shadows */
+	--shadow-sm: 2px 2px 0px var(--text-primary);
+	--shadow-md: 4px 4px 0px var(--text-primary);
+	--shadow-lg: 6px 6px 0px var(--text-primary);
+
+	/* Transitions */
+	--ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode (Soft Premium Brown) */
+:root[data-theme='dark'] {
+	--bg-primary: #2a2423;
+	--bg-secondary: #352e2d;
+	--text-primary: #fdfbf7;
+	--text-secondary: #b0a6a3;
+	--accent-primary: #bf6958;
+	--accent-hover: #ff8c75;
+	--success: #52b788;
+	--success-hover: #74c69d;
+	--error: #e63946;
+	--error-hover: #ff4d6d;
+	--info: #8ecae6;
+	--border-color: var(--text-primary);
+	--grid-color: rgba(253, 251, 247, 0.15);
+
+	/* Heatmap Rust Scale for Dark Mode */
+	--heatmap-0: #352e2d;
+	--heatmap-1: #4a3431;
+	--heatmap-2: #70443d;
+	--heatmap-3: #995548;
+	--heatmap-4: #c26756;
+}
+
+/* Balatro-style theme variations (will be applied via data-deck-theme) */
+[data-deck-theme='blue'],
+[data-theme='blue'] {
+	--bg-primary: #f0f4f8;
+	--bg-secondary: #e2e8f0;
+	--accent-primary: #3d5a80;
+	--accent-hover: #293241;
+	--text-primary: #2d2422;
+	--text-secondary: #5e544f;
+	--border-color: #2d2422;
+}
+
+[data-deck-theme='green'],
+[data-theme='green'] {
+	--bg-primary: #f1f8f1;
+	--bg-secondary: #e2f0e2;
+	--accent-primary: #2d6a4f;
+	--accent-hover: #1b4332;
+	--text-primary: #2d2422;
+	--text-secondary: #5e544f;
+	--border-color: #2d2422;
+}
+
+[data-deck-theme='yellow'],
+[data-theme='yellow'] {
+	--bg-primary: #fdfaf0;
+	--bg-secondary: #f9f2dc;
+	--accent-primary: #e9c46a;
+	--accent-hover: #cfa84a;
+	--text-primary: #2d2422;
+	--text-secondary: #5e544f;
+	--border-color: #2d2422;
+}
+
+[data-deck-theme='purple'],
+[data-theme='purple'] {
+	--bg-primary: #f8f1fa;
+	--bg-secondary: #f0e6f5;
+	--accent-primary: #9d4edd;
+	--accent-hover: #7a3bbb;
+	--text-primary: #2d2422;
+	--text-secondary: #5e544f;
+	--border-color: #2d2422;
+}
+
+[data-deck-theme='orange'],
+[data-theme='orange'] {
+	--bg-primary: #fdf5ef;
+	--bg-secondary: #f7ebe1;
+	--accent-primary: #f4a261;
+	--accent-hover: #d88a4e;
+	--text-primary: #2d2422;
+	--text-secondary: #5e544f;
+	--border-color: #2d2422;
+}
+
+[data-deck-theme='red'],
+[data-theme='red'] {
+	--bg-primary: #fdf2f2;
+	--bg-secondary: #fbe3e3;
+	--accent-primary: #e63946;
+	--accent-hover: #c92a35;
+	--text-primary: #2d2422;
+	--text-secondary: #5e544f;
+	--border-color: #2d2422;
+}
+
+[data-theme='blue'],
+[data-theme='green'],
+[data-theme='yellow'],
+[data-theme='purple'],
+[data-theme='orange'],
+[data-theme='red'] {
+	color: var(--text-primary);
+}
+
+/* Dark Mode Deck Theme Variations */
+:root[data-theme='dark'] [data-deck-theme='blue'] {
+	--bg-primary: #1b263b;
+	--bg-secondary: #2b3a55;
+	--accent-primary: #8ecae6;
+	--accent-hover: #a8dadc;
+	--text-primary: #f1faee;
+	--text-secondary: #cbd5e1;
+	--border-color: #f1faee;
+}
+
+:root[data-theme='dark'] [data-deck-theme='green'] {
+	--bg-primary: #132a13;
+	--bg-secondary: #31572c;
+	--accent-primary: #90a955;
+	--accent-hover: #ecf39e;
+	--text-primary: #fdfbf7;
+	--text-secondary: #cbd5e1;
+	--border-color: #fdfbf7;
+}
+
+:root[data-theme='dark'] [data-deck-theme='yellow'] {
+	--bg-primary: #3d300c;
+	--bg-secondary: #5f4d1c;
+	--accent-primary: #f0c23a;
+	--accent-hover: #ffdf7a;
+	--text-primary: #fffdf9;
+	--text-secondary: #cbd5e1;
+	--border-color: #fffdf9;
+}
+
+:root[data-theme='dark'] [data-deck-theme='purple'] {
+	--bg-primary: #2c1a3b;
+	--bg-secondary: #3d2755;
+	--accent-primary: #b388ff;
+	--accent-hover: #d1b3ff;
+	--text-primary: #fdfbf7;
+	--text-secondary: #cbd5e1;
+	--border-color: #fdfbf7;
+}
+
+:root[data-theme='dark'] [data-deck-theme='orange'] {
+	--bg-primary: #3f1d0b;
+	--bg-secondary: #5e3019;
+	--accent-primary: #ff9e00;
+	--accent-hover: #ffb703;
+	--text-primary: #fffdf9;
+	--text-secondary: #cbd5e1;
+	--border-color: #fffdf9;
+}
+
+:root[data-theme='dark'] [data-deck-theme='red'] {
+	--bg-primary: #3d0c11;
+	--bg-secondary: #5f1b22;
+	--accent-primary: #ff6b6b;
+	--accent-hover: #ff8787;
+	--text-primary: #fffdf9;
+	--text-secondary: #cbd5e1;
+	--border-color: #fffdf9;
+}
