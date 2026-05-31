@@ -108,7 +108,7 @@
 
 <div class="theme-dropdown-wrapper">
 	{#if themes.length <= 2}
-		<Button variant="secondary" square onclick={handleTriggerClick} aria-label={ariaLabel}>
+		<Button variant="secondary" square onclick={handleTriggerClick} {ariaLabel}>
 			<span class="trigger-icon">
 				{@render generalIcon(currentTheme, 18)}
 			</span>
@@ -116,7 +116,7 @@
 	{:else}
 		<QuickActions bind:open={isOpen} variant="dropdown" align="right">
 			{#snippet trigger()}
-				<Button variant="secondary" square aria-label={ariaLabel} aria-expanded={isOpen}>
+				<Button variant="secondary" square {ariaLabel} ariaExpanded={isOpen}>
 					<span class="trigger-icon">
 						{@render generalIcon(currentTheme, 18)}
 					</span>

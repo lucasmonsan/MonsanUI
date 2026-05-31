@@ -12,8 +12,14 @@
 		block?: boolean;
 		square?: boolean;
 		title?: string;
+		ariaLabel?: string;
+		ariaBusy?: boolean;
+		ariaExpanded?: boolean;
+		ariaPressed?: boolean;
+		ariaControls?: string;
 		'aria-label'?: string;
 		'aria-busy'?: boolean;
+		deckTheme?: string;
 	}
 
 	let {
@@ -27,8 +33,14 @@
 		block = false,
 		square = false,
 		title,
-		'aria-label': ariaLabel,
-		'aria-busy': ariaBusy
+		ariaLabel,
+		ariaBusy,
+		ariaExpanded,
+		ariaPressed,
+		ariaControls,
+		'aria-label': ariaLabelAttr,
+		'aria-busy': ariaBusyAttr,
+		deckTheme
 	}: Props = $props();
 </script>
 
@@ -37,8 +49,12 @@
 	{disabled}
 	{onclick}
 	{title}
-	aria-label={ariaLabel}
-	aria-busy={ariaBusy}
+	aria-label={ariaLabel ?? ariaLabelAttr}
+	aria-busy={ariaBusy ?? ariaBusyAttr}
+	aria-expanded={ariaExpanded}
+	aria-pressed={ariaPressed}
+	aria-controls={ariaControls}
+	data-deck-theme={deckTheme}
 	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} {square
 		? 'square'
 		: ''}"

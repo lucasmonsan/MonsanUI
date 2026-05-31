@@ -16,7 +16,7 @@
 <div class="monsan-progress-summary">
 	<Panel padding="0 var(--space-md)" maxWidth="100%">
 		<div class="progress-summary">
-			<ProgressBar {value} height="12px" variant="primary" aria-label={label} />
+			<ProgressBar {value} height="12px" variant="primary" ariaLabel={label} />
 			<Text tag="span" size="sm" weight="bold">{current}/{total}</Text>
 		</div>
 	</Panel>

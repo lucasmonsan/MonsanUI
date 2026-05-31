@@ -47,9 +47,19 @@
 	let contentVisible = $state(false);
 	let hiding = $state(false);
 	let hidden = $state(false);
+	let canHide = $state(false);
 
 	const FADE_DURATION = 400;
 	const MIN_VISIBLE = 2000;
+
+	function hideSplash() {
+		if (!canHide || loading || hiding || hidden) return;
+
+		hiding = true;
+		setTimeout(() => {
+			hidden = true;
+		}, FADE_DURATION);
+	}
 
 	onMount(() => {
 		// Fade content in after first paint
@@ -58,15 +68,15 @@
 		});
 
 		const hideTimer = setTimeout(() => {
-			if (!loading) {
-				hiding = true;
-				setTimeout(() => {
-					hidden = true;
-				}, FADE_DURATION);
-			}
+			canHide = true;
+			hideSplash();
 		}, MIN_VISIBLE);
 
 		return () => clearTimeout(hideTimer);
+	});
+
+	$effect(() => {
+		hideSplash();
 	});
 </script>
 

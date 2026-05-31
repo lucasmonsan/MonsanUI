@@ -2164,6 +2164,7 @@
 													<Button
 														variant="secondary"
 														size="sm"
+														square={quickActionsRevealMode === 'icon-only'}
 														onclick={() =>
 															addToast(
 																i18n.locale === 'pt'
@@ -2173,14 +2174,10 @@
 																		: 'Editar',
 																'info'
 															)}
-														class="btn-sm context-btn"
-														style={quickActionsRevealMode === 'icon-only'
-															? 'width: 32px; height: 32px; padding: 0 !important; aspect-ratio: 1; min-width: 0;'
-															: 'padding: 4px 8px !important; font-size: 11px; width: auto; min-width: 0;'}
 													>
 														<Pencil size={16} />
 														{#if quickActionsRevealMode === 'text-icon'}
-															<span style="font-size: 11px;"
+															<span class="quick-action-label"
 																>{i18n.locale === 'pt'
 																	? 'Edição'
 																	: i18n.locale === 'en'
@@ -2190,8 +2187,9 @@
 														{/if}
 													</Button>
 													<Button
-														variant="secondary"
+														variant="error"
 														size="sm"
+														square={quickActionsRevealMode === 'icon-only'}
 														onclick={() =>
 															addToast(
 																i18n.locale === 'pt'
@@ -2201,14 +2199,10 @@
 																		: 'Eliminar',
 																'error'
 															)}
-														class="btn-sm btn-delete context-btn"
-														style={quickActionsRevealMode === 'icon-only'
-															? 'width: 32px; height: 32px; padding: 0 !important; aspect-ratio: 1; min-width: 0;'
-															: 'padding: 4px 8px !important; font-size: 11px; width: auto; min-width: 0;'}
 													>
 														<Trash size={16} />
 														{#if quickActionsRevealMode === 'text-icon'}
-															<span style="font-size: 11px;"
+															<span class="quick-action-label"
 																>{i18n.locale === 'pt'
 																	? 'Lixo'
 																	: i18n.locale === 'en'
@@ -5375,8 +5369,7 @@
 												: 'Error'}</Button
 									>
 									<Button
-										variant="secondary"
-										style="background:#eab308; color:white;"
+										variant="warning"
 										onclick={() =>
 											addToast(
 												i18n.locale === 'pt'

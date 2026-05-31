@@ -6,6 +6,7 @@
 		variant?: 'primary' | 'success' | 'warning' | 'error' | 'info';
 		striped?: boolean;
 		animated?: boolean;
+		ariaLabel?: string;
 	}
 
 	let {
@@ -14,7 +15,8 @@
 		showLabel = false,
 		variant = 'primary',
 		striped = false,
-		animated = false
+		animated = false,
+		ariaLabel
 	}: Props = $props();
 
 	// Clamp the value between 0 and 100
@@ -36,6 +38,7 @@
 	aria-valuenow={clampedValue}
 	aria-valuemin="0"
 	aria-valuemax="100"
+	aria-label={ariaLabel}
 >
 	<div
 		class="progress-bar {variant}"

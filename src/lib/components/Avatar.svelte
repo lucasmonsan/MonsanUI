@@ -5,9 +5,21 @@
 		alt?: string;
 		size?: 'sm' | 'md' | 'lg' | number; // pre-sets or pixel value
 		shape?: 'circle' | 'square';
+		onclick?: (e: MouseEvent) => void;
+		title?: string;
+		ariaLabel?: string;
 	}
 
-	let { src, name = '', alt = '', size = 'md', shape = 'square' }: Props = $props();
+	let {
+		src,
+		name = '',
+		alt = '',
+		size = 'md',
+		shape = 'square',
+		onclick,
+		title,
+		ariaLabel
+	}: Props = $props();
 
 	let imageFailed = $state(false);
 
@@ -41,10 +53,7 @@
 	});
 </script>
 
-<div
-	class="monsan-avatar {shape}"
-	style="width: {finalSize}; height: {finalSize}; font-size: calc({finalSize} * 0.38);"
->
+{#snippet avatarContent()}
 	{#if src && !imageFailed}
 		<img {src} alt={alt || name} class="avatar-img" onerror={handleImageError} />
 	{:else}
@@ -52,7 +61,27 @@
 			{initials || '?'}
 		</div>
 	{/if}
-</div>
+{/snippet}
+
+{#if onclick}
+	<button
+		type="button"
+		class="monsan-avatar {shape} interactive"
+		style="width: {finalSize}; height: {finalSize}; font-size: calc({finalSize} * 0.38);"
+		{onclick}
+		{title}
+		aria-label={ariaLabel || title || name || alt || 'Avatar'}
+	>
+		{@render avatarContent()}
+	</button>
+{:else}
+	<div
+		class="monsan-avatar {shape}"
+		style="width: {finalSize}; height: {finalSize}; font-size: calc({finalSize} * 0.38);"
+	>
+		{@render avatarContent()}
+	</div>
+{/if}
 
 <style>
 	.monsan-avatar {
@@ -69,6 +98,12 @@
 		font-weight: 800;
 		text-transform: uppercase;
 		user-select: none;
+	}
+
+	button.monsan-avatar {
+		padding: 0;
+		cursor: pointer;
+		font: inherit;
 	}
 
 	.monsan-avatar.circle {

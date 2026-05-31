@@ -174,35 +174,38 @@
 			<div class="context-buttons">
 				<Button
 					variant="secondary"
+					size="sm"
+					square
 					onclick={(e: MouseEvent) => {
 						e.stopPropagation();
 						onDuplicate?.();
 					}}
 					title={labels?.duplicate ?? 'Duplicate'}
-					class="btn-sm context-btn"
 				>
 					<Copy size={20} />
 				</Button>
 
 				<Button
 					variant="secondary"
+					size="sm"
+					square
 					onclick={(e: MouseEvent) => {
 						e.stopPropagation();
 						onEdit?.();
 					}}
 					title={labels?.edit ?? 'Edit'}
-					class="btn-sm context-btn"
 				>
 					<Pencil size={20} />
 				</Button>
 				<Button
-					variant="secondary"
+					variant="error"
+					size="sm"
+					square
 					onclick={(e: MouseEvent) => {
 						e.stopPropagation();
 						onDelete?.();
 					}}
 					title={labels?.delete ?? 'Delete'}
-					class="btn-sm btn-delete context-btn"
 				>
 					<Trash size={20} />
 				</Button>
@@ -228,7 +231,7 @@
 				{#each modes as mode (mode.id)}
 					<Button
 						variant="primary"
-						class="btn-sm"
+						size="sm"
 						onclick={() => {
 							onStartSession?.(mode.id);
 						}}
