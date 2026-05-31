@@ -9,6 +9,7 @@
 		variant = 'dropdown',
 		align = 'right',
 		width = variant === 'dropdown' ? 'max-content' : '70%',
+		class: className = '',
 		triggerLabel,
 		trigger,
 		children
@@ -17,6 +18,7 @@
 		variant?: 'dropdown' | 'reveal';
 		align?: 'left' | 'right';
 		width?: string;
+		class?: string;
 		triggerLabel?: string;
 		trigger?: import('svelte').Snippet;
 		children?: import('svelte').Snippet;
@@ -87,7 +89,7 @@
 
 <div
 	bind:this={containerEl}
-	class="monsan-quick-actions-wrapper "
+	class="monsan-quick-actions-wrapper {className}"
 	class:is-reveal={variant === 'reveal'}
 >
 	{#if trigger}

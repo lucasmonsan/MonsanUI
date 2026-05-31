@@ -6,6 +6,7 @@
 		disabled?: boolean;
 		label?: string;
 		size?: 'sm' | 'md';
+		class?: string;
 	}
 
 	let {
@@ -13,6 +14,7 @@
 		disabled = false,
 		label = '',
 		size = 'md',
+		class: className = '',
 		...rest
 	}: Props = $props();
 </script>
@@ -20,7 +22,7 @@
 <label
 	class="monsan-checkbox-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled
 		? 'disabled'
-		: ''} "
+		: ''} {className}"
 >
 	<input type="checkbox" bind:checked {disabled} class="sr-only" {...rest} />
 	<div class="checkbox-box" class:checked>

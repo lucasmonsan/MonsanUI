@@ -15,6 +15,7 @@
 		focusOnMount?: boolean;
 		showIcon?: boolean;
 		role?: string;
+		class?: string;
 		children?: Snippet;
 		[key: string]: unknown;
 	}
@@ -28,6 +29,7 @@
 		focusOnMount = false,
 		showIcon = true,
 		role,
+		class: className = '',
 		children,
 		...restProps
 	}: Props = $props();
@@ -46,7 +48,7 @@
 
 <div
 	bind:this={alertElement}
-	class="monsan-alert {type} "
+	class="monsan-alert {type} {className}"
 	role={role ?? defaultRole}
 	tabindex="-1"
 	{...restProps}

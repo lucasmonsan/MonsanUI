@@ -7,6 +7,7 @@
 		max?: number;
 		step?: number;
 		disabled?: boolean;
+		class?: string;
 	}
 
 	let {
@@ -15,6 +16,7 @@
 		max = 100,
 		step = 1,
 		disabled = false,
+		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -23,7 +25,7 @@
 </script>
 
 <div
-	class="monsan-range-container {disabled ? 'disabled' : ''} "
+	class="monsan-range-container {disabled ? 'disabled' : ''} {className}"
 	style="--range-percentage: {percentage}%"
 >
 	<input type="range" bind:value {min} {max} {step} {disabled} class="monsan-range" {...rest} />

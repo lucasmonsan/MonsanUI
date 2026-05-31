@@ -36,7 +36,7 @@
 	{onclick}
 	{title}
 	aria-label={ariaLabel}
-	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''}"
+	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} "
 	{...restProps}
 >
 	{@render children?.()}

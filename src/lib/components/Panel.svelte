@@ -46,7 +46,7 @@
 <svelte:element
 	this={tag}
 	class="monsan-panel {variant} overflow-{overflow} {interactive ? 'is-interactive' : ''}"
-	style="padding: {padding}; max-width: {maxWidth}; width: 100%;"
+	style="padding: {padding}; max-width: {maxWidth}; width: 100%"
 	{onclick}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}

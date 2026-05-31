@@ -4,6 +4,9 @@
 	interface Props {
 		children?: Snippet;
 		/**
+		 * Classes adicionais para customização
+		 */
+		/**
 		 * Largura máxima do container. Por padrão usa a variável CSS global `--container-max-width`.
 		 */
 		maxWidth?: string;

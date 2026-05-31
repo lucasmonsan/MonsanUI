@@ -2,6 +2,7 @@
 	interface Props {
 		value?: number; // 0 to 100
 		height?: string;
+		class?: string;
 		showLabel?: boolean;
 		variant?: 'primary' | 'success' | 'warning' | 'error' | 'info';
 		striped?: boolean;
@@ -12,6 +13,7 @@
 	let {
 		value = 0,
 		height = '16px',
+		class: className = '',
 		showLabel = false,
 		variant = 'primary',
 		striped = false,
@@ -32,7 +34,7 @@
 </script>
 
 <div
-	class="monsan-progress-container "
+	class="monsan-progress-container {className}"
 	style="--progress-height: {height};"
 	role="progressbar"
 	aria-valuenow={clampedValue}

@@ -9,12 +9,14 @@
 		value?: Date | null;
 		placeholder?: string;
 		disabled?: boolean;
+		class?: string;
 	}
 
 	let {
 		value = $bindable(null),
 		placeholder,
 		disabled = false,
+		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -87,7 +89,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-datepicker-container ">
+<div bind:this={containerEl} class="monsan-datepicker-container {className}">
 	<button
 		type="button"
 		class="datepicker-trigger"

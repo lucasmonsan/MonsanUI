@@ -6,11 +6,13 @@
 	interface Props extends Omit<HTMLButtonAttributes, 'value' | 'type'> {
 		value?: string;
 		disabled?: boolean;
+		class?: string;
 	}
 
 	let {
 		value = $bindable('#c44933'),
 		disabled = false,
+		class: className = '',
 		...rest
 	}: Props = $props();
 
@@ -87,7 +89,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-color-picker-container ">
+<div bind:this={containerEl} class="monsan-color-picker-container {className}">
 	<button
 		type="button"
 		class="color-picker-trigger"
