@@ -11,6 +11,8 @@
 		padding?: string;
 		/** Max width of the panel. Defaults to '512px' */
 		maxWidth?: string;
+		/** Expand to fill parent height */
+		fullHeight?: boolean;
 		/** Neubrutalist color theme variant. Defaults to 'primary' */
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
 		/** Optional overflow handling for content that can exceed the panel width. */
@@ -27,6 +29,7 @@
 		interactive = false,
 		padding = 'var(--space-lg)',
 		maxWidth = '512px',
+		fullHeight = false,
 		variant = 'primary',
 		overflow = 'visible',
 		onclick,
@@ -46,7 +49,9 @@
 <svelte:element
 	this={tag}
 	class="monsan-panel {variant} overflow-{overflow} {interactive ? 'is-interactive' : ''}"
-	style="padding: {padding}; max-width: {maxWidth}; width: 100%"
+	style="padding: {padding}; max-width: {maxWidth}; width: 100%; {fullHeight
+		? 'height: 100%;'
+		: ''}"
 	{onclick}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}
