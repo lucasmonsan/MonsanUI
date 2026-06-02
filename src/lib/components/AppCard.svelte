@@ -26,9 +26,16 @@
 		actions,
 		titleId
 	}: Props = $props();
+
+	let labelledBy = $derived(titleId || undefined);
+	let fallbackLabel = $derived(titleId ? undefined : title);
 </script>
 
-<article class="monsan-app-card state-{state}" aria-labelledby={titleId}>
+<article
+	class="monsan-app-card state-{state}"
+	aria-labelledby={labelledBy}
+	aria-label={fallbackLabel}
+>
 	<div class="app-card-main">
 		{#if logo}
 			<div class="app-card-logo" aria-hidden="true">

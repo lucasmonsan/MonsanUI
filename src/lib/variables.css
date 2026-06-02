@@ -35,6 +35,12 @@
 	--warning-hover: #c45a26;
 	--neutral: #3d5a80;
 	--info: #3d5a80;
+	--folder-blue: #3d5a80;
+	--folder-green: #2d6a4f;
+	--folder-yellow: #e9c46a;
+	--folder-purple: #9d4edd;
+	--folder-orange: #f4a261;
+	--folder-red: #e63946;
 
 	/* Heatmap Rust Scale */
 	--heatmap-0: #f4efe6;
@@ -80,6 +86,12 @@
 	--error: #e63946;
 	--error-hover: #ff4d6d;
 	--info: #8ecae6;
+	--folder-blue: #8ecae6;
+	--folder-green: #90a955;
+	--folder-yellow: #f0c23a;
+	--folder-purple: #b388ff;
+	--folder-orange: #ff9e00;
+	--folder-red: #ff6b6b;
 	--border-color: var(--text-primary);
 	--grid-color: rgba(253, 251, 247, 0.15);
 

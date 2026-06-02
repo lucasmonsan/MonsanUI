@@ -23,7 +23,6 @@
 
 	let imageFailed = $state(false);
 
-	// Generate fallback initials
 	let initials = $derived.by(() => {
 		if (!name) return '';
 		const parts = name.trim().split(/\s+/);
@@ -32,7 +31,6 @@
 		return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 	});
 
-	// Get dimensions based on size input
 	const sizeMap = {
 		sm: '32px',
 		md: '48px',
@@ -45,7 +43,6 @@
 		imageFailed = true;
 	}
 
-	// Reset error state if the src prop changes dynamically
 	$effect(() => {
 		if (src) {
 			imageFailed = false;
@@ -127,12 +124,6 @@
 		align-items: center;
 		justify-content: center;
 		font-family: var(--font-display);
-		background-color: var(--bg-secondary);
-		color: var(--text-primary);
-	}
-
-	/* Randomish colors based on initial letter for fallback avatars */
-	:global([data-theme='dark']) .avatar-fallback {
 		background-color: var(--bg-secondary);
 		color: var(--text-primary);
 	}
