@@ -12,6 +12,7 @@
 		align = 'right',
 		width = variant === 'dropdown' ? 'max-content' : '70%',
 		triggerLabel,
+		triggerBehavior = 'wrapper',
 		trigger,
 		children
 	} = $props<{
@@ -20,7 +21,8 @@
 		align?: 'left' | 'right';
 		width?: ActionPanelWidthPreset;
 		triggerLabel?: string;
-		trigger?: import('svelte').Snippet;
+		triggerBehavior?: 'wrapper' | 'child';
+		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
 	}>();
 
@@ -66,7 +68,7 @@
 			const listener = (e: MouseEvent) => {
 				const target = e.target as HTMLElement;
 				const clickedButton = target.closest('button, a');
-				if (clickedButton) {
+				if (clickedButton && !clickedButton.closest('[data-menu-persistent]')) {
 					queueMicrotask(() => {
 						open = false;
 					});
@@ -92,23 +94,29 @@
 	class:is-reveal={variant === 'reveal'}
 >
 	{#if trigger}
-		<div
-			class="quick-actions-trigger"
-			onclick={toggle}
-			onkeydown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					open = !open;
-				}
-			}}
-			role="button"
-			tabindex="0"
-			aria-label={activeTriggerLabel}
-			aria-haspopup="menu"
-			aria-expanded={open}
-		>
-			{@render trigger()}
-		</div>
+		{#if triggerBehavior === 'wrapper'}
+			<div
+				class="quick-actions-trigger"
+				onclick={toggle}
+				onkeydown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						event.preventDefault();
+						open = !open;
+					}
+				}}
+				role="button"
+				tabindex="0"
+				aria-label={activeTriggerLabel}
+				aria-haspopup="menu"
+				aria-expanded={open}
+			>
+				{@render trigger(toggle)}
+			</div>
+		{:else}
+			<div class="quick-actions-trigger">
+				{@render trigger(toggle)}
+			</div>
+		{/if}
 	{/if}
 
 	{#if open}
@@ -168,7 +176,7 @@
 		flex-direction: column;
 		padding: var(--space-xs);
 		gap: var(--space-xs);
-		overflow: hidden;
+		overflow: visible;
 	}
 
 	.quick-actions-panel.variant-dropdown.align-right {

@@ -9,21 +9,29 @@
 		label: string;
 	}
 
+	interface Props {
+		value?: string;
+		storageKey?: string;
+		themes?: ThemeOption[];
+		onChange?: (themeId: string) => void;
+		ariaLabel?: string;
+		display?: 'icon' | 'label';
+	}
+
 	let {
+		value = $bindable('light'),
 		storageKey = 'theme',
 		themes = [
 			{ id: 'light', label: 'Light' },
 			{ id: 'dark', label: 'Dark' }
 		],
-		ariaLabel = 'Alternar tema'
-	} = $props<{
-		storageKey?: string;
-		themes?: ThemeOption[];
-		ariaLabel?: string;
-	}>();
+		onChange,
+		ariaLabel = 'Alternar tema',
+		display = 'icon'
+	}: Props = $props();
 
-	let currentTheme = $state('light');
 	let isOpen = $state(false);
+	let activeTheme = $derived(themes.find((theme) => theme.id === value));
 
 	onMount(() => {
 		const saved = localStorage.getItem(storageKey);
@@ -40,20 +48,21 @@
 			}
 		}
 
-		currentTheme = initialTheme;
-		document.documentElement.setAttribute('data-theme', currentTheme);
+		value = initialTheme;
+		document.documentElement.setAttribute('data-theme', value);
 	});
 
 	function selectTheme(themeId: string) {
-		currentTheme = themeId;
+		value = themeId;
 		document.documentElement.setAttribute('data-theme', themeId);
 		localStorage.setItem(storageKey, themeId);
+		onChange?.(themeId);
 		isOpen = false;
 	}
 
 	function handleTriggerClick() {
 		if (themes.length <= 2) {
-			const currentIndex = themes.findIndex((t: ThemeOption) => t.id === currentTheme);
+			const currentIndex = themes.findIndex((t: ThemeOption) => t.id === value);
 			const activeIdx = currentIndex === -1 ? 0 : currentIndex;
 			const nextIndex = (activeIdx + 1) % themes.length;
 			selectTheme(themes[nextIndex].id);
@@ -107,18 +116,35 @@
 
 <div class="theme-dropdown-wrapper">
 	{#if themes.length <= 2}
-		<Button variant="secondary" square onclick={handleTriggerClick} {ariaLabel}>
+		<Button
+			variant="secondary"
+			square={display === 'icon'}
+			onclick={handleTriggerClick}
+			{ariaLabel}
+		>
 			<span class="trigger-icon">
-				{@render generalIcon(currentTheme, 18)}
+				{@render generalIcon(value, 18)}
 			</span>
+			{#if display === 'label'}
+				<span>{activeTheme?.label ?? value}</span>
+			{/if}
 		</Button>
 	{:else}
-		<QuickActions bind:open={isOpen} variant="dropdown" align="right">
-			{#snippet trigger()}
-				<Button variant="secondary" square {ariaLabel} ariaExpanded={isOpen}>
+		<QuickActions bind:open={isOpen} variant="dropdown" align="right" triggerBehavior="child">
+			{#snippet trigger(toggleMenu)}
+				<Button
+					variant="secondary"
+					square={display === 'icon'}
+					onclick={toggleMenu}
+					{ariaLabel}
+					ariaExpanded={isOpen}
+				>
 					<span class="trigger-icon">
-						{@render generalIcon(currentTheme, 18)}
+						{@render generalIcon(value, 18)}
 					</span>
+					{#if display === 'label'}
+						<span>{activeTheme?.label ?? value}</span>
+					{/if}
 				</Button>
 			{/snippet}
 
@@ -126,7 +152,7 @@
 				<button
 					type="button"
 					class="dropdown-item"
-					class:active={currentTheme === theme.id}
+					class:active={value === theme.id}
 					onclick={() => selectTheme(theme.id)}
 					role="menuitem"
 				>

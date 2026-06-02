@@ -14,6 +14,7 @@
 		onChange?: (localeId: string) => void;
 		ariaLabel?: string;
 		title?: string;
+		display?: 'compact' | 'label';
 	}
 
 	let {
@@ -25,10 +26,12 @@
 		],
 		onChange,
 		ariaLabel = 'Alternar idioma / Toggle language / Cambiar idioma',
-		title = 'Alternar idioma / Toggle language / Cambiar idioma'
+		title = 'Alternar idioma / Toggle language / Cambiar idioma',
+		display = 'compact'
 	}: Props = $props();
 
 	let isOpen = $state(false);
+	let activeLocale = $derived(locales.find((locale) => locale.id === value));
 
 	function selectLocale(localeId: string) {
 		value = localeId;
@@ -48,17 +51,34 @@
 
 <div class="locale-dropdown-wrapper">
 	{#if locales.length <= 2}
-		<Button variant="secondary" square onclick={handleTriggerClick} {ariaLabel} {title}>
+		<Button
+			variant="secondary"
+			square={display === 'compact'}
+			onclick={handleTriggerClick}
+			{ariaLabel}
+			{title}
+		>
 			<span class="trigger-label">
-				{value.toUpperCase()}
+				{display === 'label'
+					? (activeLocale?.name ?? activeLocale?.label ?? value)
+					: value.toUpperCase()}
 			</span>
 		</Button>
 	{:else}
-		<QuickActions bind:open={isOpen} variant="dropdown" align="right">
-			{#snippet trigger()}
-				<Button variant="secondary" square {ariaLabel} ariaExpanded={isOpen} {title}>
+		<QuickActions bind:open={isOpen} variant="dropdown" align="right" triggerBehavior="child">
+			{#snippet trigger(toggleMenu)}
+				<Button
+					variant="secondary"
+					square={display === 'compact'}
+					onclick={toggleMenu}
+					{ariaLabel}
+					ariaExpanded={isOpen}
+					{title}
+				>
 					<span class="trigger-label">
-						{value.toUpperCase()}
+						{display === 'label'
+							? (activeLocale?.name ?? activeLocale?.label ?? value)
+							: value.toUpperCase()}
 					</span>
 				</Button>
 			{/snippet}

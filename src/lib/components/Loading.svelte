@@ -2,57 +2,50 @@
 	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
-		/** Exibe ou oculta o loading */
 		active?: boolean;
-		/** Mensagem customizada. Se não fornecida, usa o i18n padrão */
 		message?: string;
 	}
 
 	let { active = false, message }: Props = $props();
 
-	let containerEl = $state<HTMLDivElement>();
+	let containerEl = $state<HTMLDialogElement>();
 	let previousActiveElement = $state<HTMLElement | null>(null);
 
-	// Focus trapping para acessibilidade (a11y)
 	$effect(() => {
-		if (active) {
-			if (typeof document !== 'undefined') {
-				previousActiveElement = document.activeElement as HTMLElement;
-				// Aguarda renderização e foca o container
-				const timer = setTimeout(() => {
-					containerEl?.focus();
-				}, 50);
-
-				const handleFocus = (e: FocusEvent) => {
-					if (containerEl && !containerEl.contains(e.target as Node)) {
-						e.preventDefault();
-						containerEl.focus();
-					}
-				};
-
-				document.addEventListener('focusin', handleFocus);
-				return () => {
-					clearTimeout(timer);
-					document.removeEventListener('focusin', handleFocus);
-					previousActiveElement?.focus();
-				};
-			}
+		if (!active || !containerEl || typeof document === 'undefined') {
+			return;
 		}
+
+		previousActiveElement =
+			document.activeElement instanceof HTMLElement ? document.activeElement : null;
+		containerEl.showModal();
+		containerEl.focus();
+
+		return () => {
+			if (containerEl?.open) {
+				containerEl.close();
+			}
+			previousActiveElement?.focus();
+		};
 	});
 
 	let displayMessage = $derived(message ?? i18n.t('loading.message'));
+
+	function preventDismiss(event: Event) {
+		event.preventDefault();
+	}
 </script>
 
 {#if active}
-	<div
+	<dialog
 		bind:this={containerEl}
 		class="monsan-loading-overlay"
-		role="status"
-		aria-busy={active ? 'true' : 'false'}
-		aria-live="polite"
+		aria-label={displayMessage}
+		aria-busy="true"
 		tabindex="-1"
+		oncancel={preventDismiss}
 	>
-		<div class="loading-card">
+		<div class="loading-card" role="status" aria-live="polite">
 			<div class="spinner-box">
 				<div class="brutalist-spinner"></div>
 			</div>
@@ -60,22 +53,32 @@
 				<span class="loading-text">{displayMessage}</span>
 			{/if}
 		</div>
-	</div>
+	</dialog>
 {/if}
 
 <style>
 	.monsan-loading-overlay {
-		position: fixed;
-		inset: 0;
-		z-index: 10000;
-		background-color: rgba(45, 36, 34, 0.45);
+		width: 100vw;
+		height: 100dvh;
+		max-width: none;
+		max-height: none;
+		margin: 0;
+		border: 0;
+		background-color: color-mix(in srgb, var(--bg-primary) 45%, transparent);
 		backdrop-filter: blur(4px);
-		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: var(--space-md);
 		outline: none;
 		animation: overlayFadeIn 0.2s var(--ease-out);
+	}
+
+	.monsan-loading-overlay[open] {
+		display: flex;
+	}
+
+	.monsan-loading-overlay:not([open]) {
+		display: none;
 	}
 
 	@keyframes overlayFadeIn {

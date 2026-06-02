@@ -49,6 +49,10 @@
 	import Alert from '$lib/components/Alert.svelte';
 	import ProgressBar from '$lib/components/ProgressBar.svelte';
 	import Avatar from '$lib/components/Avatar.svelte';
+	import AvatarMenu from '$lib/components/AvatarMenu.svelte';
+	import AppHeader from '$lib/components/AppHeader.svelte';
+	import MenuControl from '$lib/components/MenuControl.svelte';
+	import MenuItem from '$lib/components/MenuItem.svelte';
 	import Separator from '$lib/components/Separator.svelte';
 	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
 
@@ -97,7 +101,7 @@
 	// Active copy highlights
 	let copiedIndex = $state<number | null>(null);
 
-	const themeSelectorCode = `import ThemeSelector from '$lib/components/ThemeSelector.svelte';\n\n<!-- Padrão (2 temas - Light/Dark): cicla no clique -->\n<ThemeSelector />\n\n<!-- Customizado (3+ temas): abre menu dropdown -->\n<ThemeSelector\n\tthemes={[\n\t\t{ id: 'light', label: 'Claro' },\n\t\t{ id: 'dark', label: 'Escuro' },\n\t\t{ id: 'blue', label: 'Azul do Mar' }\n\t]}\n\tstorageKey="theme-custom"\n/>`;
+	const themeSelectorCode = `import ThemeSelector from '$lib/components/ThemeSelector.svelte';\n\n<!-- Default (2 themes): cycles on click -->\n<ThemeSelector />\n\n<!-- Custom (3+ themes): opens a dropdown menu -->\n<ThemeSelector\n\tthemes={[\n\t\t{ id: 'light', label: 'Light' },\n\t\t{ id: 'dark', label: 'Dark' },\n\t\t{ id: 'blue', label: 'Ocean Blue' }\n\t]}\n\tstorageKey="theme-custom"\n/>`;
 
 	function copyToClipboard(text: string, index: number) {
 		navigator.clipboard.writeText(text);
@@ -1221,6 +1225,19 @@
 	let avatarSrc = $state(
 		'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=60'
 	);
+	let demoHeaderTheme = $state('light');
+	let demoHeaderLocale = $state('pt');
+	let demoHeaderActiveTab = $state('dashboard');
+	let demoHeaderTabs = $derived([
+		{
+			id: 'dashboard',
+			label: i18n.locale === 'pt' ? 'Painel' : i18n.locale === 'en' ? 'Dashboard' : 'Panel'
+		},
+		{
+			id: 'profile',
+			label: i18n.locale === 'pt' ? 'Perfil' : i18n.locale === 'en' ? 'Profile' : 'Perfil'
+		}
+	]);
 
 	let alertCode = $derived(
 		`import Alert from '$lib/components/Alert.svelte';\n\n` +
@@ -1238,6 +1255,32 @@
 		`import Avatar from '$lib/components/Avatar.svelte';\n\n` +
 			`<Avatar src="${avatarSrc}" name="${avatarName}" size="${avatarSize}" shape="${avatarShape}" />`
 	);
+
+	const appHeaderCode = `import {
+\tAppHeader,
+\tAvatarMenu,
+\tLanguageSelector,
+\tMenuControl,
+\tMenuItem,
+\tTabs,
+\tThemeSelector
+} from 'monsan-ui';
+
+<AppHeader title="Examster" sticky horizontalPadding="none">
+\t{#snippet actions()}
+\t\t<AvatarMenu name="Lucas Monsan" shape="square" ariaLabel="Open user menu">
+\t\t\t<MenuControl align="right">
+\t\t\t\t<ThemeSelector bind:value={theme} display="label" />
+\t\t\t</MenuControl>
+\t\t\t<MenuControl align="right">
+\t\t\t\t<LanguageSelector bind:value={locale} display="label" />
+\t\t\t</MenuControl>
+\t\t</AvatarMenu>
+\t{/snippet}
+\t{#snippet secondary()}
+\t\t<Tabs bind:value={activeTab} items={tabs} />
+\t{/snippet}
+</AppHeader>`;
 
 	// New Knobs states
 	let buttonShowIcon = $state(false);
@@ -5862,6 +5905,104 @@
 							<pre><code>{avatarCode}</code></pre>
 						</div>
 					</div>
+
+					<div class="component-card panel">
+						<div class="component-info">
+							<h3>AppHeader</h3>
+							<p>
+								{i18n.locale === 'pt'
+									? 'Cabeçalho em duas linhas com ações, navegação secundária e menu de usuário composto.'
+									: i18n.locale === 'en'
+										? 'Two-row header with actions, secondary navigation, and a composed user menu.'
+										: 'Encabezado de dos filas con acciones, navegación secundaria y menú de usuario compuesto.'}
+							</p>
+						</div>
+						<div class="component-showcase-grid layout-vertical">
+							<div class="preview-box app-header-preview">
+								<span class="box-label">{i18n.t('common.preview')}</span>
+								<AppHeader title="Examster" maxWidth="full" horizontalPadding="none">
+									{#snippet logo()}
+										<Sparkles size={24} />
+									{/snippet}
+									{#snippet actions()}
+										<AvatarMenu
+											src={avatarSrc}
+											name={avatarName}
+											size="md"
+											shape="square"
+											ariaLabel={i18n.locale === 'pt'
+												? 'Abrir menu do usuário'
+												: i18n.locale === 'en'
+													? 'Open user menu'
+													: 'Abrir menú del usuario'}
+										>
+											<MenuItem
+												align="right"
+												onclick={() =>
+													addToast(
+														i18n.locale === 'pt'
+															? 'Perfil selecionado'
+															: i18n.locale === 'en'
+																? 'Profile selected'
+																: 'Perfil seleccionado',
+														'info'
+													)}
+											>
+												<User size={16} />
+												{i18n.locale === 'pt'
+													? 'Perfil'
+													: i18n.locale === 'en'
+														? 'Profile'
+														: 'Perfil'}
+											</MenuItem>
+											<MenuControl align="right">
+												<ThemeSelector bind:value={demoHeaderTheme} display="label" />
+											</MenuControl>
+											<MenuControl align="right">
+												<LanguageSelector bind:value={demoHeaderLocale} display="label" />
+											</MenuControl>
+											<MenuItem
+												align="right"
+												variant="error"
+												onclick={() =>
+													addToast(
+														i18n.locale === 'pt'
+															? 'Sair selecionado'
+															: i18n.locale === 'en'
+																? 'Sign out selected'
+																: 'Cerrar sesión seleccionado',
+														'info'
+													)}
+											>
+												<LogOut size={16} />
+												{i18n.locale === 'pt'
+													? 'Sair'
+													: i18n.locale === 'en'
+														? 'Sign out'
+														: 'Cerrar sesión'}
+											</MenuItem>
+										</AvatarMenu>
+									{/snippet}
+									{#snippet secondary()}
+										<Tabs
+											bind:value={demoHeaderActiveTab}
+											items={demoHeaderTabs}
+											variant="underline"
+										/>
+									{/snippet}
+								</AppHeader>
+							</div>
+						</div>
+						<div class="code-container">
+							<div class="code-header">
+								<span>Svelte 5</span>
+								<button onclick={() => copyToClipboard(appHeaderCode, 204)}>
+									{copiedIndex === 204 ? i18n.t('common.copied') : i18n.t('common.copy')}
+								</button>
+							</div>
+							<pre><code>{appHeaderCode}</code></pre>
+						</div>
+					</div>
 				{/if}
 			</section>
 			<Search
@@ -6262,6 +6403,11 @@
 		flex: 1;
 		width: 100%;
 		min-width: 0;
+	}
+
+	.app-header-preview {
+		justify-content: center;
+		overflow: visible;
 	}
 
 	.knobs-content {
