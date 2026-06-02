@@ -84,7 +84,6 @@
 	{#if themeId === 'light' || themeId === 'dark'}
 		{@render themeIcon(themeId, size)}
 	{:else}
-		<!-- Palette Icon for custom themes -->
 		<svg
 			width={size}
 			height={size}
@@ -179,10 +178,6 @@
 
 	.dropdown-item.active {
 		background: var(--accent-primary);
-		color: var(--bg-primary);
-	}
-
-	:global([data-theme='dark']) .dropdown-item.active {
 		color: var(--text-primary);
 	}
 

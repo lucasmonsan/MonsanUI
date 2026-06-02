@@ -233,6 +233,7 @@
 					{/snippet}
 					<button type="button" class="dropdown-item" onclick={(e) => triggerEdit(folder.id, e)}>
 						<svg
+							class="dropdown-item-icon"
 							width="12"
 							height="12"
 							viewBox="0 0 24 24"
@@ -241,7 +242,6 @@
 							stroke-width="2.5"
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							style="margin-right: 6px;"
 						>
 							<path d="M12 20h9" />
 							<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
@@ -254,6 +254,7 @@
 						onclick={(e) => triggerDelete(folder.id, e)}
 					>
 						<svg
+							class="dropdown-item-icon"
 							width="12"
 							height="12"
 							viewBox="0 0 24 24"
@@ -262,7 +263,6 @@
 							stroke-width="2.5"
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							style="margin-right: 6px;"
 						>
 							<path d="M3 6h18" />
 							<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
@@ -495,8 +495,6 @@
 		align-items: center;
 		height: 100%;
 		border-radius: var(--radius-md) 0 0 var(--radius-md);
-
-		/* Ellipsis Truncation Setup */
 		max-width: 200px;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -524,11 +522,6 @@
 	}
 
 	.folder-chip.active .folder-options-btn {
-		color: var(--bg-primary);
-		border-left-color: var(--bg-primary);
-	}
-
-	:global([data-theme='dark']) .folder-chip.active .folder-options-btn {
 		color: var(--text-primary);
 		border-left-color: var(--text-primary);
 	}
@@ -555,11 +548,10 @@
 	}
 
 	.folder-options-btn:hover {
-		background: rgba(0, 0, 0, 0.05);
+		background: var(--bg-secondary);
 		color: var(--text-primary);
 	}
 
-	/* Options Dropdown Items styling */
 	.dropdown-item {
 		background: transparent;
 		border: none;
@@ -589,13 +581,17 @@
 		background: color-mix(in srgb, var(--error) 10%, var(--bg-primary));
 	}
 
+	.dropdown-item-icon {
+		margin-right: var(--space-xs);
+	}
+
 	.folder-chip.mode-edit {
-		border-color: #3d5a80;
+		border-color: var(--info);
 		border-style: dashed;
 	}
 
 	.folder-chip.mode-delete {
-		border-color: #e63946;
+		border-color: var(--error);
 		border-style: dashed;
 	}
 
@@ -626,7 +622,6 @@
 		box-shadow: none;
 	}
 
-	/* Form Styles */
 	.folder-form {
 		display: flex;
 		flex-direction: column;
@@ -686,22 +681,22 @@
 		background: var(--bg-secondary);
 	}
 	.color-btn.blue {
-		background: #3d5a80;
+		background: var(--folder-blue, var(--info));
 	}
 	.color-btn.green {
-		background: #2d6a4f;
+		background: var(--folder-green, var(--success));
 	}
 	.color-btn.yellow {
-		background: #e9c46a;
+		background: var(--folder-yellow, var(--warning));
 	}
 	.color-btn.purple {
-		background: #9d4edd;
+		background: var(--folder-purple, var(--accent-secondary));
 	}
 	.color-btn.orange {
-		background: #f4a261;
+		background: var(--folder-orange, var(--accent-primary));
 	}
 	.color-btn.red {
-		background: #e63946;
+		background: var(--folder-red, var(--error));
 	}
 
 	.form-actions {

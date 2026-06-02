@@ -122,10 +122,6 @@
 
 	.dropdown-item.active-locale {
 		background: var(--accent-primary);
-		color: var(--bg-primary);
-	}
-
-	:global([data-theme='dark']) .dropdown-item.active-locale {
 		color: var(--text-primary);
 	}
 
@@ -139,11 +135,7 @@
 	}
 
 	.dropdown-item.active-locale .item-name {
-		color: var(--bg-primary);
-		opacity: 0.9;
-	}
-
-	:global([data-theme='dark']) .dropdown-item.active-locale .item-name {
 		color: var(--text-primary);
+		opacity: 0.9;
 	}
 </style>

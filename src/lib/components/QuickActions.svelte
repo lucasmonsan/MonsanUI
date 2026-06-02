@@ -36,7 +36,6 @@
 	function handleOutsideClick(e: MouseEvent) {
 		if (!open) return;
 		const target = e.target as HTMLElement;
-		// If wrapper has display: contents, containerEl contains checks still work correctly on the DOM tree
 		if (containerEl && !containerEl.contains(target)) {
 			open = false;
 		}
@@ -50,7 +49,6 @@
 		return () => document.removeEventListener('click', handleOutsideClick, { capture: true });
 	});
 
-	// Global Escape key handler
 	$effect(() => {
 		if (open) {
 			const handleKeyDown = (e: KeyboardEvent) => {
@@ -63,7 +61,6 @@
 		}
 	});
 
-	// Let child handlers run first, then close the panel after actionable clicks.
 	$effect(() => {
 		if (open && panelEl) {
 			const listener = (e: MouseEvent) => {
@@ -158,7 +155,6 @@
 		box-sizing: border-box;
 	}
 
-	/* Variant dropdown: floating panel */
 	.quick-actions-panel.variant-dropdown {
 		position: absolute;
 		top: calc(100% + var(--space-xs, 4px));
@@ -183,7 +179,6 @@
 		left: 0;
 	}
 
-	/* Variant reveal: covers parent container */
 	.quick-actions-panel.variant-reveal {
 		position: absolute;
 		top: 0;
@@ -210,51 +205,5 @@
 		padding-left: var(--space-sm);
 		background: linear-gradient(to right, var(--bg-primary) 65%, transparent);
 		border-radius: var(--radius-md) 0 0 var(--radius-md);
-	}
-
-	/* Uniform Global Dropdown Item Styles (matching LanguageSelector) */
-	:global(.quick-actions-panel .dropdown-item) {
-		width: 100%;
-		padding: var(--space-sm) var(--space-md) !important;
-		border: none !important;
-		background: transparent !important;
-		color: var(--text-primary) !important;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-sm);
-		font-family: inherit;
-		font-weight: 700;
-		font-size: var(--text-sm) !important;
-		white-space: nowrap;
-		transition: background 0.1s ease;
-		box-sizing: border-box;
-		text-align: left;
-	}
-
-	:global(.quick-actions-panel .dropdown-item:hover) {
-		background: var(--bg-secondary) !important;
-	}
-
-	:global(.quick-actions-panel .dropdown-item.active),
-	:global(.quick-actions-panel .dropdown-item.active-locale),
-	:global(.quick-actions-panel .dropdown-item.active-theme) {
-		background: var(--accent-primary) !important;
-		color: var(--bg-primary) !important;
-	}
-
-	:global([data-theme='dark'] .quick-actions-panel .dropdown-item.active),
-	:global([data-theme='dark'] .quick-actions-panel .dropdown-item.active-locale),
-	:global([data-theme='dark'] .quick-actions-panel .dropdown-item.active-theme) {
-		color: var(--text-primary) !important;
-	}
-
-	:global(.quick-actions-panel .dropdown-item.delete-item) {
-		color: var(--error) !important;
-	}
-
-	:global(.quick-actions-panel .dropdown-item.delete-item:hover) {
-		background: color-mix(in srgb, var(--error) 10%, var(--bg-primary)) !important;
 	}
 </style>
