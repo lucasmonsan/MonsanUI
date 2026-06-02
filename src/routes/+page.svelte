@@ -51,8 +51,8 @@
 	import Avatar from '$lib/components/Avatar.svelte';
 	import AvatarMenu from '$lib/components/AvatarMenu.svelte';
 	import AppHeader from '$lib/components/AppHeader.svelte';
+	import IconButton from '$lib/components/IconButton.svelte';
 	import MenuControl from '$lib/components/MenuControl.svelte';
-	import MenuItem from '$lib/components/MenuItem.svelte';
 	import Separator from '$lib/components/Separator.svelte';
 	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
 
@@ -1259,9 +1259,9 @@
 	const appHeaderCode = `import {
 \tAppHeader,
 \tAvatarMenu,
+\tIconButton,
 \tLanguageSelector,
 \tMenuControl,
-\tMenuItem,
 \tTabs,
 \tThemeSelector
 } from 'monsan-ui';
@@ -1269,16 +1269,22 @@
 <AppHeader title="Examster" sticky horizontalPadding="none">
 \t{#snippet actions()}
 \t\t<AvatarMenu name="Lucas Monsan" shape="square" ariaLabel="Open user menu">
+\t\t\t<IconButton label="Open profile">
+\t\t\t\t<User size={16} />
+\t\t\t</IconButton>
 \t\t\t<MenuControl align="right">
-\t\t\t\t<ThemeSelector bind:value={theme} display="label" />
+\t\t\t\t<ThemeSelector bind:value={theme} />
 \t\t\t</MenuControl>
 \t\t\t<MenuControl align="right">
-\t\t\t\t<LanguageSelector bind:value={locale} display="label" />
+\t\t\t\t<LanguageSelector bind:value={locale} />
 \t\t\t</MenuControl>
+\t\t\t<IconButton label="Sign out" variant="error">
+\t\t\t\t<LogOut size={16} />
+\t\t\t</IconButton>
 \t\t</AvatarMenu>
 \t{/snippet}
 \t{#snippet secondary()}
-\t\t<Tabs bind:value={activeTab} items={tabs} />
+\t\t<Tabs bind:value={activeTab} items={tabs} variant="underline" embedded />
 \t{/snippet}
 </AppHeader>`;
 
@@ -5920,7 +5926,7 @@
 						<div class="component-showcase-grid layout-vertical">
 							<div class="preview-box app-header-preview">
 								<span class="box-label">{i18n.t('common.preview')}</span>
-								<AppHeader title="Examster" maxWidth="full" horizontalPadding="none">
+								<AppHeader title="Examster" horizontalPadding="none">
 									{#snippet logo()}
 										<Sparkles size={24} />
 									{/snippet}
@@ -5936,8 +5942,12 @@
 													? 'Open user menu'
 													: 'Abrir menú del usuario'}
 										>
-											<MenuItem
-												align="right"
+											<IconButton
+												label={i18n.locale === 'pt'
+													? 'Abrir perfil'
+													: i18n.locale === 'en'
+														? 'Open profile'
+														: 'Abrir perfil'}
 												onclick={() =>
 													addToast(
 														i18n.locale === 'pt'
@@ -5949,20 +5959,19 @@
 													)}
 											>
 												<User size={16} />
-												{i18n.locale === 'pt'
-													? 'Perfil'
+											</IconButton>
+											<MenuControl align="right">
+												<ThemeSelector bind:value={demoHeaderTheme} />
+											</MenuControl>
+											<MenuControl align="right">
+												<LanguageSelector bind:value={demoHeaderLocale} />
+											</MenuControl>
+											<IconButton
+												label={i18n.locale === 'pt'
+													? 'Sair'
 													: i18n.locale === 'en'
-														? 'Profile'
-														: 'Perfil'}
-											</MenuItem>
-											<MenuControl align="right">
-												<ThemeSelector bind:value={demoHeaderTheme} display="label" />
-											</MenuControl>
-											<MenuControl align="right">
-												<LanguageSelector bind:value={demoHeaderLocale} display="label" />
-											</MenuControl>
-											<MenuItem
-												align="right"
+														? 'Sign out'
+														: 'Cerrar sesión'}
 												variant="error"
 												onclick={() =>
 													addToast(
@@ -5975,12 +5984,7 @@
 													)}
 											>
 												<LogOut size={16} />
-												{i18n.locale === 'pt'
-													? 'Sair'
-													: i18n.locale === 'en'
-														? 'Sign out'
-														: 'Cerrar sesión'}
-											</MenuItem>
+											</IconButton>
 										</AvatarMenu>
 									{/snippet}
 									{#snippet secondary()}
@@ -5988,6 +5992,7 @@
 											bind:value={demoHeaderActiveTab}
 											items={demoHeaderTabs}
 											variant="underline"
+											embedded
 										/>
 									{/snippet}
 								</AppHeader>
@@ -6408,6 +6413,8 @@
 	.app-header-preview {
 		justify-content: center;
 		overflow: visible;
+		padding-right: 0;
+		padding-left: 0;
 	}
 
 	.knobs-content {

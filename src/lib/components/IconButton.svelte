@@ -10,6 +10,7 @@
 		selected?: boolean;
 		disabled?: boolean;
 		onclick?: (event: MouseEvent) => void;
+		role?: 'menuitem';
 	}
 
 	let {
@@ -20,7 +21,8 @@
 		variant = 'secondary',
 		selected,
 		disabled = false,
-		onclick
+		onclick,
+		role
 	}: Props = $props();
 </script>
 
@@ -29,6 +31,7 @@
 	{title}
 	{disabled}
 	{onclick}
+	{role}
 	class="monsan-icon-button {variant}"
 	class:selected
 	aria-label={label}

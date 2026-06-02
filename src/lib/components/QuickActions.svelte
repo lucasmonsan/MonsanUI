@@ -13,6 +13,9 @@
 		width = variant === 'dropdown' ? 'max-content' : '70%',
 		triggerLabel,
 		triggerBehavior = 'wrapper',
+		panelLayout = 'vertical',
+		placement = 'below',
+		panelRole = 'menu',
 		trigger,
 		children
 	} = $props<{
@@ -22,6 +25,9 @@
 		width?: ActionPanelWidthPreset;
 		triggerLabel?: string;
 		triggerBehavior?: 'wrapper' | 'child';
+		panelLayout?: 'vertical' | 'horizontal';
+		placement?: 'below' | 'before' | 'after';
+		panelRole?: 'menu' | 'toolbar';
 		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
 	}>();
@@ -122,9 +128,9 @@
 	{#if open}
 		<div
 			bind:this={panelEl}
-			class="quick-actions-panel variant-{variant} align-{align}"
+			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{placement}"
 			style="--panel-width: {resolvedWidth};"
-			role="menu"
+			role={panelRole}
 			transition:menuTransition
 		>
 			{#if children}
@@ -165,7 +171,6 @@
 
 	.quick-actions-panel.variant-dropdown {
 		position: absolute;
-		top: calc(100% + var(--space-xs, 4px));
 		background: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
@@ -173,10 +178,22 @@
 		width: var(--panel-width);
 		max-width: 90vw;
 		display: flex;
-		flex-direction: column;
 		padding: var(--space-xs);
 		gap: var(--space-xs);
 		overflow: visible;
+	}
+
+	.quick-actions-panel.variant-dropdown.layout-vertical {
+		flex-direction: column;
+	}
+
+	.quick-actions-panel.variant-dropdown.layout-horizontal {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-below {
+		top: calc(100% + var(--space-xs));
 	}
 
 	.quick-actions-panel.variant-dropdown.align-right {
@@ -185,6 +202,21 @@
 
 	.quick-actions-panel.variant-dropdown.align-left {
 		left: 0;
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-before,
+	.quick-actions-panel.variant-dropdown.placement-after {
+		top: 0;
+		right: auto;
+		left: auto;
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-before {
+		right: calc(100% + var(--space-xs));
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-after {
+		left: calc(100% + var(--space-xs));
 	}
 
 	.quick-actions-panel.variant-reveal {

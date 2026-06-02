@@ -18,6 +18,7 @@
 		scrollable = false,
 		showNavButtons = false,
 		hideLabels = false,
+		embedded = false,
 		onchange,
 		item: itemSnippet
 	} = $props<{
@@ -28,6 +29,7 @@
 		scrollable?: boolean;
 		showNavButtons?: boolean;
 		hideLabels?: boolean;
+		embedded?: boolean;
 		onchange?: (value: string) => void;
 		item?: Snippet<[TabItem, number]>;
 	}>();
@@ -145,6 +147,7 @@
 		class:scrollable
 		class:has-nav-buttons={scrollable && showNavButtons}
 		class:hide-labels={hideLabels}
+		class:embedded
 		role="tablist"
 		style="--mask-left: {showLeftGradient ? '48px' : '0px'}; --mask-right: {showRightGradient
 			? '48px'
@@ -439,5 +442,12 @@
 
 	.monsan-tabs-container.variant-underline {
 		padding-bottom: 0;
+	}
+
+	.monsan-tabs-container.embedded {
+		width: 100%;
+		margin: 0;
+		padding-top: 0;
+		border-bottom: 0;
 	}
 </style>

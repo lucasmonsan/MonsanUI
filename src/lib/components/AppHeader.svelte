@@ -23,7 +23,7 @@
 		secondary,
 		actionsLabel,
 		titleId,
-		maxWidth = 'wide',
+		maxWidth = 'content',
 		size = 'comfortable',
 		border = true,
 		sticky = false,
@@ -31,7 +31,12 @@
 	}: Props = $props();
 </script>
 
-<header class="monsan-app-header" class:with-border={border} class:is-sticky={sticky}>
+<header
+	class="monsan-app-header"
+	class:with-border={border}
+	class:is-sticky={sticky}
+	class:has-secondary={secondary}
+>
 	<div class="app-header-inner max-{maxWidth} horizontal-{horizontalPadding}">
 		<div class="app-header-primary size-{size}">
 			<div class="app-header-brand">
@@ -75,6 +80,8 @@
 <style>
 	.monsan-app-header {
 		width: 100%;
+		align-self: stretch;
+		flex-shrink: 0;
 		background: var(--bg-primary);
 		color: var(--text-primary);
 		box-sizing: border-box;
@@ -128,9 +135,14 @@
 		padding: var(--space-md) var(--space-lg);
 	}
 
+	.has-secondary .size-compact,
+	.has-secondary .size-comfortable {
+		padding-bottom: var(--space-xs);
+	}
+
 	.app-header-secondary {
 		width: 100%;
-		padding: 0 var(--space-lg) var(--space-sm);
+		padding: 0 var(--space-lg);
 		box-sizing: border-box;
 	}
 
@@ -144,11 +156,10 @@
 		min-width: 0;
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-sm);
+		gap: var(--space-xs);
 	}
 
 	.app-header-logo {
-		width: var(--control-height);
 		height: var(--control-height);
 		display: inline-flex;
 		align-items: center;
