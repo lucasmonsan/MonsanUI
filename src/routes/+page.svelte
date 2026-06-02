@@ -941,7 +941,7 @@
 						: 'Ninguna acción activada en la ActionBar';
 		}
 	});
-	let actionBarItems = $derived([
+	let actionBarItems = $derived<import('svelte').ComponentProps<typeof ActionBar>['items']>([
 		{
 			id: 'folders',
 			label: i18n.locale === 'pt' ? 'Pasta: ' : i18n.locale === 'en' ? 'Folder: ' : 'Carpeta: ',
@@ -1792,7 +1792,14 @@
 							<div class="preview-box">
 								<span class="box-label">{i18n.t('common.preview')}</span>
 								<div class="preview-render full-width-render">
-									<ActionBar items={actionBarItems} />
+									<ActionBar
+										items={actionBarItems}
+										ariaLabel={i18n.locale === 'pt'
+											? 'Ações dos decks'
+											: i18n.locale === 'en'
+												? 'Deck actions'
+												: 'Acciones de los decks'}
+									/>
 								</div>
 							</div>
 							<div class="knobs-box">
@@ -1818,7 +1825,7 @@
 								<button
 									onclick={() =>
 										copyToClipboard(
-											`import ActionBar from '$lib/components/ActionBar.svelte';\nimport FolderIcon from '$lib/components/icons/Folder.svelte';\n\nlet items = [\n\t{ id: 'folders', label: 'Pastas', icon: FolderIcon, flex: 2, onclick: handleOpen }\n];\n\n<ActionBar {items} />`,
+											`import ActionBar from '$lib/components/ActionBar.svelte';\nimport FolderIcon from '$lib/components/icons/Folder.svelte';\n\nlet items = [\n\t{ id: 'folders', label: 'Folders', icon: FolderIcon, flex: 2, onclick: handleOpen }\n];\n\n<ActionBar {items} ariaLabel="Deck actions" />`,
 											5
 										)}
 								>
@@ -1826,7 +1833,7 @@
 								</button>
 							</div>
 							<pre><code
-									>{`import ActionBar from '$lib/components/ActionBar.svelte';\nimport FolderIcon from '$lib/components/icons/Folder.svelte';\n\nlet items = [\n\t{ id: 'folders', label: 'Pastas', icon: FolderIcon, flex: 2, onclick: handleOpen }\n];\n\n<ActionBar {items} />`}</code
+									>{`import ActionBar from '$lib/components/ActionBar.svelte';\nimport FolderIcon from '$lib/components/icons/Folder.svelte';\n\nlet items = [\n\t{ id: 'folders', label: 'Folders', icon: FolderIcon, flex: 2, onclick: handleOpen }\n];\n\n<ActionBar {items} ariaLabel="Deck actions" />`}</code
 								></pre>
 						</div>
 					</div>
