@@ -7,7 +7,7 @@
 		id: string;
 		label: string;
 		icon?: IconComponent;
-		flex?: number | string;
+		flex?: 1 | 2 | 3;
 		onlyIcon?: boolean;
 		folderTheme?: string;
 		title?: string;
@@ -15,8 +15,13 @@
 		onclick?: (e: MouseEvent) => void;
 	}
 
-	let { items = [], item: itemSnippet } = $props<{
+	let {
+		items = [],
+		ariaLabel,
+		item: itemSnippet
+	} = $props<{
 		items: ActionItem[];
+		ariaLabel: string;
 		item?: Snippet<[ActionItem, number]>;
 	}>();
 
@@ -51,7 +56,7 @@
 	class="monsan-action-bar"
 	role="toolbar"
 	tabindex="-1"
-	aria-label="Barra de Ações"
+	aria-label={ariaLabel}
 	onkeydown={handleKeyDown}
 >
 	{#each items as action, index (action.id)}
@@ -63,16 +68,18 @@
 				class="monsan-action-bar-item"
 				class:only-icon={action.onlyIcon}
 				class:disabled={action.disabled}
-				style="flex: {action.flex ?? 1};"
+				class:flex-1={(action.flex ?? 1) === 1}
+				class:flex-2={action.flex === 2}
+				class:flex-3={action.flex === 3}
 				data-deck-theme={action.folderTheme}
 				onclick={action.onclick}
 				title={action.title ?? action.label}
+				aria-label={action.label}
 				disabled={action.disabled}
 				tabindex={index === 0 ? 0 : -1}
 			>
 				{#if action.icon}
 					<span class="action-item-icon">
-						<!-- Render standard icon components -->
 						<action.icon size={18} />
 					</span>
 				{/if}
@@ -118,8 +125,20 @@
 		box-sizing: border-box;
 	}
 
+	.flex-1 {
+		flex: 1;
+	}
+
+	.flex-2 {
+		flex: 2;
+	}
+
+	.flex-3 {
+		flex: 3;
+	}
+
 	.monsan-action-bar-item.only-icon {
-		flex: 0 0 auto !important;
+		flex: 0 0 auto;
 		padding: 0;
 		width: var(--control-height);
 	}
@@ -137,8 +156,8 @@
 	.monsan-action-bar-item:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
-		box-shadow: var(--shadow-sm) !important;
-		transform: none !important;
+		box-shadow: var(--shadow-sm);
+		transform: none;
 	}
 
 	.action-item-icon {
