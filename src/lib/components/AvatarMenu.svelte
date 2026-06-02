@@ -15,6 +15,8 @@
 		open = $bindable(false),
 		align = 'right',
 		width = 'max-content',
+		layout = 'horizontal',
+		placement = 'before',
 		children
 	}: {
 		src?: string;
@@ -27,11 +29,22 @@
 		open?: boolean;
 		align?: 'left' | 'right';
 		width?: ActionPanelWidthPreset;
+		layout?: 'vertical' | 'horizontal';
+		placement?: 'below' | 'before' | 'after';
 		children?: Snippet;
 	} = $props();
 </script>
 
-<QuickActions bind:open variant="dropdown" {align} {width} triggerLabel={ariaLabel}>
+<QuickActions
+	bind:open
+	variant="dropdown"
+	{align}
+	{width}
+	panelLayout={layout}
+	{placement}
+	panelRole="toolbar"
+	triggerLabel={ariaLabel}
+>
 	{#snippet trigger()}
 		<Avatar {src} {name} {alt} {size} {shape} {ariaLabel} {title} />
 	{/snippet}

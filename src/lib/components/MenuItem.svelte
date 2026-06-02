@@ -5,12 +5,13 @@
 		children: Snippet;
 		onclick?: (event: MouseEvent) => void;
 		variant?: 'default' | 'error';
+		align?: 'left' | 'right';
 	}
 
-	let { children, onclick, variant = 'default' }: Props = $props();
+	let { children, onclick, variant = 'default', align = 'left' }: Props = $props();
 </script>
 
-<button type="button" class="monsan-menu-item {variant}" role="menuitem" {onclick}>
+<button type="button" class="monsan-menu-item {variant} align-{align}" role="menuitem" {onclick}>
 	{@render children()}
 </button>
 
@@ -29,7 +30,16 @@
 		font-weight: 700;
 		font-size: var(--text-sm);
 		white-space: nowrap;
+	}
+
+	.align-left {
+		justify-content: flex-start;
 		text-align: left;
+	}
+
+	.align-right {
+		justify-content: flex-end;
+		text-align: right;
 	}
 
 	.monsan-menu-item:hover {

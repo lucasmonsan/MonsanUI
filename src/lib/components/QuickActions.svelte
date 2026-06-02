@@ -12,6 +12,10 @@
 		align = 'right',
 		width = variant === 'dropdown' ? 'max-content' : '70%',
 		triggerLabel,
+		triggerBehavior = 'wrapper',
+		panelLayout = 'vertical',
+		placement = 'below',
+		panelRole = 'menu',
 		trigger,
 		children
 	} = $props<{
@@ -20,7 +24,11 @@
 		align?: 'left' | 'right';
 		width?: ActionPanelWidthPreset;
 		triggerLabel?: string;
-		trigger?: import('svelte').Snippet;
+		triggerBehavior?: 'wrapper' | 'child';
+		panelLayout?: 'vertical' | 'horizontal';
+		placement?: 'below' | 'before' | 'after';
+		panelRole?: 'menu' | 'toolbar';
+		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
 	}>();
 
@@ -66,7 +74,7 @@
 			const listener = (e: MouseEvent) => {
 				const target = e.target as HTMLElement;
 				const clickedButton = target.closest('button, a');
-				if (clickedButton) {
+				if (clickedButton && !clickedButton.closest('[data-menu-persistent]')) {
 					queueMicrotask(() => {
 						open = false;
 					});
@@ -92,31 +100,37 @@
 	class:is-reveal={variant === 'reveal'}
 >
 	{#if trigger}
-		<div
-			class="quick-actions-trigger"
-			onclick={toggle}
-			onkeydown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					open = !open;
-				}
-			}}
-			role="button"
-			tabindex="0"
-			aria-label={activeTriggerLabel}
-			aria-haspopup="menu"
-			aria-expanded={open}
-		>
-			{@render trigger()}
-		</div>
+		{#if triggerBehavior === 'wrapper'}
+			<div
+				class="quick-actions-trigger"
+				onclick={toggle}
+				onkeydown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						event.preventDefault();
+						open = !open;
+					}
+				}}
+				role="button"
+				tabindex="0"
+				aria-label={activeTriggerLabel}
+				aria-haspopup="menu"
+				aria-expanded={open}
+			>
+				{@render trigger(toggle)}
+			</div>
+		{:else}
+			<div class="quick-actions-trigger">
+				{@render trigger(toggle)}
+			</div>
+		{/if}
 	{/if}
 
 	{#if open}
 		<div
 			bind:this={panelEl}
-			class="quick-actions-panel variant-{variant} align-{align}"
+			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{placement}"
 			style="--panel-width: {resolvedWidth};"
-			role="menu"
+			role={panelRole}
 			transition:menuTransition
 		>
 			{#if children}
@@ -157,7 +171,6 @@
 
 	.quick-actions-panel.variant-dropdown {
 		position: absolute;
-		top: calc(100% + var(--space-xs, 4px));
 		background: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
@@ -165,10 +178,22 @@
 		width: var(--panel-width);
 		max-width: 90vw;
 		display: flex;
-		flex-direction: column;
 		padding: var(--space-xs);
 		gap: var(--space-xs);
-		overflow: hidden;
+		overflow: visible;
+	}
+
+	.quick-actions-panel.variant-dropdown.layout-vertical {
+		flex-direction: column;
+	}
+
+	.quick-actions-panel.variant-dropdown.layout-horizontal {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-below {
+		top: calc(100% + var(--space-xs));
 	}
 
 	.quick-actions-panel.variant-dropdown.align-right {
@@ -177,6 +202,21 @@
 
 	.quick-actions-panel.variant-dropdown.align-left {
 		left: 0;
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-before,
+	.quick-actions-panel.variant-dropdown.placement-after {
+		top: 0;
+		right: auto;
+		left: auto;
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-before {
+		right: calc(100% + var(--space-xs));
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-after {
+		left: calc(100% + var(--space-xs));
 	}
 
 	.quick-actions-panel.variant-reveal {
