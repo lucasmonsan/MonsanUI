@@ -20,6 +20,7 @@ export { default as Toast } from './components/Toast.svelte';
 export { default as ToastViewport } from './components/ToastViewport.svelte';
 export { default as FlashOverlay } from './components/FlashOverlay.svelte';
 export { default as RouteViewport } from './components/RouteViewport.svelte';
+export { default as SkipLink } from './components/SkipLink.svelte';
 export { default as MediaDialog } from './components/MediaDialog.svelte';
 export { default as ExpandableCard } from './components/ExpandableCard.svelte';
 export { default as FlipCard } from './components/FlipCard.svelte';
