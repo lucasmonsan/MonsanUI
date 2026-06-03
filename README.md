@@ -7,14 +7,14 @@ Its job is simple: keep Examster, Manki and Owlth visually consistent without fo
 ## What It Provides
 
 - Styled Svelte 5 components exported from `src/lib`.
-- Shared CSS tokens in `monsan-ui.css` and `variables.css`.
+- Shared normalize, base styles and CSS tokens in `monsan-ui.css` and `variables.css`.
 - A local showcase app in `src/routes`.
 - Package output generated with `svelte-package`.
 - Strict lint, typecheck, build and package validation through `pnpm test`.
 
 ## Usage In Apps
 
-Consumer apps install MonsanUI from the private GitHub repository:
+Consumer apps install MonsanUI from the private GitHub repository in every environment:
 
 ```bash
 pnpm add "git+ssh://git@github.com/lucasmonsan/MonsanUI.git#main"
@@ -33,6 +33,8 @@ Then import components directly:
 	import { Button, Stack, Alert } from 'monsan-ui';
 </script>
 ```
+
+Consumer apps must not restyle MonsanUI components. New visual or layout needs should become MonsanUI components or documented props first. See `docs/project-standards.md`.
 
 ## Updating Consumers
 
