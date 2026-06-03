@@ -58,7 +58,9 @@
 
 <style>
 	.monsan-loading-overlay {
-		width: 100vw;
+		position: fixed;
+		inset: 0;
+		width: 100dvw;
 		height: 100dvh;
 		max-width: none;
 		max-height: none;
