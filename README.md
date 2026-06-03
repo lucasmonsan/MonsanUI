@@ -12,6 +12,14 @@ Its job is simple: keep Examster, Manki and Owlth visually consistent without fo
 - Package output generated with `svelte-package`.
 - Strict lint, typecheck, build and package validation through `pnpm test`.
 
+## Layout Primitives
+
+Consumer apps should prefer these primitives before adding any app-owned layout CSS:
+
+- `PageShell`, `PageHeader` and `ContentRegion` for page structure.
+- `ResponsiveGrid` and `ActionFooter` for repeated layouts and action bars.
+- `DataCard`, `StatusPill` and `ConsolePanel` for admin records, status indicators and logs.
+
 ## Usage In Apps
 
 Consumer apps install MonsanUI from the private GitHub repository in every environment:
