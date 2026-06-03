@@ -25,6 +25,7 @@
 	--text-primary: #2d2422;
 	--text-secondary: #5e544f;
 	--brand-color: #ff8c75;
+	--brand-logo-filter: brightness(0);
 	--accent-primary: #b94b38;
 	--accent-hover: #9c3b2a;
 	--success: #2d6a4f;
@@ -79,6 +80,7 @@
 	--bg-secondary: #352e2d;
 	--text-primary: #fdfbf7;
 	--text-secondary: #b0a6a3;
+	--brand-logo-filter: brightness(0) invert(1);
 	--accent-primary: #bf6958;
 	--accent-hover: #ff8c75;
 	--success: #52b788;

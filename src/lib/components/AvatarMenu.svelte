@@ -17,6 +17,7 @@
 		width = 'max-content',
 		layout = 'horizontal',
 		placement = 'before',
+		variant = 'floating',
 		children
 	}: {
 		src?: string;
@@ -31,18 +32,20 @@
 		width?: ActionPanelWidthPreset;
 		layout?: 'vertical' | 'horizontal';
 		placement?: 'below' | 'before' | 'after';
+		variant?: 'floating' | 'dropdown';
 		children?: Snippet;
 	} = $props();
 </script>
 
 <QuickActions
 	bind:open
-	variant="dropdown"
+	variant={variant === 'floating' ? 'reveal' : 'dropdown'}
 	{align}
 	{width}
 	panelLayout={layout}
 	{placement}
 	panelRole="toolbar"
+	surface={variant === 'floating' ? 'plain' : 'panel'}
 	triggerLabel={ariaLabel}
 >
 	{#snippet trigger()}
