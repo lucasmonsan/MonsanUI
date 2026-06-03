@@ -7,7 +7,7 @@ Its job is simple: keep Examster, Manki and Owlth visually consistent without fo
 ## What It Provides
 
 - Styled Svelte 5 components exported from `src/lib`.
-- Shared normalize, base styles and CSS tokens in `monsan-ui.css` and `variables.css`.
+- Shared normalize, app base styles and CSS tokens in `monsan-ui.css` and `variables.css`.
 - A local showcase app in `src/routes`.
 - Package output generated with `svelte-package`.
 - Strict lint, typecheck, build and package validation through `pnpm test`.
