@@ -1231,11 +1231,13 @@
 	let demoHeaderTabs = $derived([
 		{
 			id: 'dashboard',
-			label: i18n.locale === 'pt' ? 'Painel' : i18n.locale === 'en' ? 'Dashboard' : 'Panel'
+			label: i18n.locale === 'pt' ? 'Painel' : i18n.locale === 'en' ? 'Dashboard' : 'Panel',
+			icon: Sparkles
 		},
 		{
 			id: 'profile',
-			label: i18n.locale === 'pt' ? 'Perfil' : i18n.locale === 'en' ? 'Profile' : 'Perfil'
+			label: i18n.locale === 'pt' ? 'Perfil' : i18n.locale === 'en' ? 'Profile' : 'Perfil',
+			icon: User
 		}
 	]);
 
@@ -1266,7 +1268,7 @@
 \tThemeSelector
 } from 'monsan-ui';
 
-<AppHeader title="Examster" sticky horizontalPadding="none">
+<AppHeader title="Examster" subtitle="Student Panel" logoSrc="/favicon.svg" sticky>
 \t{#snippet actions()}
 \t\t<AvatarMenu name="Lucas Monsan" shape="square" ariaLabel="Open user menu">
 \t\t\t<IconButton label="Open profile">
@@ -1284,7 +1286,7 @@
 \t\t</AvatarMenu>
 \t{/snippet}
 \t{#snippet secondary()}
-\t\t<Tabs bind:value={activeTab} items={tabs} variant="underline" embedded />
+\t\t<Tabs bind:value={activeTab} items={tabs} embedded />
 \t{/snippet}
 </AppHeader>`;
 
@@ -5933,10 +5935,15 @@
 						<div class="component-showcase-grid layout-vertical">
 							<div class="preview-box app-header-preview">
 								<span class="box-label">{i18n.t('common.preview')}</span>
-								<AppHeader title="Examster" horizontalPadding="none">
-									{#snippet logo()}
-										<Sparkles size={24} />
-									{/snippet}
+								<AppHeader
+									title="Examster"
+									subtitle={i18n.locale === 'pt'
+										? 'Painel do aluno'
+										: i18n.locale === 'en'
+											? 'Student panel'
+											: 'Panel del estudiante'}
+									logoSrc="/favicon.svg"
+								>
 									{#snippet actions()}
 										<AvatarMenu
 											src={avatarSrc}
@@ -5995,12 +6002,7 @@
 										</AvatarMenu>
 									{/snippet}
 									{#snippet secondary()}
-										<Tabs
-											bind:value={demoHeaderActiveTab}
-											items={demoHeaderTabs}
-											variant="underline"
-											embedded
-										/>
+										<Tabs bind:value={demoHeaderActiveTab} items={demoHeaderTabs} embedded />
 									{/snippet}
 								</AppHeader>
 							</div>

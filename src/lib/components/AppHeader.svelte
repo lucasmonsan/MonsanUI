@@ -4,6 +4,9 @@
 
 	interface Props {
 		title: string;
+		subtitle?: string;
+		logoSrc?: string;
+		logoAlt?: string;
 		logo?: Snippet;
 		actions?: Snippet;
 		secondary?: Snippet;
@@ -18,6 +21,9 @@
 
 	let {
 		title,
+		subtitle,
+		logoSrc,
+		logoAlt = '',
 		logo,
 		actions,
 		secondary,
@@ -27,7 +33,7 @@
 		size = 'comfortable',
 		border = true,
 		sticky = false,
-		horizontalPadding = 'default'
+		horizontalPadding = 'none'
 	}: Props = $props();
 </script>
 
@@ -40,22 +46,33 @@
 	<div class="app-header-inner max-{maxWidth} horizontal-{horizontalPadding}">
 		<div class="app-header-primary size-{size}">
 			<div class="app-header-brand">
-				{#if logo}
+				{#if logoSrc}
+					<div class="app-header-logo" aria-hidden={logoAlt ? undefined : 'true'}>
+						<img class="app-header-logo-image" src={logoSrc} alt={logoAlt} />
+					</div>
+				{:else if logo}
 					<div class="app-header-logo" aria-hidden="true">
 						{@render logo()}
 					</div>
 				{/if}
-				<Text
-					tag="h1"
-					id={titleId}
-					size={size === 'compact' ? 'xl' : '2xl'}
-					weight="bold"
-					family="display"
-					variant="primary"
-					truncate
-				>
-					{title}
-				</Text>
+				<div class="app-header-title-group">
+					<Text
+						tag="h1"
+						id={titleId}
+						size={size === 'compact' ? 'xl' : '2xl'}
+						weight="bold"
+						family="display"
+						variant="accent"
+						truncate
+					>
+						{title}
+					</Text>
+					{#if subtitle}
+						<Text tag="p" size="sm" weight="semibold" variant="secondary" truncate>
+							{subtitle}
+						</Text>
+					{/if}
+				</div>
 			</div>
 
 			{#if actions}
@@ -82,7 +99,7 @@
 		width: 100%;
 		align-self: stretch;
 		flex-shrink: 0;
-		background: var(--bg-primary);
+		background: transparent;
 		color: var(--text-primary);
 		box-sizing: border-box;
 	}
@@ -118,7 +135,7 @@
 	}
 
 	.max-wide {
-		max-width: 1400px;
+		max-width: var(--container-max-width);
 	}
 
 	.max-full {
@@ -127,12 +144,12 @@
 
 	.size-compact {
 		min-height: calc(var(--control-height) + var(--space-md));
-		padding: var(--space-sm) var(--space-md);
+		padding: var(--space-sm) 0;
 	}
 
 	.size-comfortable {
 		min-height: calc(var(--control-height) + var(--space-lg));
-		padding: var(--space-md) var(--space-lg);
+		padding: var(--space-md) 0;
 	}
 
 	.has-secondary .size-compact,
@@ -142,8 +159,19 @@
 
 	.app-header-secondary {
 		width: 100%;
-		padding: 0 var(--space-lg);
+		border-top: var(--border-width) solid var(--border-color);
+		padding: var(--space-xs) 0 0;
 		box-sizing: border-box;
+	}
+
+	.horizontal-default .app-header-primary {
+		padding-right: var(--space-lg);
+		padding-left: var(--space-lg);
+	}
+
+	.horizontal-default .app-header-secondary {
+		padding-right: var(--space-lg);
+		padding-left: var(--space-lg);
 	}
 
 	.horizontal-none .app-header-primary,
@@ -168,6 +196,21 @@
 		color: var(--text-primary);
 	}
 
+	.app-header-logo-image {
+		width: 100%;
+		height: 100%;
+		display: block;
+		object-fit: contain;
+		filter: var(--brand-logo-filter);
+	}
+
+	.app-header-title-group {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
 	.app-header-actions {
 		display: inline-flex;
 		align-items: center;
@@ -179,22 +222,18 @@
 	@media (max-width: 640px) {
 		.size-comfortable,
 		.size-compact {
-			padding: var(--space-sm) var(--space-md);
+			padding-top: var(--space-sm);
+			padding-bottom: var(--space-sm);
 		}
 
 		.app-header-primary {
 			align-items: flex-start;
 		}
 
-		.app-header-secondary {
+		.horizontal-default .app-header-primary,
+		.horizontal-default .app-header-secondary {
 			padding-right: var(--space-md);
 			padding-left: var(--space-md);
-		}
-
-		.horizontal-none .app-header-primary,
-		.horizontal-none .app-header-secondary {
-			padding-right: 0;
-			padding-left: 0;
 		}
 
 		.app-header-actions {

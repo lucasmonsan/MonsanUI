@@ -16,6 +16,7 @@
 		panelLayout = 'vertical',
 		placement = 'below',
 		panelRole = 'menu',
+		surface = variant === 'reveal' ? 'gradient' : 'panel',
 		trigger,
 		children
 	} = $props<{
@@ -28,6 +29,7 @@
 		panelLayout?: 'vertical' | 'horizontal';
 		placement?: 'below' | 'before' | 'after';
 		panelRole?: 'menu' | 'toolbar';
+		surface?: 'panel' | 'gradient' | 'plain';
 		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
 	}>();
@@ -128,7 +130,7 @@
 	{#if open}
 		<div
 			bind:this={panelEl}
-			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{placement}"
+			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{placement} surface-{surface}"
 			style="--panel-width: {resolvedWidth};"
 			role={panelRole}
 			transition:menuTransition
@@ -235,7 +237,6 @@
 		right: 0;
 		justify-content: flex-end;
 		padding-right: var(--space-sm);
-		background: linear-gradient(to left, var(--bg-primary) 65%, transparent);
 		border-radius: 0 var(--radius-md) var(--radius-md) 0;
 	}
 
@@ -243,7 +244,36 @@
 		left: 0;
 		justify-content: flex-start;
 		padding-left: var(--space-sm);
-		background: linear-gradient(to right, var(--bg-primary) 65%, transparent);
 		border-radius: var(--radius-md) 0 0 var(--radius-md);
+	}
+
+	.quick-actions-panel.variant-reveal.surface-gradient.align-right {
+		background: linear-gradient(to left, var(--bg-primary) 65%, transparent);
+	}
+
+	.quick-actions-panel.variant-reveal.surface-gradient.align-left {
+		background: linear-gradient(to right, var(--bg-primary) 65%, transparent);
+	}
+
+	.quick-actions-panel.variant-reveal.surface-plain {
+		background: transparent;
+		border-radius: 0;
+		padding-right: 0;
+		padding-left: 0;
+	}
+
+	.quick-actions-panel.variant-reveal.placement-before {
+		right: calc(100% + var(--space-xs));
+		left: auto;
+	}
+
+	.quick-actions-panel.variant-reveal.placement-after {
+		right: auto;
+		left: calc(100% + var(--space-xs));
+	}
+
+	.quick-actions-panel.variant-reveal.placement-below {
+		right: 0;
+		left: auto;
 	}
 </style>
