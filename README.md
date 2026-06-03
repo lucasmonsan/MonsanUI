@@ -19,7 +19,7 @@ Consumer apps should prefer these primitives before adding any app-owned layout 
 - `PageShell`, `PageHeader` and `ContentRegion` for page structure.
 - `ResponsiveGrid` and `ActionFooter` for repeated layouts and action bars.
 - `DataCard`, `StatusPill` and `ConsolePanel` for admin records, status indicators and logs.
-- `RouteViewport`, `ToastViewport` and `FlashOverlay` for app-level route frames and feedback layers.
+- `RouteViewport`, `ToastViewport`, `FlashOverlay` and `SkipLink` for app-level route frames, feedback layers and accessibility.
 
 ## Usage In Apps
 
