@@ -8,6 +8,7 @@ Its job is simple: keep Examster, Manki and Owlth visually consistent without fo
 
 - Styled Svelte 5 components exported from `src/lib`.
 - Shared normalize, app base styles and CSS tokens in `monsan-ui.css` and `variables.css`.
+- A package CLI that verifies consumer apps do not add local styling.
 - A local showcase app in `src/routes`.
 - Package output generated with `svelte-package`.
 - Strict lint, typecheck, build and package validation through `pnpm test`.
@@ -45,6 +46,14 @@ Then import components directly:
 
 Consumer apps must not restyle MonsanUI components. New visual or layout needs should become MonsanUI components or documented props first. See `docs/project-standards.md`.
 
+Consumer apps should run the packaged standards checker:
+
+```bash
+monsan-ui-check-consumer
+```
+
+Temporary migration exceptions may be declared in `monsan-ui.consumer-standards.mjs`, but the default and expected state is an empty allowlist.
+
 ## Updating Consumers
 
 After changing MonsanUI and merging it into `main`, update each consumer app with:
@@ -64,12 +73,13 @@ pnpm test
 pnpm build
 pnpm run build:package
 pnpm run lint:package
+pnpm run test:standards
 ```
 
 `pnpm test` is the full gate:
 
 ```bash
-pnpm lint && pnpm typecheck && pnpm build && pnpm run build:package && pnpm run lint:package
+pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm build && pnpm run build:package && pnpm run lint:package
 ```
 
 ## Generated Files
