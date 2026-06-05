@@ -110,7 +110,7 @@
 		z-index: 100;
 	}
 
-	.with-border {
+	.with-border .app-header-inner {
 		border-bottom: var(--border-width) solid var(--border-color);
 		box-shadow: var(--shadow-xs);
 	}
@@ -143,8 +143,8 @@
 	}
 
 	.size-compact {
-		min-height: calc(var(--control-height) + var(--space-md));
-		padding: var(--space-sm) 0;
+		min-height: var(--control-height);
+		padding: var(--space-xs) 0;
 	}
 
 	.size-comfortable {
@@ -160,7 +160,7 @@
 	.app-header-secondary {
 		width: 100%;
 		border-top: var(--border-width) solid var(--border-color);
-		padding: var(--space-xs) 0 0;
+		padding: calc(var(--space-xs) * 0.5) 0 0;
 		box-sizing: border-box;
 	}
 

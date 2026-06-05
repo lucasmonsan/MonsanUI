@@ -47,6 +47,7 @@
 	panelRole="toolbar"
 	surface={variant === 'floating' ? 'plain' : 'panel'}
 	triggerLabel={ariaLabel}
+	containedReveal={variant === 'floating'}
 >
 	{#snippet trigger()}
 		<Avatar {src} {name} {alt} {size} {shape} {ariaLabel} {title} />

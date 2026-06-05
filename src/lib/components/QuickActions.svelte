@@ -17,6 +17,7 @@
 		placement = 'below',
 		panelRole = 'menu',
 		surface = variant === 'reveal' ? 'gradient' : 'panel',
+		containedReveal = false,
 		trigger,
 		children
 	} = $props<{
@@ -30,6 +31,7 @@
 		placement?: 'below' | 'before' | 'after';
 		panelRole?: 'menu' | 'toolbar';
 		surface?: 'panel' | 'gradient' | 'plain';
+		containedReveal?: boolean;
 		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
 	}>();
@@ -100,6 +102,7 @@
 	bind:this={containerEl}
 	class="monsan-quick-actions-wrapper"
 	class:is-reveal={variant === 'reveal'}
+	class:contained-reveal={containedReveal}
 >
 	{#if trigger}
 		{#if triggerBehavior === 'wrapper'}
@@ -148,8 +151,13 @@
 		display: inline-block;
 	}
 
-	.monsan-quick-actions-wrapper.is-reveal {
+	.monsan-quick-actions-wrapper.is-reveal:not(.contained-reveal) {
 		display: contents;
+	}
+
+	.monsan-quick-actions-wrapper.contained-reveal {
+		position: relative;
+		display: inline-block;
 	}
 
 	.quick-actions-trigger {
@@ -227,6 +235,7 @@
 		bottom: 0;
 		height: 100%;
 		width: var(--panel-width);
+		max-width: calc(100vw - var(--space-md) * 2);
 		display: flex;
 		align-items: center;
 		z-index: 10;
