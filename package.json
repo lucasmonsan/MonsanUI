@@ -22,8 +22,9 @@
 		"lint": "prettier --check . && eslint .",
 		"lint:package": "publint run --pack false",
 		"test:standards": "node tests/consumer-standards.test.mjs",
+		"test:tooling": "node tests/tooling-standards.test.mjs",
 		"format": "prettier --write .",
-		"test": "pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm build && pnpm run build:package && pnpm run lint:package",
+		"test": "pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm run test:tooling && pnpm build && pnpm run build:package && pnpm run lint:package",
 		"test:latest": "pnpm update && pnpm test"
 	},
 	"files": [
@@ -38,7 +39,8 @@
 	"types": "./dist/index.d.ts",
 	"type": "module",
 	"bin": {
-		"monsan-ui-check-consumer": "./dist/standards/check-consumer-standards.js"
+		"monsan-ui-check-consumer": "./dist/standards/check-consumer-standards.js",
+		"monsan-ui-check-tooling": "./dist/standards/check-tooling-standards.js"
 	},
 	"exports": {
 		".": {
