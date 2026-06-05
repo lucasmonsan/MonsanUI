@@ -21,8 +21,9 @@
 		"typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && tsc --noEmit",
 		"lint": "prettier --check . && eslint .",
 		"lint:package": "publint run --pack false",
+		"test:standards": "node tests/consumer-standards.test.mjs",
 		"format": "prettier --write .",
-		"test": "pnpm lint && pnpm typecheck && pnpm build && pnpm run build:package && pnpm run lint:package",
+		"test": "pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm build && pnpm run build:package && pnpm run lint:package",
 		"test:latest": "pnpm update && pnpm test"
 	},
 	"files": [
@@ -36,6 +37,9 @@
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"type": "module",
+	"bin": {
+		"monsan-ui-check-consumer": "./dist/standards/check-consumer-standards.js"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",

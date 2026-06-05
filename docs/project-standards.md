@@ -4,6 +4,31 @@ MonsanUI is the only source of visual language for the Monsan suite.
 
 Consumer apps may compose exported MonsanUI components and use documented props, snippets and options. They must not restyle MonsanUI components with local CSS, `:global`, inline styles or consumer-owned classes.
 
+The package owns the executable checker for this rule. Consumers should call:
+
+```bash
+monsan-ui-check-consumer
+```
+
+The checker blocks:
+
+- Local `<style>` blocks in `.svelte` files.
+- `:global(...)` selectors.
+- Inline `style=` attributes.
+- Svelte `style:*=` directives.
+- Consumer-owned `class=` and `class:*=` attributes.
+- CSS files that contain anything beyond `@import 'monsan-ui/monsan-ui.css';`.
+
+Consumers may create `monsan-ui.consumer-standards.mjs` only for approved temporary migrations:
+
+```js
+export default {
+	allowlist: []
+};
+```
+
+The expected suite state is an empty allowlist.
+
 ## Component Ownership
 
 New visual or layout needs should be added to MonsanUI first. Consumer apps should keep domain logic, data loading and app-specific text, but reusable layout and aesthetic behavior belongs here.
