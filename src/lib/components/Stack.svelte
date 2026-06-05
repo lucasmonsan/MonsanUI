@@ -8,6 +8,7 @@
 		justify?: 'start' | 'center' | 'between';
 		textAlign?: 'start' | 'center';
 		fullWidth?: boolean;
+		fullHeight?: boolean;
 	}
 
 	let {
@@ -16,13 +17,15 @@
 		align = 'stretch',
 		justify = 'start',
 		textAlign = 'start',
-		fullWidth = false
+		fullWidth = false,
+		fullHeight = false
 	}: Props = $props();
 </script>
 
 <div
 	class="monsan-stack gap-{gap} align-{align} justify-{justify} text-{textAlign}"
 	class:full-width={fullWidth}
+	class:full-height={fullHeight}
 >
 	{@render children()}
 </div>
@@ -36,6 +39,9 @@
 
 	.full-width {
 		width: 100%;
+	}
+	.full-height {
+		height: 100%;
 	}
 
 	.gap-xs {

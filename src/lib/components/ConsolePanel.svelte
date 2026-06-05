@@ -11,9 +11,22 @@
 		children: Snippet;
 		actions?: Snippet;
 		height?: 'sm' | 'md' | 'lg' | 'auto';
+		statusLabel?: 'visible' | 'hidden';
+		statusShape?: 'pill' | 'square';
+		lined?: boolean;
 	}
 
-	let { title, status, statusTone = 'neutral', children, actions, height = 'md' }: Props = $props();
+	let {
+		title,
+		status,
+		statusTone = 'neutral',
+		children,
+		actions,
+		height = 'md',
+		statusLabel = 'visible',
+		statusShape = 'pill',
+		lined = false
+	}: Props = $props();
 </script>
 
 <Panel variant="primary" maxWidth="100%" padding="0" overflow="hidden">
@@ -26,10 +39,16 @@
 							{title}
 						</Text>
 					{/if}
-					{#if status}
+					{#if status && statusLabel === 'visible'}
 						<StatusPill tone={statusTone} pulse={statusTone === 'warning'}>
 							{status}
 						</StatusPill>
+					{:else if status}
+						<span
+							class="console-status-indicator tone-{statusTone} shape-{statusShape}"
+							aria-label={status}
+							title={status}
+						></span>
 					{/if}
 				</div>
 
@@ -41,7 +60,7 @@
 			</header>
 		{/if}
 
-		<div class="console-body">
+		<div class="console-body" class:is-lined={lined}>
 			{@render children()}
 		</div>
 	</section>
@@ -113,6 +132,10 @@
 		white-space: pre-wrap;
 		word-break: break-word;
 		color: var(--text-primary);
+		background: var(--bg-primary);
+	}
+
+	.console-body.is-lined {
 		background:
 			linear-gradient(
 				color-mix(in srgb, var(--border-color) 18%, transparent) 1px,
@@ -120,6 +143,44 @@
 			),
 			var(--bg-primary);
 		background-size: 100% 24px;
+	}
+
+	.console-status-indicator {
+		display: inline-flex;
+		flex-shrink: 0;
+		width: 14px;
+		height: 14px;
+		border: var(--border-width) solid var(--border-color);
+		box-shadow: 1px 1px 0 var(--text-primary);
+		background: var(--neutral);
+	}
+
+	.shape-square {
+		border-radius: var(--radius-sm);
+	}
+
+	.shape-pill {
+		border-radius: var(--radius-full);
+	}
+
+	.tone-info {
+		background: var(--accent-primary);
+	}
+
+	.tone-success {
+		background: var(--success);
+	}
+
+	.tone-warning {
+		background: var(--warning);
+	}
+
+	.tone-error {
+		background: var(--error);
+	}
+
+	.tone-accent {
+		background: var(--accent-primary);
 	}
 
 	@media (max-width: 560px) {

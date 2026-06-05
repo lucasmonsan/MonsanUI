@@ -2,15 +2,19 @@
 	let {
 		variant = 'default',
 		noShrink = false,
+		size = 'md',
+		nowrap = false,
 		children
 	} = $props<{
 		variant?: 'default' | 'primary' | 'secondary' | 'success' | 'due' | 'new' | 'warning';
 		noShrink?: boolean;
+		size?: 'sm' | 'md';
+		nowrap?: boolean;
 		children?: import('svelte').Snippet;
 	}>();
 </script>
 
-<span class="monsan-badge variant-{variant}" class:no-shrink={noShrink}>
+<span class="monsan-badge variant-{variant} size-{size}" class:no-shrink={noShrink} class:nowrap>
 	{#if children}
 		{@render children()}
 	{/if}
@@ -34,6 +38,12 @@
 		box-sizing: border-box;
 		text-transform: uppercase;
 		letter-spacing: 0;
+	}
+
+	.size-sm {
+		padding: 1px 5px;
+		font-size: calc(var(--base) * 0.62);
+		line-height: 1;
 	}
 
 	.monsan-badge.variant-default {
@@ -99,5 +109,9 @@
 	}
 	.no-shrink {
 		flex-shrink: 0;
+	}
+
+	.nowrap {
+		white-space: nowrap;
 	}
 </style>

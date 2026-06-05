@@ -62,7 +62,8 @@
 	}
 
 	.height-viewport {
-		min-height: 100dvh;
+		height: 100dvh;
+		min-height: 0;
 	}
 
 	.overflow-visible {
