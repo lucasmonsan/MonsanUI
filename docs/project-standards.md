@@ -29,6 +29,23 @@ export default {
 
 The expected suite state is an empty allowlist.
 
+## Tooling Contract
+
+MonsanUI also owns the suite tooling checker. Consumers should call:
+
+```bash
+monsan-ui-check-tooling
+```
+
+The checker verifies:
+
+- `packageManager` is `pnpm@11.5.0`.
+- `type` is `module`.
+- `lint` is `prettier --check . && eslint .`.
+- `.prettierrc` matches the suite Prettier config.
+- `.prettierignore` contains required generated-output ignores and does not contain broad source ignores.
+- `eslint.config.js` uses the shared recommended configs, TypeScript/Svelte parser settings, `no-undef` handling and `svelte/no-navigation-without-resolve`.
+
 ## Component Ownership
 
 New visual or layout needs should be added to MonsanUI first. Consumer apps should keep domain logic, data loading and app-specific text, but reusable layout and aesthetic behavior belongs here.
