@@ -43,18 +43,21 @@
 						<StatusPill tone={statusTone} pulse={statusTone === 'warning'}>
 							{status}
 						</StatusPill>
-					{:else if status}
-						<span
-							class="console-status-indicator tone-{statusTone} shape-{statusShape}"
-							aria-label={status}
-							title={status}
-						></span>
 					{/if}
 				</div>
 
-				{#if actions}
+				{#if actions || (status && statusLabel === 'hidden')}
 					<div class="console-actions">
-						{@render actions()}
+						{#if status && statusLabel === 'hidden'}
+							<span
+								class="console-status-indicator tone-{statusTone} shape-{statusShape}"
+								aria-label={status}
+								title={status}
+							></span>
+						{/if}
+						{#if actions}
+							{@render actions()}
+						{/if}
 					</div>
 				{/if}
 			</header>
@@ -191,6 +194,7 @@
 
 		.console-actions {
 			justify-content: flex-start;
+			align-self: flex-end;
 		}
 	}
 </style>

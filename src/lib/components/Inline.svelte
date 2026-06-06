@@ -8,6 +8,7 @@
 		justify?: 'start' | 'center' | 'between' | 'end';
 		wrap?: boolean;
 		fullWidth?: boolean;
+		growChildren?: boolean;
 	}
 
 	let {
@@ -16,7 +17,8 @@
 		align = 'center',
 		justify = 'start',
 		wrap = false,
-		fullWidth = false
+		fullWidth = false,
+		growChildren = false
 	}: Props = $props();
 </script>
 
@@ -24,6 +26,7 @@
 	class="monsan-inline gap-{gap} align-{align} justify-{justify}"
 	class:wrap
 	class:full-width={fullWidth}
+	class:grow-children={growChildren}
 >
 	{@render children()}
 </div>
@@ -39,6 +42,10 @@
 	}
 	.full-width {
 		width: 100%;
+	}
+	.grow-children > :global(*) {
+		flex: 1 1 0;
+		min-width: 0;
 	}
 	.gap-xs {
 		gap: var(--space-xs);
