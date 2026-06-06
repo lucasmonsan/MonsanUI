@@ -4,17 +4,27 @@
 		noShrink = false,
 		size = 'md',
 		nowrap = false,
+		title,
+		ariaLabel,
 		children
 	} = $props<{
 		variant?: 'default' | 'primary' | 'secondary' | 'success' | 'due' | 'new' | 'warning';
 		noShrink?: boolean;
 		size?: 'sm' | 'md';
 		nowrap?: boolean;
+		title?: string;
+		ariaLabel?: string;
 		children?: import('svelte').Snippet;
 	}>();
 </script>
 
-<span class="monsan-badge variant-{variant} size-{size}" class:no-shrink={noShrink} class:nowrap>
+<span
+	class="monsan-badge variant-{variant} size-{size}"
+	class:no-shrink={noShrink}
+	class:nowrap
+	{title}
+	aria-label={ariaLabel}
+>
 	{#if children}
 		{@render children()}
 	{/if}
