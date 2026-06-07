@@ -91,6 +91,9 @@
 
 	function menuTransition(node: HTMLElement) {
 		if (variant === 'reveal') {
+			if (placement === 'below') {
+				return fly(node, { y: 12, duration: 200 });
+			}
 			return fly(node, { x: align === 'left' ? -50 : 50, duration: 200 });
 		} else {
 			return scale(node, { duration: 150, start: 0.95, easing: backOut });
@@ -242,6 +245,16 @@
 		gap: var(--space-sm);
 	}
 
+	.quick-actions-panel.variant-reveal.layout-vertical {
+		flex-direction: column;
+		align-items: stretch;
+		height: auto;
+	}
+
+	.quick-actions-panel.variant-reveal.layout-horizontal {
+		flex-direction: row;
+	}
+
 	.quick-actions-panel.variant-reveal.align-right {
 		right: 0;
 		justify-content: flex-end;
@@ -284,5 +297,18 @@
 	.quick-actions-panel.variant-reveal.placement-below {
 		right: 0;
 		left: auto;
+		top: calc(100% + var(--space-xs));
+		bottom: auto;
+		height: auto;
+		width: max-content;
+		max-width: calc(100vw - var(--space-md) * 2);
+		align-items: stretch;
+		padding: 0;
+		border-radius: var(--radius-md);
+	}
+
+	.quick-actions-panel.variant-reveal.placement-below.align-left {
+		left: 0;
+		right: auto;
 	}
 </style>
