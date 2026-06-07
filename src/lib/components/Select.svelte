@@ -104,7 +104,7 @@
 
 	.monsan-select-container.width-auto {
 		width: auto;
-		min-width: min(100%, 180px);
+		min-width: min(100%, 140px);
 	}
 
 	.monsan-select-trigger {
