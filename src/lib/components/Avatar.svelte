@@ -3,7 +3,7 @@
 		src?: string;
 		name?: string;
 		alt?: string;
-		size?: 'sm' | 'md' | 'lg';
+		size?: 'sm' | 'md' | 'lg' | 'control';
 		shape?: 'circle' | 'square';
 		onclick?: (e: MouseEvent) => void;
 		title?: string;
@@ -33,6 +33,7 @@
 
 	const sizeMap = {
 		sm: '32px',
+		control: 'var(--control-height)',
 		md: '48px',
 		lg: '64px'
 	};

@@ -23,7 +23,7 @@
 		src?: string;
 		name?: string;
 		alt?: string;
-		size?: 'sm' | 'md' | 'lg';
+		size?: 'sm' | 'md' | 'lg' | 'control';
 		shape?: 'circle' | 'square';
 		ariaLabel: string;
 		title?: string;

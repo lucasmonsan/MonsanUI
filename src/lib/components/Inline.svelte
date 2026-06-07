@@ -51,8 +51,9 @@
 		min-width: 0;
 	}
 	.grow-first-child > :global(:first-child) {
-		flex: 1 1 auto;
-		min-width: min(100%, 220px);
+		flex: 1 1 0;
+		width: auto;
+		min-width: 0;
 	}
 	.grow-first-child > :global(:not(:first-child)) {
 		flex: 0 0 auto;
