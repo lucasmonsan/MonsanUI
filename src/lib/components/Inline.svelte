@@ -9,6 +9,7 @@
 		wrap?: boolean;
 		fullWidth?: boolean;
 		growChildren?: boolean;
+		growFirstChild?: boolean;
 	}
 
 	let {
@@ -18,7 +19,8 @@
 		justify = 'start',
 		wrap = false,
 		fullWidth = false,
-		growChildren = false
+		growChildren = false,
+		growFirstChild = false
 	}: Props = $props();
 </script>
 
@@ -27,6 +29,7 @@
 	class:wrap
 	class:full-width={fullWidth}
 	class:grow-children={growChildren}
+	class:grow-first-child={growFirstChild}
 >
 	{@render children()}
 </div>
@@ -46,6 +49,13 @@
 	.grow-children > :global(*) {
 		flex: 1 1 0;
 		min-width: 0;
+	}
+	.grow-first-child > :global(:first-child) {
+		flex: 1 1 auto;
+		min-width: min(100%, 220px);
+	}
+	.grow-first-child > :global(:not(:first-child)) {
+		flex: 0 0 auto;
 	}
 	.gap-xs {
 		gap: var(--space-xs);

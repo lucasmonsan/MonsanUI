@@ -16,7 +16,8 @@
 		id = '',
 		showChevron = true,
 		textAlign = 'left',
-		disabled = false
+		disabled = false,
+		width = 'full'
 	} = $props<{
 		value: string | number;
 		options: Option[];
@@ -25,6 +26,7 @@
 		showChevron?: boolean;
 		textAlign?: 'left' | 'center' | 'right';
 		disabled?: boolean;
+		width?: 'full' | 'auto';
 	}>();
 
 	let isOpen = $state(false);
@@ -52,7 +54,7 @@
 	});
 </script>
 
-<div class="monsan-select-container" bind:this={selectEl}>
+<div class="monsan-select-container width-{width}" bind:this={selectEl}>
 	<button
 		{id}
 		class="monsan-select-trigger align-{textAlign}"
@@ -98,6 +100,11 @@
 		position: relative;
 		width: 100%;
 		font-family: var(--font-body);
+	}
+
+	.monsan-select-container.width-auto {
+		width: auto;
+		min-width: min(100%, 180px);
 	}
 
 	.monsan-select-trigger {
