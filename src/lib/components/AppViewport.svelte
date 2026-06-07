@@ -54,10 +54,10 @@
 
 <style>
 	.monsan-app-viewport {
-		position: fixed;
-		inset: 0;
 		width: 100%;
+		min-height: 100dvh;
 		height: 100dvh;
+		max-height: 100dvh;
 		padding: var(--app-viewport-padding);
 		display: flex;
 		flex-direction: column;
