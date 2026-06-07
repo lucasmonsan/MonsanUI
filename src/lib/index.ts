@@ -2,6 +2,7 @@
 export { default as Calendar } from './components/Calendar.svelte';
 export { default as AppCard } from './components/AppCard.svelte';
 export { default as AppHeader } from './components/AppHeader.svelte';
+export { default as AppViewport } from './components/AppViewport.svelte';
 export { default as Background } from './components/Background.svelte';
 export { default as Button } from './components/Button.svelte';
 export { default as ChoiceCard } from './components/ChoiceCard.svelte';
