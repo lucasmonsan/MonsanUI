@@ -41,16 +41,25 @@
 <style>
 	.monsan-centered-panel {
 		display: flex;
-		align-items: center;
+		align-items: safe center;
 		justify-content: center;
 		width: 100%;
 		box-sizing: border-box;
 		position: relative;
 		z-index: 10;
+		min-width: 0;
 	}
 
 	.is-full-height {
-		min-height: 100dvh;
+		height: 100dvh;
+		max-height: 100dvh;
+		overflow-y: auto;
+		overflow-x: hidden;
+		scrollbar-width: none;
+	}
+
+	.is-full-height::-webkit-scrollbar {
+		display: none;
 	}
 
 	.monsan-centered-panel :global(.centered-panel-surface) {
@@ -60,8 +69,9 @@
 	.centered-panel-content {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-xl);
+		gap: var(--space-md);
 		width: 100%;
+		min-width: 0;
 	}
 
 	.align-center {

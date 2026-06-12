@@ -114,6 +114,7 @@ export { default as ZapIcon } from './components/icons/Zap.svelte';
 export { default as MicroscopeIcon } from './components/icons/Microscope.svelte';
 export { default as BarChartIcon } from './components/icons/BarChart.svelte';
 export { default as LockIcon } from './components/icons/Lock.svelte';
+export { default as MailIcon } from './components/icons/Mail.svelte';
 export { default as UnlockIcon } from './components/icons/Unlock.svelte';
 export { default as RotateCwIcon } from './components/icons/RotateCw.svelte';
 export { default as FolderIcon } from './components/icons/Folder.svelte';
