@@ -7,12 +7,14 @@
 		children: Snippet;
 		header: Snippet;
 		toolbar?: Snippet;
+		footer?: Snippet;
 		padding?: PaddingPreset;
 		gap?: 'none' | 'sm' | 'md' | 'lg';
 		toolbarGap?: 'none' | 'xs' | 'sm' | 'md' | 'lg';
 		contentGap?: 'none' | 'sm' | 'md' | 'lg';
 		contentMaxWidth?: MaxWidthPreset;
 		toolbarMaxWidth?: MaxWidthPreset;
+		footerMaxWidth?: MaxWidthPreset;
 		contentFade?: 'none' | 'top' | 'bottom' | 'both';
 	}
 
@@ -20,23 +22,26 @@
 		children,
 		header,
 		toolbar,
+		footer,
 		padding = 'app-authenticated',
 		gap = 'md',
 		toolbarGap = 'sm',
 		contentGap = 'md',
 		contentMaxWidth = 'content',
 		toolbarMaxWidth = 'content',
+		footerMaxWidth = 'content',
 		contentFade = 'none'
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
 	let resolvedContentMaxWidth = $derived(resolveMaxWidth(contentMaxWidth));
 	let resolvedToolbarMaxWidth = $derived(resolveMaxWidth(toolbarMaxWidth));
+	let resolvedFooterMaxWidth = $derived(resolveMaxWidth(footerMaxWidth));
 </script>
 
 <section
 	class="monsan-app-viewport gap-{gap}"
-	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth};"
+	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth}; --app-viewport-footer-max-width: {resolvedFooterMaxWidth};"
 >
 	<div class="app-viewport-fixed toolbar-gap-{toolbar ? toolbarGap : 'none'}">
 		{@render header()}
@@ -52,6 +57,12 @@
 			{@render children()}
 		</div>
 	</div>
+
+	{#if footer}
+		<div class="app-viewport-footer">
+			{@render footer()}
+		</div>
+	{/if}
 </section>
 
 <style>
@@ -122,11 +133,20 @@
 	.app-viewport-content {
 		width: 100%;
 		max-width: var(--app-viewport-content-max-width);
+		min-height: 100%;
 		margin: 0 auto;
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
 		box-sizing: border-box;
+	}
+
+	.app-viewport-footer {
+		width: 100%;
+		max-width: var(--app-viewport-footer-max-width);
+		margin: 0 auto;
+		box-sizing: border-box;
+		flex: 0 0 auto;
 	}
 
 	.gap-none {

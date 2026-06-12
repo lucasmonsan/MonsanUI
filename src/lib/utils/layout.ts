@@ -90,7 +90,7 @@ const paddingValues: Record<PaddingPreset, string> = {
 	page: 'var(--space-xl) var(--space-md)',
 	'page-wide': 'var(--space-xl) var(--space-lg)',
 	'page-compact': 'var(--space-md) var(--space-md) 0 var(--space-md)',
-	'app-authenticated': 'var(--space-lg) var(--space-md) 0 var(--space-md)',
+	'app-authenticated': 'var(--space-lg) var(--space-md) var(--space-md) var(--space-md)',
 	'0': '0',
 	'0 var(--space-md)': '0 var(--space-md)',
 	'var(--space-xs)': 'var(--space-xs)',
