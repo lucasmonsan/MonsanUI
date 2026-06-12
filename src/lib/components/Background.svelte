@@ -17,28 +17,24 @@
 
 <style>
 	.background-grid {
-		top: -40px;
-		left: -40px;
 		z-index: -1;
 		pointer-events: none;
-		will-change: transform;
+		will-change: background-position;
 		opacity: 0.65;
+		background-position: 0 0;
+		contain: paint;
 	}
 
 	/* Fixed full screen mode */
 	.background-grid:not(.is-local) {
 		position: fixed;
-		width: calc(100dvw + 40px);
-		height: calc(100dvh + 40px);
+		inset: 0;
 	}
 
 	/* Local relative box mode */
 	.background-grid.is-local {
 		position: absolute;
-		right: -40px;
-		bottom: -40px;
-		width: auto;
-		height: auto;
+		inset: 0;
 	}
 
 	/* Patterns styling */
@@ -83,7 +79,7 @@
 		background-image: linear-gradient(to bottom, var(--grid-color) 1.5px, transparent 1.5px);
 	}
 
-	/* Animation toggling and directions mapping using GPU translation */
+	/* Animation toggling and directions mapping */
 	.is-animated {
 		animation-duration: 12s;
 		animation-timing-function: linear;
@@ -151,100 +147,100 @@
 	/* Keyframes for 40px cycle */
 	@keyframes scrollUp40 {
 		0% {
-			transform: translateY(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateY(-40px);
+			background-position: 0 -40px;
 		}
 	}
 	@keyframes scrollDown40 {
 		0% {
-			transform: translateY(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateY(40px);
+			background-position: 0 40px;
 		}
 	}
 	@keyframes scrollLeft40 {
 		0% {
-			transform: translateX(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateX(-40px);
+			background-position: -40px 0;
 		}
 	}
 	@keyframes scrollRight40 {
 		0% {
-			transform: translateX(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateX(40px);
+			background-position: 40px 0;
 		}
 	}
 	@keyframes scrollDiag40 {
 		0% {
-			transform: translate(0, 0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translate(40px, 40px);
+			background-position: 40px 40px;
 		}
 	}
 	@keyframes scrollDiagRev40 {
 		0% {
-			transform: translate(0, 0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translate(-40px, -40px);
+			background-position: -40px -40px;
 		}
 	}
 
 	/* Keyframes for 24px cycle */
 	@keyframes scrollUp24 {
 		0% {
-			transform: translateY(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateY(-24px);
+			background-position: 0 -24px;
 		}
 	}
 	@keyframes scrollDown24 {
 		0% {
-			transform: translateY(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateY(24px);
+			background-position: 0 24px;
 		}
 	}
 	@keyframes scrollLeft24 {
 		0% {
-			transform: translateX(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateX(-24px);
+			background-position: -24px 0;
 		}
 	}
 	@keyframes scrollRight24 {
 		0% {
-			transform: translateX(0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translateX(24px);
+			background-position: 24px 0;
 		}
 	}
 	@keyframes scrollDiag24 {
 		0% {
-			transform: translate(0, 0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translate(24px, 24px);
+			background-position: 24px 24px;
 		}
 	}
 	@keyframes scrollDiagRev24 {
 		0% {
-			transform: translate(0, 0);
+			background-position: 0 0;
 		}
 		100% {
-			transform: translate(-24px, -24px);
+			background-position: -24px -24px;
 		}
 	}
 
