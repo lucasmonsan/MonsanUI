@@ -9,6 +9,7 @@
 		toolbar?: Snippet;
 		padding?: PaddingPreset;
 		gap?: 'none' | 'sm' | 'md' | 'lg';
+		toolbarGap?: 'none' | 'xs' | 'sm' | 'md' | 'lg';
 		contentGap?: 'none' | 'sm' | 'md' | 'lg';
 		contentMaxWidth?: MaxWidthPreset;
 		toolbarMaxWidth?: MaxWidthPreset;
@@ -21,6 +22,7 @@
 		toolbar,
 		padding = 'app-authenticated',
 		gap = 'md',
+		toolbarGap = 'sm',
 		contentGap = 'md',
 		contentMaxWidth = 'content',
 		toolbarMaxWidth = 'content',
@@ -36,7 +38,7 @@
 	class="monsan-app-viewport gap-{gap}"
 	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth};"
 >
-	<div class="app-viewport-fixed">
+	<div class="app-viewport-fixed toolbar-gap-{toolbar ? toolbarGap : 'none'}">
 		{@render header()}
 		{#if toolbar}
 			<div class="app-viewport-toolbar">
@@ -72,6 +74,26 @@
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
+	}
+
+	.toolbar-gap-none {
+		gap: 0;
+	}
+
+	.toolbar-gap-xs {
+		gap: var(--space-xs);
+	}
+
+	.toolbar-gap-sm {
+		gap: var(--space-sm);
+	}
+
+	.toolbar-gap-md {
+		gap: var(--space-md);
+	}
+
+	.toolbar-gap-lg {
+		gap: var(--space-lg);
 	}
 
 	.app-viewport-toolbar {
