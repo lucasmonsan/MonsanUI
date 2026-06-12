@@ -140,6 +140,7 @@
 
 	.alert-body {
 		flex: 1;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-xs);
@@ -158,6 +159,7 @@
 		font-size: var(--text-sm);
 		color: var(--text-primary);
 		line-height: 1.4;
+		overflow-wrap: anywhere;
 	}
 
 	.alert-close-btn {
