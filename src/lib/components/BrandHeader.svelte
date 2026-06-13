@@ -70,7 +70,6 @@
 	.monsan-brand-header {
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm);
 	}
 
 	.stacked {
@@ -79,7 +78,7 @@
 	}
 
 	.stacked .brand-logo {
-		margin-bottom: var(--space-xs);
+		margin-bottom: 0;
 	}
 
 	.inline {
@@ -95,7 +94,6 @@
 		display: flex;
 		flex-direction: column;
 		align-items: inherit;
-		gap: var(--space-xs);
 	}
 
 	.brand-logo {
