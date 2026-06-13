@@ -12,6 +12,7 @@
 		gap?: 'none' | 'sm' | 'md' | 'lg';
 		toolbarGap?: 'none' | 'xs' | 'sm' | 'md' | 'lg';
 		contentGap?: 'none' | 'sm' | 'md' | 'lg';
+		headerMaxWidth?: MaxWidthPreset;
 		contentMaxWidth?: MaxWidthPreset;
 		toolbarMaxWidth?: MaxWidthPreset;
 		footerMaxWidth?: MaxWidthPreset;
@@ -27,6 +28,7 @@
 		gap = 'md',
 		toolbarGap = 'sm',
 		contentGap = 'md',
+		headerMaxWidth = 'content',
 		contentMaxWidth = 'content',
 		toolbarMaxWidth = 'content',
 		footerMaxWidth = 'content',
@@ -34,6 +36,7 @@
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
+	let resolvedHeaderMaxWidth = $derived(resolveMaxWidth(headerMaxWidth));
 	let resolvedContentMaxWidth = $derived(resolveMaxWidth(contentMaxWidth));
 	let resolvedToolbarMaxWidth = $derived(resolveMaxWidth(toolbarMaxWidth));
 	let resolvedFooterMaxWidth = $derived(resolveMaxWidth(footerMaxWidth));
@@ -41,10 +44,12 @@
 
 <section
 	class="monsan-app-viewport gap-{gap}"
-	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth}; --app-viewport-footer-max-width: {resolvedFooterMaxWidth};"
+	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-header-max-width: {resolvedHeaderMaxWidth}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth}; --app-viewport-footer-max-width: {resolvedFooterMaxWidth};"
 >
 	<div class="app-viewport-fixed toolbar-gap-{toolbar ? toolbarGap : 'none'}">
-		{@render header()}
+		<div class="app-viewport-header">
+			{@render header()}
+		</div>
 		{#if toolbar}
 			<div class="app-viewport-toolbar">
 				{@render toolbar()}
@@ -85,6 +90,14 @@
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
+	}
+
+	.app-viewport-header {
+		width: 100%;
+		max-width: var(--app-viewport-header-max-width);
+		margin: 0 auto;
+		box-sizing: border-box;
+		flex: 0 0 auto;
 	}
 
 	.toolbar-gap-none {

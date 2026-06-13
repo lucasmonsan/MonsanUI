@@ -4,7 +4,7 @@
 	interface Props {
 		children: Snippet;
 		position?: 'static' | 'sticky' | 'fixed';
-		align?: 'start' | 'center' | 'end' | 'between';
+		align?: 'start' | 'center' | 'end' | 'between' | 'split';
 		wrap?: boolean;
 		surface?: 'plain' | 'raised';
 	}
@@ -70,6 +70,23 @@
 
 	.align-between {
 		justify-content: space-between;
+	}
+
+	.align-split {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+	}
+
+	.align-split > :global(:nth-child(1)) {
+		justify-self: start;
+	}
+
+	.align-split > :global(:nth-child(2)) {
+		justify-self: center;
+	}
+
+	.align-split > :global(:nth-child(3)) {
+		justify-self: end;
 	}
 
 	.surface-raised {
