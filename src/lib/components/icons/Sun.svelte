@@ -1,4 +1,6 @@
 <script lang="ts">
+	import PhosphorIcon from 'phosphor-svelte/lib/SunIcon';
+
 	let {
 		size = 24,
 		color = 'currentColor',
@@ -6,7 +8,7 @@
 		decorative = true,
 		ariaLabel
 	} = $props<{
-		size?: number;
+		size?: number | string;
 		color?: string;
 		strokeWidth?: number;
 		decorative?: boolean;
@@ -14,27 +16,12 @@
 	}>();
 </script>
 
-<svg
-	width={size}
-	height={size}
-	viewBox="0 0 24 24"
-	fill="none"
-	stroke={color}
-	stroke-width={strokeWidth}
-	stroke-linecap="round"
-	stroke-linejoin="round"
+<PhosphorIcon
+	{size}
+	{color}
+	weight={strokeWidth >= 3 ? 'bold' : strokeWidth <= 1.5 ? 'light' : 'regular'}
 	aria-hidden={decorative}
 	aria-label={decorative ? undefined : ariaLabel}
 	focusable="false"
 	role={decorative ? undefined : 'img'}
->
-	<circle cx="12" cy="12" r="4" />
-	<path d="M12 2v2" />
-	<path d="M12 20v2" />
-	<path d="m4.93 4.93 1.41 1.41" />
-	<path d="m17.66 17.66 1.41 1.41" />
-	<path d="M2 12h2" />
-	<path d="M20 12h2" />
-	<path d="m6.34 17.66-1.41 1.41" />
-	<path d="m19.07 4.93-1.41 1.41" />
-</svg>
+/>

@@ -77,6 +77,11 @@
 		text-align: center;
 	}
 
+	.stacked .brand-copy {
+		align-items: center;
+		text-align: center;
+	}
+
 	.stacked .brand-logo {
 		margin-bottom: 0;
 	}
@@ -94,6 +99,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: inherit;
+		text-align: inherit;
 	}
 
 	.brand-logo {
