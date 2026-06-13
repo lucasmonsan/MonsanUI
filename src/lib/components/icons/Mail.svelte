@@ -19,7 +19,7 @@
 <PhosphorIcon
 	{size}
 	{color}
-	weight={strokeWidth >= 3 ? 'bold' : strokeWidth <= 1.5 ? 'light' : 'regular'}
+	weight={strokeWidth <= 1.5 ? 'regular' : 'fill'}
 	aria-hidden={decorative}
 	aria-label={decorative ? undefined : ariaLabel}
 	focusable="false"
