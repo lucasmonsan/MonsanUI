@@ -118,6 +118,10 @@
 		flex: 1;
 	}
 
+	.console-title :global(.monsan-text) {
+		white-space: nowrap;
+	}
+
 	.console-actions {
 		justify-content: flex-end;
 		flex-shrink: 0;
@@ -188,13 +192,13 @@
 
 	@media (max-width: 560px) {
 		.console-header {
-			align-items: flex-start;
-			flex-direction: column;
+			align-items: center;
+			gap: var(--space-sm);
 		}
 
 		.console-actions {
-			justify-content: flex-start;
-			align-self: flex-end;
+			justify-content: flex-end;
+			align-self: center;
 		}
 	}
 </style>

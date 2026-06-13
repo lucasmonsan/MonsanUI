@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount, tick } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
 	import { resolveMaxWidth, resolvePadding } from '$lib/utils/layout.js';
@@ -16,7 +17,7 @@
 		contentMaxWidth?: MaxWidthPreset;
 		toolbarMaxWidth?: MaxWidthPreset;
 		footerMaxWidth?: MaxWidthPreset;
-		contentFade?: 'none' | 'top' | 'bottom' | 'both';
+		contentFade?: 'none' | 'top' | 'bottom' | 'both' | 'auto';
 	}
 
 	let {
@@ -40,6 +41,51 @@
 	let resolvedContentMaxWidth = $derived(resolveMaxWidth(contentMaxWidth));
 	let resolvedToolbarMaxWidth = $derived(resolveMaxWidth(toolbarMaxWidth));
 	let resolvedFooterMaxWidth = $derived(resolveMaxWidth(footerMaxWidth));
+
+	let scrollEl = $state<HTMLElement>();
+	let hasOverflowTop = $state(false);
+	let hasOverflowBottom = $state(false);
+
+	function updateOverflowFade() {
+		if (!scrollEl || contentFade !== 'auto') {
+			hasOverflowTop = false;
+			hasOverflowBottom = false;
+			return;
+		}
+
+		const threshold = 1;
+		hasOverflowTop = scrollEl.scrollTop > threshold;
+		hasOverflowBottom =
+			scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - threshold;
+	}
+
+	onMount(() => {
+		void tick().then(updateOverflowFade);
+
+		const resizeObserver = new ResizeObserver(updateOverflowFade);
+		const mutationObserver = new MutationObserver(updateOverflowFade);
+
+		if (scrollEl) {
+			resizeObserver.observe(scrollEl);
+			mutationObserver.observe(scrollEl, { childList: true, subtree: true });
+		}
+
+		window.addEventListener('resize', updateOverflowFade);
+
+		return () => {
+			resizeObserver.disconnect();
+			mutationObserver.disconnect();
+			window.removeEventListener('resize', updateOverflowFade);
+		};
+	});
+
+	$effect(() => {
+		if (contentFade !== 'auto') {
+			hasOverflowTop = false;
+			hasOverflowBottom = false;
+		}
+		void tick().then(updateOverflowFade);
+	});
 </script>
 
 <section
@@ -57,7 +103,13 @@
 		{/if}
 	</div>
 
-	<div class="app-viewport-scroll content-gap-{contentGap} fade-{contentFade}">
+	<div
+		bind:this={scrollEl}
+		class="app-viewport-scroll content-gap-{contentGap} fade-{contentFade}"
+		class:has-overflow-top={hasOverflowTop}
+		class:has-overflow-bottom={hasOverflowBottom}
+		onscroll={updateOverflowFade}
+	>
 		<div class="app-viewport-content">
 			{@render children()}
 		</div>
@@ -137,6 +189,7 @@
 		overflow-x: hidden;
 		scrollbar-width: none;
 		box-sizing: border-box;
+		position: relative;
 	}
 
 	.app-viewport-scroll::-webkit-scrollbar {
@@ -210,5 +263,36 @@
 			black calc(100% - var(--space-lg)),
 			transparent 100%
 		);
+	}
+
+	.fade-auto::before,
+	.fade-auto::after {
+		content: '';
+		position: sticky;
+		left: 0;
+		right: 0;
+		z-index: 3;
+		display: block;
+		height: var(--space-xl);
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.18s var(--ease-out);
+	}
+
+	.fade-auto::before {
+		top: 0;
+		margin-bottom: calc(var(--space-xl) * -1);
+		background: linear-gradient(to bottom, var(--bg-primary), transparent);
+	}
+
+	.fade-auto::after {
+		bottom: 0;
+		margin-top: calc(var(--space-xl) * -1);
+		background: linear-gradient(to top, var(--bg-primary), transparent);
+	}
+
+	.fade-auto.has-overflow-top::before,
+	.fade-auto.has-overflow-bottom::after {
+		opacity: 1;
 	}
 </style>

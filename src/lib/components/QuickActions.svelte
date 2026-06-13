@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { fly, scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import type { ActionPanelWidthPreset } from '$lib/utils/layout.js';
 	import { resolveActionPanelWidth } from '$lib/utils/layout.js';
 	import { i18n } from '../utils/i18n.svelte';
+
+	type PanelPlacement = 'below' | 'before' | 'after';
+	type ResolvedPanelPlacement = PanelPlacement | 'above';
 
 	let {
 		open = $bindable(false),
@@ -28,7 +31,7 @@
 		triggerLabel?: string;
 		triggerBehavior?: 'wrapper' | 'child';
 		panelLayout?: 'vertical' | 'horizontal';
-		placement?: 'below' | 'before' | 'after';
+		placement?: PanelPlacement;
 		panelRole?: 'menu' | 'toolbar';
 		surface?: 'panel' | 'gradient' | 'plain';
 		containedReveal?: boolean;
@@ -55,6 +58,31 @@
 
 	let panelEl = $state<HTMLDivElement>();
 	let activeTriggerLabel = $derived(triggerLabel ?? i18n.t('quickActions.open'));
+	let resolvedPlacement = $state<ResolvedPanelPlacement>('below');
+	let panelMaxHeight = $state('none');
+
+	function updateDropdownPlacement() {
+		if (!open || variant !== 'dropdown' || !containerEl || !panelEl) return;
+
+		resolvedPlacement = placement;
+		panelMaxHeight = 'none';
+
+		if (placement !== 'below') return;
+
+		const gap = 8;
+		const rect = containerEl.getBoundingClientRect();
+		const panelHeight = panelEl.offsetHeight;
+		const spaceBelow = window.innerHeight - rect.bottom - gap;
+		const spaceAbove = rect.top - gap;
+
+		if (spaceBelow < panelHeight && spaceAbove > spaceBelow) {
+			resolvedPlacement = 'above';
+			panelMaxHeight = `${Math.max(120, spaceAbove)}px`;
+			return;
+		}
+
+		panelMaxHeight = `${Math.max(120, spaceBelow)}px`;
+	}
 
 	onMount(() => {
 		document.addEventListener('click', handleOutsideClick, { capture: true });
@@ -86,6 +114,20 @@
 			};
 			panelEl.addEventListener('click', listener);
 			return () => panelEl?.removeEventListener('click', listener);
+		}
+	});
+
+	$effect(() => {
+		if (open) {
+			void tick().then(updateDropdownPlacement);
+
+			window.addEventListener('resize', updateDropdownPlacement);
+			window.addEventListener('scroll', updateDropdownPlacement, true);
+
+			return () => {
+				window.removeEventListener('resize', updateDropdownPlacement);
+				window.removeEventListener('scroll', updateDropdownPlacement, true);
+			};
 		}
 	});
 
@@ -136,8 +178,8 @@
 	{#if open}
 		<div
 			bind:this={panelEl}
-			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{placement} surface-{surface}"
-			style="--panel-width: {resolvedWidth};"
+			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{resolvedPlacement} surface-{surface}"
+			style="--panel-width: {resolvedWidth}; --panel-max-height: {panelMaxHeight};"
 			role={panelRole}
 			transition:menuTransition
 		>
@@ -193,7 +235,13 @@
 		display: flex;
 		padding: var(--space-xs);
 		gap: var(--space-xs);
-		overflow: visible;
+		overflow: auto;
+		max-height: var(--panel-max-height);
+		scrollbar-width: none;
+	}
+
+	.quick-actions-panel.variant-dropdown::-webkit-scrollbar {
+		display: none;
 	}
 
 	.quick-actions-panel.variant-dropdown.layout-vertical {
@@ -207,6 +255,10 @@
 
 	.quick-actions-panel.variant-dropdown.placement-below {
 		top: calc(100% + var(--space-xs));
+	}
+
+	.quick-actions-panel.variant-dropdown.placement-above {
+		bottom: calc(100% + var(--space-xs));
 	}
 
 	.quick-actions-panel.variant-dropdown.align-right {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import ChevronDown from './icons/ChevronDown.svelte';
 
 	interface Option {
@@ -30,6 +30,8 @@
 	}>();
 
 	let isOpen = $state(false);
+	let dropdownPlacement = $state<'below' | 'above'>('below');
+	let dropdownMaxHeight = $state('none');
 	let selectedLabel = $derived(
 		options.find((o: Option) => o.value === value)?.label || placeholder
 	);
@@ -40,6 +42,28 @@
 	}
 
 	let selectEl = $state<HTMLElement>();
+	let dropdownEl = $state<HTMLDivElement>();
+
+	function updateDropdownPlacement() {
+		if (!isOpen || !selectEl || !dropdownEl) return;
+
+		dropdownPlacement = 'below';
+		dropdownMaxHeight = 'none';
+
+		const gap = 8;
+		const rect = selectEl.getBoundingClientRect();
+		const dropdownHeight = dropdownEl.offsetHeight;
+		const spaceBelow = window.innerHeight - rect.bottom - gap;
+		const spaceAbove = rect.top - gap;
+
+		if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+			dropdownPlacement = 'above';
+			dropdownMaxHeight = `${Math.max(120, spaceAbove)}px`;
+			return;
+		}
+
+		dropdownMaxHeight = `${Math.max(120, spaceBelow)}px`;
+	}
 
 	// Fechar ao clicar fora
 	function handleClickOutside(e: MouseEvent) {
@@ -51,6 +75,20 @@
 	onMount(() => {
 		document.addEventListener('click', handleClickOutside, { capture: true });
 		return () => document.removeEventListener('click', handleClickOutside, { capture: true });
+	});
+
+	$effect(() => {
+		if (isOpen) {
+			void tick().then(updateDropdownPlacement);
+
+			window.addEventListener('resize', updateDropdownPlacement);
+			window.addEventListener('scroll', updateDropdownPlacement, true);
+
+			return () => {
+				window.removeEventListener('resize', updateDropdownPlacement);
+				window.removeEventListener('scroll', updateDropdownPlacement, true);
+			};
+		}
 	});
 </script>
 
@@ -78,7 +116,9 @@
 
 	{#if isOpen}
 		<div
-			class="monsan-select-dropdown"
+			bind:this={dropdownEl}
+			class="monsan-select-dropdown placement-{dropdownPlacement}"
+			style="--dropdown-max-height: {dropdownMaxHeight};"
 			transition:scale={{ duration: 150, start: 0.95, easing: backOut }}
 		>
 			{#each options as option, i (option.value + '-' + i)}
@@ -189,7 +229,6 @@
 
 	.monsan-select-dropdown {
 		position: absolute;
-		top: calc(100% + var(--space-xs, 4px));
 		left: 0;
 		width: 100%;
 		background: var(--bg-primary);
@@ -202,9 +241,19 @@
 		flex-direction: column;
 		padding: var(--space-xs);
 		gap: var(--space-xs);
-		overflow: hidden;
+		overflow: auto;
+		max-height: var(--dropdown-max-height);
 		-ms-overflow-style: none;
 		scrollbar-width: none;
+	}
+
+	.monsan-select-dropdown.placement-below {
+		top: calc(100% + var(--space-xs, 4px));
+	}
+
+	.monsan-select-dropdown.placement-above {
+		top: auto;
+		bottom: calc(100% + var(--space-xs, 4px));
 	}
 
 	.monsan-select-dropdown::-webkit-scrollbar {

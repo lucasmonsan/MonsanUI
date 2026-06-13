@@ -10,6 +10,7 @@
 		fullWidth?: boolean;
 		growChildren?: boolean;
 		growFirstChild?: boolean;
+		collapseBelow?: 'never' | 'sm' | 'md';
 	}
 
 	let {
@@ -20,12 +21,13 @@
 		wrap = false,
 		fullWidth = false,
 		growChildren = false,
-		growFirstChild = false
+		growFirstChild = false,
+		collapseBelow = 'never'
 	}: Props = $props();
 </script>
 
 <div
-	class="monsan-inline gap-{gap} align-{align} justify-{justify}"
+	class="monsan-inline gap-{gap} align-{align} justify-{justify} collapse-{collapseBelow}"
 	class:wrap
 	class:full-width={fullWidth}
 	class:grow-children={growChildren}
@@ -90,5 +92,35 @@
 	}
 	.justify-end {
 		justify-content: flex-end;
+	}
+
+	@media (max-width: 640px) {
+		.collapse-sm {
+			flex-wrap: wrap;
+		}
+
+		.collapse-sm.grow-first-child > :global(:first-child) {
+			flex: 1 1 100%;
+			width: 100%;
+		}
+
+		.collapse-sm.grow-first-child > :global(:not(:first-child)) {
+			flex: 1 1 auto;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.collapse-md {
+			flex-wrap: wrap;
+		}
+
+		.collapse-md.grow-first-child > :global(:first-child) {
+			flex: 1 1 100%;
+			width: 100%;
+		}
+
+		.collapse-md.grow-first-child > :global(:not(:first-child)) {
+			flex: 1 1 auto;
+		}
 	}
 </style>
