@@ -287,14 +287,14 @@
 	.fade-auto .app-viewport-content::before {
 		top: 0;
 		margin-bottom: calc((var(--space-xl) + var(--app-viewport-content-gap, 0px)) * -1);
-		border-top: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
+		border-top: var(--border-width) solid var(--border-color);
 		background: linear-gradient(to bottom, var(--bg-primary), transparent);
 	}
 
 	.fade-auto .app-viewport-content::after {
 		bottom: 0;
 		margin-top: calc((var(--space-xl) + var(--app-viewport-content-gap, 0px)) * -1);
-		border-bottom: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
+		border-bottom: var(--border-width) solid var(--border-color);
 		background: linear-gradient(to top, var(--bg-primary), transparent);
 	}
 
