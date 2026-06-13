@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import MoonIcon from 'phosphor-svelte/lib/MoonIcon';
-	import PaletteIcon from 'phosphor-svelte/lib/PaletteIcon';
 	import Sun from '$lib/components/icons/Sun.svelte';
 	import Button from './Button.svelte';
 	import QuickActions from './QuickActions.svelte';
@@ -74,7 +72,18 @@
 
 {#snippet themeIcon(themeId: string, size: number)}
 	{#if themeId === 'dark'}
-		<MoonIcon {size} color="currentColor" weight="fill" />
+		<svg
+			width={size}
+			height={size}
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2.5"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+		</svg>
 	{:else}
 		<Sun {size} />
 	{/if}
@@ -84,7 +93,24 @@
 	{#if themeId === 'light' || themeId === 'dark'}
 		{@render themeIcon(themeId, size)}
 	{:else}
-		<PaletteIcon {size} color="currentColor" weight="fill" />
+		<svg
+			width={size}
+			height={size}
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2.5"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+			<circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+			<circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+			<circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+			<path
+				d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.63-.77 1.63-1.7 0-.42-.15-.81-.4-1.12-.13-.15-.22-.35-.22-.57 0-.46.38-.84.84-.84H15c4.97 0 9-4.03 9-9 0-4.97-4.03-9-9-9Z"
+			/>
+		</svg>
 	{/if}
 {/snippet}
 
