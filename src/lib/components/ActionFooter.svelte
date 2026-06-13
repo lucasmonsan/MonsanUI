@@ -74,19 +74,24 @@
 
 	.align-split {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		grid-template-columns: auto minmax(0, auto) auto;
+		justify-content: space-between;
+		column-gap: var(--space-sm);
 	}
 
 	.align-split > :global(:nth-child(1)) {
 		justify-self: start;
+		min-width: 0;
 	}
 
 	.align-split > :global(:nth-child(2)) {
 		justify-self: center;
+		min-width: 0;
 	}
 
 	.align-split > :global(:nth-child(3)) {
 		justify-self: end;
+		min-width: 0;
 	}
 
 	.surface-raised {

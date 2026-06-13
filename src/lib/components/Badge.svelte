@@ -2,6 +2,7 @@
 	let {
 		variant = 'default',
 		noShrink = false,
+		fullWidth = false,
 		size = 'md',
 		nowrap = false,
 		title,
@@ -10,6 +11,7 @@
 	} = $props<{
 		variant?: 'default' | 'primary' | 'secondary' | 'success' | 'due' | 'new' | 'warning';
 		noShrink?: boolean;
+		fullWidth?: boolean;
 		size?: 'sm' | 'md';
 		nowrap?: boolean;
 		title?: string;
@@ -21,6 +23,7 @@
 <span
 	class="monsan-badge variant-{variant} size-{size}"
 	class:no-shrink={noShrink}
+	class:full-width={fullWidth}
 	class:nowrap
 	{title}
 	aria-label={ariaLabel}
@@ -45,9 +48,11 @@
 		box-shadow: 1px 1px 0px var(--text-primary);
 		line-height: 1.1;
 		width: fit-content;
+		min-width: 0;
 		box-sizing: border-box;
 		text-transform: uppercase;
 		letter-spacing: 0;
+		text-align: center;
 	}
 
 	.size-sm {
@@ -119,6 +124,10 @@
 	}
 	.no-shrink {
 		flex-shrink: 0;
+	}
+
+	.full-width {
+		width: 100%;
 	}
 
 	.nowrap {
