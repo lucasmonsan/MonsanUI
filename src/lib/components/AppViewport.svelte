@@ -232,18 +232,22 @@
 	}
 
 	.content-gap-none .app-viewport-content {
+		--app-viewport-content-gap: 0px;
 		gap: 0;
 	}
 
 	.content-gap-sm .app-viewport-content {
+		--app-viewport-content-gap: var(--space-sm);
 		gap: var(--space-sm);
 	}
 
 	.content-gap-md .app-viewport-content {
+		--app-viewport-content-gap: var(--space-md);
 		gap: var(--space-md);
 	}
 
 	.content-gap-lg .app-viewport-content {
+		--app-viewport-content-gap: var(--space-lg);
 		gap: var(--space-lg);
 	}
 
@@ -265,8 +269,8 @@
 		);
 	}
 
-	.fade-auto::before,
-	.fade-auto::after {
+	.fade-auto .app-viewport-content::before,
+	.fade-auto .app-viewport-content::after {
 		content: '';
 		position: sticky;
 		left: 0;
@@ -274,25 +278,28 @@
 		z-index: 3;
 		display: block;
 		height: var(--space-xl);
+		box-sizing: border-box;
 		pointer-events: none;
 		opacity: 0;
 		transition: opacity 0.18s var(--ease-out);
 	}
 
-	.fade-auto::before {
+	.fade-auto .app-viewport-content::before {
 		top: 0;
-		margin-bottom: calc(var(--space-xl) * -1);
+		margin-bottom: calc((var(--space-xl) + var(--app-viewport-content-gap, 0px)) * -1);
+		border-top: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
 		background: linear-gradient(to bottom, var(--bg-primary), transparent);
 	}
 
-	.fade-auto::after {
+	.fade-auto .app-viewport-content::after {
 		bottom: 0;
-		margin-top: calc(var(--space-xl) * -1);
+		margin-top: calc((var(--space-xl) + var(--app-viewport-content-gap, 0px)) * -1);
+		border-bottom: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
 		background: linear-gradient(to top, var(--bg-primary), transparent);
 	}
 
-	.fade-auto.has-overflow-top::before,
-	.fade-auto.has-overflow-bottom::after {
+	.fade-auto.has-overflow-top .app-viewport-content::before,
+	.fade-auto.has-overflow-bottom .app-viewport-content::after {
 		opacity: 1;
 	}
 </style>
