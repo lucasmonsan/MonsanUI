@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Panel from './Panel.svelte';
 	import ProgressBar from './ProgressBar.svelte';
 	import Text from './Text.svelte';
 
@@ -14,26 +13,28 @@
 </script>
 
 <div class="monsan-progress-summary">
-	<Panel padding="0 var(--space-md)" maxWidth="100%">
-		<div class="progress-summary">
-			<ProgressBar {value} height="12px" variant="primary" ariaLabel={label} />
-			<Text tag="span" size="sm" weight="bold">{current}/{total}</Text>
-		</div>
-	</Panel>
+	<ProgressBar {value} height="12px" variant="primary" ariaLabel={label} />
+	<Text tag="span" size="sm" weight="bold">{current}/{total}</Text>
 </div>
 
 <style>
 	.monsan-progress-summary {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.progress-summary {
 		display: flex;
 		align-items: center;
 		gap: var(--space-md);
-		height: 36px;
-		box-sizing: border-box;
 		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+
+	.monsan-progress-summary :global(.monsan-progress-container) {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	.monsan-progress-summary :global(.monsan-text) {
+		flex: 0 0 auto;
+		white-space: nowrap;
+		overflow-wrap: normal;
 	}
 </style>

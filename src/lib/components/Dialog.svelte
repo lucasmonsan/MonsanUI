@@ -10,22 +10,32 @@
 		children,
 		onClose,
 		headerActions,
+		subheader,
+		footer,
 		closeLabel = 'Fechar',
 		closeOnBackNavigation = true,
 		size = 'md',
 		animation = 'pop',
-		padding = 'var(--space-md)'
+		padding = 'var(--space-md)',
+		compactHeader = false,
+		showSubheader = true,
+		showFooter = true
 	} = $props<{
 		open: boolean;
 		title: string;
 		children: import('svelte').Snippet;
 		onClose?: () => void;
 		headerActions?: import('svelte').Snippet;
+		subheader?: import('svelte').Snippet;
+		footer?: import('svelte').Snippet;
 		closeLabel?: string;
 		closeOnBackNavigation?: boolean;
 		size?: 'sm' | 'md' | 'lg';
 		animation?: 'pop' | 'slide' | 'fade' | 'scale';
 		padding?: PaddingPreset;
+		compactHeader?: boolean;
+		showSubheader?: boolean;
+		showFooter?: boolean;
 	}>();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -104,7 +114,7 @@
 		<!-- Dialog Content Container -->
 		<div class="modal-container anim-{animation} size-{size}" role="document">
 			<!-- Header -->
-			<header class="modal-header">
+			<header class="modal-header" class:compact={compactHeader}>
 				<h2 id="modal-title">{title}</h2>
 				<div class="modal-header-actions">
 					{#if headerActions}
@@ -116,10 +126,22 @@
 				</div>
 			</header>
 
+			{#if subheader && showSubheader}
+				<div class="modal-subheader">
+					{@render subheader()}
+				</div>
+			{/if}
+
 			<!-- Content -->
 			<div class="modal-content" style="padding: {resolvedPadding}">
 				{@render children()}
 			</div>
+
+			{#if footer && showFooter}
+				<footer class="modal-footer">
+					{@render footer()}
+				</footer>
+			{/if}
 		</div>
 	</dialog>
 {/if}
@@ -174,6 +196,8 @@
 		flex-direction: column;
 		position: relative;
 		z-index: 1001;
+		max-height: min(85vh, calc(100dvh - var(--space-md) * 2));
+		overflow: hidden;
 	}
 
 	.modal-container.size-sm {
@@ -197,6 +221,10 @@
 		background: var(--bg-secondary);
 	}
 
+	.modal-header.compact {
+		padding: var(--space-sm) var(--space-md);
+	}
+
 	.modal-header-actions {
 		display: flex;
 		align-items: center;
@@ -209,6 +237,10 @@
 		font-size: var(--text-xl);
 		font-weight: 900;
 		color: var(--text-primary);
+	}
+
+	.modal-header.compact h2 {
+		font-size: var(--text-lg);
 	}
 
 	.close-btn {
@@ -242,8 +274,25 @@
 		padding: var(--space-md);
 		background: var(--bg-primary);
 		color: var(--text-primary);
+		flex: 1 1 auto;
+		min-height: 0;
 		overflow-y: auto;
-		max-height: calc(85vh - 80px);
+	}
+
+	.modal-subheader,
+	.modal-footer {
+		flex: 0 0 auto;
+		background: var(--bg-primary);
+	}
+
+	.modal-subheader {
+		padding: var(--space-md);
+		border-bottom: var(--border-width) solid var(--border-color);
+	}
+
+	.modal-footer {
+		padding: var(--space-sm) var(--space-md);
+		border-top: var(--border-width) solid var(--border-color);
 	}
 
 	/* Keyframes and classes for selectable dialog animations */
