@@ -7,18 +7,36 @@
 		pulse?: boolean;
 		dot?: boolean;
 		noShrink?: boolean;
+		indicatorOnly?: boolean;
+		title?: string;
 	}
 
-	let { children, tone = 'neutral', pulse = false, dot = true, noShrink = false }: Props = $props();
+	let {
+		children,
+		tone = 'neutral',
+		pulse = false,
+		dot = true,
+		noShrink = false,
+		indicatorOnly = false,
+		title
+	}: Props = $props();
 </script>
 
-<span class="monsan-status-pill tone-{tone}" class:is-pulsing={pulse} class:no-shrink={noShrink}>
+<span
+	class="monsan-status-pill tone-{tone}"
+	class:is-pulsing={pulse}
+	class:no-shrink={noShrink}
+	class:indicator-only={indicatorOnly}
+	{title}
+>
 	{#if dot}
 		<span class="status-dot" aria-hidden="true"></span>
 	{/if}
-	<span class="status-label">
-		{@render children()}
-	</span>
+	{#if !indicatorOnly}
+		<span class="status-label">
+			{@render children()}
+		</span>
+	{/if}
 </span>
 
 <style>
@@ -48,6 +66,13 @@
 		flex-shrink: 0;
 	}
 
+	.indicator-only {
+		width: 18px;
+		height: 18px;
+		padding: 0;
+		gap: 0;
+	}
+
 	.status-dot {
 		width: 8px;
 		height: 8px;
@@ -56,6 +81,12 @@
 		border: 1px solid var(--border-color);
 		box-shadow: 0 0 0 1px color-mix(in srgb, var(--status-color) 20%, transparent);
 		flex-shrink: 0;
+	}
+
+	.indicator-only .status-dot {
+		width: 100%;
+		height: 100%;
+		border-radius: var(--radius-xs);
 	}
 
 	.status-label {

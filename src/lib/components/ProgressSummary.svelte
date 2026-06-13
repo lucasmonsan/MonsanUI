@@ -7,13 +7,15 @@
 		current: number;
 		total: number;
 		label: string;
+		striped?: boolean;
+		animated?: boolean;
 	}
 
-	let { value, current, total, label }: Props = $props();
+	let { value, current, total, label, striped = true, animated = true }: Props = $props();
 </script>
 
 <div class="monsan-progress-summary">
-	<ProgressBar {value} height="12px" variant="primary" ariaLabel={label} />
+	<ProgressBar {value} height="12px" variant="primary" ariaLabel={label} {striped} {animated} />
 	<Text tag="span" size="sm" weight="bold">{current}/{total}</Text>
 </div>
 
