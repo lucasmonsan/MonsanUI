@@ -111,6 +111,13 @@
 		color: var(--bg-primary);
 	}
 
+	.accent :global(.monsan-text),
+	.success :global(.monsan-text),
+	.error :global(.monsan-text),
+	.neutral :global(.monsan-text) {
+		color: inherit;
+	}
+
 	/* Adjustments for Dark Theme */
 	:global([data-theme='dark']) .accent {
 		background-color: var(--accent-primary);

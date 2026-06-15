@@ -9,6 +9,7 @@
 		message,
 		confirmText,
 		cancelText,
+		closeOnBackNavigation = true,
 		onConfirm,
 		onCancel
 	} = $props<{
@@ -17,6 +18,7 @@
 		message: string;
 		confirmText?: string;
 		cancelText?: string;
+		closeOnBackNavigation?: boolean;
 		onConfirm: () => void;
 		onCancel: () => void;
 	}>();
@@ -30,7 +32,13 @@
 	}
 </script>
 
-<Dialog bind:open {title} onClose={handleClose} closeLabel={activeCancelText}>
+<Dialog
+	bind:open
+	{title}
+	onClose={handleClose}
+	closeLabel={activeCancelText}
+	{closeOnBackNavigation}
+>
 	<div class="confirm-content">
 		<p class="modal-body">{message}</p>
 
