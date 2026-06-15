@@ -75,6 +75,12 @@
 		}
 	}
 
+	function handlePointerDown(e: PointerEvent) {
+		if (e.target === dialogRef) {
+			close();
+		}
+	}
+
 	// Back button/gesture navigation handler using dialogStack
 	$effect(() => {
 		if (!closeOnBackNavigation) return;
@@ -100,17 +106,10 @@
 		bind:this={dialogRef}
 		oncancel={handleCancel}
 		onclose={handleNativeClose}
+		onpointerdown={handlePointerDown}
 		class="dialog-wrapper"
 		aria-labelledby="modal-title"
 	>
-		<!-- Backdrop overlay button -->
-		<button
-			type="button"
-			class="modal-backdrop animate-fade-in"
-			onclick={close}
-			aria-label={closeLabel}
-		></button>
-
 		<!-- Dialog Content Container -->
 		<div class="modal-container anim-{animation} size-{size}" role="document">
 			<!-- Header -->
@@ -155,7 +154,8 @@
 		height: 100vh;
 		max-width: 100vw;
 		max-height: 100vh;
-		background: transparent;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: blur(4px);
 		border: none;
 		padding: 0;
 		margin: 0;
@@ -170,22 +170,6 @@
 		background: transparent;
 	}
 
-	.modal-backdrop {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(4px);
-		z-index: 1000;
-		border: none;
-		margin: 0;
-		padding: 0;
-		outline: none;
-		cursor: pointer;
-	}
-
 	.modal-container {
 		background: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
@@ -195,7 +179,7 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		z-index: 1001;
+		z-index: 1;
 		max-height: min(85vh, calc(100dvh - var(--space-md) * 2));
 		overflow: hidden;
 	}
