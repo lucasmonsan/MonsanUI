@@ -6,7 +6,7 @@
 		label: string;
 		title?: string;
 		type?: 'button' | 'submit' | 'reset';
-		variant?: 'primary' | 'secondary' | 'error';
+		variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error';
 		selected?: boolean;
 		disabled?: boolean;
 		onclick?: (event: MouseEvent) => void;
@@ -62,8 +62,26 @@
 		color: var(--bg-primary);
 	}
 
+	.success {
+		background: var(--success);
+		color: var(--bg-primary);
+	}
+
+	.warning {
+		background: var(--warning);
+		color: var(--bg-primary);
+	}
+
 	.error {
-		color: var(--error);
+		background: var(--error);
+		color: var(--bg-primary);
+	}
+
+	:global([data-theme='dark']) .primary,
+	:global([data-theme='dark']) .success,
+	:global([data-theme='dark']) .warning,
+	:global([data-theme='dark']) .error {
+		color: var(--text-primary);
 	}
 
 	.monsan-icon-button:hover:not(:disabled) {
