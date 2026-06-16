@@ -11,6 +11,7 @@ export { default as Deck } from './components/Deck.svelte';
 export { default as Folders } from './components/Folders.svelte';
 export { default as Input } from './components/Input.svelte';
 export { default as LanguageSelector } from './components/LanguageSelector.svelte';
+export { default as LegalLinks } from './components/LegalLinks.svelte';
 export { default as Dialog } from './components/Dialog.svelte';
 export { default as ConfirmDialog } from './components/ConfirmDialog.svelte';
 export { default as Search } from './components/Search.svelte';
