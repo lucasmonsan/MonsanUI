@@ -6,7 +6,7 @@
 
 	interface Props {
 		children: Snippet;
-		header: Snippet;
+		header?: Snippet;
 		toolbar?: Snippet;
 		footer?: Snippet;
 		padding?: PaddingPreset;
@@ -34,7 +34,7 @@
 		contentMaxWidth = 'content',
 		toolbarMaxWidth = 'content',
 		footerMaxWidth = 'content',
-		contentFade = 'none',
+		contentFade = 'auto',
 		animate = true
 	}: Props = $props();
 
@@ -95,16 +95,21 @@
 	class:is-animated={animate}
 	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-header-max-width: {resolvedHeaderMaxWidth}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth}; --app-viewport-footer-max-width: {resolvedFooterMaxWidth};"
 >
-	<div class="app-viewport-fixed toolbar-gap-{toolbar ? toolbarGap : 'none'}">
-		<div class="app-viewport-header">
-			{@render header()}
+	{#if header || toolbar}
+		<div class="app-viewport-fixed toolbar-gap-{toolbar ? toolbarGap : 'none'}">
+			{#if header}
+				<div class="app-viewport-header">
+					{@render header()}
+				</div>
+			{/if}
+
+			{#if toolbar}
+				<div class="app-viewport-toolbar">
+					{@render toolbar()}
+				</div>
+			{/if}
 		</div>
-		{#if toolbar}
-			<div class="app-viewport-toolbar">
-				{@render toolbar()}
-			</div>
-		{/if}
-	</div>
+	{/if}
 
 	<div
 		bind:this={scrollEl}
