@@ -18,6 +18,7 @@
 		toolbarMaxWidth?: MaxWidthPreset;
 		footerMaxWidth?: MaxWidthPreset;
 		contentFade?: 'none' | 'top' | 'bottom' | 'both' | 'auto';
+		animate?: boolean;
 	}
 
 	let {
@@ -33,7 +34,8 @@
 		contentMaxWidth = 'content',
 		toolbarMaxWidth = 'content',
 		footerMaxWidth = 'content',
-		contentFade = 'none'
+		contentFade = 'none',
+		animate = true
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -90,6 +92,7 @@
 
 <section
 	class="monsan-app-viewport gap-{gap}"
+	class:is-animated={animate}
 	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-header-max-width: {resolvedHeaderMaxWidth}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth}; --app-viewport-footer-max-width: {resolvedFooterMaxWidth};"
 >
 	<div class="app-viewport-fixed toolbar-gap-{toolbar ? toolbarGap : 'none'}">
@@ -142,6 +145,8 @@
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
+		position: relative;
+		z-index: 20;
 	}
 
 	.app-viewport-header {
@@ -190,6 +195,7 @@
 		scrollbar-width: none;
 		box-sizing: border-box;
 		position: relative;
+		z-index: 0;
 	}
 
 	.app-viewport-scroll::-webkit-scrollbar {
@@ -213,6 +219,53 @@
 		margin: 0 auto;
 		box-sizing: border-box;
 		flex: 0 0 auto;
+		position: relative;
+		z-index: 10;
+	}
+
+	.is-animated .app-viewport-fixed {
+		animation: monsan-app-viewport-fixed-enter 0.22s var(--ease-out) both;
+	}
+
+	.is-animated .app-viewport-scroll {
+		animation: monsan-app-viewport-content-enter 0.26s var(--ease-out) 0.04s both;
+	}
+
+	.is-animated .app-viewport-footer {
+		animation: monsan-app-viewport-footer-enter 0.22s var(--ease-out) 0.08s both;
+	}
+
+	@keyframes monsan-app-viewport-fixed-enter {
+		from {
+			opacity: 0;
+			transform: translateY(calc(var(--space-xs) * -1));
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes monsan-app-viewport-content-enter {
+		from {
+			opacity: 0;
+			transform: translateY(var(--space-sm));
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes monsan-app-viewport-footer-enter {
+		from {
+			opacity: 0;
+			transform: translateY(var(--space-xs));
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.gap-none {
@@ -301,5 +354,13 @@
 	.fade-auto.has-overflow-top .app-viewport-content::before,
 	.fade-auto.has-overflow-bottom .app-viewport-content::after {
 		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.is-animated .app-viewport-fixed,
+		.is-animated .app-viewport-scroll,
+		.is-animated .app-viewport-footer {
+			animation: none;
+		}
 	}
 </style>
