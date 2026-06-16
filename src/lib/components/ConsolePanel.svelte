@@ -10,7 +10,7 @@
 		statusTone?: 'neutral' | 'info' | 'success' | 'warning' | 'error' | 'accent';
 		children: Snippet;
 		actions?: Snippet;
-		height?: 'sm' | 'md' | 'lg' | 'auto';
+		height?: 'xs' | 'sm' | 'md' | 'lg' | 'auto';
 		statusLabel?: 'visible' | 'hidden';
 		statusShape?: 'pill' | 'square';
 		lined?: boolean;
@@ -77,6 +77,10 @@
 		min-width: 0;
 		box-sizing: border-box;
 		background: var(--bg-primary);
+	}
+
+	.height-xs {
+		--console-height: 120px;
 	}
 
 	.height-sm {
