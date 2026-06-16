@@ -75,6 +75,7 @@ export { default as PreferenceBar } from './components/PreferenceBar.svelte';
 export { default as ProfileSummary } from './components/ProfileSummary.svelte';
 export { default as IconButton } from './components/IconButton.svelte';
 export { default as MetricButton } from './components/MetricButton.svelte';
+export { default as MetaDisclosure } from './components/MetaDisclosure.svelte';
 export { default as MenuItem } from './components/MenuItem.svelte';
 export { default as MenuControl } from './components/MenuControl.svelte';
 export { default as EmptyState } from './components/EmptyState.svelte';
