@@ -4,7 +4,7 @@
 	let {
 		size = 24,
 		color = 'currentColor',
-		strokeWidth = 2.5,
+		strokeWidth = 3,
 		decorative = true,
 		ariaLabel
 	} = $props<{
