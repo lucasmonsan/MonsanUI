@@ -10,7 +10,7 @@
 		statusTone?: 'neutral' | 'info' | 'success' | 'warning' | 'error' | 'accent';
 		children: Snippet;
 		actions?: Snippet;
-		height?: 'sm' | 'md' | 'lg' | 'auto';
+		height?: 'xs' | 'sm' | 'md' | 'lg' | 'auto' | 'fill';
 		statusLabel?: 'visible' | 'hidden';
 		statusShape?: 'pill' | 'square';
 		lined?: boolean;
@@ -29,7 +29,13 @@
 	}: Props = $props();
 </script>
 
-<Panel variant="primary" maxWidth="100%" padding="0" overflow="hidden">
+<Panel
+	variant="primary"
+	maxWidth="100%"
+	padding="0"
+	overflow="hidden"
+	fullHeight={height === 'fill'}
+>
 	<section class="monsan-console-panel height-{height}">
 		{#if title || status || actions}
 			<header class="console-header">
@@ -79,6 +85,10 @@
 		background: var(--bg-primary);
 	}
 
+	.height-xs {
+		--console-height: 120px;
+	}
+
 	.height-sm {
 		--console-height: 180px;
 	}
@@ -93,6 +103,16 @@
 
 	.height-auto {
 		--console-height: auto;
+	}
+
+	.height-fill {
+		--console-height: auto;
+		height: 100%;
+	}
+
+	.height-fill .console-body {
+		flex: 1 1 auto;
+		height: auto;
 	}
 
 	.console-header {
