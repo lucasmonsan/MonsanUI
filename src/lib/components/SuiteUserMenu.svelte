@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { ActionPanelWidthPreset } from '$lib/utils/layout.js';
 	import AvatarMenu from './AvatarMenu.svelte';
 	import IconButton from './IconButton.svelte';
@@ -30,6 +31,7 @@
 		logoutDisabled?: boolean;
 		onProfile?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
+		children?: Snippet;
 	}
 
 	let {
@@ -50,7 +52,8 @@
 		profileDisabled = false,
 		logoutDisabled = false,
 		onProfile,
-		onLogout
+		onLogout,
+		children
 	}: Props = $props();
 
 	const resolvedSrc = $derived(src ?? user?.image ?? undefined);
@@ -74,6 +77,7 @@
 	<IconButton label={profileLabel} disabled={profileDisabled} onclick={onProfile}>
 		<UserIcon size={16} />
 	</IconButton>
+	{@render children?.()}
 	<IconButton label={logoutLabel} variant="error" disabled={logoutDisabled} onclick={onLogout}>
 		<LogOutIcon size={16} />
 	</IconButton>

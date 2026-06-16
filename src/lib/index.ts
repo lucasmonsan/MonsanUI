@@ -61,6 +61,7 @@ export { default as Alert } from './components/Alert.svelte';
 export { default as ProgressBar } from './components/ProgressBar.svelte';
 export { default as Avatar } from './components/Avatar.svelte';
 export { default as AvatarMenu } from './components/AvatarMenu.svelte';
+export { default as SuiteHeaderActions } from './components/SuiteHeaderActions.svelte';
 export { default as SuiteUserMenu } from './components/SuiteUserMenu.svelte';
 export { default as Separator } from './components/Separator.svelte';
 export { default as CenteredPanel } from './components/CenteredPanel.svelte';
