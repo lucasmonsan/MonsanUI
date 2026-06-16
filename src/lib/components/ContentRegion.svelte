@@ -10,7 +10,7 @@
 		padding?: 'none' | 'sm' | 'md';
 	}
 
-	let { children, gap = 'md', scroll = true, fade = 'none', padding = 'none' }: Props = $props();
+	let { children, gap = 'md', scroll = true, fade = 'auto', padding = 'none' }: Props = $props();
 
 	let regionEl = $state<HTMLElement>();
 	let hasOverflowTop = $state(false);
@@ -154,12 +154,14 @@
 	.fade-auto::before {
 		top: 0;
 		margin-bottom: calc(var(--space-xl) * -1);
+		border-top: var(--border-width) solid var(--border-color);
 		background: linear-gradient(to bottom, var(--bg-primary), transparent);
 	}
 
 	.fade-auto::after {
 		bottom: 0;
 		margin-top: calc(var(--space-xl) * -1);
+		border-bottom: var(--border-width) solid var(--border-color);
 		background: linear-gradient(to top, var(--bg-primary), transparent);
 	}
 
