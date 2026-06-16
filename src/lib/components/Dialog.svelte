@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import X from '$lib/components/icons/X.svelte';
 	import type { PaddingPreset } from '$lib/utils/layout.js';
 	import { resolvePadding } from '$lib/utils/layout.js';
@@ -41,23 +42,51 @@
 	let resolvedPadding = $derived(resolvePadding(padding));
 
 	const dialogId = Math.random().toString(36).substring(2, 9);
+	const closeAnimationMs = 180;
 	let dialogRef = $state<HTMLDialogElement>();
 	let historyAdded = false;
+	let mounted = $state(open);
+	let closing = $state(false);
+	let closeAnimationTimer: ReturnType<typeof setTimeout> | undefined;
 
-	// Control native dialog modal display state
+	function clearCloseAnimationTimer() {
+		if (closeAnimationTimer) {
+			clearTimeout(closeAnimationTimer);
+			closeAnimationTimer = undefined;
+		}
+	}
+
+	function finishCloseAnimation() {
+		if (open) return;
+		if (dialogRef?.open) {
+			dialogRef.close();
+		}
+		mounted = false;
+		closing = false;
+		closeAnimationTimer = undefined;
+	}
+
+	// Keep the native dialog mounted long enough for exit animation to play.
 	$effect(() => {
-		if (dialogRef) {
-			if (open) {
-				if (!dialogRef.open) {
-					dialogRef.showModal();
-				}
-			} else {
-				if (dialogRef.open) {
-					dialogRef.close();
-				}
-			}
+		if (open) {
+			clearCloseAnimationTimer();
+			mounted = true;
+			closing = false;
+		} else if (mounted && !closing) {
+			closing = true;
+			clearCloseAnimationTimer();
+			closeAnimationTimer = setTimeout(finishCloseAnimation, closeAnimationMs);
 		}
 	});
+
+	// Control native dialog modal display state after the element is rendered.
+	$effect(() => {
+		if (mounted && dialogRef && !dialogRef.open) {
+			dialogRef.showModal();
+		}
+	});
+
+	onDestroy(clearCloseAnimationTimer);
 
 	function close() {
 		open = false;
@@ -101,17 +130,18 @@
 	});
 </script>
 
-{#if open}
+{#if mounted}
 	<dialog
 		bind:this={dialogRef}
 		oncancel={handleCancel}
 		onclose={handleNativeClose}
 		onpointerdown={handlePointerDown}
 		class="dialog-wrapper"
+		class:closing
 		aria-labelledby="modal-title"
 	>
 		<!-- Dialog Content Container -->
-		<div class="modal-container anim-{animation} size-{size}" role="document">
+		<div class="modal-container anim-{animation} size-{size}" class:closing role="document">
 			<!-- Header -->
 			<header class="modal-header" class:compact={compactHeader}>
 				<h2 id="modal-title">{title}</h2>
@@ -164,6 +194,12 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
+		animation: dialogBackdropIn 0.18s ease-out forwards;
+	}
+
+	.dialog-wrapper.closing {
+		pointer-events: none;
+		animation: dialogBackdropOut 0.18s ease-in forwards;
 	}
 
 	.dialog-wrapper::backdrop {
@@ -293,6 +329,40 @@
 		animation: animScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 	}
 
+	.modal-container.anim-pop.closing {
+		animation: popOut 0.18s ease-in forwards;
+	}
+
+	.modal-container.anim-slide.closing {
+		animation: animSlideOut 0.18s ease-in forwards;
+	}
+
+	.modal-container.anim-fade.closing {
+		animation: animFadeOutOnly 0.18s ease-in forwards;
+	}
+
+	.modal-container.anim-scale.closing {
+		animation: animScaleOut 0.18s ease-in forwards;
+	}
+
+	@keyframes dialogBackdropIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes dialogBackdropOut {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
 	@keyframes animSlideIn {
 		from {
 			opacity: 0;
@@ -304,12 +374,32 @@
 		}
 	}
 
+	@keyframes animSlideOut {
+		from {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		to {
+			opacity: 0;
+			transform: translateY(80px);
+		}
+	}
+
 	@keyframes animFadeInOnly {
 		from {
 			opacity: 0;
 		}
 		to {
 			opacity: 1;
+		}
+	}
+
+	@keyframes animFadeOutOnly {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
 		}
 	}
 
@@ -324,6 +414,17 @@
 		}
 	}
 
+	@keyframes animScaleOut {
+		from {
+			opacity: 1;
+			transform: scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: scale(0.96);
+		}
+	}
+
 	@keyframes popInSpring {
 		0% {
 			opacity: 0;
@@ -335,6 +436,32 @@
 		100% {
 			opacity: 1;
 			transform: scale(1);
+		}
+	}
+
+	@keyframes popOut {
+		from {
+			opacity: 1;
+			transform: scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: scale(0.96);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dialog-wrapper,
+		.dialog-wrapper.closing,
+		.anim-pop,
+		.anim-slide,
+		.anim-fade,
+		.anim-scale,
+		.modal-container.anim-pop.closing,
+		.modal-container.anim-slide.closing,
+		.modal-container.anim-fade.closing,
+		.modal-container.anim-scale.closing {
+			animation-duration: 0.01ms;
 		}
 	}
 
