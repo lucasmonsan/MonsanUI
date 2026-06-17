@@ -17,7 +17,7 @@
 	let {
 		children,
 		maxWidth = 'full',
-		padding = 'page-compact',
+		padding = 'document',
 		gap = 'md',
 		height = 'fill',
 		overflow = 'hidden',

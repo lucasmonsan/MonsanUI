@@ -11,7 +11,11 @@ const rules = [
 	{ name: 'global selectors', pattern: /:global\s*\(/ },
 	{ name: 'inline style attributes', pattern: /\sstyle=/ },
 	{ name: 'Svelte style directives', pattern: /\sstyle:[\w-]+=/ },
-	{ name: 'local class attributes', pattern: /\sclass(?::[\w-]+)?=/ }
+	{ name: 'local class attributes', pattern: /\sclass(?::[\w-]+)?=/ },
+	{
+		name: 'legacy viewport padding presets',
+		pattern: /\bpadding=["'](?:app-authenticated|page|page-wide|page-compact)["']/
+	}
 ];
 
 /**

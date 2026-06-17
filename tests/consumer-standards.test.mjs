@@ -38,6 +38,23 @@ await withFixture(
 
 await withFixture(
 	{
+		'src/app.css': "@import 'monsan-ui/monsan-ui.css';\n",
+		'src/routes/+page.svelte':
+			'<script>import { AppViewport } from "monsan-ui";</script><AppViewport padding="app-authenticated">Content</AppViewport>\n'
+	},
+	async (root) => {
+		const violations = await checkConsumerStandards({ root });
+		const report = violations.join('\n');
+
+		assert(
+			report.includes('legacy viewport padding presets'),
+			`Expected legacy viewport padding violation: ${report}`
+		);
+	}
+);
+
+await withFixture(
+	{
 		'src/app.css': "@import 'monsan-ui/monsan-ui.css';\nbody { color: red; }\n",
 		'src/routes/+page.svelte': '<div class="local"><style>.local { color: red; }</style></div>\n'
 	},

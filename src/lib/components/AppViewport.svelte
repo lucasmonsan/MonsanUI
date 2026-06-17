@@ -26,7 +26,7 @@
 		header,
 		toolbar,
 		footer,
-		padding = 'app-authenticated',
+		padding = 'app',
 		gap = 'md',
 		toolbarGap = 'sm',
 		contentGap = 'md',

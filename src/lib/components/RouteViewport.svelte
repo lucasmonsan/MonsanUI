@@ -16,7 +16,7 @@
 		children,
 		routeKey = 'default',
 		maxWidth = 'var(--container-max-width)',
-		padding = 'var(--space-md) var(--space-md) 0 var(--space-md)',
+		padding = 'app',
 		animate = true
 	}: Props = $props();
 </script>

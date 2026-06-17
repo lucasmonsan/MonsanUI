@@ -28,10 +28,11 @@ export type PaddingPreset =
 	| 'md'
 	| 'lg'
 	| 'xl'
-	| 'page'
-	| 'page-wide'
-	| 'page-compact'
-	| 'app-authenticated'
+	| 'app'
+	| 'flow'
+	| 'document'
+	| 'document-wide'
+	| 'fullscreen'
 	| '0'
 	| '0 var(--space-md)'
 	| 'var(--space-xs)'
@@ -87,10 +88,14 @@ const paddingValues: Record<PaddingPreset, string> = {
 	md: 'var(--space-md)',
 	lg: 'var(--space-lg)',
 	xl: 'var(--space-xl)',
-	page: 'var(--space-xl) var(--space-md)',
-	'page-wide': 'var(--space-xl) var(--space-lg)',
-	'page-compact': 'var(--space-md) var(--space-md) 0 var(--space-md)',
-	'app-authenticated': 'var(--space-lg) var(--space-md) var(--space-md) var(--space-md)',
+	app: 'max(var(--space-md), env(safe-area-inset-top)) max(var(--space-md), env(safe-area-inset-right)) max(var(--space-md), env(safe-area-inset-bottom)) max(var(--space-md), env(safe-area-inset-left))',
+	flow: 'max(var(--space-lg), env(safe-area-inset-top)) max(var(--space-md), env(safe-area-inset-right)) max(var(--space-lg), env(safe-area-inset-bottom)) max(var(--space-md), env(safe-area-inset-left))',
+	document:
+		'max(var(--space-xl), env(safe-area-inset-top)) max(var(--space-md), env(safe-area-inset-right)) max(var(--space-xl), env(safe-area-inset-bottom)) max(var(--space-md), env(safe-area-inset-left))',
+	'document-wide':
+		'max(var(--space-xl), env(safe-area-inset-top)) max(var(--space-lg), env(safe-area-inset-right)) max(var(--space-xl), env(safe-area-inset-bottom)) max(var(--space-lg), env(safe-area-inset-left))',
+	fullscreen:
+		'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
 	'0': '0',
 	'0 var(--space-md)': '0 var(--space-md)',
 	'var(--space-xs)': 'var(--space-xs)',
