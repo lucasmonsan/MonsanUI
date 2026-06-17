@@ -72,6 +72,7 @@
 	}
 
 	.monsan-menu-item:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--accent-primary) 10%, var(--bg-secondary));
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0 var(--text-primary);
 	}
@@ -86,7 +87,7 @@
 	}
 
 	.error:hover:not(:disabled) {
-		background: var(--error);
+		background: color-mix(in srgb, var(--error) 18%, var(--bg-primary));
 	}
 
 	.monsan-menu-item:disabled {

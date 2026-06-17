@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { fly, scale } from 'svelte/transition';
-	import { backOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 	import { onMount, tick } from 'svelte';
 	import type { ActionPanelWidthPreset } from '$lib/utils/layout.js';
 	import { resolveActionPanelWidth } from '$lib/utils/layout.js';
@@ -21,6 +20,7 @@
 		panelRole = 'menu',
 		surface = variant === 'reveal' ? 'gradient' : 'panel',
 		containedReveal = false,
+		backdrop = false,
 		trigger,
 		children
 	} = $props<{
@@ -35,6 +35,7 @@
 		panelRole?: 'menu' | 'toolbar';
 		surface?: 'panel' | 'gradient' | 'plain';
 		containedReveal?: boolean;
+		backdrop?: boolean;
 		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
 	}>();
@@ -138,7 +139,7 @@
 			}
 			return fly(node, { x: align === 'left' ? -50 : 50, duration: 200 });
 		} else {
-			return scale(node, { duration: 150, start: 0.95, easing: backOut });
+			return fly(node, { y: resolvedPlacement === 'above' ? 6 : -6, duration: 150 });
 		}
 	}
 </script>
@@ -176,6 +177,16 @@
 	{/if}
 
 	{#if open}
+		{#if backdrop}
+			<button
+				type="button"
+				class="quick-actions-backdrop"
+				aria-label={i18n.t('quickActions.close')}
+				onclick={() => {
+					open = false;
+				}}
+			></button>
+		{/if}
 		<div
 			bind:this={panelEl}
 			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{resolvedPlacement} surface-{surface}"
@@ -224,6 +235,16 @@
 		box-sizing: border-box;
 	}
 
+	.quick-actions-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 40;
+		border: 0;
+		padding: 0;
+		background: color-mix(in srgb, var(--bg-primary) 35%, transparent);
+		cursor: default;
+	}
+
 	.quick-actions-panel.variant-dropdown {
 		position: absolute;
 		background: var(--bg-primary);
@@ -254,11 +275,11 @@
 	}
 
 	.quick-actions-panel.variant-dropdown.placement-below {
-		top: calc(100% + var(--space-xs));
+		top: calc(100% + var(--space-sm));
 	}
 
 	.quick-actions-panel.variant-dropdown.placement-above {
-		bottom: calc(100% + var(--space-xs));
+		bottom: calc(100% + var(--space-sm));
 	}
 
 	.quick-actions-panel.variant-dropdown.align-right {
