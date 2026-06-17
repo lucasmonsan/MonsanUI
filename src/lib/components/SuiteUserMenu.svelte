@@ -65,7 +65,7 @@
 		width = 'dropdown',
 		layout = 'vertical',
 		placement = 'below',
-		variant = 'floating',
+		variant = 'dropdown',
 		profileDisabled = false,
 		logoutDisabled = false,
 		onProfile,
