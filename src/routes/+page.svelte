@@ -1076,9 +1076,11 @@
 		'md',
 		'lg',
 		'xl',
-		'page',
-		'page-wide',
-		'page-compact'
+		'app',
+		'flow',
+		'document',
+		'document-wide',
+		'fullscreen'
 	];
 
 	let pageContainerMaxWidth = $state<MaxWidthPreset>('content');
