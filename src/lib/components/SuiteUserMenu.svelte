@@ -2,7 +2,9 @@
 	import type { Snippet } from 'svelte';
 	import type { ActionPanelWidthPreset } from '$lib/utils/layout.js';
 	import AvatarMenu from './AvatarMenu.svelte';
-	import IconButton from './IconButton.svelte';
+	import MenuItem from './MenuItem.svelte';
+	import FileTextIcon from './icons/FileText.svelte';
+	import LockIcon from './icons/Lock.svelte';
 	import LogOutIcon from './icons/LogOut.svelte';
 	import UserIcon from './icons/User.svelte';
 
@@ -19,6 +21,10 @@
 		alt?: string;
 		ariaLabel: string;
 		profileLabel: string;
+		termsLabel: string;
+		termsHref: string;
+		privacyLabel: string;
+		privacyHref: string;
 		logoutLabel: string;
 		size?: 'sm' | 'md' | 'lg' | 'control';
 		shape?: 'circle' | 'square';
@@ -30,6 +36,8 @@
 		profileDisabled?: boolean;
 		logoutDisabled?: boolean;
 		onProfile?: (event: MouseEvent) => void;
+		onTerms?: (event: MouseEvent) => void;
+		onPrivacy?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
 		children?: Snippet;
 	}
@@ -41,17 +49,23 @@
 		alt,
 		ariaLabel,
 		profileLabel,
+		termsLabel,
+		termsHref,
+		privacyLabel,
+		privacyHref,
 		logoutLabel,
 		size = 'control',
 		shape = 'square',
 		align = 'right',
-		width = 'max-content',
+		width = 'dropdown',
 		layout = 'vertical',
 		placement = 'below',
 		variant = 'floating',
 		profileDisabled = false,
 		logoutDisabled = false,
 		onProfile,
+		onTerms,
+		onPrivacy,
 		onLogout,
 		children
 	}: Props = $props();
@@ -74,11 +88,21 @@
 	{variant}
 	{ariaLabel}
 >
-	<IconButton label={profileLabel} disabled={profileDisabled} onclick={onProfile}>
+	<MenuItem disabled={profileDisabled} onclick={onProfile}>
 		<UserIcon size={16} />
-	</IconButton>
+		{profileLabel}
+	</MenuItem>
 	{@render children?.()}
-	<IconButton label={logoutLabel} variant="error" disabled={logoutDisabled} onclick={onLogout}>
+	<MenuItem href={termsHref} onclick={onTerms}>
+		<FileTextIcon size={16} />
+		{termsLabel}
+	</MenuItem>
+	<MenuItem href={privacyHref} onclick={onPrivacy}>
+		<LockIcon size={16} />
+		{privacyLabel}
+	</MenuItem>
+	<MenuItem variant="error" disabled={logoutDisabled} onclick={onLogout}>
 		<LogOutIcon size={16} />
-	</IconButton>
+		{logoutLabel}
+	</MenuItem>
 </AvatarMenu>

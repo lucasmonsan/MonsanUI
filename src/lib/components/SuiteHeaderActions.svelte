@@ -18,6 +18,10 @@
 		alt?: string;
 		userMenuAriaLabel: string;
 		profileLabel: string;
+		termsLabel: string;
+		termsHref: string;
+		privacyLabel: string;
+		privacyHref: string;
 		logoutLabel: string;
 		localeValue: string;
 		localeAriaLabel?: string;
@@ -29,6 +33,8 @@
 		onThemeChange?: (themeId: string) => void;
 		onLocaleChange?: (localeId: string) => void;
 		onProfile?: (event: MouseEvent) => void;
+		onTerms?: (event: MouseEvent) => void;
+		onPrivacy?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
 		children?: Snippet;
 		userMenuExtras?: Snippet;
@@ -41,6 +47,10 @@
 		alt,
 		userMenuAriaLabel,
 		profileLabel,
+		termsLabel,
+		termsHref,
+		privacyLabel,
+		privacyHref,
 		logoutLabel,
 		localeValue,
 		localeAriaLabel,
@@ -52,6 +62,8 @@
 		onThemeChange,
 		onLocaleChange,
 		onProfile,
+		onTerms,
+		onPrivacy,
 		onLogout,
 		children,
 		userMenuExtras
@@ -74,10 +86,16 @@
 		{alt}
 		ariaLabel={userMenuAriaLabel}
 		{profileLabel}
+		{termsLabel}
+		{termsHref}
+		{privacyLabel}
+		{privacyHref}
 		{logoutLabel}
 		{profileDisabled}
 		{logoutDisabled}
 		{onProfile}
+		{onTerms}
+		{onPrivacy}
 		{onLogout}
 	>
 		{@render userMenuExtras?.()}

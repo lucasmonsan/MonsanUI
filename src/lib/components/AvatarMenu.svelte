@@ -44,7 +44,7 @@
 	{width}
 	panelLayout={layout}
 	{placement}
-	panelRole="toolbar"
+	panelRole="menu"
 	surface={variant === 'floating' ? 'plain' : 'panel'}
 	triggerLabel={ariaLabel}
 	containedReveal={variant === 'floating'}
