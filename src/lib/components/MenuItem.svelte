@@ -39,6 +39,8 @@
 <style>
 	.monsan-menu-item {
 		width: 100%;
+		box-sizing: border-box;
+		appearance: none;
 		padding: var(--space-sm) var(--space-md);
 		min-height: calc(var(--control-height) * 0.85);
 		border: var(--border-width) solid var(--border-color);
@@ -52,8 +54,10 @@
 		font-family: var(--font-body);
 		font-weight: 800;
 		font-size: var(--text-sm);
+		line-height: 1;
 		text-decoration: none;
 		white-space: nowrap;
+		cursor: pointer;
 	}
 
 	.align-left {

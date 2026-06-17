@@ -18,7 +18,6 @@
 		layout = 'horizontal',
 		placement = 'before',
 		variant = 'floating',
-		backdrop = false,
 		children
 	}: {
 		src?: string;
@@ -34,7 +33,6 @@
 		layout?: 'vertical' | 'horizontal';
 		placement?: 'below' | 'before' | 'after';
 		variant?: 'floating' | 'dropdown';
-		backdrop?: boolean;
 		children?: Snippet;
 	} = $props();
 </script>
@@ -50,7 +48,6 @@
 	surface={variant === 'floating' ? 'plain' : 'panel'}
 	triggerLabel={ariaLabel}
 	containedReveal={variant === 'floating'}
-	{backdrop}
 >
 	{#snippet trigger()}
 		<Avatar {src} {name} {alt} {size} {shape} {ariaLabel} {title} />
