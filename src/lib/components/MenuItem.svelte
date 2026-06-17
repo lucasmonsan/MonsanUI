@@ -3,32 +3,56 @@
 
 	interface Props {
 		children: Snippet;
+		href?: string;
 		onclick?: (event: MouseEvent) => void;
 		variant?: 'default' | 'error';
-		align?: 'left' | 'right';
+		align?: 'left' | 'center' | 'right';
+		disabled?: boolean;
 	}
 
-	let { children, onclick, variant = 'default', align = 'left' }: Props = $props();
+	let {
+		children,
+		href,
+		onclick,
+		variant = 'default',
+		align = 'center',
+		disabled = false
+	}: Props = $props();
 </script>
 
-<button type="button" class="monsan-menu-item {variant} align-{align}" role="menuitem" {onclick}>
-	{@render children()}
-</button>
+{#if href && !disabled}
+	<a class="monsan-menu-item {variant} align-{align}" role="menuitem" {href} {onclick}>
+		{@render children()}
+	</a>
+{:else}
+	<button
+		type="button"
+		class="monsan-menu-item {variant} align-{align}"
+		role="menuitem"
+		{disabled}
+		{onclick}
+	>
+		{@render children()}
+	</button>
+{/if}
 
 <style>
 	.monsan-menu-item {
 		width: 100%;
 		padding: var(--space-sm) var(--space-md);
-		border: none;
-		box-shadow: none;
-		background: transparent;
+		min-height: calc(var(--control-height) * 0.85);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-sm);
+		background: var(--bg-secondary);
 		color: var(--text-primary);
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
 		font-family: var(--font-body);
-		font-weight: 700;
+		font-weight: 800;
 		font-size: var(--text-sm);
+		text-decoration: none;
 		white-space: nowrap;
 	}
 
@@ -37,22 +61,52 @@
 		text-align: left;
 	}
 
+	.align-center {
+		justify-content: center;
+		text-align: center;
+	}
+
 	.align-right {
 		justify-content: flex-end;
 		text-align: right;
 	}
 
-	.monsan-menu-item:hover {
-		background: var(--bg-secondary);
-		transform: none;
-		box-shadow: none;
+	.monsan-menu-item:hover:not(:disabled) {
+		transform: translate(-1px, -1px);
+		box-shadow: 3px 3px 0 var(--text-primary);
 	}
 
 	.error {
-		color: var(--error);
+		background: var(--error);
+		color: var(--bg-primary);
 	}
 
-	.error:hover {
-		background: color-mix(in srgb, var(--error) 10%, var(--bg-primary));
+	:global([data-theme='dark']) .error {
+		color: var(--text-primary);
+	}
+
+	.error:hover:not(:disabled) {
+		background: var(--error);
+	}
+
+	.monsan-menu-item:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		filter: grayscale(0.5);
+	}
+
+	.monsan-menu-item:active:not(:disabled) {
+		transform: translate(2px, 2px);
+		box-shadow: none;
+	}
+
+	.monsan-menu-item:focus-visible {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+	}
+
+	:global([data-theme='light']) .error {
+		color: var(--error);
+		background: color-mix(in srgb, var(--error) 12%, var(--bg-primary));
 	}
 </style>
