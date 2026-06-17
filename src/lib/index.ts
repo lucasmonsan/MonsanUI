@@ -68,6 +68,7 @@ export { default as Separator } from './components/Separator.svelte';
 export { default as CenteredPanel } from './components/CenteredPanel.svelte';
 export { default as BrandHeader } from './components/BrandHeader.svelte';
 export { default as StatusBanner } from './components/StatusBanner.svelte';
+export { default as StepTransition } from './components/StepTransition.svelte';
 export { default as FormStack } from './components/FormStack.svelte';
 export { default as FormField } from './components/FormField.svelte';
 export { default as Divider } from './components/Divider.svelte';
