@@ -18,6 +18,8 @@
 		alt?: string;
 		userMenuAriaLabel: string;
 		profileLabel: string;
+		loginLabel?: string;
+		loginHref?: string;
 		termsLabel: string;
 		termsHref: string;
 		privacyLabel: string;
@@ -33,6 +35,7 @@
 		onThemeChange?: (themeId: string) => void;
 		onLocaleChange?: (localeId: string) => void;
 		onProfile?: (event: MouseEvent) => void;
+		onLogin?: (event: MouseEvent) => void;
 		onTerms?: (event: MouseEvent) => void;
 		onPrivacy?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
@@ -47,6 +50,8 @@
 		alt,
 		userMenuAriaLabel,
 		profileLabel,
+		loginLabel,
+		loginHref,
 		termsLabel,
 		termsHref,
 		privacyLabel,
@@ -62,6 +67,7 @@
 		onThemeChange,
 		onLocaleChange,
 		onProfile,
+		onLogin,
 		onTerms,
 		onPrivacy,
 		onLogout,
@@ -79,25 +85,53 @@
 		onChange={onThemeChange}
 	/>
 	<LanguageSelector value={localeValue} ariaLabel={localeAriaLabel} onChange={onLocaleChange} />
-	<SuiteUserMenu
-		{user}
-		src={src ?? undefined}
-		{name}
-		{alt}
-		ariaLabel={userMenuAriaLabel}
-		{profileLabel}
-		{termsLabel}
-		{termsHref}
-		{privacyLabel}
-		{privacyHref}
-		{logoutLabel}
-		{profileDisabled}
-		{logoutDisabled}
-		{onProfile}
-		{onTerms}
-		{onPrivacy}
-		{onLogout}
-	>
-		{@render userMenuExtras?.()}
-	</SuiteUserMenu>
+	{#if userMenuExtras}
+		<SuiteUserMenu
+			{user}
+			src={src ?? undefined}
+			{name}
+			{alt}
+			ariaLabel={userMenuAriaLabel}
+			{profileLabel}
+			{loginLabel}
+			{loginHref}
+			{termsLabel}
+			{termsHref}
+			{privacyLabel}
+			{privacyHref}
+			{logoutLabel}
+			{profileDisabled}
+			{logoutDisabled}
+			{onProfile}
+			{onLogin}
+			{onTerms}
+			{onPrivacy}
+			{onLogout}
+		>
+			{@render userMenuExtras()}
+		</SuiteUserMenu>
+	{:else}
+		<SuiteUserMenu
+			{user}
+			src={src ?? undefined}
+			{name}
+			{alt}
+			ariaLabel={userMenuAriaLabel}
+			{profileLabel}
+			{loginLabel}
+			{loginHref}
+			{termsLabel}
+			{termsHref}
+			{privacyLabel}
+			{privacyHref}
+			{logoutLabel}
+			{profileDisabled}
+			{logoutDisabled}
+			{onProfile}
+			{onLogin}
+			{onTerms}
+			{onPrivacy}
+			{onLogout}
+		/>
+	{/if}
 </Inline>

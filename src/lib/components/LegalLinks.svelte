@@ -109,4 +109,9 @@
 	.variant-auth-note {
 		gap: var(--space-xs);
 	}
+
+	.variant-auth-note .legal-note {
+		font-size: calc(var(--text-xs) * 0.9);
+		line-height: 1.35;
+	}
 </style>
