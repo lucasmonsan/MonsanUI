@@ -18,6 +18,7 @@
 		toolbarMaxWidth?: MaxWidthPreset;
 		footerMaxWidth?: MaxWidthPreset;
 		contentFade?: 'none' | 'top' | 'bottom' | 'both' | 'auto';
+		contentLayout?: 'default' | 'center';
 		animate?: boolean;
 	}
 
@@ -35,6 +36,7 @@
 		toolbarMaxWidth = 'content',
 		footerMaxWidth = 'content',
 		contentFade = 'auto',
+		contentLayout = 'default',
 		animate = true
 	}: Props = $props();
 
@@ -113,7 +115,7 @@
 
 	<div
 		bind:this={scrollEl}
-		class="app-viewport-scroll content-gap-{contentGap} fade-{contentFade}"
+		class="app-viewport-scroll content-gap-{contentGap} fade-{contentFade} content-layout-{contentLayout}"
 		class:has-overflow-top={hasOverflowTop}
 		class:has-overflow-bottom={hasOverflowBottom}
 		onscroll={updateOverflowFade}
@@ -307,6 +309,11 @@
 	.content-gap-lg .app-viewport-content {
 		--app-viewport-content-gap: var(--space-lg);
 		gap: var(--space-lg);
+	}
+
+	.content-layout-center .app-viewport-content {
+		align-items: center;
+		justify-content: safe center;
 	}
 
 	.fade-top {
