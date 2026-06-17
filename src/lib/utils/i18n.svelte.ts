@@ -42,8 +42,7 @@ class I18n {
 				close: 'Fechar alerta'
 			},
 			quickActions: {
-				open: 'Abrir ações',
-				close: 'Fechar ações'
+				open: 'Abrir ações'
 			},
 			mediaDialog: {
 				closeAriaLabel: 'Fechar',
@@ -94,8 +93,7 @@ class I18n {
 				close: 'Close alert'
 			},
 			quickActions: {
-				open: 'Open actions',
-				close: 'Close actions'
+				open: 'Open actions'
 			},
 			mediaDialog: {
 				closeAriaLabel: 'Close',
@@ -146,8 +144,7 @@ class I18n {
 				close: 'Cerrar alerta'
 			},
 			quickActions: {
-				open: 'Abrir acciones',
-				close: 'Cerrar acciones'
+				open: 'Abrir acciones'
 			},
 			mediaDialog: {
 				closeAriaLabel: 'Cerrar',

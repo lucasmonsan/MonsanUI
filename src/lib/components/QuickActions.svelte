@@ -20,7 +20,6 @@
 		panelRole = 'menu',
 		surface = variant === 'reveal' ? 'gradient' : 'panel',
 		containedReveal = false,
-		backdrop = false,
 		trigger,
 		children
 	} = $props<{
@@ -35,7 +34,6 @@
 		panelRole?: 'menu' | 'toolbar';
 		surface?: 'panel' | 'gradient' | 'plain';
 		containedReveal?: boolean;
-		backdrop?: boolean;
 		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
 	}>();
@@ -177,16 +175,6 @@
 	{/if}
 
 	{#if open}
-		{#if backdrop}
-			<button
-				type="button"
-				class="quick-actions-backdrop"
-				aria-label={i18n.t('quickActions.close')}
-				onclick={() => {
-					open = false;
-				}}
-			></button>
-		{/if}
 		<div
 			bind:this={panelEl}
 			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{resolvedPlacement} surface-{surface}"
@@ -233,16 +221,6 @@
 	.quick-actions-panel {
 		z-index: 50;
 		box-sizing: border-box;
-	}
-
-	.quick-actions-backdrop {
-		position: fixed;
-		inset: 0;
-		z-index: 40;
-		border: 0;
-		padding: 0;
-		background: color-mix(in srgb, var(--bg-primary) 35%, transparent);
-		cursor: default;
 	}
 
 	.quick-actions-panel.variant-dropdown {

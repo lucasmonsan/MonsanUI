@@ -97,7 +97,6 @@
 	{placement}
 	{variant}
 	{ariaLabel}
-	backdrop
 >
 	<MenuItem href={primaryHref} disabled={profileDisabled} onclick={primaryAction} align="right">
 		<UserIcon size={16} />
