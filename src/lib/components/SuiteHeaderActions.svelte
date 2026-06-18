@@ -33,6 +33,8 @@
 		profileDisabled?: boolean;
 		logoutDisabled?: boolean;
 		userMenuPanelShadow?: 'default' | 'none';
+		userMenuPanelPadding?: 'xs' | 'sm' | 'md';
+		userMenuPanelGap?: 'xs' | 'sm' | 'md';
 		onThemeChange?: (themeId: string) => void;
 		onLocaleChange?: (localeId: string) => void;
 		onProfile?: (event: MouseEvent) => void;
@@ -66,6 +68,8 @@
 		profileDisabled = false,
 		logoutDisabled = false,
 		userMenuPanelShadow = 'default',
+		userMenuPanelPadding = 'xs',
+		userMenuPanelGap = 'sm',
 		onThemeChange,
 		onLocaleChange,
 		onProfile,
@@ -105,6 +109,8 @@
 			{profileDisabled}
 			{logoutDisabled}
 			panelShadow={userMenuPanelShadow}
+			panelPadding={userMenuPanelPadding}
+			panelGap={userMenuPanelGap}
 			{onProfile}
 			{onLogin}
 			{onTerms}
@@ -131,6 +137,8 @@
 			{profileDisabled}
 			{logoutDisabled}
 			panelShadow={userMenuPanelShadow}
+			panelPadding={userMenuPanelPadding}
+			panelGap={userMenuPanelGap}
 			{onProfile}
 			{onLogin}
 			{onTerms}

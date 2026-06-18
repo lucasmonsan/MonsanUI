@@ -7,6 +7,7 @@
 		align?: 'start' | 'center' | 'end' | 'between' | 'split';
 		wrap?: boolean;
 		surface?: 'plain' | 'raised';
+		mobileBlockLast?: boolean;
 	}
 
 	let {
@@ -14,11 +15,16 @@
 		position = 'sticky',
 		align = 'between',
 		wrap = true,
-		surface = 'plain'
+		surface = 'plain',
+		mobileBlockLast = false
 	}: Props = $props();
 </script>
 
-<footer class="monsan-action-footer position-{position} align-{align} surface-{surface}" class:wrap>
+<footer
+	class="monsan-action-footer position-{position} align-{align} surface-{surface}"
+	class:wrap
+	class:mobile-block-last={mobileBlockLast}
+>
 	{@render children()}
 </footer>
 
@@ -100,5 +106,16 @@
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
 		background: var(--bg-primary);
+	}
+
+	@media (max-width: 640px) {
+		.mobile-block-last > :global(:last-child) {
+			width: 100%;
+		}
+
+		.mobile-block-last > :global(:last-child.monsan-button),
+		.mobile-block-last > :global(:last-child .monsan-button) {
+			width: 100%;
+		}
 	}
 </style>

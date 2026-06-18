@@ -51,10 +51,12 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
+		font: inherit;
 		font-family: var(--font-body);
 		font-weight: 800;
 		font-size: var(--text-sm);
 		line-height: 1;
+		margin: 0;
 		text-decoration: none;
 		white-space: nowrap;
 		cursor: pointer;

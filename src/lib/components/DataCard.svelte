@@ -8,11 +8,15 @@
 		title?: string;
 		subtitle?: string;
 		eyebrow?: string;
-		children: Snippet;
+		children?: Snippet;
+		top?: Snippet;
+		body?: Snippet;
+		bottom?: Snippet;
 		actions?: Snippet;
 		footer?: Snippet;
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
 		padding?: 'sm' | 'md' | 'lg';
+		fullHeight?: boolean;
 	}
 
 	let {
@@ -20,10 +24,14 @@
 		subtitle,
 		eyebrow,
 		children,
+		top,
+		body,
+		bottom,
 		actions,
 		footer,
 		variant = 'secondary',
-		padding = 'md'
+		padding = 'md',
+		fullHeight = false
 	}: Props = $props();
 
 	let panelPadding = $derived<PaddingPreset>(
@@ -31,9 +39,21 @@
 	);
 </script>
 
-<Panel {variant} maxWidth="100%" padding={panelPadding} overflow="hidden">
-	<article class="monsan-data-card">
-		{#if title || subtitle || eyebrow || actions}
+<Panel {variant} maxWidth="100%" padding={panelPadding} overflow="hidden" {fullHeight}>
+	<article class="monsan-data-card" class:full-height={fullHeight}>
+		{#if top}
+			<header class="data-card-header">
+				<div class="data-card-copy">
+					{@render top()}
+				</div>
+
+				{#if actions}
+					<div class="data-card-actions">
+						{@render actions()}
+					</div>
+				{/if}
+			</header>
+		{:else if title || subtitle || eyebrow || actions}
 			<header class="data-card-header">
 				<div class="data-card-copy">
 					{#if eyebrow}
@@ -69,10 +89,18 @@
 		{/if}
 
 		<div class="data-card-body">
-			{@render children()}
+			{#if body}
+				{@render body()}
+			{:else}
+				{@render children?.()}
+			{/if}
 		</div>
 
-		{#if footer}
+		{#if bottom}
+			<footer class="data-card-bottom">
+				{@render bottom()}
+			</footer>
+		{:else if footer}
 			<footer class="data-card-footer">
 				{@render footer()}
 			</footer>
@@ -90,7 +118,12 @@
 		box-sizing: border-box;
 	}
 
+	.full-height {
+		height: 100%;
+	}
+
 	.data-card-header,
+	.data-card-bottom,
 	.data-card-footer {
 		display: flex;
 		align-items: flex-start;
@@ -109,6 +142,7 @@
 
 	.data-card-body {
 		gap: var(--space-sm);
+		flex: 1 1 auto;
 	}
 
 	.data-card-actions {
@@ -124,6 +158,11 @@
 		align-items: center;
 		padding-top: var(--space-sm);
 		border-top: 1px solid var(--border-color);
+		flex-wrap: wrap;
+	}
+
+	.data-card-bottom {
+		align-items: flex-end;
 		flex-wrap: wrap;
 	}
 

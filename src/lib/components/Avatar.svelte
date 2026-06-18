@@ -102,6 +102,19 @@
 		padding: 0;
 		cursor: pointer;
 		font: inherit;
+		transition:
+			transform 0.1s ease,
+			box-shadow 0.1s ease;
+	}
+
+	button.monsan-avatar:hover:not(:disabled) {
+		transform: translate(-1px, -1px);
+		box-shadow: 3px 3px 0 var(--text-primary);
+	}
+
+	button.monsan-avatar:active:not(:disabled) {
+		transform: translate(2px, 2px);
+		box-shadow: none;
 	}
 
 	.monsan-avatar.circle {

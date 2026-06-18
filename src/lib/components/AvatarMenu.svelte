@@ -19,6 +19,8 @@
 		placement = 'before',
 		variant = 'floating',
 		panelShadow = 'default',
+		panelPadding = 'xs',
+		panelGap = 'sm',
 		children
 	}: {
 		src?: string;
@@ -35,6 +37,8 @@
 		placement?: 'below' | 'before' | 'after';
 		variant?: 'floating' | 'dropdown';
 		panelShadow?: 'default' | 'none';
+		panelPadding?: 'xs' | 'sm' | 'md';
+		panelGap?: 'xs' | 'sm' | 'md';
 		children?: Snippet;
 	} = $props();
 </script>
@@ -49,11 +53,14 @@
 	panelRole="menu"
 	surface={variant === 'floating' ? 'plain' : 'panel'}
 	{panelShadow}
+	{panelPadding}
+	{panelGap}
 	triggerLabel={ariaLabel}
+	triggerBehavior="child"
 	containedReveal={variant === 'floating'}
 >
-	{#snippet trigger()}
-		<Avatar {src} {name} {alt} {size} {shape} {ariaLabel} {title} />
+	{#snippet trigger(toggle)}
+		<Avatar {src} {name} {alt} {size} {shape} {ariaLabel} {title} onclick={toggle} />
 	{/snippet}
 
 	{@render children?.()}

@@ -143,74 +143,85 @@
 	{#if actionsSnippet}
 		{@render actionsSnippet()}
 	{:else}
-		<QuickActions bind:open={isMenuOpen} variant="reveal" align="right" width="70%">
-			{#snippet trigger()}
-				<button
-					class="context-menu-btn"
-					onclick={(e: MouseEvent) => {
-						e.stopPropagation();
-						onOpenMenu?.();
-					}}
-					aria-label="Mais opções"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
+		<div class="quick-actions-menu">
+			<QuickActions
+				bind:open={isMenuOpen}
+				variant="reveal"
+				align="right"
+				width="max-content"
+				placement="before"
+				panelLayout="horizontal"
+				surface="plain"
+				containedReveal
+			>
+				{#snippet trigger()}
+					<button
+						class="context-menu-btn"
+						onclick={(e: MouseEvent) => {
+							e.stopPropagation();
+							onOpenMenu?.();
+						}}
+						aria-label="Mais opções"
 					>
-						<circle cx="12" cy="12" r="1.5" />
-						<circle cx="12" cy="5" r="1.5" />
-						<circle cx="12" cy="19" r="1.5" />
-					</svg>
-				</button>
-			{/snippet}
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<circle cx="12" cy="12" r="1.5" />
+							<circle cx="12" cy="5" r="1.5" />
+							<circle cx="12" cy="19" r="1.5" />
+						</svg>
+					</button>
+				{/snippet}
 
-			<div class="context-buttons">
-				<Button
-					variant="secondary"
-					size="sm"
-					square
-					onclick={(e: MouseEvent) => {
-						e.stopPropagation();
-						onDuplicate?.();
-					}}
-					title={labels?.duplicate ?? 'Duplicate'}
-				>
-					<Copy size={20} />
-				</Button>
+				<div class="context-buttons">
+					<Button
+						variant="secondary"
+						size="sm"
+						square
+						onclick={(e: MouseEvent) => {
+							e.stopPropagation();
+							onDuplicate?.();
+						}}
+						title={labels?.duplicate ?? 'Duplicate'}
+					>
+						<Copy size={20} />
+					</Button>
 
-				<Button
-					variant="secondary"
-					size="sm"
-					square
-					onclick={(e: MouseEvent) => {
-						e.stopPropagation();
-						onEdit?.();
-					}}
-					title={labels?.edit ?? 'Edit'}
-				>
-					<Pencil size={20} />
-				</Button>
-				<Button
-					variant="error"
-					size="sm"
-					square
-					onclick={(e: MouseEvent) => {
-						e.stopPropagation();
-						onDelete?.();
-					}}
-					title={labels?.delete ?? 'Delete'}
-				>
-					<Trash size={20} />
-				</Button>
-			</div>
-		</QuickActions>
+					<Button
+						variant="secondary"
+						size="sm"
+						square
+						onclick={(e: MouseEvent) => {
+							e.stopPropagation();
+							onEdit?.();
+						}}
+						title={labels?.edit ?? 'Edit'}
+					>
+						<Pencil size={20} />
+					</Button>
+					<Button
+						variant="error"
+						size="sm"
+						square
+						onclick={(e: MouseEvent) => {
+							e.stopPropagation();
+							onDelete?.();
+						}}
+						title={labels?.delete ?? 'Delete'}
+					>
+						<Trash size={20} />
+					</Button>
+				</div>
+			</QuickActions>
+		</div>
 	{/if}
 
 	{#if popoverSnippet}
@@ -320,6 +331,13 @@
 		z-index: 30 !important;
 	}
 
+	.quick-actions-menu {
+		position: absolute;
+		right: var(--space-sm);
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
 	.context-menu-btn {
 		background: none;
 		border: none;
@@ -330,10 +348,6 @@
 		justify-content: center;
 		color: var(--text-secondary);
 		transition: color 0.2s ease;
-		position: absolute;
-		right: var(--space-sm);
-		top: 50%;
-		transform: translateY(-50%);
 	}
 
 	.context-menu-btn:hover {
@@ -344,7 +358,6 @@
 		display: flex;
 		gap: var(--space-sm);
 		justify-content: flex-end;
-		padding-right: var(--space-sm);
 		width: auto;
 	}
 
