@@ -13,6 +13,7 @@
 		align?: 'start' | 'center';
 		border?: boolean;
 		sticky?: boolean;
+		mobileInline?: boolean;
 	}
 
 	let {
@@ -25,7 +26,8 @@
 		size = 'md',
 		align = 'start',
 		border = true,
-		sticky = false
+		sticky = false,
+		mobileInline = false
 	}: Props = $props();
 
 	let titleSize = $derived<'xl' | '2xl' | '3xl'>(
@@ -37,6 +39,7 @@
 	class="monsan-page-header size-{size} align-{align}"
 	class:with-border={border}
 	class:is-sticky={sticky}
+	class:mobile-inline={mobileInline}
 >
 	<div class="header-main">
 		{#if leading}
@@ -167,6 +170,11 @@
 		.header-main {
 			align-items: stretch;
 			flex-direction: column;
+		}
+
+		.mobile-inline .header-main {
+			align-items: center;
+			flex-direction: row;
 		}
 
 		.header-actions {
