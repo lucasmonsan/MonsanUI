@@ -18,6 +18,7 @@
 		layout = 'horizontal',
 		placement = 'before',
 		variant = 'floating',
+		panelShadow = 'default',
 		children
 	}: {
 		src?: string;
@@ -33,6 +34,7 @@
 		layout?: 'vertical' | 'horizontal';
 		placement?: 'below' | 'before' | 'after';
 		variant?: 'floating' | 'dropdown';
+		panelShadow?: 'default' | 'none';
 		children?: Snippet;
 	} = $props();
 </script>
@@ -46,6 +48,7 @@
 	{placement}
 	panelRole="menu"
 	surface={variant === 'floating' ? 'plain' : 'panel'}
+	{panelShadow}
 	triggerLabel={ariaLabel}
 	containedReveal={variant === 'floating'}
 >

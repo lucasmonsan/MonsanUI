@@ -32,6 +32,7 @@
 		themeAriaLabel?: string;
 		profileDisabled?: boolean;
 		logoutDisabled?: boolean;
+		userMenuPanelShadow?: 'default' | 'none';
 		onThemeChange?: (themeId: string) => void;
 		onLocaleChange?: (localeId: string) => void;
 		onProfile?: (event: MouseEvent) => void;
@@ -64,6 +65,7 @@
 		themeAriaLabel,
 		profileDisabled = false,
 		logoutDisabled = false,
+		userMenuPanelShadow = 'default',
 		onThemeChange,
 		onLocaleChange,
 		onProfile,
@@ -102,6 +104,7 @@
 			{logoutLabel}
 			{profileDisabled}
 			{logoutDisabled}
+			panelShadow={userMenuPanelShadow}
 			{onProfile}
 			{onLogin}
 			{onTerms}
@@ -127,6 +130,7 @@
 			{logoutLabel}
 			{profileDisabled}
 			{logoutDisabled}
+			panelShadow={userMenuPanelShadow}
 			{onProfile}
 			{onLogin}
 			{onTerms}
