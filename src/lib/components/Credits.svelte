@@ -154,6 +154,9 @@
 	.variant-compact .credits-main {
 		flex-direction: row;
 		gap: var(--space-xs);
+		flex-wrap: wrap;
+		white-space: normal;
+		row-gap: var(--space-2xs);
 	}
 
 	.variant-compact .credits-copyright {

@@ -19,6 +19,7 @@
 		placement = 'below',
 		panelRole = 'menu',
 		surface = variant === 'reveal' ? 'gradient' : 'panel',
+		panelShadow = 'default',
 		containedReveal = false,
 		trigger,
 		children
@@ -33,6 +34,7 @@
 		placement?: PanelPlacement;
 		panelRole?: 'menu' | 'toolbar';
 		surface?: 'panel' | 'gradient' | 'plain';
+		panelShadow?: 'default' | 'none';
 		containedReveal?: boolean;
 		trigger?: import('svelte').Snippet<[(event: MouseEvent) => void]>;
 		children?: import('svelte').Snippet;
@@ -177,7 +179,7 @@
 	{#if open}
 		<div
 			bind:this={panelEl}
-			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{resolvedPlacement} surface-{surface}"
+			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{resolvedPlacement} surface-{surface} shadow-{panelShadow}"
 			style="--panel-width: {resolvedWidth}; --panel-max-height: {panelMaxHeight};"
 			role={panelRole}
 			transition:menuTransition
@@ -237,6 +239,10 @@
 		overflow: auto;
 		max-height: var(--panel-max-height);
 		scrollbar-width: none;
+	}
+
+	.quick-actions-panel.variant-dropdown.shadow-none {
+		box-shadow: none;
 	}
 
 	.quick-actions-panel.variant-dropdown::-webkit-scrollbar {

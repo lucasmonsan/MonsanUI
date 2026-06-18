@@ -7,6 +7,7 @@
 		note?: string;
 		variant?: 'inline' | 'auth-note';
 		align?: 'start' | 'center' | 'end';
+		divider?: boolean;
 	}
 
 	let {
@@ -16,13 +17,17 @@
 		privacyLabel,
 		note,
 		variant = 'inline',
-		align = 'center'
+		align = 'center',
+		divider = false
 	}: Props = $props();
 
 	let resolvedAriaLabel = $derived(note ? undefined : `${termsLabel} / ${privacyLabel}`);
 </script>
 
 <nav class="monsan-legal-links variant-{variant} align-{align}" aria-label={resolvedAriaLabel}>
+	{#if divider}
+		<span class="legal-divider" aria-hidden="true"></span>
+	{/if}
 	{#if variant === 'auth-note' && note}
 		<p class="legal-note">
 			{note}
@@ -106,12 +111,23 @@
 		font-weight: 700;
 	}
 
+	.legal-divider {
+		display: block;
+		width: min(100%, 18rem);
+		height: var(--border-width);
+		background: color-mix(in srgb, var(--border-color) 54%, transparent);
+	}
+
 	.variant-auth-note {
 		gap: var(--space-xs);
 	}
 
+	.variant-auth-note .legal-link-row {
+		font-size: calc(var(--text-xs) * 0.86);
+	}
+
 	.variant-auth-note .legal-note {
-		font-size: calc(var(--text-xs) * 0.9);
-		line-height: 1.35;
+		font-size: calc(var(--text-xs) * 0.82);
+		line-height: 1.3;
 	}
 </style>

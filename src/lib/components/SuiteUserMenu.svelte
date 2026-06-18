@@ -35,6 +35,7 @@
 		layout?: 'vertical' | 'horizontal';
 		placement?: 'below' | 'before' | 'after';
 		variant?: 'floating' | 'dropdown';
+		panelShadow?: 'default' | 'none';
 		profileDisabled?: boolean;
 		logoutDisabled?: boolean;
 		onProfile?: (event: MouseEvent) => void;
@@ -66,6 +67,7 @@
 		layout = 'vertical',
 		placement = 'below',
 		variant = 'dropdown',
+		panelShadow = 'default',
 		profileDisabled = false,
 		logoutDisabled = false,
 		onProfile,
@@ -96,6 +98,7 @@
 	{layout}
 	{placement}
 	{variant}
+	{panelShadow}
 	{ariaLabel}
 >
 	<MenuItem href={primaryHref} disabled={profileDisabled} onclick={primaryAction} align="right">
