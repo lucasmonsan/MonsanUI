@@ -102,6 +102,7 @@ export { default as CircleAlertIcon } from './components/icons/CircleAlert.svelt
 export { default as CopyIcon } from './components/icons/Copy.svelte';
 export { default as FileTextIcon } from './components/icons/FileText.svelte';
 export { default as GripVerticalIcon } from './components/icons/GripVertical.svelte';
+export { default as DownloadIcon } from './components/icons/Download.svelte';
 export { default as MinusIcon } from './components/icons/Minus.svelte';
 export { default as PencilIcon } from './components/icons/Pencil.svelte';
 export { default as PlusIcon } from './components/icons/Plus.svelte';
@@ -123,6 +124,7 @@ export { default as MailIcon } from './components/icons/Mail.svelte';
 export { default as UnlockIcon } from './components/icons/Unlock.svelte';
 export { default as RotateCwIcon } from './components/icons/RotateCw.svelte';
 export { default as FolderIcon } from './components/icons/Folder.svelte';
+export { default as UploadIcon } from './components/icons/Upload.svelte';
 
 // Types
 export * from './types.js';
