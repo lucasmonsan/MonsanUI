@@ -10,9 +10,10 @@
 		meta?: Snippet;
 		leading?: Snippet;
 		size?: 'sm' | 'md' | 'lg';
-		align?: 'start' | 'center';
+		align?: 'start' | 'center' | 'end';
 		border?: boolean;
 		sticky?: boolean;
+		mobileInline?: boolean;
 	}
 
 	let {
@@ -25,7 +26,8 @@
 		size = 'md',
 		align = 'start',
 		border = true,
-		sticky = false
+		sticky = false,
+		mobileInline = false
 	}: Props = $props();
 
 	let titleSize = $derived<'xl' | '2xl' | '3xl'>(
@@ -37,6 +39,7 @@
 	class="monsan-page-header size-{size} align-{align}"
 	class:with-border={border}
 	class:is-sticky={sticky}
+	class:mobile-inline={mobileInline}
 >
 	<div class="header-main">
 		{#if leading}
@@ -124,6 +127,11 @@
 		align-items: center;
 	}
 
+	.align-end .header-copy {
+		text-align: right;
+		align-items: flex-end;
+	}
+
 	.header-leading,
 	.header-actions,
 	.header-meta {
@@ -167,6 +175,11 @@
 		.header-main {
 			align-items: stretch;
 			flex-direction: column;
+		}
+
+		.mobile-inline .header-main {
+			align-items: center;
+			flex-direction: row;
 		}
 
 		.header-actions {
