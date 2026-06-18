@@ -154,13 +154,25 @@
 	.variant-compact .credits-main {
 		flex-direction: row;
 		gap: var(--space-xs);
-		flex-wrap: wrap;
-		white-space: normal;
+		flex-wrap: nowrap;
+		white-space: nowrap;
 		row-gap: var(--space-2xs);
 	}
 
 	.variant-compact .credits-copyright {
 		font-size: inherit;
 		opacity: 0.68;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 420px) {
+		.variant-compact {
+			padding-inline: var(--space-sm);
+			font-size: calc(var(--text-xs) * 0.88);
+		}
+
+		.variant-compact .credits-inner {
+			gap: var(--space-2xs);
+		}
 	}
 </style>

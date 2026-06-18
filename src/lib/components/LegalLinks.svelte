@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Divider from './Divider.svelte';
+
 	interface Props {
 		termsHref: string;
 		privacyHref: string;
@@ -26,7 +28,7 @@
 
 <nav class="monsan-legal-links variant-{variant} align-{align}" aria-label={resolvedAriaLabel}>
 	{#if divider}
-		<span class="legal-divider" aria-hidden="true"></span>
+		<Divider />
 	{/if}
 	{#if variant === 'auth-note' && note}
 		<p class="legal-note">
@@ -109,13 +111,6 @@
 	.legal-separator {
 		color: color-mix(in srgb, var(--text-secondary) 60%, transparent);
 		font-weight: 700;
-	}
-
-	.legal-divider {
-		display: block;
-		width: min(100%, 18rem);
-		height: var(--border-width);
-		background: color-mix(in srgb, var(--border-color) 54%, transparent);
 	}
 
 	.variant-auth-note {
