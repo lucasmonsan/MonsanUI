@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Divider from './Divider.svelte';
-
 	interface Props {
 		termsHref: string;
 		privacyHref: string;
@@ -9,7 +7,6 @@
 		note?: string;
 		variant?: 'inline' | 'auth-note';
 		align?: 'start' | 'center' | 'end';
-		divider?: boolean;
 	}
 
 	let {
@@ -19,17 +16,13 @@
 		privacyLabel,
 		note,
 		variant = 'inline',
-		align = 'center',
-		divider = false
+		align = 'center'
 	}: Props = $props();
 
 	let resolvedAriaLabel = $derived(note ? undefined : `${termsLabel} / ${privacyLabel}`);
 </script>
 
 <nav class="monsan-legal-links variant-{variant} align-{align}" aria-label={resolvedAriaLabel}>
-	{#if divider}
-		<Divider />
-	{/if}
 	{#if variant === 'auth-note' && note}
 		<p class="legal-note">
 			{note}
