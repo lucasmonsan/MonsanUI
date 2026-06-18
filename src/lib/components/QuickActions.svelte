@@ -17,6 +17,8 @@
 		triggerBehavior = 'wrapper',
 		panelLayout = 'vertical',
 		placement = 'below',
+		panelPadding = 'xs',
+		panelGap = 'sm',
 		panelRole = 'menu',
 		surface = variant === 'reveal' ? 'gradient' : 'panel',
 		panelShadow = 'default',
@@ -32,6 +34,8 @@
 		triggerBehavior?: 'wrapper' | 'child';
 		panelLayout?: 'vertical' | 'horizontal';
 		placement?: PanelPlacement;
+		panelPadding?: 'xs' | 'sm' | 'md';
+		panelGap?: 'xs' | 'sm' | 'md';
 		panelRole?: 'menu' | 'toolbar';
 		surface?: 'panel' | 'gradient' | 'plain';
 		panelShadow?: 'default' | 'none';
@@ -60,6 +64,7 @@
 	let panelEl = $state<HTMLDivElement>();
 	let activeTriggerLabel = $derived(triggerLabel ?? i18n.t('quickActions.open'));
 	let resolvedPlacement = $state<ResolvedPanelPlacement>('below');
+	let activePlacement = $derived(variant === 'dropdown' ? resolvedPlacement : placement);
 	let panelMaxHeight = $state('none');
 
 	function updateDropdownPlacement() {
@@ -179,8 +184,8 @@
 	{#if open}
 		<div
 			bind:this={panelEl}
-			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{resolvedPlacement} surface-{surface} shadow-{panelShadow}"
-			style="--panel-width: {resolvedWidth}; --panel-max-height: {panelMaxHeight};"
+			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{activePlacement} surface-{surface} shadow-{panelShadow}"
+			style="--panel-width: {resolvedWidth}; --panel-max-height: {panelMaxHeight}; --quick-actions-panel-padding: var(--space-{panelPadding}); --quick-actions-panel-gap: var(--space-{panelGap});"
 			role={panelRole}
 			transition:menuTransition
 		>
@@ -223,6 +228,7 @@
 	.quick-actions-panel {
 		z-index: 50;
 		box-sizing: border-box;
+		gap: var(--quick-actions-panel-gap);
 	}
 
 	.quick-actions-panel.variant-dropdown {
@@ -234,8 +240,7 @@
 		width: var(--panel-width);
 		max-width: 90vw;
 		display: flex;
-		padding: var(--space-xs);
-		gap: var(--space-xs);
+		padding: var(--quick-actions-panel-padding);
 		overflow: auto;
 		max-height: var(--panel-max-height);
 		scrollbar-width: none;
@@ -299,7 +304,6 @@
 		display: flex;
 		align-items: center;
 		z-index: 10;
-		gap: var(--space-sm);
 	}
 
 	.quick-actions-panel.variant-reveal.layout-vertical {

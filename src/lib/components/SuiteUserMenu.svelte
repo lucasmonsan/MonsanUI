@@ -36,6 +36,8 @@
 		placement?: 'below' | 'before' | 'after';
 		variant?: 'floating' | 'dropdown';
 		panelShadow?: 'default' | 'none';
+		panelPadding?: 'xs' | 'sm' | 'md';
+		panelGap?: 'xs' | 'sm' | 'md';
 		profileDisabled?: boolean;
 		logoutDisabled?: boolean;
 		onProfile?: (event: MouseEvent) => void;
@@ -68,6 +70,8 @@
 		placement = 'below',
 		variant = 'dropdown',
 		panelShadow = 'default',
+		panelPadding = 'xs',
+		panelGap = 'sm',
 		profileDisabled = false,
 		logoutDisabled = false,
 		onProfile,
@@ -99,6 +103,8 @@
 	{placement}
 	{variant}
 	{panelShadow}
+	{panelPadding}
+	{panelGap}
 	{ariaLabel}
 >
 	<MenuItem href={primaryHref} disabled={profileDisabled} onclick={primaryAction} align="right">

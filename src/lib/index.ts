@@ -31,6 +31,7 @@ export { default as PageShell } from './components/PageShell.svelte';
 export { default as PageHeader } from './components/PageHeader.svelte';
 export { default as ContentRegion } from './components/ContentRegion.svelte';
 export { default as ResponsiveGrid } from './components/ResponsiveGrid.svelte';
+export { default as ResponsiveSplit } from './components/ResponsiveSplit.svelte';
 export { default as ActionFooter } from './components/ActionFooter.svelte';
 export { default as DataCard } from './components/DataCard.svelte';
 export { default as StatusPill } from './components/StatusPill.svelte';
