@@ -50,20 +50,18 @@ The checker verifies:
 
 New visual or layout needs should be added to MonsanUI first. Consumer apps should keep domain logic, data loading and app-specific text, but reusable layout and aesthetic behavior belongs here.
 
-Recommended additions to reduce consumer style debt:
+Use existing primitives before adding new ones:
 
-- `AppShell` for app-level header, content and footer structure.
-- `PageShell` for page height, padding, overflow and entry motion.
-- `PageHeader` for title, subtitle, actions and metrics.
-- `ContentRegion` for scrollable content with optional edge fades.
-- `ResponsiveGrid` for repeated cards and lists.
-- `ActionFooter` for sticky or fixed action bars.
-- `DataCard` for admin records with header, fields and footer actions.
-- `StatusDot` and `StatusPill` for health, review and engine states.
-- `ConsolePanel` for logs, benchmark output and AI engine output.
-- `QuestionPanel` and `MediaPreview` for Examster question surfaces.
-- `SkipLink`, `ToastHost` and `FlashMessage` for shared accessibility and feedback.
-- Motion presets for enter, pulse, shake and fade transitions.
+- `AppViewport` for fixed-height app screens with header, content and footer regions.
+- `PageShell`, `PageHeader` and `ContentRegion` for page structure.
+- `Stack`, `Inline`, `Grid` and `ResponsiveGrid` for composition.
+- `ActionFooter`, `ActionBar`, `ButtonGroup`, `QuickActions` and `Tabs` for actions and navigation.
+- `CenteredPanel`, `Panel`, `DataCard`, `ExpandableCard`, `ConsolePanel` and `EmptyState` for surfaces.
+- `Alert`, `InlineNotice`, `Toast`, `ToastViewport`, `FlashOverlay` and `SkipLink` for feedback and accessibility.
+- `QuestionPanel`, `MediaPreview`, `MediaDialog` and question controls for Examster question surfaces.
+- Shared icons from `src/lib/components/icons/*`, exported through `src/lib/index.ts`.
+
+Only add new primitives when the existing API cannot express the required layout or behavior cleanly.
 
 ## Shared CSS
 
@@ -73,7 +71,7 @@ MonsanUI owns `modern-normalize`, global tokens and base CSS. Consumer apps impo
 
 Use a new branch for each stage. Before committing, run the project gate and inspect `git status` so generated files, secrets and unrelated local changes are not included accidentally.
 
-Prefer explicit staging after review over `git add .` as an automatic rule.
+Use `git add .` after confirming the worktree contains only changes intended for the commit.
 
 Commit format:
 
