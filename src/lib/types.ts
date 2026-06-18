@@ -28,6 +28,8 @@ export interface Toast {
 	id: string;
 	message: string;
 	type: 'success' | 'error' | 'warning' | 'info';
+	actionLabel?: string;
+	onAction?: () => void;
 }
 
 export interface SearchResultItem {

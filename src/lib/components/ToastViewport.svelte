@@ -5,6 +5,8 @@
 		id: string;
 		message: string;
 		type: 'success' | 'error' | 'warning' | 'info';
+		actionLabel?: string;
+		onAction?: () => void;
 	}
 
 	interface Props {

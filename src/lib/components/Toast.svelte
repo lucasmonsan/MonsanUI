@@ -7,6 +7,8 @@
 	interface Toast {
 		message: string;
 		type: 'success' | 'error' | 'warning' | 'info';
+		actionLabel?: string;
+		onAction?: () => void;
 	}
 
 	interface Props {
@@ -63,6 +65,11 @@
 		{/if}
 	</div>
 	<p class="toast-message">{toast.message}</p>
+	{#if toast.actionLabel && toast.onAction}
+		<button type="button" class="toast-action" onclick={toast.onAction}>
+			{toast.actionLabel}
+		</button>
+	{/if}
 </div>
 
 <style>
@@ -99,6 +106,27 @@
 		font-weight: 500;
 		color: var(--text-primary);
 		margin: 0;
+		flex: 1;
+	}
+
+	.toast-action {
+		flex-shrink: 0;
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-sm);
+		background: var(--bg-secondary);
+		color: var(--text-primary);
+		font-family: var(--font-display);
+		font-size: var(--text-xs);
+		font-weight: 700;
+		line-height: 1;
+		padding: var(--space-xs) var(--space-sm);
+		cursor: pointer;
+	}
+
+	.toast-action:hover,
+	.toast-action:focus-visible {
+		background: var(--accent);
+		color: var(--accent-contrast);
 	}
 
 	.toast-item.warning {
