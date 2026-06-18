@@ -10,7 +10,7 @@
 		meta?: Snippet;
 		leading?: Snippet;
 		size?: 'sm' | 'md' | 'lg';
-		align?: 'start' | 'center';
+		align?: 'start' | 'center' | 'end';
 		border?: boolean;
 		sticky?: boolean;
 		mobileInline?: boolean;
@@ -125,6 +125,11 @@
 	.align-center .header-copy {
 		text-align: center;
 		align-items: center;
+	}
+
+	.align-end .header-copy {
+		text-align: right;
+		align-items: flex-end;
 	}
 
 	.header-leading,
