@@ -17,8 +17,8 @@
 	{#key stepKey}
 		<div
 			class="step-panel"
-			in:fly={animate ? { y, duration, delay: 2500 } : undefined}
-			out:fly={animate ? { y: -y, duration } : undefined}
+			in:fly|global={animate ? { y, duration, delay: 2500 } : undefined}
+			out:fly|global={animate ? { y: -y, duration } : undefined}
 		>
 			{@render children()}
 		</div>
