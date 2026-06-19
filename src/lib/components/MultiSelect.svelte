@@ -78,12 +78,18 @@
 	let displayLabel = $derived.by(() => {
 		// Filter out the placeholder option (value === '') when counting selections
 		const selectedValues = value.filter((v) => v !== '');
-		if (selectedValues.length === 0) return placeholder;
+		if (selectedValues.length === 0) {
+			const allOption = options.find((opt) => opt.value === '');
+			return allOption ? allOption.label : placeholder;
+		}
 
 		const selectedOptions = options.filter(
 			(opt) => opt.value !== '' && selectedValues.includes(opt.value)
 		);
-		if (selectedOptions.length === 0) return placeholder;
+		if (selectedOptions.length === 0) {
+			const allOption = options.find((opt) => opt.value === '');
+			return allOption ? allOption.label : placeholder;
+		}
 
 		if (selectedOptions.length <= 2) {
 			return selectedOptions.map((opt) => opt.label).join(', ');
