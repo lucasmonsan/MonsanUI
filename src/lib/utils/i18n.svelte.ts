@@ -35,6 +35,9 @@ class I18n {
 				removeFile: 'Remover arquivo',
 				filesSelected: '{count} arquivos selecionados'
 			},
+			multiSelect: {
+				itemsSelected: '{count} selecionados'
+			},
 			loading: {
 				message: 'Carregando...'
 			},
@@ -86,6 +89,9 @@ class I18n {
 				removeFile: 'Remove file',
 				filesSelected: '{count} files selected'
 			},
+			multiSelect: {
+				itemsSelected: '{count} selected'
+			},
 			loading: {
 				message: 'Loading...'
 			},
@@ -135,7 +141,10 @@ class I18n {
 				buttonLabel: 'Seleccionar archivo',
 				dropHere: 'Arrastre aquí para cargar',
 				removeFile: 'Eliminar archivo',
-				filesSelected: '{count} archivos seleccionados'
+				filesSelected: '{count} archivos selecionados'
+			},
+			multiSelect: {
+				itemsSelected: '{count} seleccionados'
 			},
 			loading: {
 				message: 'Cargando...'

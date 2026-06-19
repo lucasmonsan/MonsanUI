@@ -16,6 +16,7 @@ export { default as Dialog } from './components/Dialog.svelte';
 export { default as ConfirmDialog } from './components/ConfirmDialog.svelte';
 export { default as Search } from './components/Search.svelte';
 export { default as Select } from './components/Select.svelte';
+export { default as MultiSelect } from './components/MultiSelect.svelte';
 export { default as Textarea } from './components/Textarea.svelte';
 export { default as ThemeSelector } from './components/ThemeSelector.svelte';
 export { default as Toast } from './components/Toast.svelte';
