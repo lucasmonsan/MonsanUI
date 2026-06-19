@@ -262,6 +262,6 @@
 
 	/* Variante Success */
 	.monsan-expandable-card.variant-success .card-header {
-		background: color-mix(in srgb, var(--success) 8%, var(--bg-secondary));
+		background: color-mix(in srgb, var(--success) 16%, var(--bg-secondary));
 	}
 </style>
