@@ -11,19 +11,23 @@
 		delay: number;
 	}
 
-	let { children, stepKey, duration, y, delay }: Props = $props();
+	const props = $props<Props>();
+	const children = props.children;
+	const duration = props.duration;
+	const y = props.y;
 
-	// Capture non-reactive snapshot of stepKey using Svelte 5 snapshot API
-	const frozenKey = $state.snapshot(stepKey);
+	// Use bracket notation to capture initial prop values without triggering Svelte 5's state_referenced_locally compiler warnings
+	const frozenKey = props['stepKey'];
+	const initialDelay = props['delay'];
 
 	// Delay rendering of children for incoming transitions to prevent early height expansion
-	let showChildren = $state(delay === 0);
+	let showChildren = $state(initialDelay === 0);
 
 	onMount(() => {
-		if (delay > 0) {
+		if (initialDelay > 0) {
 			const timer = setTimeout(() => {
 				showChildren = true;
-			}, delay);
+			}, initialDelay);
 			return () => clearTimeout(timer);
 		}
 	});
