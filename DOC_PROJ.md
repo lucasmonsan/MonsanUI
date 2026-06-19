@@ -50,14 +50,13 @@ import { Button, Stack, Alert } from 'monsan-ui';
 
 Consumers should use layout primitives before app-owned CSS:
 
-- `PageShell`
-- `PageHeader`
+- `AppShell`
+- `AppHeader`
 - `ContentRegion`
 - `ResponsiveGrid`
 - `Stack`
 - `Inline`
 - `ActionFooter`
-- `AppViewport`
 
 Temporary exceptions belong in `monsan-ui.consumer-standards.mjs`, but expected final state is no exceptions.
 

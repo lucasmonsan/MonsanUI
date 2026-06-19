@@ -109,7 +109,10 @@
 		}
 
 		.collapse-sm.grow-first-child > :global(.monsan-icon-button),
-		.collapse-sm.grow-first-child > :global(.monsan-button.square),
+		.collapse-sm.grow-first-child > :global(.monsan-button.square) {
+			flex: 0 0 auto;
+		}
+
 		.collapse-sm.grow-first-child > :global(form:has(> .monsan-icon-button)),
 		.collapse-sm.grow-first-child > :global(form:has(> .monsan-button.square)) {
 			flex: 0 0 auto;
@@ -132,7 +135,10 @@
 		}
 
 		.collapse-md.grow-first-child > :global(.monsan-icon-button),
-		.collapse-md.grow-first-child > :global(.monsan-button.square),
+		.collapse-md.grow-first-child > :global(.monsan-button.square) {
+			flex: 0 0 auto;
+		}
+
 		.collapse-md.grow-first-child > :global(form:has(> .monsan-icon-button)),
 		.collapse-md.grow-first-child > :global(form:has(> .monsan-button.square)) {
 			flex: 0 0 auto;

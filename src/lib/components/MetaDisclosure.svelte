@@ -47,6 +47,7 @@
 		width: 100%;
 		min-width: 0;
 		border-top: var(--border-width) solid var(--border-color);
+		border-top-color: color-mix(in srgb, var(--border-color) 30%, transparent);
 	}
 
 	.meta-disclosure-trigger {

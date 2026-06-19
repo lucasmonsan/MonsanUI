@@ -1,0 +1,206 @@
+<script lang="ts">
+	import { onMount, tick } from 'svelte';
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		children: Snippet;
+		header?: Snippet;
+		top?: Snippet;
+		bottom?: Snippet;
+		footer?: Snippet;
+	}
+
+	let { children, header, top, bottom, footer }: Props = $props();
+
+	let scrollEl = $state<HTMLElement>();
+	let hasOverflowTop = $state(false);
+	let hasOverflowBottom = $state(false);
+
+	function updateOverflowFade() {
+		if (!scrollEl) {
+			hasOverflowTop = false;
+			hasOverflowBottom = false;
+			return;
+		}
+
+		const threshold = 1;
+		hasOverflowTop = scrollEl.scrollTop > threshold;
+		hasOverflowBottom =
+			scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - threshold;
+	}
+
+	onMount(() => {
+		void tick().then(updateOverflowFade);
+
+		const resizeObserver = new ResizeObserver(updateOverflowFade);
+		const mutationObserver = new MutationObserver(updateOverflowFade);
+
+		if (scrollEl) {
+			resizeObserver.observe(scrollEl);
+			mutationObserver.observe(scrollEl, { childList: true, subtree: true });
+		}
+
+		window.addEventListener('resize', updateOverflowFade);
+
+		return () => {
+			resizeObserver.disconnect();
+			mutationObserver.disconnect();
+			window.removeEventListener('resize', updateOverflowFade);
+		};
+	});
+
+	$effect(() => {
+		void tick().then(updateOverflowFade);
+	});
+</script>
+
+<main class="monsan-app-shell">
+	{#if header}
+		<header class="app-shell-header">
+			{@render header()}
+		</header>
+	{/if}
+
+	{#if top}
+		<div class="app-shell-top">
+			{@render top()}
+		</div>
+	{/if}
+
+	<div
+		bind:this={scrollEl}
+		class="app-shell-scroll"
+		class:has-overflow-top={hasOverflowTop}
+		class:has-overflow-bottom={hasOverflowBottom}
+		onscroll={updateOverflowFade}
+	>
+		<div class="app-shell-content">
+			{@render children()}
+		</div>
+	</div>
+
+	{#if bottom}
+		<div class="app-shell-bottom">
+			{@render bottom()}
+		</div>
+	{/if}
+
+	{#if footer}
+		<footer class="app-shell-footer">
+			{@render footer()}
+		</footer>
+	{/if}
+</main>
+
+<style>
+	.monsan-app-shell {
+		width: 100%;
+		max-width: var(--container-max-width);
+		height: 100%;
+		min-height: 0;
+		max-height: 100%;
+		margin: 0 auto;
+		padding: max(var(--space-md), env(safe-area-inset-top))
+			max(var(--space-md), env(safe-area-inset-right))
+			max(var(--space-md), env(safe-area-inset-bottom))
+			max(var(--space-md), env(safe-area-inset-left));
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md);
+		box-sizing: border-box;
+		overflow: hidden;
+		min-width: 0;
+		position: relative;
+		z-index: 0;
+	}
+
+	.app-shell-header,
+	.app-shell-top,
+	.app-shell-bottom,
+	.app-shell-footer {
+		flex: 0 0 auto;
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+
+	.app-shell-top,
+	.app-shell-bottom {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md);
+	}
+
+	.app-shell-scroll {
+		flex: 1 1 auto;
+		min-height: 0;
+		min-width: 0;
+		width: 100%;
+		overflow-y: auto;
+		overflow-x: hidden;
+		scrollbar-width: none;
+		box-sizing: border-box;
+		position: relative;
+		z-index: 0;
+	}
+
+	.app-shell-scroll::-webkit-scrollbar {
+		display: none;
+	}
+
+	.app-shell-content {
+		width: 100%;
+		min-width: 0;
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md);
+		box-sizing: border-box;
+		position: relative;
+	}
+
+	.app-shell-content > :global(.monsan-centered-panel:only-child) {
+		flex: 1 1 auto;
+	}
+
+	.app-shell-content::before,
+	.app-shell-content::after {
+		content: '';
+		position: sticky;
+		left: 0;
+		right: 0;
+		z-index: 3;
+		display: block;
+		height: var(--space-xl);
+		box-sizing: border-box;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.18s var(--ease-out);
+	}
+
+	.app-shell-content::before {
+		top: 0;
+		margin-bottom: calc((var(--space-xl) + var(--space-md)) * -1);
+		border-top: var(--border-width) solid var(--border-color);
+		background: linear-gradient(to bottom, var(--bg-primary), transparent);
+	}
+
+	.app-shell-content::after {
+		bottom: 0;
+		margin-top: calc((var(--space-xl) + var(--space-md)) * -1);
+		border-bottom: var(--border-width) solid var(--border-color);
+		background: linear-gradient(to top, var(--bg-primary), transparent);
+	}
+
+	.has-overflow-top .app-shell-content::before,
+	.has-overflow-bottom .app-shell-content::after {
+		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.app-shell-content::before,
+		.app-shell-content::after {
+			transition: none;
+		}
+	}
+</style>
