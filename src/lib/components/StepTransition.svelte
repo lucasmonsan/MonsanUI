@@ -10,13 +10,13 @@
 		y?: number;
 	}
 
-	let { children: childrenProp, stepKey, animate = true, duration = 1500, y = 8 }: Props = $props();
+	let { children: childrenProp, stepKey, animate = true, duration = 200, y = 8 }: Props = $props();
 </script>
 
 <div class="monsan-step-transition">
 	{#key stepKey}
 		{#if animate}
-			<StepPanel {stepKey} {duration} {y} delay={2500}>
+			<StepPanel {stepKey} {duration} {y} delay={duration}>
 				{#snippet children(frozenKey: string | number)}
 					{@render childrenProp(frozenKey)}
 				{/snippet}
