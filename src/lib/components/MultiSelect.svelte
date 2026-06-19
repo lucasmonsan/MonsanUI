@@ -91,8 +91,8 @@
 			return allOption ? allOption.label : placeholder;
 		}
 
-		if (selectedOptions.length <= 2) {
-			return selectedOptions.map((opt) => opt.label).join(', ');
+		if (selectedOptions.length === 1) {
+			return selectedOptions[0].label;
 		}
 
 		if (formatSelected) {
