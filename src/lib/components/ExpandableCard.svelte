@@ -12,7 +12,8 @@
 		showChevron = true,
 		showText = true,
 		expandOn = 'card', // 'card' | 'header' | 'indicator'
-		compact = false
+		compact = false,
+		variant = 'default'
 	} = $props<{
 		expanded?: boolean;
 		title?: string;
@@ -25,6 +26,7 @@
 		showText?: boolean;
 		expandOn?: 'card' | 'header' | 'indicator';
 		compact?: boolean;
+		variant?: 'default' | 'success';
 	}>();
 
 	function handleCardClick(e: MouseEvent) {
@@ -59,7 +61,7 @@
 
 <div
 	bind:this={cardEl}
-	class="monsan-expandable-card"
+	class="monsan-expandable-card variant-{variant}"
 	class:compact
 	class:is-expanded={expanded}
 	class:clickable-card={expandOn === 'card'}
@@ -256,5 +258,19 @@
 	}
 	.compact .card-body {
 		padding: var(--space-sm);
+	}
+
+	/* Variante Success */
+	.monsan-expandable-card.variant-success {
+		border-color: var(--success);
+	}
+
+	.monsan-expandable-card.variant-success .card-header {
+		background: color-mix(in srgb, var(--success) 8%, var(--bg-secondary));
+		border-bottom-color: var(--success);
+	}
+
+	.monsan-expandable-card.variant-success .card-indicator-footer {
+		border-top-color: var(--success);
 	}
 </style>
