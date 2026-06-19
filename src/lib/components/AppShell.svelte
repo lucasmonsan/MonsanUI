@@ -124,6 +124,21 @@
 		box-sizing: border-box;
 	}
 
+	.app-shell-header,
+	.app-shell-top {
+		border-bottom: var(--border-width) solid var(--border-color);
+	}
+
+	.app-shell-bottom,
+	.app-shell-footer {
+		border-top: var(--border-width) solid var(--border-color);
+	}
+
+	.app-shell-header.app-shell-header :global(.monsan-app-header.with-border .app-header-inner) {
+		border-bottom: 0;
+		box-shadow: none;
+	}
+
 	.app-shell-top,
 	.app-shell-bottom {
 		display: flex;
