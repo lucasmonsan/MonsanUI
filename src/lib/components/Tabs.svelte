@@ -447,7 +447,7 @@
 	.monsan-tabs-container.embedded {
 		width: 100%;
 		margin: 0;
-		padding: 2px 0 var(--space-sm);
+		padding: 2px 0;
 		border-bottom: 0;
 	}
 </style>
