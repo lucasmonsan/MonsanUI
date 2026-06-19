@@ -3,7 +3,7 @@
 	import StepPanel from './StepPanel.svelte';
 
 	interface Props {
-		children: Snippet<[any]>;
+		children: Snippet<[string | number]>;
 		stepKey: string | number;
 		animate?: boolean;
 		duration?: number;
@@ -42,6 +42,3 @@
 		min-width: 0;
 	}
 </style>
-
-
-

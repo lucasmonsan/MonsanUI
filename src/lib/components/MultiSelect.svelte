@@ -43,7 +43,7 @@
 		} else {
 			// Toggle value
 			if (value.includes(optValue)) {
-				value = value.filter((v) => v !== optValue);
+				value = value.filter((v: string | number) => v !== optValue);
 			} else {
 				value = [...value, optValue];
 			}
@@ -77,17 +77,17 @@
 	// Compute display label
 	let displayLabel = $derived.by(() => {
 		// Filter out the placeholder option (value === '') when counting selections
-		const selectedValues = value.filter((v) => v !== '');
+		const selectedValues = value.filter((v: string | number) => v !== '');
 		if (selectedValues.length === 0) {
-			const allOption = options.find((opt) => opt.value === '');
+			const allOption = options.find((opt: Option) => opt.value === '');
 			return allOption ? allOption.label : placeholder;
 		}
 
 		const selectedOptions = options.filter(
-			(opt) => opt.value !== '' && selectedValues.includes(opt.value)
+			(opt: Option) => opt.value !== '' && selectedValues.includes(opt.value)
 		);
 		if (selectedOptions.length === 0) {
-			const allOption = options.find((opt) => opt.value === '');
+			const allOption = options.find((opt: Option) => opt.value === '');
 			return allOption ? allOption.label : placeholder;
 		}
 

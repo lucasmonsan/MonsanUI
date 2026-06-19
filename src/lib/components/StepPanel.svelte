@@ -4,21 +4,18 @@
 	import { onMount } from 'svelte';
 
 	interface Props {
-		children: Snippet<[any]>;
+		children: Snippet<[string | number]>;
 		stepKey: string | number;
 		duration: number;
 		y: number;
 		delay: number;
 	}
 
-	const props = $props<Props>();
-	const children = props.children;
-	const duration = props.duration;
-	const y = props.y;
+	let { children, stepKey, duration, y, delay }: Props = $props();
 
-	// Use bracket notation to capture initial prop values without triggering Svelte 5's state_referenced_locally compiler warnings
-	const frozenKey = props['stepKey'];
-	const initialDelay = props['delay'];
+	// Capture initial values using $state.snapshot to avoid compiler warnings
+	const frozenKey = $state.snapshot(stepKey);
+	const initialDelay = $state.snapshot(delay);
 
 	// Delay rendering of children for incoming transitions to prevent early height expansion
 	let showChildren = $state(initialDelay === 0);
