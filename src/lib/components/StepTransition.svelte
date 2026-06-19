@@ -1,27 +1,31 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
 	import type { Snippet } from 'svelte';
+	import StepPanel from './StepPanel.svelte';
 
 	interface Props {
-		children: Snippet;
+		children: Snippet<[any]>;
 		stepKey: string | number;
 		animate?: boolean;
 		duration?: number;
 		y?: number;
 	}
 
-	let { children, stepKey, animate = true, duration = 1500, y = 8 }: Props = $props();
+	let { children: childrenProp, stepKey, animate = true, duration = 1500, y = 8 }: Props = $props();
 </script>
 
 <div class="monsan-step-transition">
 	{#key stepKey}
-		<div
-			class="step-panel"
-			in:fly|global={animate ? { y, duration, delay: 2500 } : undefined}
-			out:fly|global={animate ? { y: -y, duration } : undefined}
-		>
-			{@render children()}
-		</div>
+		{#if animate}
+			<StepPanel {stepKey} {duration} {y} delay={2500}>
+				{#snippet children(frozenKey: string | number)}
+					{@render childrenProp(frozenKey)}
+				{/snippet}
+			</StepPanel>
+		{:else}
+			<div class="step-panel">
+				{@render childrenProp(stepKey)}
+			</div>
+		{/if}
 	{/key}
 </div>
 
@@ -37,10 +41,7 @@
 		width: 100%;
 		min-width: 0;
 	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.step-panel {
-			transition: none;
-		}
-	}
 </style>
+
+
+
