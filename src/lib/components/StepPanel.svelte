@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import type { Snippet } from 'svelte';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	interface Props {
 		children: Snippet<[string | number]>;
@@ -13,9 +13,9 @@
 
 	let { children, stepKey, duration, y, delay }: Props = $props();
 
-	// Capture initial values using $state.snapshot to avoid compiler warnings
-	const frozenKey = $state.snapshot(stepKey);
-	const initialDelay = $state.snapshot(delay);
+	// Capture initial values using untrack to avoid compiler warnings about referencing reactive state locally
+	const frozenKey = untrack(() => stepKey);
+	const initialDelay = untrack(() => delay);
 
 	// Delay rendering of children for incoming transitions to prevent early height expansion
 	let showChildren = $state(initialDelay === 0);
