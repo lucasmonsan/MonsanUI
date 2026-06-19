@@ -17,7 +17,7 @@
 	{#key stepKey}
 		<div
 			class="step-panel"
-			in:fly={animate ? { y, duration, delay: 80 } : undefined}
+			in:fly={animate ? { y, duration, delay: Math.max(120, duration - 40) } : undefined}
 			out:fly={animate ? { y: -y, duration: Math.max(120, duration - 40) } : undefined}
 		>
 			{@render children()}
