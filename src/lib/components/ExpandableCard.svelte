@@ -261,16 +261,7 @@
 	}
 
 	/* Variante Success */
-	.monsan-expandable-card.variant-success {
-		border-color: var(--success);
-	}
-
 	.monsan-expandable-card.variant-success .card-header {
 		background: color-mix(in srgb, var(--success) 8%, var(--bg-secondary));
-		border-bottom-color: var(--success);
-	}
-
-	.monsan-expandable-card.variant-success .card-indicator-footer {
-		border-top-color: var(--success);
 	}
 </style>
