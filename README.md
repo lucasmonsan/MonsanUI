@@ -18,10 +18,11 @@ Its job is simple: keep Examster, Manki and Owlth visually consistent without fo
 
 Consumer apps should prefer these primitives before adding any app-owned layout CSS:
 
-- `PageShell`, `PageHeader` and `ContentRegion` for page structure.
+- `AppShell` for every app page, with optional header, top, bottom and footer regions.
+- `AppHeader` and `ContentRegion` for page structure inside the shell.
 - `ResponsiveGrid` and `ActionFooter` for repeated layouts and action bars.
 - `DataCard`, `StatusPill` and `ConsolePanel` for admin records, status indicators and logs.
-- `RouteViewport`, `ToastViewport`, `FlashOverlay` and `SkipLink` for app-level route frames, feedback layers and accessibility.
+- `Background`, `ToastViewport`, `FlashOverlay` and `SkipLink` for app-level visual, feedback and accessibility layers.
 
 ## Usage In Apps
 

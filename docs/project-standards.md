@@ -52,8 +52,8 @@ New visual or layout needs should be added to MonsanUI first. Consumer apps shou
 
 Use existing primitives before adding new ones:
 
-- `AppViewport` for fixed-height app screens with header, content and footer regions.
-- `PageShell`, `PageHeader` and `ContentRegion` for page structure.
+- `AppShell` for every app page, with fixed suite padding, max-width, optional header/top/bottom/footer regions and internally scrolling content.
+- `AppHeader` and `ContentRegion` for page structure inside the shell.
 - `Stack`, `Inline`, `Grid` and `ResponsiveGrid` for composition.
 - `ActionFooter`, `ActionBar`, `ButtonGroup`, `QuickActions` and `Tabs` for actions and navigation.
 - `CenteredPanel`, `Panel`, `DataCard`, `ExpandableCard`, `ConsolePanel` and `EmptyState` for surfaces.

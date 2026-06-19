@@ -6,6 +6,7 @@ body {
 	margin: 0;
 	padding: 0;
 	width: 100%;
+	height: 100dvh;
 	background-color: var(--bg-primary);
 	color: var(--text-primary);
 	font-family: var(--font-body);
@@ -14,12 +15,12 @@ body {
 		background-color 0.3s var(--ease-out),
 		color 0.3s var(--ease-out);
 	min-height: 100dvh;
+	max-height: 100dvh;
 	overflow: hidden;
 	isolation: isolate;
 }
 
 body {
-	height: 100dvh;
 	display: flex;
 	flex-direction: column;
 	-webkit-font-smoothing: antialiased;
