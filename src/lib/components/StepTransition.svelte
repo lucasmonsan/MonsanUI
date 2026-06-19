@@ -10,14 +10,14 @@
 		y?: number;
 	}
 
-	let { children, stepKey, animate = true, duration = 600, y = 8 }: Props = $props();
+	let { children, stepKey, animate = true, duration = 1500, y = 8 }: Props = $props();
 </script>
 
 <div class="monsan-step-transition">
 	{#key stepKey}
 		<div
 			class="step-panel"
-			in:fly={animate ? { y, duration, delay: duration + 100 } : undefined}
+			in:fly={animate ? { y, duration, delay: 2500 } : undefined}
 			out:fly={animate ? { y: -y, duration } : undefined}
 		>
 			{@render children()}
