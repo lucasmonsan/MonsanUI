@@ -174,7 +174,7 @@
 		position: relative;
 	}
 
-	.app-shell-content > :global(.monsan-centered-panel:only-child) {
+	.app-shell-content > :global(.monsan-centered-panel) {
 		flex: 1 1 auto;
 	}
 
