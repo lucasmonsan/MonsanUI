@@ -106,7 +106,7 @@
 			max(var(--space-md), env(safe-area-inset-left));
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 		box-sizing: border-box;
 		overflow: hidden;
 		min-width: 0;
@@ -143,7 +143,7 @@
 	.app-shell-bottom {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 	}
 
 	.app-shell-scroll {
