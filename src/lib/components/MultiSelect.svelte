@@ -234,7 +234,10 @@
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
 		z-index: 100;
-		padding: var(--space-xs) 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
+		padding: var(--space-xs);
 		box-sizing: border-box;
 	}
 
