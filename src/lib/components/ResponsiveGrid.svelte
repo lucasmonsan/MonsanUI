@@ -1,14 +1,44 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	type MinItemWidth = 'xs' | 'sm' | 'md' | 'lg';
+	type Gap = 'sm' | 'md' | 'lg';
+	type Align = 'stretch' | 'start';
+	type Columns = 'auto' | '2' | '3' | '4';
+	type ColumnsBreakpoint = 'md' | 'lg';
+
 	interface Props {
 		children: Snippet;
-		minItemWidth?: 'xs' | 'sm' | 'md' | 'lg';
-		gap?: 'sm' | 'md' | 'lg';
-		align?: 'stretch' | 'start';
-		columns?: 'auto' | '2' | '3' | '4';
-		columnsBreakpoint?: 'md' | 'lg';
+		minItemWidth?: MinItemWidth;
+		gap?: Gap;
+		align?: Align;
+		columns?: Columns;
+		columnsBreakpoint?: ColumnsBreakpoint;
 	}
+
+	const MIN_ITEM_WIDTH_VALUES: Record<MinItemWidth, string> = {
+		xs: '140px',
+		sm: '180px',
+		md: '240px',
+		lg: '320px'
+	};
+
+	const GAP_VALUES: Record<Gap, string> = {
+		sm: 'var(--space-sm)',
+		md: 'var(--space-md)',
+		lg: 'var(--space-lg)'
+	};
+
+	const ALIGN_VALUES: Record<Align, string> = {
+		stretch: 'stretch',
+		start: 'start'
+	};
+
+	const FIXED_COLUMN_VALUES: Record<Exclude<Columns, 'auto'>, string> = {
+		'2': 'repeat(2, minmax(0, 1fr))',
+		'3': 'repeat(3, minmax(0, 1fr))',
+		'4': 'repeat(4, minmax(0, 1fr))'
+	};
 
 	let {
 		children,
@@ -18,10 +48,20 @@
 		columns = 'auto',
 		columnsBreakpoint = 'lg'
 	}: Props = $props();
+
+	let minItemWidthValue = $derived(MIN_ITEM_WIDTH_VALUES[minItemWidth]);
+	let gapValue = $derived(GAP_VALUES[gap]);
+	let alignValue = $derived(ALIGN_VALUES[align]);
+	let fixedColumnsValue = $derived(columns === 'auto' ? '' : FIXED_COLUMN_VALUES[columns]);
 </script>
 
 <div
-	class="monsan-responsive-grid min-{minItemWidth} gap-{gap} align-{align} columns-{columns} columns-breakpoint-{columnsBreakpoint}"
+	class="monsan-responsive-grid columns-breakpoint-{columnsBreakpoint}"
+	class:fixed-columns={columns !== 'auto'}
+	style:--monsan-responsive-grid-min-width={minItemWidthValue}
+	style:--monsan-responsive-grid-gap={gapValue}
+	style:--monsan-responsive-grid-align={alignValue}
+	style:--monsan-responsive-grid-fixed-columns={fixedColumnsValue}
 >
 	{@render children()}
 </div>
@@ -32,69 +72,23 @@
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
-	}
-
-	.min-xs {
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
-	}
-
-	.min-sm {
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-	}
-
-	.min-md {
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-	}
-
-	.min-lg {
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-	}
-
-	.gap-sm {
-		gap: var(--space-sm);
-	}
-
-	.gap-md {
-		gap: var(--space-md);
-	}
-
-	.gap-lg {
-		gap: var(--space-lg);
-	}
-
-	.align-stretch {
-		align-items: stretch;
-	}
-
-	.align-start {
-		align-items: start;
+		grid-template-columns: repeat(
+			auto-fit,
+			minmax(min(100%, var(--monsan-responsive-grid-min-width)), 1fr)
+		);
+		gap: var(--monsan-responsive-grid-gap);
+		align-items: var(--monsan-responsive-grid-align);
 	}
 
 	@media (min-width: 768px) {
-		.columns-breakpoint-md.columns-2 {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.columns-breakpoint-md.columns-3 {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-
-		.columns-breakpoint-md.columns-4 {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
+		.columns-breakpoint-md.fixed-columns {
+			grid-template-columns: var(--monsan-responsive-grid-fixed-columns);
 		}
 	}
 
 	@media (min-width: 900px) {
-		.columns-breakpoint-lg.columns-2 {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.columns-breakpoint-lg.columns-3 {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-
-		.columns-breakpoint-lg.columns-4 {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
+		.columns-breakpoint-lg.fixed-columns {
+			grid-template-columns: var(--monsan-responsive-grid-fixed-columns);
 		}
 	}
 </style>
