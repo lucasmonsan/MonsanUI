@@ -138,25 +138,11 @@
 				<button
 					type="button"
 					class="multiselect-option"
+					class:selected={isOptionChecked}
 					onclick={() => handleOptionClick(option.value)}
 					role="option"
 					aria-selected={isOptionChecked}
 				>
-					<div class="option-checkbox-box" class:checked={isOptionChecked}>
-						{#if isOptionChecked}
-							<svg
-								class="check-icon"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="3.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<polyline points="20 6 9 17 4 12"></polyline>
-							</svg>
-						{/if}
-					</div>
 					<span class="option-label">{option.label}</span>
 				</button>
 			{/each}
@@ -256,66 +242,46 @@
 	.multiselect-option {
 		display: flex;
 		align-items: center;
-		gap: var(--space-md);
+		justify-content: flex-start;
 		width: 100%;
 		padding: var(--space-sm) var(--space-md);
-		border: none;
+		border: var(--border-width) solid transparent;
+		border-radius: var(--radius-sm);
 		background: transparent;
 		color: var(--text-primary);
 		font-family: inherit;
 		font-size: var(--text-sm);
-		font-weight: 500;
+		font-weight: 800;
 		cursor: pointer;
 		text-align: left;
-		transition: background 0.1s ease;
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.12s var(--ease-out),
+			border-color 0.12s var(--ease-out);
 		box-sizing: border-box;
 	}
 
 	.multiselect-option:hover:not(:disabled) {
 		background: var(--bg-secondary);
+		border-color: var(--border-color);
 	}
 
-	.option-checkbox-box {
-		width: 18px;
-		height: 18px;
-		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-sm);
-		background-color: var(--bg-primary);
-		box-shadow: var(--shadow-sm);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		color: var(--bg-primary);
-		transition:
-			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out),
-			background-color 0.1s var(--ease-out),
-			border-color 0.1s var(--ease-out);
-		box-sizing: border-box;
-	}
-
-	.multiselect-option:hover:not(:disabled) .option-checkbox-box {
+	.multiselect-option:focus-visible {
+		outline: none;
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
 		box-shadow: 2px 2px 0px var(--accent-primary);
 	}
 
-	.option-checkbox-box.checked {
+	.multiselect-option.selected {
 		background-color: var(--accent-primary);
 		border-color: var(--border-color);
 		color: var(--bg-primary);
 	}
 
-	.multiselect-option:hover:not(:disabled) .option-checkbox-box.checked {
+	.multiselect-option.selected:hover:not(:disabled) {
+		background-color: var(--accent-primary);
 		border-color: var(--border-color);
-		box-shadow: 2px 2px 0px var(--border-color);
-	}
-
-	.check-icon {
-		width: 12px;
-		height: 12px;
-		flex-shrink: 0;
 	}
 
 	.option-label {
