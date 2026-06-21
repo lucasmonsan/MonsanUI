@@ -106,7 +106,7 @@
 			max(var(--space-md), env(safe-area-inset-left));
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 		box-sizing: border-box;
 		overflow: hidden;
 		min-width: 0;
@@ -124,13 +124,13 @@
 		box-sizing: border-box;
 	}
 
-	.app-shell-header,
-	.app-shell-top {
+	.app-shell-header {
 		border-bottom: var(--border-width) solid var(--border-color);
 	}
 
-	.app-shell-bottom,
-	.app-shell-footer {
+	.app-shell-top > :global(* + *),
+	.app-shell-bottom > :global(* + *) {
+		padding-top: var(--space-sm);
 		border-top: var(--border-width) solid var(--border-color);
 	}
 
@@ -143,7 +143,7 @@
 	.app-shell-bottom {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 	}
 
 	.app-shell-scroll {
@@ -157,6 +157,11 @@
 		box-sizing: border-box;
 		position: relative;
 		z-index: 0;
+	}
+
+	.app-shell-header + .app-shell-scroll,
+	.app-shell-top + .app-shell-scroll {
+		margin-top: var(--space-sm);
 	}
 
 	.app-shell-scroll::-webkit-scrollbar {
