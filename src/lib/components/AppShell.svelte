@@ -130,7 +130,7 @@
 
 	.app-shell-top > :global(* + *),
 	.app-shell-bottom > :global(* + *) {
-		padding-top: var(--space-md);
+		padding-top: var(--space-sm);
 		border-top: var(--border-width) solid var(--border-color);
 	}
 
