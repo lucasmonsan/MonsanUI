@@ -53,12 +53,14 @@
 		text-transform: uppercase;
 		letter-spacing: 0;
 		text-align: center;
+		height: calc(var(--base) * 0.77 + 8px);
 	}
 
 	.size-sm {
 		padding: 1px 5px;
 		font-size: calc(var(--base) * 0.62);
 		line-height: 1;
+		height: calc(var(--base) * 0.62 + 6px);
 	}
 
 	.monsan-badge.variant-default {
