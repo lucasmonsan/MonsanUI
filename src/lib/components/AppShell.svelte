@@ -124,13 +124,13 @@
 		box-sizing: border-box;
 	}
 
-	.app-shell-header,
-	.app-shell-top {
+	.app-shell-header {
 		border-bottom: var(--border-width) solid var(--border-color);
 	}
 
-	.app-shell-bottom,
-	.app-shell-footer {
+	.app-shell-top > :global(* + *),
+	.app-shell-bottom > :global(* + *) {
+		padding-top: var(--space-md);
 		border-top: var(--border-width) solid var(--border-color);
 	}
 
