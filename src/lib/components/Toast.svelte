@@ -16,9 +16,10 @@
 		toast: Toast;
 		role?: string;
 		ariaLive?: 'polite' | 'assertive' | 'off';
+		announce?: boolean;
 	}
 
-	let { toast, role = 'alert', ariaLive = 'assertive' }: Props = $props();
+	let { toast, role = 'status', ariaLive = 'polite', announce = true }: Props = $props();
 	let prefersReducedMotion = $state(false);
 
 	const colors: Record<Toast['type'], string> = {
@@ -47,8 +48,9 @@
 
 <div
 	class="toast-item {toast.type}"
-	{role}
-	aria-live={ariaLive}
+	role={announce ? role : undefined}
+	aria-live={announce ? ariaLive : undefined}
+	aria-atomic={announce ? 'true' : undefined}
 	in:fly={{ y: prefersReducedMotion ? 0 : 20, duration: prefersReducedMotion ? 0 : 400 }}
 	out:fly={{ y: prefersReducedMotion ? 0 : -20, duration: prefersReducedMotion ? 0 : 300 }}
 	style:--toast-color={toastColor}
