@@ -16,10 +16,14 @@
 	}: Props = $props();
 </script>
 
-<div class="options-list size-{size}" style="--cols: {columns};">
+<div class="options-list size-{size}" role="radiogroup" style:--cols={String(columns)}>
 	{#each options as option (option)}
 		<button
-			class="option-btn {value === option ? 'selected' : ''}"
+			type="button"
+			class="option-btn"
+			class:selected={value === option}
+			role="radio"
+			aria-checked={value === option}
 			onclick={() => {
 				if (!disabled) value = option;
 			}}
@@ -41,7 +45,6 @@
 		width: 100%;
 	}
 
-	/* Responsive fallback: on small devices, show in single column */
 	@media (max-width: 600px) {
 		.options-list {
 			grid-template-columns: 1fr !important;
@@ -59,7 +62,12 @@
 		color: var(--text-primary);
 		text-align: left;
 		box-shadow: var(--shadow-sm);
-		transition: all 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease,
+			background-color 0.2s ease,
+			border-color 0.2s ease,
+			color 0.2s ease;
 		cursor: pointer;
 		font-family: var(--font-body);
 	}
@@ -144,5 +152,11 @@
 	.options-list.size-sm .radio-inner {
 		width: 8px;
 		height: 8px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.option-btn {
+			transition: none;
+		}
 	}
 </style>

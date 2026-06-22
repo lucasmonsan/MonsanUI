@@ -110,4 +110,10 @@
 		font-weight: 800;
 		color: currentColor;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-choice-card {
+			transition: none;
+		}
+	}
 </style>

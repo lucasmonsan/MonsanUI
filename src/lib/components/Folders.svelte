@@ -3,7 +3,9 @@
 	import Input from './Input.svelte';
 	import Button from './Button.svelte';
 	import Plus from './icons/Plus.svelte';
+	import Pencil from './icons/Pencil.svelte';
 	import QuickActions from './QuickActions.svelte';
+	import Trash from './icons/Trash.svelte';
 
 	interface Folder {
 		id: string;
@@ -174,6 +176,7 @@
 	class:layout-grid={layout === 'grid'}
 >
 	<button
+		type="button"
 		class="folder-chip-all"
 		class:active={activeId === null}
 		onclick={() => {
@@ -214,7 +217,12 @@
 			<div class="folder-chip-actions">
 				<QuickActions variant="dropdown" align="right">
 					{#snippet trigger()}
-						<button type="button" class="folder-options-btn" aria-label={l.options}>
+						<button
+							type="button"
+							class="folder-options-btn"
+							aria-label={l.options}
+							aria-haspopup="menu"
+						>
 							<svg
 								width="14"
 								height="14"
@@ -232,20 +240,9 @@
 						</button>
 					{/snippet}
 					<button type="button" class="dropdown-item" onclick={(e) => triggerEdit(folder.id, e)}>
-						<svg
-							class="dropdown-item-icon"
-							width="12"
-							height="12"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M12 20h9" />
-							<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-						</svg>
+						<span class="dropdown-item-icon" aria-hidden="true">
+							<Pencil size={12} />
+						</span>
 						{l.edit}
 					</button>
 					<button
@@ -253,21 +250,9 @@
 						class="dropdown-item delete-item"
 						onclick={(e) => triggerDelete(folder.id, e)}
 					>
-						<svg
-							class="dropdown-item-icon"
-							width="12"
-							height="12"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M3 6h18" />
-							<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-							<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-						</svg>
+						<span class="dropdown-item-icon" aria-hidden="true">
+							<Trash size={12} />
+						</span>
 						{l.delete}
 					</button>
 				</QuickActions>
@@ -276,6 +261,7 @@
 	{/each}
 	{#if !hideAddButton}
 		<button
+			type="button"
 			class="folder-chip-all add-folder-chip"
 			onclick={() => {
 				showCreateModal = true;
@@ -309,7 +295,15 @@
 			<div class="color-options">
 				{#each ['default', 'blue', 'green', 'yellow', 'purple', 'orange', 'red'] as color (color)}
 					<button
-						class="color-btn {color}"
+						type="button"
+						class="color-btn"
+						class:default={color === 'default'}
+						class:blue={color === 'blue'}
+						class:green={color === 'green'}
+						class:yellow={color === 'yellow'}
+						class:purple={color === 'purple'}
+						class:orange={color === 'orange'}
+						class:red={color === 'red'}
 						class:selected={newFolderColor === color}
 						onclick={() => (newFolderColor = color)}
 						title={color}
@@ -582,6 +576,9 @@
 	}
 
 	.dropdown-item-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		margin-right: var(--space-xs);
 	}
 
@@ -704,5 +701,15 @@
 		justify-content: flex-end;
 		gap: var(--space-sm);
 		margin-top: var(--space-sm);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.folder-chip-all,
+		.folder-chip,
+		.dropdown-item,
+		.add-folder-chip,
+		.color-btn {
+			transition: none;
+		}
 	}
 </style>

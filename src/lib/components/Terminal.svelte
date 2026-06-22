@@ -423,7 +423,7 @@
 	{#each Object.entries(nodes) as [name, node] (name)}
 		{@const fullPath = [...parentPath, name]}
 		{@const isActive = pathString === '/' + fullPath.join('/')}
-		<div class="tree-line" class:active={isActive} style="padding-left: {depth * 15 + 10}px">
+		<div class="tree-line" class:active={isActive} style:padding-left={`${depth * 15 + 10}px`}>
 			{#if node.type === 'dir'}
 				<svg class="icon-folder" viewBox="0 0 24 24" width="14" height="14"
 					><path
@@ -450,11 +450,15 @@
 
 <div class="terminal-container">
 	<div class="mobile-tabs">
-		<button class:active={activeTab === 'terminal'} onclick={() => (activeTab = 'terminal')}
-			>{mergedMessages.tabTerminal}</button
+		<button
+			type="button"
+			class:active={activeTab === 'terminal'}
+			onclick={() => (activeTab = 'terminal')}>{mergedMessages.tabTerminal}</button
 		>
-		<button class:active={activeTab === 'explorer'} onclick={() => (activeTab = 'explorer')}
-			>{mergedMessages.tabFiles}</button
+		<button
+			type="button"
+			class:active={activeTab === 'explorer'}
+			onclick={() => (activeTab = 'explorer')}>{mergedMessages.tabFiles}</button
 		>
 	</div>
 

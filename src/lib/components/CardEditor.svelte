@@ -186,25 +186,26 @@
 
 	let headerEl = $state<HTMLDivElement>();
 	$effect(() => {
-		if (headerEl) {
-			const onMouseDown = (e: MouseEvent) => {
-				const interactive = (e.target as HTMLElement).closest('button, input, textarea, a, select');
-				dragAllowed = !interactive;
-			};
-			headerEl.addEventListener('mousedown', onMouseDown);
-			headerEl.addEventListener('touchstart', handleTouchStart);
-			headerEl.addEventListener('touchmove', handleTouchMove);
-			headerEl.addEventListener('touchend', handleTouchEnd);
-			headerEl.addEventListener('touchcancel', handleTouchEnd);
+		if (!headerEl) return;
 
-			return () => {
-				headerEl?.removeEventListener('mousedown', onMouseDown);
-				headerEl?.removeEventListener('touchstart', handleTouchStart);
-				headerEl?.removeEventListener('touchmove', handleTouchMove);
-				headerEl?.removeEventListener('touchend', handleTouchEnd);
-				headerEl?.removeEventListener('touchcancel', handleTouchEnd);
-			};
-		}
+		const onMouseDown = (e: MouseEvent) => {
+			const interactive = (e.target as HTMLElement).closest('button, input, textarea, a, select');
+			dragAllowed = !interactive;
+		};
+
+		headerEl.addEventListener('mousedown', onMouseDown);
+		headerEl.addEventListener('touchstart', handleTouchStart);
+		headerEl.addEventListener('touchmove', handleTouchMove);
+		headerEl.addEventListener('touchend', handleTouchEnd);
+		headerEl.addEventListener('touchcancel', handleTouchEnd);
+
+		return () => {
+			headerEl?.removeEventListener('mousedown', onMouseDown);
+			headerEl?.removeEventListener('touchstart', handleTouchStart);
+			headerEl?.removeEventListener('touchmove', handleTouchMove);
+			headerEl?.removeEventListener('touchend', handleTouchEnd);
+			headerEl?.removeEventListener('touchcancel', handleTouchEnd);
+		};
 	});
 </script>
 
@@ -474,7 +475,6 @@
 		color: var(--text-primary);
 	}
 
-	/* Hint / Optional Group styling */
 	.hint-group {
 		display: flex;
 		flex-direction: column;
@@ -539,5 +539,14 @@
 
 	.hint-slide-wrapper {
 		padding-top: var(--space-xs);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.card-editor-item,
+		.btn-icon,
+		.btn-toggle-hint-icon,
+		.hint-input-wrapper {
+			transition: none;
+		}
 	}
 </style>

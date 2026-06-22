@@ -157,13 +157,14 @@
 
 <div
 	class="monsan-flipcard-container"
-	style="--flipcard-height: {resolvedHeight};"
+	style:--flipcard-height={resolvedHeight}
 	class:flipped
 	onpointerdown={onPointerDown}
 	onpointermove={onPointerMoveLocal}
 	onpointerleave={() => !isDragging && tilt.set({ x: 0, y: 0 })}
 	ondragstart={(e) => e.preventDefault()}
 	role="button"
+	aria-pressed={flipped}
 	tabindex="0"
 	onclick={handleFlip}
 	onkeydown={(e) => {
@@ -274,5 +275,11 @@
 		overflow: auto;
 		overflow-wrap: anywhere;
 		transform: translateZ(1px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.card {
+			transition: none;
+		}
 	}
 </style>
