@@ -54,4 +54,10 @@
 			box-shadow: 0 0 0 0 transparent;
 		}
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.status-dot {
+			animation: none;
+		}
+	}
 </style>

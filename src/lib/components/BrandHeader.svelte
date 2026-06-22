@@ -35,7 +35,7 @@
 				<span
 					class="brand-logo"
 					class:adaptive={adaptiveLogo}
-					style="mask: url({logoSrc}) no-repeat center / contain; -webkit-mask: url({logoSrc}) no-repeat center / contain; background-color: var(--text-primary);"
+					style:--brand-logo-mask={`url("${logoSrc}") no-repeat center / contain`}
 					aria-hidden="true"
 				></span>
 			</button>
@@ -43,7 +43,7 @@
 			<span
 				class="brand-logo"
 				class:adaptive={adaptiveLogo}
-				style="mask: url({logoSrc}) no-repeat center / contain; -webkit-mask: url({logoSrc}) no-repeat center / contain; background-color: var(--text-primary);"
+				style:--brand-logo-mask={`url("${logoSrc}") no-repeat center / contain`}
 				aria-label={logoAlt}
 			></span>
 		{/if}
@@ -106,6 +106,9 @@
 		width: calc(var(--base) * 5);
 		height: calc(var(--base) * 5);
 		display: inline-block;
+		background-color: var(--text-primary);
+		mask: var(--brand-logo-mask);
+		-webkit-mask: var(--brand-logo-mask);
 		opacity: 1;
 		transition: opacity 0.3s var(--ease-out);
 	}
@@ -132,5 +135,11 @@
 	.compact .brand-logo {
 		width: calc(var(--base) * 2.25);
 		height: calc(var(--base) * 2.25);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.brand-logo {
+			transition: none;
+		}
 	}
 </style>

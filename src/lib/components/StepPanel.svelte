@@ -17,24 +17,53 @@
 	const frozenKey = untrack(() => stepKey);
 	const initialDelay = untrack(() => delay);
 
-	// Delay rendering of children for incoming transitions to prevent early height expansion
 	let showChildren = $state(initialDelay === 0);
+	let prefersReducedMotion = $state(false);
+
+	let effectiveDuration = $derived(prefersReducedMotion ? 0 : duration);
+	let effectiveY = $derived(prefersReducedMotion ? 0 : y);
 
 	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+			if (event.matches) {
+				showChildren = true;
+			}
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+
 		if (initialDelay > 0) {
+			if (motionQuery.matches) {
+				showChildren = true;
+				return () => {
+					motionQuery.removeEventListener('change', updateMotionPreference);
+				};
+			}
+
 			const timer = setTimeout(() => {
 				showChildren = true;
 			}, initialDelay);
-			return () => clearTimeout(timer);
+			return () => {
+				clearTimeout(timer);
+				motionQuery.removeEventListener('change', updateMotionPreference);
+			};
 		}
+
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
 	});
 </script>
 
 {#if showChildren}
 	<div
 		class="step-panel"
-		in:fly|global={{ y, duration, delay: 0 }}
-		out:fly|global={{ y: -y, duration }}
+		in:fly|global={{ y: effectiveY, duration: effectiveDuration, delay: 0 }}
+		out:fly|global={{ y: -effectiveY, duration: effectiveDuration }}
 	>
 		{@render children(frozenKey)}
 	</div>

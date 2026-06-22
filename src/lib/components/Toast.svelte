@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
 	import Check from './icons/Check.svelte';
 	import CircleAlert from './icons/CircleAlert.svelte';
 	import TriangleAlert from './icons/TriangleAlert.svelte';
@@ -18,6 +19,7 @@
 	}
 
 	let { toast, role = 'alert', ariaLive = 'assertive' }: Props = $props();
+	let prefersReducedMotion = $state(false);
 
 	const colors: Record<Toast['type'], string> = {
 		success: 'var(--success)',
@@ -26,17 +28,30 @@
 		info: 'var(--info)'
 	};
 
-	// Forçar a tipagem da chave para evitar que o TS a veja como 'any'
-	let toastColor = $derived(colors[toast.type as keyof typeof colors]);
+	let toastColor = $derived(colors[toast.type]);
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 </script>
 
 <div
 	class="toast-item {toast.type}"
 	{role}
 	aria-live={ariaLive}
-	in:fly={{ y: 20, duration: 400 }}
-	out:fly={{ y: -20, duration: 300 }}
-	style="--toast-color: {toastColor}"
+	in:fly={{ y: prefersReducedMotion ? 0 : 20, duration: prefersReducedMotion ? 0 : 400 }}
+	out:fly={{ y: prefersReducedMotion ? 0 : -20, duration: prefersReducedMotion ? 0 : 300 }}
+	style:--toast-color={toastColor}
 >
 	<div class="toast-icon">
 		{#if toast.type === 'success'}

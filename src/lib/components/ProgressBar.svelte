@@ -24,7 +24,6 @@
 		ariaLabel
 	}: Props = $props();
 
-	// Clamp the value between 0 and 100
 	let clampedValue = $derived(Math.min(Math.max(value, 0), 100));
 	let resolvedHeight = $derived(resolveHeight(height));
 
@@ -40,7 +39,8 @@
 <div
 	class="monsan-progress-container"
 	class:has-text={text}
-	style="--progress-height: {resolvedHeight}; --progress-value: {clampedValue}%;"
+	style:--progress-height={resolvedHeight}
+	style:--progress-value={`${clampedValue}%`}
 	role="progressbar"
 	aria-valuenow={clampedValue}
 	aria-valuemin="0"
@@ -52,7 +52,8 @@
 		class="progress-bar {variant}"
 		class:striped
 		class:animated
-		style="width: {clampedValue}%; --progress-color: {colors[variant]}"
+		style:width={`${clampedValue}%`}
+		style:--progress-color={colors[variant]}
 	>
 		{#if showLabel && clampedValue > 10}
 			<span class="progress-label">{clampedValue}%</span>
@@ -160,6 +161,16 @@
 	/* Stripe animation */
 	.animated {
 		animation: progressStripes 1.2s linear infinite;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.progress-bar {
+			transition: none;
+		}
+
+		.animated {
+			animation: none;
+		}
 	}
 
 	@keyframes progressStripes {

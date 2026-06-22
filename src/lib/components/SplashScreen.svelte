@@ -85,7 +85,7 @@
 </script>
 
 {#if !hidden}
-	<div class="monsan-splash-screen" class:hiding style="z-index: {zIndex}">
+	<div class="monsan-splash-screen" class:hiding style:z-index={zIndex}>
 		<div class="splash-content" class:visible={contentVisible}>
 			{#if children}
 				{@render children()}
@@ -222,6 +222,22 @@
 		background-color: var(--accent-primary);
 		border: 3px solid var(--border-color);
 		animation: spinCube 1.2s infinite ease-in-out;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-splash-screen.hiding {
+			animation: none;
+			opacity: 0;
+		}
+
+		.splash-content,
+		.splash-footer {
+			transition: none;
+		}
+
+		.spinner-cube {
+			animation: none;
+		}
 	}
 
 	@keyframes spinCube {

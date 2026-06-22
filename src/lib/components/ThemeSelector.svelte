@@ -212,4 +212,10 @@
 		align-items: center;
 		justify-content: center;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dropdown-item {
+			transition: none;
+		}
+	}
 </style>

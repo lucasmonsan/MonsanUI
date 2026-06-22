@@ -65,7 +65,9 @@
 	<button
 		type="button"
 		class="monsan-avatar {shape} interactive"
-		style="width: {finalSize}; height: {finalSize}; font-size: calc({finalSize} * 0.38);"
+		style:width={finalSize}
+		style:height={finalSize}
+		style:font-size={`calc(${finalSize} * 0.38)`}
 		{onclick}
 		{title}
 		aria-label={ariaLabel || title || name || alt || 'Avatar'}
@@ -75,7 +77,9 @@
 {:else}
 	<div
 		class="monsan-avatar {shape}"
-		style="width: {finalSize}; height: {finalSize}; font-size: calc({finalSize} * 0.38);"
+		style:width={finalSize}
+		style:height={finalSize}
+		style:font-size={`calc(${finalSize} * 0.38)`}
 	>
 		{@render avatarContent()}
 	</div>
@@ -115,6 +119,12 @@
 	button.monsan-avatar:active:not(:disabled) {
 		transform: translate(2px, 2px);
 		box-shadow: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		button.monsan-avatar {
+			transition: none;
+		}
 	}
 
 	.monsan-avatar.circle {

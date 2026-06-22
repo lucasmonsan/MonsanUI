@@ -152,4 +152,12 @@
 		text-transform: uppercase;
 		letter-spacing: 0;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-loading-overlay,
+		.loading-card,
+		.brutalist-spinner {
+			animation: none;
+		}
+	}
 </style>
