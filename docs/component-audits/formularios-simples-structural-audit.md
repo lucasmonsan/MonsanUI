@@ -148,18 +148,18 @@ apps hoje, mas sao componentes publicos e precisam manter API.
 
 ## Resumo executivo
 
-| Componente | Diagnostico | Acao recomendada |
-| --- | --- | --- |
-| `FormField` | Estrutura pequena, mas incompleta: nao possui helper, erro nem contrato de `aria-describedby`. | Recontratar de forma compatível com snippet `control`. |
-| `FieldGroup` | Semantica correta com `fieldset`/`legend`; sem wrapper redundante. | Manter; avaliar helper/erro de grupo depois. |
-| `FormStack` | Estrutura simples, mas força botoes internos a `width: 100%` via `:global`. | Simplificar removendo estilo global ou tornando full-width opt-in. |
-| `Input` | Wrapper necessario para toggle de senha, mas desnecessario quando nao ha toggle. | Simplificar com wrapper condicional ou manter wrapper se risco visual for alto; mover foco para `focus-visible`. |
-| `Textarea` | Controle puro, mas duplica markup por causa de action opcional. | Simplificar apenas se Svelte permitir action opcional com seguranca; manter se nao. |
-| `Checkbox` | Label-wrapper e input sr-only sao justificaveis; label proprio pode duplicar `FormField`. | Manter DOM; documentar uso com `FieldGroup`; adicionar `ariaInvalid` opcional. |
-| `Radio` | Mesmo diagnostico de `Checkbox`; semantica individual correta quando dentro de `FieldGroup`. | Manter DOM; documentar uso com `FieldGroup`; adicionar `ariaInvalid` opcional. |
-| `Range` | Wrapper simples usado para fill visual; padding vertical e interno ao controle. | Manter; adicionar `ariaInvalid` se necessario e revisar padding depois de validacao visual. |
-| `Search` | Dialog de busca global, mas listbox/option usa botoes sem `aria-activedescendant` e sem IDs. | Recontratar como command/search dialog acessivel. |
-| `SearchBar` | Busca contextual boa visualmente, mas sugestoes sao dropdown proprio sem semantica combobox/listbox completa. | Recontratar parcialmente como combobox contextual. |
+| Componente   | Diagnostico                                                                                                   | Acao recomendada                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `FormField`  | Estrutura pequena, mas incompleta: nao possui helper, erro nem contrato de `aria-describedby`.                | Recontratar de forma compatível com snippet `control`.                                                           |
+| `FieldGroup` | Semantica correta com `fieldset`/`legend`; sem wrapper redundante.                                            | Manter; avaliar helper/erro de grupo depois.                                                                     |
+| `FormStack`  | Estrutura simples, mas força botoes internos a `width: 100%` via `:global`.                                   | Simplificar removendo estilo global ou tornando full-width opt-in.                                               |
+| `Input`      | Wrapper necessario para toggle de senha, mas desnecessario quando nao ha toggle.                              | Simplificar com wrapper condicional ou manter wrapper se risco visual for alto; mover foco para `focus-visible`. |
+| `Textarea`   | Controle puro, mas duplica markup por causa de action opcional.                                               | Simplificar apenas se Svelte permitir action opcional com seguranca; manter se nao.                              |
+| `Checkbox`   | Label-wrapper e input sr-only sao justificaveis; label proprio pode duplicar `FormField`.                     | Manter DOM; documentar uso com `FieldGroup`; adicionar `ariaInvalid` opcional.                                   |
+| `Radio`      | Mesmo diagnostico de `Checkbox`; semantica individual correta quando dentro de `FieldGroup`.                  | Manter DOM; documentar uso com `FieldGroup`; adicionar `ariaInvalid` opcional.                                   |
+| `Range`      | Wrapper simples usado para fill visual; padding vertical e interno ao controle.                               | Manter; adicionar `ariaInvalid` se necessario e revisar padding depois de validacao visual.                      |
+| `Search`     | Dialog de busca global, mas listbox/option usa botoes sem `aria-activedescendant` e sem IDs.                  | Recontratar como command/search dialog acessivel.                                                                |
+| `SearchBar`  | Busca contextual boa visualmente, mas sugestoes sao dropdown proprio sem semantica combobox/listbox completa. | Recontratar parcialmente como combobox contextual.                                                               |
 
 ## Auditoria por componente
 
