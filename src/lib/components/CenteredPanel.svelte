@@ -44,6 +44,7 @@
 		align-items: safe center;
 		justify-content: center;
 		width: 100%;
+		min-height: 0;
 		box-sizing: border-box;
 		position: relative;
 		z-index: 10;
@@ -51,8 +52,8 @@
 	}
 
 	.is-full-height {
-		height: 100dvh;
-		max-height: 100dvh;
+		flex: 1 1 auto;
+		height: 100%;
 		overflow-y: auto;
 		overflow-x: hidden;
 		scrollbar-width: none;
