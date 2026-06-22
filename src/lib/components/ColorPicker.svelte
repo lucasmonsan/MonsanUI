@@ -98,7 +98,7 @@
 		focusPreset(normalizedIndex);
 	}
 
-	function handleRootKeyDown(event: KeyboardEvent) {
+	function handleDocumentKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Escape' && isOpen) {
 			event.preventDefault();
 			closePopover(true);
@@ -127,8 +127,10 @@
 	$effect(() => {
 		if (isOpen) {
 			document.addEventListener('click', handleOutsideClick, { capture: true });
+			document.addEventListener('keydown', handleDocumentKeyDown);
 			return () => {
 				document.removeEventListener('click', handleOutsideClick, { capture: true });
+				document.removeEventListener('keydown', handleDocumentKeyDown);
 			};
 		}
 	});
@@ -161,7 +163,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-color-picker-container" onkeydown={handleRootKeyDown}>
+<div bind:this={containerEl} class="monsan-color-picker-container">
 	<button
 		bind:this={triggerEl}
 		type="button"

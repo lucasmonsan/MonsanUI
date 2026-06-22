@@ -70,7 +70,6 @@
 	class:focused={isFocused}
 	class:disabled
 	class:invalid
-	onclick={() => !disabled && inputEl?.focus()}
 >
 	<ul class="chips-list">
 		{#each value as tag, index (tag)}
