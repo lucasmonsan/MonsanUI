@@ -20,6 +20,7 @@
 		buttonLabel?: string;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 	}
 
 	let {
@@ -35,7 +36,8 @@
 		trigger,
 		buttonLabel,
 		ariaLabel,
-		ariaDescribedby
+		ariaDescribedby,
+		ariaInvalid
 	}: Props = $props();
 
 	let activePlaceholder = $derived(placeholder ?? i18n.t('fileUpload.placeholder'));
@@ -48,6 +50,7 @@
 	let isDragOver = $state(false);
 	let isWindowDragOver = $state(false);
 	let windowDragCounter = $state(0);
+	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 
 	function open() {
 		if (!disabled) fileInputEl?.click();
@@ -158,6 +161,46 @@
 	});
 </script>
 
+{#snippet fileList(compact: boolean)}
+	{#if files && files.length > 0 && (!compact || files.length > 1)}
+		<div class={compact ? 'compact-file-list' : 'file-list-preview'} aria-live="polite">
+			{#each Array.from(files) as file, index (file.name + file.size + index)}
+				{#if compact}
+					<div class="compact-file-item">
+						<span class="compact-file-name" title={file.name}>{file.name}</span>
+						<span class="compact-file-size">{formatSize(file.size)}</span>
+						<button
+							type="button"
+							class="compact-remove-btn"
+							{disabled}
+							onclick={(e) => removeFile(index, e)}
+							aria-label={i18n.t('fileUpload.removeFile')}
+						>
+							<X size={14} />
+						</button>
+					</div>
+				{:else}
+					<div class="file-item-card" class:disabled>
+						<div class="file-info-col">
+							<span class="file-name" title={file.name}>{file.name}</span>
+							<span class="file-size">{formatSize(file.size)}</span>
+						</div>
+						<button
+							type="button"
+							class="file-remove-btn"
+							{disabled}
+							onclick={(e) => removeFile(index, e)}
+							aria-label={i18n.t('fileUpload.removeFile')}
+						>
+							<X size={18} />
+						</button>
+					</div>
+				{/if}
+			{/each}
+		</div>
+	{/if}
+{/snippet}
+
 <input
 	bind:this={fileInputEl}
 	id={inputId}
@@ -169,6 +212,7 @@
 	{disabled}
 	aria-label={ariaLabel}
 	aria-describedby={ariaDescribedby}
+	aria-invalid={ariaInvalid}
 	class="sr-only"
 	onchange={handleFileChange}
 />
@@ -178,7 +222,7 @@
 		{@render trigger({ open })}
 	{/if}
 {:else if variant === 'compact'}
-	<div class="monsan-file-upload-container monsan-file-compact">
+	<div class="monsan-file-upload-container monsan-file-compact" class:invalid>
 		<div class="compact-row">
 			<button
 				type="button"
@@ -198,29 +242,11 @@
 			{/if}
 		</div>
 
-		{#if files && files.length > 1}
-			<div class="compact-file-list">
-				{#each Array.from(files) as file, index (file.name + file.size + index)}
-					<div class="compact-file-item">
-						<span class="compact-file-name" title={file.name}>{file.name}</span>
-						<span class="compact-file-size">{formatSize(file.size)}</span>
-						<button
-							type="button"
-							class="compact-remove-btn"
-							{disabled}
-							onclick={(e) => removeFile(index, e)}
-							aria-label={i18n.t('fileUpload.removeFile')}
-						>
-							<X size={14} />
-						</button>
-					</div>
-				{/each}
-			</div>
-		{/if}
+		{@render fileList(true)}
 	</div>
 {:else if variant === 'overlay'}
-	<div class="monsan-file-upload-container">
-		<div class="overlay-hint" class:disabled>
+	<div class="monsan-file-upload-container" class:invalid>
+		<div class="overlay-hint" class:disabled class:invalid>
 			<span class="overlay-hint-icon">
 				<Upload size={28} />
 			</span>
@@ -241,35 +267,16 @@
 			</div>
 		{/if}
 
-		{#if files && files.length > 0}
-			<div class="file-list-preview">
-				{#each Array.from(files) as file, index (file.name + file.size + index)}
-					<div class="file-item-card" class:disabled>
-						<div class="file-info-col">
-							<span class="file-name" title={file.name}>{file.name}</span>
-							<span class="file-size">{formatSize(file.size)}</span>
-						</div>
-						<button
-							type="button"
-							class="file-remove-btn"
-							{disabled}
-							onclick={(e) => removeFile(index, e)}
-							aria-label={i18n.t('fileUpload.removeFile')}
-						>
-							<X size={18} />
-						</button>
-					</div>
-				{/each}
-			</div>
-		{/if}
+		{@render fileList(false)}
 	</div>
 {:else}
-	<div class="monsan-file-upload-container">
+	<div class="monsan-file-upload-container" class:invalid>
 		<label
 			for={inputId}
 			class="monsan-file-dropzone"
 			class:dragover={isDragOver}
 			class:disabled
+			class:invalid
 			ondragover={handleDragOver}
 			ondragleave={handleDragLeave}
 			ondrop={handleDrop}
@@ -282,27 +289,7 @@
 			</div>
 		</label>
 
-		{#if files && files.length > 0}
-			<div class="file-list-preview">
-				{#each Array.from(files) as file, index (file.name + file.size + index)}
-					<div class="file-item-card" class:disabled>
-						<div class="file-info-col">
-							<span class="file-name" title={file.name}>{file.name}</span>
-							<span class="file-size">{formatSize(file.size)}</span>
-						</div>
-						<button
-							type="button"
-							class="file-remove-btn"
-							{disabled}
-							onclick={(e) => removeFile(index, e)}
-							aria-label={i18n.t('fileUpload.removeFile')}
-						>
-							<X size={18} />
-						</button>
-					</div>
-				{/each}
-			</div>
-		{/if}
+		{@render fileList(false)}
 	</div>
 {/if}
 
@@ -366,6 +353,11 @@
 		border-color: var(--accent-primary);
 		transform: translate(-2px, -2px);
 		box-shadow: 4px 4px 0px var(--accent-primary);
+	}
+
+	.monsan-file-dropzone.invalid {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.monsan-file-dropzone.disabled {
@@ -510,6 +502,11 @@
 		cursor: not-allowed;
 	}
 
+	.monsan-file-compact.invalid .compact-btn {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
+	}
+
 	.compact-file-label {
 		font-size: var(--text-sm);
 		font-weight: 600;
@@ -597,6 +594,11 @@
 
 	.overlay-hint.disabled {
 		opacity: 0.6;
+	}
+
+	.overlay-hint.invalid {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.overlay-hint-icon {
