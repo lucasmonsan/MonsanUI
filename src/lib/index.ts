@@ -3,6 +3,7 @@ export { default as Calendar } from './components/Calendar.svelte';
 export { default as AppCard } from './components/AppCard.svelte';
 export { default as AppHeader } from './components/AppHeader.svelte';
 export { default as AppShell } from './components/AppShell.svelte';
+/** @deprecated Use AppShell for page structure. AppViewport remains only for legacy migrations. */
 export { default as AppViewport } from './components/AppViewport.svelte';
 export { default as Background } from './components/Background.svelte';
 export { default as Button } from './components/Button.svelte';
@@ -23,13 +24,16 @@ export { default as ThemeSelector } from './components/ThemeSelector.svelte';
 export { default as Toast } from './components/Toast.svelte';
 export { default as ToastViewport } from './components/ToastViewport.svelte';
 export { default as FlashOverlay } from './components/FlashOverlay.svelte';
+/** @deprecated Use AppShell directly and keep route transitions separate from page structure. */
 export { default as RouteViewport } from './components/RouteViewport.svelte';
 export { default as SkipLink } from './components/SkipLink.svelte';
 export { default as MediaDialog } from './components/MediaDialog.svelte';
 export { default as ExpandableCard } from './components/ExpandableCard.svelte';
 export { default as FlipCard } from './components/FlipCard.svelte';
 export { default as Tabs } from './components/Tabs.svelte';
+/** @deprecated Use AppShell for page structure. PageShell remains only for legacy migrations. */
 export { default as PageShell } from './components/PageShell.svelte';
+/** Use PageHeader only for section/content headers. Use AppHeader inside AppShell.header for page headers. */
 export { default as PageHeader } from './components/PageHeader.svelte';
 export { default as ContentRegion } from './components/ContentRegion.svelte';
 export { default as ResponsiveGrid } from './components/ResponsiveGrid.svelte';
@@ -38,12 +42,14 @@ export { default as ActionFooter } from './components/ActionFooter.svelte';
 export { default as DataCard } from './components/DataCard.svelte';
 export { default as StatusPill } from './components/StatusPill.svelte';
 export { default as ConsolePanel } from './components/ConsolePanel.svelte';
+/** @deprecated Use AppShell for page structure. PageContainer remains only for legacy migrations. */
 export { default as PageContainer } from './components/PageContainer.svelte';
 export { default as Panel } from './components/Panel.svelte';
 export { default as Badge } from './components/Badge.svelte';
 export { default as QuickActions } from './components/QuickActions.svelte';
 export { default as Credits } from './components/Credits.svelte';
 export { default as SplashScreen } from './components/SplashScreen.svelte';
+/** Toolbar content only; parent layout such as AppShell owns structural spacing. */
 export { default as ActionBar } from './components/ActionBar.svelte';
 export { default as SingleChoice } from './components/questions/SingleChoice.svelte';
 export { default as MultipleChoice } from './components/questions/MultipleChoice.svelte';
@@ -68,6 +74,7 @@ export { default as AvatarMenu } from './components/AvatarMenu.svelte';
 export { default as SuiteHeaderActions } from './components/SuiteHeaderActions.svelte';
 export { default as SuiteUserMenu } from './components/SuiteUserMenu.svelte';
 export { default as Separator } from './components/Separator.svelte';
+/** Centers panel content inside its parent. AppShell owns page sizing and viewport padding. */
 export { default as CenteredPanel } from './components/CenteredPanel.svelte';
 export { default as BrandHeader } from './components/BrandHeader.svelte';
 export { default as StatusBanner } from './components/StatusBanner.svelte';

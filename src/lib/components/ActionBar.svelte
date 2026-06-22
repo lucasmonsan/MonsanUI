@@ -98,7 +98,6 @@
 		display: flex;
 		gap: var(--space-sm);
 		width: 100%;
-		padding: var(--space-sm) 0;
 		box-sizing: border-box;
 	}
 
@@ -182,6 +181,12 @@
 		}
 		.monsan-action-bar-item.only-icon {
 			padding: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-action-bar-item {
+			transition: none;
 		}
 	}
 </style>
