@@ -37,46 +37,41 @@
 	let panelPadding = $derived<PaddingPreset>(
 		padding === 'sm' ? 'var(--space-sm)' : padding === 'lg' ? 'var(--space-lg)' : 'var(--space-md)'
 	);
+
+	let hasTop = $derived(Boolean(top || title || subtitle || eyebrow || actions));
+	let hasBottom = $derived(Boolean(bottom || footer));
 </script>
 
 <Panel {variant} maxWidth="100%" padding={panelPadding} overflow="hidden" {fullHeight}>
 	<article class="monsan-data-card" class:full-height={fullHeight}>
-		{#if top}
-			<header class="data-card-header">
+		{#if hasTop}
+			<header class="data-card-top">
 				<div class="data-card-copy">
-					{@render top()}
-				</div>
-
-				{#if actions}
-					<div class="data-card-actions">
-						{@render actions()}
-					</div>
-				{/if}
-			</header>
-		{:else if title || subtitle || eyebrow || actions}
-			<header class="data-card-header">
-				<div class="data-card-copy">
-					{#if eyebrow}
-						<Text
-							tag="span"
-							family="display"
-							size="sm"
-							weight="bold"
-							variant="accent"
-							transform="uppercase"
-						>
-							{eyebrow}
-						</Text>
-					{/if}
-					{#if title}
-						<Text tag="h3" family="display" size="lg" weight="bold">
-							{title}
-						</Text>
-					{/if}
-					{#if subtitle}
-						<Text tag="p" size="sm" variant="secondary">
-							{subtitle}
-						</Text>
+					{#if top}
+						{@render top()}
+					{:else}
+						{#if eyebrow}
+							<Text
+								tag="span"
+								family="display"
+								size="sm"
+								weight="bold"
+								variant="accent"
+								transform="uppercase"
+							>
+								{eyebrow}
+							</Text>
+						{/if}
+						{#if title}
+							<Text tag="h3" family="display" size="lg" weight="bold">
+								{title}
+							</Text>
+						{/if}
+						{#if subtitle}
+							<Text tag="p" size="sm" variant="secondary">
+								{subtitle}
+							</Text>
+						{/if}
 					{/if}
 				</div>
 
@@ -96,13 +91,13 @@
 			{/if}
 		</div>
 
-		{#if bottom}
+		{#if hasBottom}
 			<footer class="data-card-bottom">
-				{@render bottom()}
-			</footer>
-		{:else if footer}
-			<footer class="data-card-footer">
-				{@render footer()}
+				{#if bottom}
+					{@render bottom()}
+				{:else}
+					{@render footer?.()}
+				{/if}
 			</footer>
 		{/if}
 	</article>
@@ -122,9 +117,8 @@
 		height: 100%;
 	}
 
-	.data-card-header,
-	.data-card-bottom,
-	.data-card-footer {
+	.data-card-top,
+	.data-card-bottom {
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
@@ -154,20 +148,13 @@
 		flex-shrink: 0;
 	}
 
-	.data-card-footer {
-		align-items: center;
-		padding-top: var(--space-sm);
-		border-top: 1px solid var(--border-color);
-		flex-wrap: wrap;
-	}
-
 	.data-card-bottom {
 		align-items: flex-end;
 		flex-wrap: wrap;
 	}
 
 	@media (max-width: 520px) {
-		.data-card-header {
+		.data-card-top {
 			flex-direction: column;
 		}
 
