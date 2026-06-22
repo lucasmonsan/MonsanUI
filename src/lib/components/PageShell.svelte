@@ -33,7 +33,8 @@
 	this={tag}
 	class="monsan-page-shell gap-{gap} height-{height} overflow-{overflow}"
 	class:is-animated={animate}
-	style="--page-shell-max-width: {resolvedMaxWidth}; --page-shell-padding: {resolvedPadding};"
+	style:--page-shell-max-width={resolvedMaxWidth}
+	style:--page-shell-padding={resolvedPadding}
 >
 	{@render children()}
 </svelte:element>

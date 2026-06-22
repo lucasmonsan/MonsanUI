@@ -29,7 +29,7 @@
 	class="monsan-centered-panel"
 	class:is-animated={animate}
 	class:is-full-height={fullHeight}
-	style="padding: {resolvedPadding}"
+	style:padding={resolvedPadding}
 >
 	<Panel tag="section" {maxWidth}>
 		<div class="centered-panel-content align-{align}">

@@ -53,10 +53,11 @@
 
 <svelte:element
 	this={tag}
-	class="monsan-panel {variant} overflow-{overflow} {interactive ? 'is-interactive' : ''}"
-	style="padding: {resolvedPadding}; max-width: {resolvedMaxWidth}; width: 100%; {fullHeight
-		? 'height: 100%;'
-		: ''}"
+	class="monsan-panel {variant} overflow-{overflow}"
+	class:is-interactive={interactive}
+	style:padding={resolvedPadding}
+	style:max-width={resolvedMaxWidth}
+	style:height={fullHeight ? '100%' : undefined}
 	{onclick}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}
@@ -67,6 +68,7 @@
 
 <style>
 	.monsan-panel {
+		width: 100%;
 		border: var(--border-width) solid var(--border-color);
 		box-shadow: var(--shadow-sm);
 		border-radius: var(--radius-md);

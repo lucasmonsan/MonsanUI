@@ -5,20 +5,8 @@
 
 	interface Props {
 		children?: Snippet;
-		/**
-		 * Classes adicionais para customização
-		 */
-		/**
-		 * Largura máxima do container. Por padrão usa a variável CSS global `--container-max-width`.
-		 */
 		maxWidth?: MaxWidthPreset;
-		/**
-		 * Padding interno do container. Por padrão é 0, mas você pode passar `var(--space-md)` etc.
-		 */
 		padding?: PaddingPreset;
-		/**
-		 * Applies the shared MonsanUI page entrance motion.
-		 */
 		animate?: boolean;
 	}
 
@@ -36,7 +24,8 @@
 <div
 	class="monsan-page-container"
 	class:is-animated={animate}
-	style="--page-container-max-width: {resolvedMaxWidth}; --page-container-padding: {resolvedPadding};"
+	style:--page-container-max-width={resolvedMaxWidth}
+	style:--page-container-padding={resolvedPadding}
 >
 	{@render children?.()}
 </div>
