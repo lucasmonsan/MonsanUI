@@ -25,9 +25,14 @@
 		maxlength?: number;
 		pattern?: string;
 		title?: string;
+		role?: string;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
 		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+		ariaAutocomplete?: 'none' | 'inline' | 'list' | 'both';
+		ariaControls?: string;
+		ariaExpanded?: boolean | 'false' | 'true';
+		ariaActivedescendant?: string;
 		oninput?: (event: Event) => void;
 		onchange?: (event: Event) => void;
 		onkeydown?: (event: KeyboardEvent) => void;
@@ -58,9 +63,14 @@
 		maxlength,
 		pattern,
 		title,
+		role,
 		ariaLabel,
 		ariaDescribedby,
 		ariaInvalid,
+		ariaAutocomplete,
+		ariaControls,
+		ariaExpanded,
+		ariaActivedescendant,
 		oninput,
 		onchange,
 		onkeydown,
@@ -103,9 +113,14 @@
 		{maxlength}
 		{pattern}
 		{title}
+		{role}
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
 		aria-invalid={ariaInvalid}
+		aria-autocomplete={ariaAutocomplete}
+		aria-controls={ariaControls}
+		aria-expanded={ariaExpanded}
+		aria-activedescendant={ariaActivedescendant}
 		{oninput}
 		{onchange}
 		{onkeydown}
@@ -196,6 +211,11 @@
 		border-color: var(--accent-primary);
 		box-shadow: 3px 3px 0px var(--accent-primary);
 		transform: translate(-1px, -1px);
+	}
+
+	.monsan-input[aria-invalid='true']:not(.variant-unstyled) {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.monsan-input.variant-title {

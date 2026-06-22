@@ -9,6 +9,7 @@
 		name?: string;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 		oninput?: (event: Event) => void;
 		onchange?: (event: Event) => void;
 	}
@@ -23,6 +24,7 @@
 		name,
 		ariaLabel,
 		ariaDescribedby,
+		ariaInvalid,
 		oninput,
 		onchange
 	}: Props = $props();
@@ -44,6 +46,7 @@
 		{disabled}
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
+		aria-invalid={ariaInvalid}
 		{oninput}
 		{onchange}
 		class="monsan-range"
@@ -154,6 +157,11 @@
 	.monsan-range:focus-visible {
 		outline: 2px solid var(--accent-primary);
 		outline-offset: 4px;
+	}
+
+	.monsan-range[aria-invalid='true'] {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

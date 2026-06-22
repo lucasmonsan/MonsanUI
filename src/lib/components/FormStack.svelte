@@ -23,8 +23,4 @@
 		text-align: left;
 		width: 100%;
 	}
-
-	.monsan-form-stack :global(.monsan-button) {
-		width: 100%;
-	}
 </style>

@@ -17,7 +17,9 @@
 		autocomplete?: HTMLInputAttributes['autocomplete'];
 		ariaLabel?: string;
 		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 		clearLabel?: string;
+		readonly?: boolean;
 		oninput?: (event: Event) => void;
 		onfocus?: (event: FocusEvent) => void;
 		onblur?: (event: FocusEvent) => void;
@@ -33,19 +35,27 @@
 		autocomplete,
 		ariaLabel,
 		ariaDescribedby,
+		ariaInvalid,
 		clearLabel,
+		readonly = false,
 		oninput,
 		onfocus,
 		onblur
 	}: Props = $props();
 
+	const fallbackId = `searchbar-${Math.random().toString(36).slice(2, 11)}`;
+
 	let inputEl = $state<HTMLInputElement>();
 	let containerEl = $state<HTMLDivElement>();
 	let isFocused = $state(false);
 	let showSuggestions = $state(false);
+	let activeSuggestionIndex = $state(-1);
 	let prefersReducedMotion = $state(false);
 	let activePlaceholder = $derived(placeholder ?? i18n.t('searchBar.placeholder'));
 	let activeClearLabel = $derived(clearLabel ?? i18n.t('searchBar.clear'));
+	let inputId = $derived(id ?? fallbackId);
+	let listboxId = $derived(`${inputId}-suggestions`);
+	let isInvalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 
 	let filteredSuggestions = $derived(
 		value.trim() === ''
@@ -54,6 +64,11 @@
 	);
 
 	let displayDropdown = $derived(showSuggestions && filteredSuggestions.length > 0 && !disabled);
+	let activeDescendant = $derived(
+		displayDropdown && activeSuggestionIndex >= 0
+			? `${listboxId}-option-${activeSuggestionIndex}`
+			: undefined
+	);
 
 	onMount(() => {
 		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -72,29 +87,64 @@
 	function handleOutsideClick(event: MouseEvent) {
 		if (containerEl && !containerEl.contains(event.target as Node)) {
 			showSuggestions = false;
+			activeSuggestionIndex = -1;
 		}
 	}
 
 	function selectSuggestion(s: string) {
 		value = s;
 		showSuggestions = false;
+		activeSuggestionIndex = -1;
 		inputEl?.focus();
 	}
 
 	function handleFocus(event: FocusEvent) {
 		isFocused = true;
-		showSuggestions = true;
+		showSuggestions = !readonly;
 		onfocus?.(event);
 	}
 
 	function handleBlur(event: FocusEvent) {
 		isFocused = false;
+		if (!containerEl?.contains(event.relatedTarget as Node | null)) {
+			showSuggestions = false;
+			activeSuggestionIndex = -1;
+		}
 		onblur?.(event);
 	}
 
 	function handleInput(event: Event) {
-		showSuggestions = true;
+		showSuggestions = !readonly;
+		activeSuggestionIndex = -1;
 		oninput?.(event);
+	}
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (disabled || readonly) return;
+
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			showSuggestions = true;
+			activeSuggestionIndex =
+				filteredSuggestions.length === 0
+					? -1
+					: (activeSuggestionIndex + 1) % filteredSuggestions.length;
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			showSuggestions = true;
+			activeSuggestionIndex =
+				filteredSuggestions.length === 0
+					? -1
+					: activeSuggestionIndex <= 0
+						? filteredSuggestions.length - 1
+						: activeSuggestionIndex - 1;
+		} else if (event.key === 'Enter' && displayDropdown && activeSuggestionIndex >= 0) {
+			event.preventDefault();
+			selectSuggestion(filteredSuggestions[activeSuggestionIndex]);
+		} else if (event.key === 'Escape') {
+			showSuggestions = false;
+			activeSuggestionIndex = -1;
+		}
 	}
 
 	$effect(() => {
@@ -105,10 +155,19 @@
 			};
 		}
 	});
+
+	$effect(() => {
+		if (
+			(!displayDropdown && activeSuggestionIndex !== -1) ||
+			activeSuggestionIndex >= filteredSuggestions.length
+		) {
+			activeSuggestionIndex = -1;
+		}
+	});
 </script>
 
 <div bind:this={containerEl} class="monsan-searchbar-container">
-	<div class="searchbar-wrapper" class:focused={isFocused} class:disabled>
+	<div class="searchbar-wrapper" class:focused={isFocused} class:disabled class:invalid={isInvalid}>
 		<span class="search-icon">
 			<Search size={20} />
 		</span>
@@ -117,17 +176,25 @@
 			bind:this={inputEl}
 			type="text"
 			bind:value
-			{id}
+			id={inputId}
 			{name}
 			placeholder={activePlaceholder}
 			{disabled}
+			{readonly}
 			{autocomplete}
+			role="combobox"
+			aria-autocomplete="list"
+			aria-expanded={displayDropdown}
+			aria-controls={listboxId}
+			aria-activedescendant={activeDescendant}
 			aria-label={ariaLabel}
 			aria-describedby={ariaDescribedby}
+			aria-invalid={ariaInvalid}
 			class="search-input"
 			onfocus={handleFocus}
 			onblur={handleBlur}
 			oninput={handleInput}
+			onkeydown={handleKeyDown}
 		/>
 
 		{#if value}
@@ -149,15 +216,26 @@
 
 	{#if displayDropdown}
 		<div
+			id={listboxId}
 			class="suggestions-dropdown panel"
+			role="listbox"
 			transition:scale={{
 				duration: prefersReducedMotion ? 0 : 150,
 				easing: backOut,
 				start: prefersReducedMotion ? 1 : 0.98
 			}}
 		>
-			{#each filteredSuggestions as suggestion (suggestion)}
-				<button type="button" class="suggestion-item" onclick={() => selectSuggestion(suggestion)}>
+			{#each filteredSuggestions as suggestion, index (suggestion)}
+				<button
+					id={`${listboxId}-option-${index}`}
+					type="button"
+					class="suggestion-item"
+					class:active={index === activeSuggestionIndex}
+					role="option"
+					aria-selected={index === activeSuggestionIndex}
+					onmousedown={(event) => event.preventDefault()}
+					onclick={() => selectSuggestion(suggestion)}
+				>
 					{suggestion}
 				</button>
 			{/each}
@@ -198,6 +276,11 @@
 		border-color: var(--accent-primary);
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0px var(--accent-primary);
+	}
+
+	.searchbar-wrapper.invalid {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.searchbar-wrapper.disabled {
@@ -284,7 +367,8 @@
 			color 0.2s ease;
 	}
 
-	.suggestion-item:hover {
+	.suggestion-item:hover,
+	.suggestion-item.active {
 		background-color: var(--bg-secondary);
 		color: var(--accent-primary);
 		font-weight: bold;

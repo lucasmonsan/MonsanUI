@@ -10,6 +10,7 @@
 		required?: boolean;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 		onchange?: (event: Event) => void;
 	}
 
@@ -24,13 +25,15 @@
 		required = false,
 		ariaLabel,
 		ariaDescribedby,
+		ariaInvalid,
 		onchange
 	}: Props = $props();
 
 	let checked = $derived(group === value);
+	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 </script>
 
-<label class="monsan-radio-wrapper" class:size-sm={size === 'sm'} class:disabled>
+<label class="monsan-radio-wrapper" class:size-sm={size === 'sm'} class:disabled class:invalid>
 	<input
 		type="radio"
 		bind:group
@@ -145,6 +148,11 @@
 	input:focus-visible + .radio-circle {
 		outline: 2px solid var(--accent-primary);
 		outline-offset: 2px;
+	}
+
+	.monsan-radio-wrapper.invalid .radio-circle {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.radio-label {
