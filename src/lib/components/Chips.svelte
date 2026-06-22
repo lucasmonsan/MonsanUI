@@ -10,6 +10,7 @@
 		name?: string;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 		removeLabel?: (tag: string) => string;
 		oninput?: (event: Event) => void;
 	}
@@ -22,6 +23,7 @@
 		name,
 		ariaLabel,
 		ariaDescribedby,
+		ariaInvalid,
 		removeLabel,
 		oninput
 	}: Props = $props();
@@ -34,6 +36,7 @@
 	let activeRemoveLabel = $derived(
 		removeLabel ?? ((tag: string) => i18n.t('chips.remove', { tag }))
 	);
+	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 
 	function addTag() {
 		const cleanTag = inputValue.trim().replace(/,$/, '');
@@ -63,15 +66,15 @@
 
 <div
 	bind:this={containerEl}
-	role="presentation"
 	class="monsan-chips-input-container"
 	class:focused={isFocused}
 	class:disabled
+	class:invalid
 	onclick={() => !disabled && inputEl?.focus()}
 >
-	<div class="chips-list">
+	<ul class="chips-list">
 		{#each value as tag, index (tag)}
-			<div class="chip-item">
+			<li class="chip-item">
 				<span class="chip-text">{tag}</span>
 				<button
 					type="button"
@@ -82,29 +85,32 @@
 				>
 					<X size={12} />
 				</button>
-			</div>
+			</li>
 		{/each}
 
-		<input
-			bind:this={inputEl}
-			type="text"
-			bind:value={inputValue}
-			{id}
-			{name}
-			placeholder={value.length === 0 ? activePlaceholder : ''}
-			{disabled}
-			aria-label={ariaLabel}
-			aria-describedby={ariaDescribedby}
-			class="chips-input"
-			onfocus={() => (isFocused = true)}
-			onblur={() => {
-				isFocused = false;
-				addTag();
-			}}
-			onkeydown={handleKeyDown}
-			{oninput}
-		/>
-	</div>
+		<li class="chips-input-item">
+			<input
+				bind:this={inputEl}
+				type="text"
+				bind:value={inputValue}
+				{id}
+				{name}
+				placeholder={value.length === 0 ? activePlaceholder : ''}
+				{disabled}
+				aria-label={ariaLabel}
+				aria-describedby={ariaDescribedby}
+				aria-invalid={ariaInvalid}
+				class="chips-input"
+				onfocus={() => (isFocused = true)}
+				onblur={() => {
+					isFocused = false;
+					addTag();
+				}}
+				onkeydown={handleKeyDown}
+				{oninput}
+			/>
+		</li>
+	</ul>
 </div>
 
 <style>
@@ -137,6 +143,11 @@
 		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
+	.monsan-chips-input-container.invalid {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
+	}
+
 	.monsan-chips-input-container.disabled {
 		cursor: not-allowed;
 		opacity: 0.6;
@@ -148,6 +159,9 @@
 		gap: var(--space-xs);
 		align-items: center;
 		width: 100%;
+		list-style: none;
+		margin: 0;
+		padding: 0;
 	}
 
 	.chip-item {
@@ -198,6 +212,12 @@
 
 	.chip-remove-btn:disabled {
 		cursor: not-allowed;
+	}
+
+	.chips-input-item {
+		display: flex;
+		flex: 1;
+		min-width: 80px;
 	}
 
 	.chips-input {
