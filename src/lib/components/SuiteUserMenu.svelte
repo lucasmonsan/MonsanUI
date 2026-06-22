@@ -45,6 +45,7 @@
 		onTerms?: (event: MouseEvent) => void;
 		onPrivacy?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
+		/** Official extension point for custom user menu links, such as About. */
 		children?: Snippet;
 	}
 
