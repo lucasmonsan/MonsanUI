@@ -13,6 +13,8 @@
 		id?: string;
 		title?: string;
 		ariaLabel?: string;
+		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 	}
 
 	let {
@@ -21,17 +23,25 @@
 		disabled = false,
 		id,
 		title,
-		ariaLabel
+		ariaLabel,
+		ariaDescribedby,
+		ariaInvalid
 	}: Props = $props();
+
+	const fallbackId = `datepicker-${Math.random().toString(36).slice(2, 11)}`;
 
 	let activePlaceholder = $derived(placeholder ?? i18n.t('datePicker.placeholder'));
 
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
+	let triggerEl = $state<HTMLButtonElement>();
 	let selectedDateString = $state<string | null>(null);
 	let prefersReducedMotion = $state(false);
 
 	let formattedDate = $derived(formatDate(value));
+	let triggerId = $derived(id || fallbackId);
+	let panelId = $derived(`${triggerId}-panel`);
+	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 
 	onMount(() => {
 		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -57,7 +67,21 @@
 
 	function handleOutsideClick(event: MouseEvent) {
 		if (isOpen && containerEl && !containerEl.contains(event.target as Node)) {
-			isOpen = false;
+			closePopover();
+		}
+	}
+
+	function closePopover(focusTrigger = false) {
+		isOpen = false;
+		if (focusTrigger) {
+			triggerEl?.focus();
+		}
+	}
+
+	function handleDocumentKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && isOpen) {
+			event.preventDefault();
+			closePopover(true);
 		}
 	}
 
@@ -87,8 +111,10 @@
 	$effect(() => {
 		if (isOpen) {
 			document.addEventListener('click', handleOutsideClick, { capture: true });
+			document.addEventListener('keydown', handleDocumentKeyDown);
 			return () => {
 				document.removeEventListener('click', handleOutsideClick, { capture: true });
+				document.removeEventListener('keydown', handleDocumentKeyDown);
 			};
 		}
 	});
@@ -96,7 +122,7 @@
 	$effect(() => {
 		if (value) {
 			const timer = setTimeout(() => {
-				isOpen = false;
+				closePopover(true);
 			}, 150);
 			return () => clearTimeout(timer);
 		}
@@ -105,14 +131,19 @@
 
 <div bind:this={containerEl} class="monsan-datepicker-container">
 	<button
+		bind:this={triggerEl}
 		type="button"
 		class="datepicker-trigger"
 		class:has-value={value !== null}
-		{id}
+		class:invalid
+		id={triggerId}
 		{disabled}
 		{title}
 		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		aria-haspopup="dialog"
 		aria-expanded={isOpen}
+		aria-controls={panelId}
 		onclick={() => !disabled && (isOpen = !isOpen)}
 	>
 		<span class="calendar-icon">
@@ -123,6 +154,7 @@
 
 	{#if isOpen}
 		<div
+			id={panelId}
 			class="datepicker-dropdown"
 			transition:scale={{
 				duration: prefersReducedMotion ? 0 : 200,
@@ -171,6 +203,11 @@
 		color: var(--text-primary);
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0px var(--accent-primary);
+	}
+
+	.datepicker-trigger.invalid {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.datepicker-trigger:disabled {

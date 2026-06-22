@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ChevronDown from './icons/ChevronDown.svelte';
-	import { onMount } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte.js';
 
 	interface Option {
@@ -26,23 +25,59 @@
 		formatSelected?: (count: number) => string;
 	}>();
 
+	const fallbackId = `multiselect-${Math.random().toString(36).slice(2, 11)}`;
+
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
+	let triggerEl = $state<HTMLButtonElement>();
+	let activeIndex = $state(-1);
 	let activePlaceholder = $derived(placeholder ?? i18n.t('select.placeholder'));
+	let triggerId = $derived(id || fallbackId);
+	let listboxId = $derived(`${triggerId}-listbox`);
+	let firstSelectedIndex = $derived(
+		options.findIndex((option: Option) =>
+			option.value === '' ? value.length === 0 : value.includes(option.value)
+		)
+	);
+	let activeDescendant = $derived(
+		isOpen && activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
+	);
+
+	function getInitialIndex(direction: 'first' | 'last' = 'first') {
+		if (options.length === 0) return -1;
+		if (firstSelectedIndex >= 0) return firstSelectedIndex;
+		return direction === 'last' ? options.length - 1 : 0;
+	}
+
+	function openDropdown(direction: 'first' | 'last' = 'first') {
+		if (disabled) return;
+		isOpen = true;
+		activeIndex = getInitialIndex(direction);
+	}
+
+	function closeDropdown(focusTrigger = false) {
+		isOpen = false;
+		activeIndex = -1;
+		if (focusTrigger) {
+			triggerEl?.focus();
+		}
+	}
 
 	function toggleDropdown() {
 		if (disabled) return;
-		isOpen = !isOpen;
+		if (isOpen) {
+			closeDropdown();
+		} else {
+			openDropdown();
+		}
 	}
 
 	function handleOptionClick(optValue: string | number) {
 		if (disabled) return;
 
 		if (optValue === '') {
-			// Clicked "All" option (empty value represents "all" or reset)
 			value = [];
 		} else {
-			// Toggle value
 			if (value.includes(optValue)) {
 				value = value.filter((v: string | number) => v !== optValue);
 			} else {
@@ -55,29 +90,56 @@
 		if (!isOpen) return;
 		const target = e.target as HTMLElement;
 		if (containerEl && !containerEl.contains(target)) {
-			isOpen = false;
+			closeDropdown();
 		}
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (disabled) return;
 		if (e.key === 'Escape' && isOpen) {
-			isOpen = false;
+			closeDropdown(true);
 			e.preventDefault();
-		} else if ((e.key === 'Enter' || e.key === ' ') && !isOpen) {
-			isOpen = true;
+		} else if (!isOpen && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown')) {
+			openDropdown();
+			e.preventDefault();
+		} else if (!isOpen && e.key === 'ArrowUp') {
+			openDropdown('last');
+			e.preventDefault();
+		} else if (isOpen && e.key === 'ArrowDown') {
+			activeIndex = options.length === 0 ? -1 : (activeIndex + 1) % options.length;
+			e.preventDefault();
+		} else if (isOpen && e.key === 'ArrowUp') {
+			activeIndex =
+				options.length === 0 ? -1 : activeIndex <= 0 ? options.length - 1 : activeIndex - 1;
+			e.preventDefault();
+		} else if (isOpen && e.key === 'Home') {
+			activeIndex = options.length === 0 ? -1 : 0;
+			e.preventDefault();
+		} else if (isOpen && e.key === 'End') {
+			activeIndex = options.length - 1;
+			e.preventDefault();
+		} else if (isOpen && (e.key === 'Enter' || e.key === ' ') && activeIndex >= 0) {
+			handleOptionClick(options[activeIndex].value);
 			e.preventDefault();
 		}
 	}
 
-	onMount(() => {
-		document.addEventListener('click', handleOutsideClick, { capture: true });
-		return () => document.removeEventListener('click', handleOutsideClick, { capture: true });
+	$effect(() => {
+		if (isOpen) {
+			document.addEventListener('click', handleOutsideClick, { capture: true });
+			return () => document.removeEventListener('click', handleOutsideClick, { capture: true });
+		}
 	});
 
-	// Compute display label
+	$effect(() => {
+		if (!isOpen && activeIndex !== -1) {
+			activeIndex = -1;
+		} else if (isOpen && activeIndex >= options.length) {
+			activeIndex = getInitialIndex();
+		}
+	});
+
 	let displayLabel = $derived.by(() => {
-		// Filter out the placeholder option (value === '') when counting selections
 		const selectedValues = value.filter((v: string | number) => v !== '');
 		if (selectedValues.length === 0) {
 			const allOption = options.find((opt: Option) => opt.value === '');
@@ -111,14 +173,18 @@
 	role="none"
 >
 	<button
+		bind:this={triggerEl}
 		type="button"
-		{id}
+		id={triggerId}
 		class="monsan-multiselect-trigger"
 		class:open={isOpen}
 		onclick={toggleDropdown}
 		{disabled}
+		role="combobox"
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
+		aria-controls={listboxId}
+		aria-activedescendant={activeDescendant}
 	>
 		<span class="label-text">{displayLabel}</span>
 		<span class="chevron-wrapper" class:open={isOpen}>
@@ -128,6 +194,7 @@
 
 	{#if isOpen}
 		<div
+			id={listboxId}
 			class="monsan-multiselect-dropdown"
 			role="listbox"
 			aria-multiselectable="true"
@@ -137,9 +204,12 @@
 				{@const isOptionChecked =
 					option.value === '' ? value.length === 0 : value.includes(option.value)}
 				<button
+					id={`${listboxId}-option-${i}`}
 					type="button"
 					class="multiselect-option"
 					class:selected={isOptionChecked}
+					class:active={i === activeIndex}
+					onmouseenter={() => (activeIndex = i)}
 					onclick={() => handleOptionClick(option.value)}
 					role="option"
 					aria-selected={isOptionChecked}
@@ -242,7 +312,6 @@
 		box-sizing: border-box;
 	}
 
-	/* Option item styling */
 	.multiselect-option {
 		display: flex;
 		align-items: center;
@@ -266,7 +335,8 @@
 		box-sizing: border-box;
 	}
 
-	.multiselect-option:hover:not(:disabled) {
+	.multiselect-option:hover:not(:disabled),
+	.multiselect-option.active:not(:disabled) {
 		background: var(--bg-secondary);
 		border-color: var(--border-color);
 	}
