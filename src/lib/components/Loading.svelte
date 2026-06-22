@@ -10,6 +10,7 @@
 
 	let containerEl = $state<HTMLDialogElement>();
 	let previousActiveElement = $state<HTMLElement | null>(null);
+	const messageId = `loading-${Math.random().toString(36).slice(2, 9)}-message`;
 
 	$effect(() => {
 		if (!active || !containerEl || typeof document === 'undefined') {
@@ -25,7 +26,10 @@
 			if (containerEl?.open) {
 				containerEl.close();
 			}
-			previousActiveElement?.focus();
+			if (previousActiveElement?.isConnected) {
+				previousActiveElement.focus();
+			}
+			previousActiveElement = null;
 		};
 	});
 
@@ -40,17 +44,17 @@
 	<dialog
 		bind:this={containerEl}
 		class="monsan-loading-overlay"
-		aria-label={displayMessage}
+		aria-labelledby={messageId}
 		aria-busy="true"
 		tabindex="-1"
 		oncancel={preventDismiss}
 	>
-		<div class="loading-card" role="status" aria-live="polite">
+		<div class="loading-card" role="status" aria-live="polite" aria-atomic="true">
 			<div class="spinner-box">
 				<div class="brutalist-spinner"></div>
 			</div>
 			{#if displayMessage}
-				<span class="loading-text">{displayMessage}</span>
+				<span id={messageId} class="loading-text">{displayMessage}</span>
 			{/if}
 		</div>
 	</dialog>
