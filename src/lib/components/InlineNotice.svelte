@@ -14,7 +14,6 @@
 
 <style>
 	.monsan-inline-notice {
-		margin-top: var(--space-sm);
 		padding-top: var(--space-sm);
 		border-top: 1px dashed var(--text-primary);
 		word-break: break-word;

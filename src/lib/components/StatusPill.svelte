@@ -9,6 +9,7 @@
 		noShrink?: boolean;
 		indicatorOnly?: boolean;
 		title?: string;
+		ariaLabel?: string;
 	}
 
 	let {
@@ -18,8 +19,11 @@
 		dot = true,
 		noShrink = false,
 		indicatorOnly = false,
-		title
+		title,
+		ariaLabel
 	}: Props = $props();
+
+	let resolvedAriaLabel = $derived(indicatorOnly ? ariaLabel || title : undefined);
 </script>
 
 <span
@@ -28,6 +32,7 @@
 	class:no-shrink={noShrink}
 	class:indicator-only={indicatorOnly}
 	{title}
+	aria-label={resolvedAriaLabel}
 >
 	{#if dot}
 		<span class="status-dot" aria-hidden="true"></span>
