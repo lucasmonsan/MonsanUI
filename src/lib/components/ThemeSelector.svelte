@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Sun from '$lib/components/icons/Sun.svelte';
 	import Button from './Button.svelte';
+	import MenuItem from './MenuItem.svelte';
 	import QuickActions from './QuickActions.svelte';
 
 	interface ThemeOption {
@@ -149,18 +150,12 @@
 			{/snippet}
 
 			{#each themes as theme (theme.id)}
-				<button
-					type="button"
-					class="dropdown-item"
-					class:active={value === theme.id}
-					onclick={() => selectTheme(theme.id)}
-					role="menuitem"
-				>
+				<MenuItem align="left" checked={value === theme.id} onclick={() => selectTheme(theme.id)}>
 					<span class="item-icon">
 						{@render generalIcon(theme.id, 16)}
 					</span>
 					{theme.label}
-				</button>
+				</MenuItem>
 			{/each}
 		</QuickActions>
 	{/if}
@@ -179,43 +174,9 @@
 		height: 1.2em;
 	}
 
-	.dropdown-item {
-		width: 100%;
-		padding: var(--space-sm) var(--space-md);
-		border: none;
-		background: transparent;
-		color: var(--text-primary);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		gap: var(--space-sm);
-		font-family: inherit;
-		font-weight: 700;
-		font-size: var(--text-sm);
-		white-space: nowrap;
-		transition: background 0.1s ease;
-		box-sizing: border-box;
-		text-align: left;
-	}
-
-	.dropdown-item:hover {
-		background: var(--bg-secondary);
-	}
-
-	.dropdown-item.active {
-		background: var(--accent-primary);
-		color: var(--text-primary);
-	}
-
 	.item-icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.dropdown-item {
-			transition: none;
-		}
 	}
 </style>

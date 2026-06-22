@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from './Button.svelte';
+	import MenuItem from './MenuItem.svelte';
 	import QuickActions from './QuickActions.svelte';
 
 	interface LocaleOption {
@@ -84,18 +85,18 @@
 			{/snippet}
 
 			{#each locales as locale (locale.id)}
-				<button
-					type="button"
-					class="dropdown-item"
-					class:active-locale={value === locale.id}
+				<MenuItem
+					align="left"
+					checked={value === locale.id}
 					onclick={() => selectLocale(locale.id)}
-					role="menuitem"
 				>
-					<span class="item-label">{locale.label}</span>
-					{#if locale.name}
-						<span class="item-name">{locale.name}</span>
-					{/if}
-				</button>
+					<span class="locale-option">
+						<span class="item-label">{locale.label}</span>
+						{#if locale.name}
+							<span class="item-name">{locale.name}</span>
+						{/if}
+					</span>
+				</MenuItem>
 			{/each}
 		</QuickActions>
 	{/if}
@@ -117,32 +118,13 @@
 		height: 1.2em;
 	}
 
-	.dropdown-item {
-		width: 100%;
-		padding: var(--space-sm) var(--space-md);
-		border: none;
-		background: transparent;
-		color: var(--text-primary);
-		cursor: pointer;
-		display: flex;
+	.locale-option {
+		display: inline-flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-sm);
-		font-family: inherit;
-		font-weight: 700;
-		font-size: var(--text-sm);
-		white-space: nowrap;
-		transition: background 0.1s ease;
-		box-sizing: border-box;
-	}
-
-	.dropdown-item:hover {
-		background: var(--bg-secondary);
-	}
-
-	.dropdown-item.active-locale {
-		background: var(--accent-primary);
-		color: var(--text-primary);
+		gap: var(--space-md);
+		width: 100%;
+		min-width: 0;
 	}
 
 	.item-label {
@@ -152,16 +134,5 @@
 	.item-name {
 		font-size: var(--text-xs);
 		opacity: 0.8;
-	}
-
-	.dropdown-item.active-locale .item-name {
-		color: var(--text-primary);
-		opacity: 0.9;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.dropdown-item {
-			transition: none;
-		}
 	}
 </style>

@@ -8,6 +8,9 @@
 		variant?: 'default' | 'error';
 		align?: 'left' | 'center' | 'right';
 		disabled?: boolean;
+		selected?: boolean;
+		checked?: boolean;
+		current?: boolean | 'page' | 'step' | 'location' | 'date' | 'time';
 	}
 
 	let {
@@ -16,19 +19,38 @@
 		onclick,
 		variant = 'default',
 		align = 'center',
-		disabled = false
+		disabled = false,
+		selected = false,
+		checked,
+		current
 	}: Props = $props();
+
+	let itemRole = $derived(checked === undefined ? 'menuitem' : 'menuitemradio');
+	let isSelected = $derived(selected || checked === true);
 </script>
 
 {#if href && !disabled}
-	<a class="monsan-menu-item {variant} align-{align}" role="menuitem" {href} {onclick}>
+	<a
+		class="monsan-menu-item {variant} align-{align}"
+		class:selected={isSelected}
+		role={itemRole}
+		aria-checked={checked}
+		aria-current={current}
+		data-menu-item="true"
+		{href}
+		{onclick}
+	>
 		{@render children()}
 	</a>
 {:else}
 	<button
 		type="button"
 		class="monsan-menu-item {variant} align-{align}"
-		role="menuitem"
+		class:selected={isSelected}
+		role={itemRole}
+		aria-checked={checked}
+		aria-current={current}
+		data-menu-item="true"
 		{disabled}
 		{onclick}
 	>
@@ -88,12 +110,21 @@
 		color: var(--bg-primary);
 	}
 
+	.selected {
+		background: var(--accent-primary);
+		color: var(--text-primary);
+	}
+
 	:global([data-theme='dark']) .error {
 		color: var(--text-primary);
 	}
 
 	.error:hover:not(:disabled) {
 		background: color-mix(in srgb, var(--error) 18%, var(--bg-primary));
+	}
+
+	.selected:hover:not(:disabled) {
+		background: var(--accent-primary);
 	}
 
 	.monsan-menu-item:disabled {

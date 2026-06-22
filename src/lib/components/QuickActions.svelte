@@ -109,8 +109,10 @@
 
 	function handlePanelClick(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		const clickedButton = target.closest('button, a');
-		if (clickedButton && !clickedButton.closest('[data-menu-persistent]')) {
+		const clickedItem = target.closest(
+			'button, a, [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [data-menu-item]'
+		);
+		if (clickedItem && !clickedItem.closest('[data-menu-persistent]')) {
 			queueMicrotask(() => {
 				open = false;
 			});
