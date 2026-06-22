@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Component, Snippet } from 'svelte';
+	import ChevronLeft from './icons/ChevronLeft.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	type IconComponent = Component<{ size?: number }>;
 
@@ -19,6 +21,8 @@
 		showNavButtons = false,
 		hideLabels = false,
 		embedded = false,
+		scrollLeftLabel,
+		scrollRightLabel,
 		onchange,
 		item: itemSnippet
 	} = $props<{
@@ -30,9 +34,14 @@
 		showNavButtons?: boolean;
 		hideLabels?: boolean;
 		embedded?: boolean;
+		scrollLeftLabel?: string;
+		scrollRightLabel?: string;
 		onchange?: (value: string) => void;
 		item?: Snippet<[TabItem, number]>;
 	}>();
+
+	let activeScrollLeftLabel = $derived(scrollLeftLabel ?? i18n.t('tabs.scrollLeft'));
+	let activeScrollRightLabel = $derived(scrollRightLabel ?? i18n.t('tabs.scrollRight'));
 
 	let containerEl = $state<HTMLElement | null>(null);
 	let showLeftGradient = $state(false);
@@ -121,20 +130,9 @@
 					type="button"
 					class="monsan-tabs-nav-btn"
 					onclick={scrollLeft}
-					aria-label="Scroll left"
+					aria-label={activeScrollLeftLabel}
 				>
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="3"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path d="m15 18-6-6 6-6" />
-					</svg>
+					<ChevronLeft size={16} />
 				</button>
 			{/if}
 		</div>
@@ -149,9 +147,8 @@
 		class:hide-labels={hideLabels}
 		class:embedded
 		role="tablist"
-		style="--mask-left: {showLeftGradient ? '48px' : '0px'}; --mask-right: {showRightGradient
-			? '48px'
-			: '0px'};"
+		style:--mask-left={showLeftGradient ? '48px' : '0px'}
+		style:--mask-right={showRightGradient ? '48px' : '0px'}
 	>
 		{#each items as tab, index (tab.id)}
 			{#if itemSnippet}
@@ -182,23 +179,11 @@
 			{#if showNavButtons}
 				<button
 					type="button"
-					class="monsan-tabs-nav-btn"
+					class="monsan-tabs-nav-btn is-right"
 					onclick={scrollRight}
-					aria-label="Scroll right"
+					aria-label={activeScrollRightLabel}
 				>
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="3"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						style="transform: scaleX(-1);"
-					>
-						<path d="m15 18-6-6 6-6" />
-					</svg>
+					<ChevronLeft size={16} />
 				</button>
 			{/if}
 		</div>
@@ -430,8 +415,23 @@
 		box-shadow: none;
 	}
 
+	.monsan-tabs-nav-btn.is-right :global(svg) {
+		transform: rotate(180deg);
+	}
+
 	:global([data-theme='dark']) .monsan-tabs-nav-btn {
 		color: var(--text-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-tabs-container.scrollable {
+			scroll-behavior: auto;
+		}
+
+		.monsan-tab-item,
+		.monsan-tabs-nav-btn {
+			transition: none;
+		}
 	}
 
 	@media (max-width: 600px) {

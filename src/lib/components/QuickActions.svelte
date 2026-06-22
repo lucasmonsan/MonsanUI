@@ -107,21 +107,15 @@
 		}
 	});
 
-	$effect(() => {
-		if (open && panelEl) {
-			const listener = (e: MouseEvent) => {
-				const target = e.target as HTMLElement;
-				const clickedButton = target.closest('button, a');
-				if (clickedButton && !clickedButton.closest('[data-menu-persistent]')) {
-					queueMicrotask(() => {
-						open = false;
-					});
-				}
-			};
-			panelEl.addEventListener('click', listener);
-			return () => panelEl?.removeEventListener('click', listener);
+	function handlePanelClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		const clickedButton = target.closest('button, a');
+		if (clickedButton && !clickedButton.closest('[data-menu-persistent]')) {
+			queueMicrotask(() => {
+				open = false;
+			});
 		}
-	});
+	}
 
 	$effect(() => {
 		if (open) {
@@ -185,8 +179,12 @@
 		<div
 			bind:this={panelEl}
 			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{activePlacement} surface-{surface} shadow-{panelShadow}"
-			style="--panel-width: {resolvedWidth}; --panel-max-height: {panelMaxHeight}; --quick-actions-panel-padding: var(--space-{panelPadding}); --quick-actions-panel-gap: var(--space-{panelGap});"
+			style:--panel-width={resolvedWidth}
+			style:--panel-max-height={panelMaxHeight}
+			style:--quick-actions-panel-padding={`var(--space-${panelPadding})`}
+			style:--quick-actions-panel-gap={`var(--space-${panelGap})`}
 			role={panelRole}
+			onclick={handlePanelClick}
 			transition:menuTransition
 		>
 			{#if children}
