@@ -43,6 +43,7 @@
 		onPrivacy?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
 		children?: Snippet;
+		/** Official extension point forwarded to SuiteUserMenu for custom links, such as About. */
 		userMenuExtras?: Snippet;
 	}
 

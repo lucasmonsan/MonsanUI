@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Component, Snippet } from 'svelte';
+	import ChevronLeft from './icons/ChevronLeft.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	type IconComponent = Component<{ size?: number }>;
 
@@ -19,6 +21,9 @@
 		showNavButtons = false,
 		hideLabels = false,
 		embedded = false,
+		scrollLeftLabel,
+		scrollRightLabel,
+		panelIdPrefix,
 		onchange,
 		item: itemSnippet
 	} = $props<{
@@ -30,13 +35,28 @@
 		showNavButtons?: boolean;
 		hideLabels?: boolean;
 		embedded?: boolean;
+		scrollLeftLabel?: string;
+		scrollRightLabel?: string;
+		panelIdPrefix?: string;
 		onchange?: (value: string) => void;
 		item?: Snippet<[TabItem, number]>;
 	}>();
 
+	let activeScrollLeftLabel = $derived(scrollLeftLabel ?? i18n.t('tabs.scrollLeft'));
+	let activeScrollRightLabel = $derived(scrollRightLabel ?? i18n.t('tabs.scrollRight'));
+
 	let containerEl = $state<HTMLElement | null>(null);
 	let showLeftGradient = $state(false);
 	let showRightGradient = $state(false);
+	const tabsId = $props.id();
+
+	function getTabId(id: string) {
+		return `${tabsId}-tab-${id}`;
+	}
+
+	function getPanelId(id: string) {
+		return panelIdPrefix ? `${panelIdPrefix}-${id}` : undefined;
+	}
 
 	function updateScrollShadows() {
 		if (containerEl && scrollable) {
@@ -64,6 +84,53 @@
 	function selectTab(id: string) {
 		value = id;
 		onchange?.(id);
+	}
+
+	function getTabButtons() {
+		if (!containerEl) return [];
+		return Array.from(containerEl.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+	}
+
+	function focusTabAt(index: number) {
+		const buttons = getTabButtons();
+		const target = buttons[index];
+		const targetId = target?.dataset.tabId;
+		if (!target || !targetId) return;
+
+		target.focus();
+		selectTab(targetId);
+	}
+
+	function handleTabListKeydown(event: KeyboardEvent) {
+		if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
+			return;
+		}
+
+		const buttons = getTabButtons();
+		if (buttons.length === 0) return;
+
+		const activeElement = document.activeElement;
+		const currentButton = activeElement instanceof HTMLButtonElement ? activeElement : null;
+		const currentIndex = currentButton ? buttons.indexOf(currentButton) : -1;
+		const fallbackIndex = Math.max(
+			0,
+			buttons.findIndex((button) => button.dataset.tabId === value)
+		);
+		const baseIndex = currentIndex >= 0 ? currentIndex : fallbackIndex;
+		let nextIndex = baseIndex;
+
+		if (event.key === 'Home') {
+			nextIndex = 0;
+		} else if (event.key === 'End') {
+			nextIndex = buttons.length - 1;
+		} else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+			nextIndex = (baseIndex + 1) % buttons.length;
+		} else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+			nextIndex = (baseIndex - 1 + buttons.length) % buttons.length;
+		}
+
+		event.preventDefault();
+		focusTabAt(nextIndex);
 	}
 
 	onMount(() => {
@@ -121,20 +188,9 @@
 					type="button"
 					class="monsan-tabs-nav-btn"
 					onclick={scrollLeft}
-					aria-label="Scroll left"
+					aria-label={activeScrollLeftLabel}
 				>
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="3"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path d="m15 18-6-6 6-6" />
-					</svg>
+					<ChevronLeft size={16} />
 				</button>
 			{/if}
 		</div>
@@ -149,9 +205,10 @@
 		class:hide-labels={hideLabels}
 		class:embedded
 		role="tablist"
-		style="--mask-left: {showLeftGradient ? '48px' : '0px'}; --mask-right: {showRightGradient
-			? '48px'
-			: '0px'};"
+		tabindex="-1"
+		style:--mask-left={showLeftGradient ? '48px' : '0px'}
+		style:--mask-right={showRightGradient ? '48px' : '0px'}
+		onkeydown={handleTabListKeydown}
 	>
 		{#each items as tab, index (tab.id)}
 			{#if itemSnippet}
@@ -164,7 +221,11 @@
 					class:has-icon={!!tab.icon}
 					onclick={() => selectTab(tab.id)}
 					role="tab"
+					id={getTabId(tab.id)}
+					data-tab-id={tab.id}
 					aria-selected={value === tab.id}
+					aria-controls={getPanelId(tab.id)}
+					tabindex={value === tab.id ? 0 : -1}
 				>
 					{#if tab.icon}
 						<span class="monsan-tab-icon">
@@ -182,23 +243,11 @@
 			{#if showNavButtons}
 				<button
 					type="button"
-					class="monsan-tabs-nav-btn"
+					class="monsan-tabs-nav-btn is-right"
 					onclick={scrollRight}
-					aria-label="Scroll right"
+					aria-label={activeScrollRightLabel}
 				>
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="3"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						style="transform: scaleX(-1);"
-					>
-						<path d="m15 18-6-6 6-6" />
-					</svg>
+					<ChevronLeft size={16} />
 				</button>
 			{/if}
 		</div>
@@ -220,10 +269,10 @@
 	.monsan-tabs-container {
 		display: flex;
 		gap: var(--space-sm);
-		border-bottom: var(--border-width) solid var(--border-color);
-		padding: 16px 16px var(--space-sm) 16px;
-		margin: -12px -12px 0 -12px;
-		width: calc(100% + 24px);
+		border-bottom: 0;
+		padding: 0;
+		margin: 0;
+		width: 100%;
 		overflow-x: auto;
 		scrollbar-width: thin;
 		scrollbar-color: var(--border-color) var(--bg-secondary);
@@ -324,6 +373,11 @@
 		box-shadow: none;
 	}
 
+	.monsan-tab-item:focus-visible {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+	}
+
 	.monsan-tab-item.active {
 		background-color: var(--accent-primary);
 		color: var(--bg-primary);
@@ -374,8 +428,8 @@
 	/* Nav controls gradients */
 	.monsan-tabs-nav-wrapper {
 		position: absolute;
-		top: 4px;
-		bottom: calc(var(--space-sm) + var(--border-width));
+		top: 0;
+		bottom: 0;
 		width: 36px;
 		display: flex;
 		align-items: center;
@@ -430,8 +484,23 @@
 		box-shadow: none;
 	}
 
+	.monsan-tabs-nav-btn.is-right :global(svg) {
+		transform: rotate(180deg);
+	}
+
 	:global([data-theme='dark']) .monsan-tabs-nav-btn {
 		color: var(--text-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-tabs-container.scrollable {
+			scroll-behavior: auto;
+		}
+
+		.monsan-tab-item,
+		.monsan-tabs-nav-btn {
+			transition: none;
+		}
 	}
 
 	@media (max-width: 600px) {

@@ -6,9 +6,10 @@
 		label: string;
 		children?: Snippet;
 		onclick?: (event: MouseEvent) => void;
+		disabled?: boolean;
 	}
 
-	let { value, label, children, onclick }: Props = $props();
+	let { value, label, children, onclick, disabled = false }: Props = $props();
 </script>
 
 <button
@@ -16,6 +17,7 @@
 	class="monsan-metric-button"
 	title={label}
 	aria-label={`${label}: ${value}`}
+	{disabled}
 	{onclick}
 >
 	<span class="metric-value">{value}</span>
@@ -62,14 +64,25 @@
 		align-items: center;
 	}
 
-	.monsan-metric-button:hover {
+	.monsan-metric-button:hover:not(:disabled) {
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0 var(--text-primary);
 	}
 
-	.monsan-metric-button:active {
+	.monsan-metric-button:active:not(:disabled) {
 		transform: translate(2px, 2px);
 		box-shadow: none;
+	}
+
+	.monsan-metric-button:focus-visible {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+	}
+
+	.monsan-metric-button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		transform: none;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

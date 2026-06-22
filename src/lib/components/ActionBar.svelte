@@ -152,6 +152,11 @@
 		box-shadow: none;
 	}
 
+	.monsan-action-bar-item:focus-visible {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+	}
+
 	.monsan-action-bar-item:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;

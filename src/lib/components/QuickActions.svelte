@@ -7,6 +7,11 @@
 
 	type PanelPlacement = 'below' | 'before' | 'after';
 	type ResolvedPanelPlacement = PanelPlacement | 'above';
+	type PanelRole = 'menu' | 'toolbar';
+
+	const MENU_CLOSE_SELECTOR =
+		'button, a, [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [data-menu-item]';
+	const MENU_PERSISTENT_SELECTOR = '[data-menu-persistent]';
 
 	let {
 		open = $bindable(false),
@@ -36,7 +41,7 @@
 		placement?: PanelPlacement;
 		panelPadding?: 'xs' | 'sm' | 'md';
 		panelGap?: 'xs' | 'sm' | 'md';
-		panelRole?: 'menu' | 'toolbar';
+		panelRole?: PanelRole;
 		surface?: 'panel' | 'gradient' | 'plain';
 		panelShadow?: 'default' | 'none';
 		containedReveal?: boolean;
@@ -45,6 +50,7 @@
 	}>();
 
 	let resolvedWidth = $derived(resolveActionPanelWidth(width));
+	const panelId = $props.id();
 
 	let containerEl = $state<HTMLElement>();
 
@@ -64,7 +70,8 @@
 	let panelEl = $state<HTMLDivElement>();
 	let activeTriggerLabel = $derived(triggerLabel ?? i18n.t('quickActions.open'));
 	let resolvedPlacement = $state<ResolvedPanelPlacement>('below');
-	let activePlacement = $derived(variant === 'dropdown' ? resolvedPlacement : placement);
+	let activePanelPlacement = $derived(variant === 'dropdown' ? resolvedPlacement : placement);
+	let triggerHaspopup = $derived.by<'menu' | true>(() => (panelRole === 'menu' ? 'menu' : true));
 	let panelMaxHeight = $state('none');
 
 	function updateDropdownPlacement() {
@@ -107,21 +114,15 @@
 		}
 	});
 
-	$effect(() => {
-		if (open && panelEl) {
-			const listener = (e: MouseEvent) => {
-				const target = e.target as HTMLElement;
-				const clickedButton = target.closest('button, a');
-				if (clickedButton && !clickedButton.closest('[data-menu-persistent]')) {
-					queueMicrotask(() => {
-						open = false;
-					});
-				}
-			};
-			panelEl.addEventListener('click', listener);
-			return () => panelEl?.removeEventListener('click', listener);
+	function handlePanelClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		const clickedItem = target.closest(MENU_CLOSE_SELECTOR);
+		if (clickedItem && !clickedItem.closest(MENU_PERSISTENT_SELECTOR)) {
+			queueMicrotask(() => {
+				open = false;
+			});
 		}
-	});
+	}
 
 	$effect(() => {
 		if (open) {
@@ -169,8 +170,9 @@
 				role="button"
 				tabindex="0"
 				aria-label={activeTriggerLabel}
-				aria-haspopup="menu"
+				aria-haspopup={triggerHaspopup}
 				aria-expanded={open}
+				aria-controls={panelId}
 			>
 				{@render trigger(toggle)}
 			</div>
@@ -183,10 +185,15 @@
 
 	{#if open}
 		<div
+			id={panelId}
 			bind:this={panelEl}
-			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{activePlacement} surface-{surface} shadow-{panelShadow}"
-			style="--panel-width: {resolvedWidth}; --panel-max-height: {panelMaxHeight}; --quick-actions-panel-padding: var(--space-{panelPadding}); --quick-actions-panel-gap: var(--space-{panelGap});"
+			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{activePanelPlacement} surface-{surface} shadow-{panelShadow}"
+			style:--panel-width={resolvedWidth}
+			style:--panel-max-height={panelMaxHeight}
+			style:--quick-actions-panel-padding={`var(--space-${panelPadding})`}
+			style:--quick-actions-panel-gap={`var(--space-${panelGap})`}
 			role={panelRole}
+			onclick={handlePanelClick}
 			transition:menuTransition
 		>
 			{#if children}

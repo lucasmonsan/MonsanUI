@@ -8,6 +8,7 @@
 		onclick?: (e: MouseEvent) => void;
 		title?: string;
 		ariaLabel?: string;
+		fallbackLabel?: string;
 	}
 
 	let {
@@ -18,7 +19,8 @@
 		shape = 'square',
 		onclick,
 		title,
-		ariaLabel
+		ariaLabel,
+		fallbackLabel
 	}: Props = $props();
 
 	let imageFailed = $state(false);
@@ -39,6 +41,7 @@
 	};
 
 	let finalSize = $derived(sizeMap[size] ?? '48px');
+	let resolvedLabel = $derived(ariaLabel || title || name || alt || fallbackLabel);
 
 	function handleImageError() {
 		imageFailed = true;
@@ -55,7 +58,7 @@
 	{#if src && !imageFailed}
 		<img {src} alt={alt || name} class="avatar-img" onerror={handleImageError} />
 	{:else}
-		<div class="avatar-fallback" role="img" aria-label={name || alt || 'Avatar'}>
+		<div class="avatar-fallback" role="img" aria-label={resolvedLabel}>
 			{initials || '?'}
 		</div>
 	{/if}
@@ -70,7 +73,7 @@
 		style:font-size={`calc(${finalSize} * 0.38)`}
 		{onclick}
 		{title}
-		aria-label={ariaLabel || title || name || alt || 'Avatar'}
+		aria-label={resolvedLabel}
 	>
 		{@render avatarContent()}
 	</button>

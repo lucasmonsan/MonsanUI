@@ -19,7 +19,6 @@
 
 <style>
 	.monsan-status-banner {
-		align-self: center;
 		background: var(--bg-secondary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-sm);
