@@ -29,53 +29,28 @@
 		variant?: 'default' | 'success';
 	}>();
 
-	function handleCardClick(e: MouseEvent) {
-		// Se clicar dentro de botões/links no conteúdo expandido, não deve fechar
-		const target = e.target as HTMLElement;
-		const interactive = target.closest(
-			'.expandable-content-inner a, .expandable-content-inner button, .expandable-content-inner input, .expandable-content-inner select, .expandable-content-inner textarea, .expandable-content-inner [role="button"]'
-		);
-		if (interactive) return;
+	const contentId = $props.id();
+	let headerIsTrigger = $derived(expandOn === 'header' || expandOn === 'card');
 
-		if (expandOn === 'card') {
-			expanded = !expanded;
-		}
-	}
-
-	function handleIndicatorClick(e: MouseEvent) {
-		e.stopPropagation();
+	function toggleExpanded() {
 		expanded = !expanded;
 	}
 
-	let cardEl = $state<HTMLDivElement>();
-	$effect(() => {
-		if (expandOn === 'card' && cardEl) {
-			const listener = (e: MouseEvent) => {
-				handleCardClick(e);
-			};
-			cardEl.addEventListener('click', listener);
-			return () => cardEl?.removeEventListener('click', listener);
-		}
-	});
+	function handleTriggerClick(e: MouseEvent) {
+		e.stopPropagation();
+		toggleExpanded();
+	}
 </script>
 
-<div
-	bind:this={cardEl}
-	class="monsan-expandable-card variant-{variant}"
-	class:compact
-	class:is-expanded={expanded}
-	class:clickable-card={expandOn === 'card'}
->
-	<!-- Cabeçalho -->
+{#snippet content()}
 	<header class="card-header">
-		{#if expandOn === 'header'}
+		{#if headerIsTrigger}
 			<button
 				type="button"
 				class="header-toggle-btn"
-				onclick={() => {
-					expanded = !expanded;
-				}}
+				onclick={handleTriggerClick}
 				aria-expanded={expanded}
+				aria-controls={contentId}
 			>
 				{#if header}
 					{@render header()}
@@ -94,8 +69,7 @@
 		{/if}
 	</header>
 
-	<!-- Conteúdo Expansível (Transição Suave de Altura) -->
-	<div class="expandable-content-wrapper" class:expanded>
+	<div id={contentId} class="expandable-content-wrapper" class:expanded aria-hidden={!expanded}>
 		<div class="expandable-content-inner">
 			<div class="card-body">
 				{@render children()}
@@ -103,12 +77,13 @@
 		</div>
 	</div>
 
-	<!-- Rodapé / Indicador -->
 	{#if showIndicator && (showText || showChevron)}
 		<button
 			type="button"
 			class="card-indicator-footer clickable-indicator"
-			onclick={handleIndicatorClick}
+			onclick={handleTriggerClick}
+			aria-expanded={expanded}
+			aria-controls={contentId}
 		>
 			<div class="indicator-container">
 				{#if showText}
@@ -124,7 +99,15 @@
 			</div>
 		</button>
 	{/if}
-</div>
+{/snippet}
+
+<article
+	class="monsan-expandable-card variant-{variant}"
+	class:compact
+	class:is-expanded={expanded}
+>
+	{@render content()}
+</article>
 
 <style>
 	.monsan-expandable-card {
@@ -140,15 +123,6 @@
 		overflow: hidden;
 		width: 100%;
 		box-sizing: border-box;
-	}
-
-	.monsan-expandable-card.clickable-card {
-		cursor: pointer;
-	}
-
-	.monsan-expandable-card.clickable-card:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 4px 4px 0px var(--border-color);
 	}
 
 	/* Cabeçalho */
@@ -256,6 +230,7 @@
 	.chevron-wrapper.rotated {
 		transform: rotate(180deg);
 	}
+
 	.compact .card-body {
 		padding: var(--space-sm);
 	}
@@ -263,5 +238,15 @@
 	/* Variante Success */
 	.monsan-expandable-card.variant-success .card-header {
 		background: color-mix(in srgb, var(--success) 16%, var(--bg-secondary));
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-expandable-card,
+		.expandable-content-wrapper,
+		.header-toggle-btn,
+		.card-indicator-footer,
+		.chevron-wrapper {
+			transition: none;
+		}
 	}
 </style>
