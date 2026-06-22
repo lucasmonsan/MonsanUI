@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ChevronDown from './icons/ChevronDown.svelte';
 	import { onMount } from 'svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Option {
 		value: string | number;
@@ -10,7 +11,7 @@
 	let {
 		value = $bindable(),
 		options = [],
-		placeholder = 'Selecione...',
+		placeholder,
 		id = '',
 		showChevron = true,
 		textAlign = 'left',
@@ -29,9 +30,10 @@
 
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
+	let activePlaceholder = $derived(placeholder ?? i18n.t('select.placeholder'));
 
 	let selectedOption = $derived(options.find((option: Option) => option.value === value));
-	let displayLabel = $derived(selectedOption?.label ?? placeholder);
+	let displayLabel = $derived(selectedOption?.label ?? activePlaceholder);
 
 	function toggleDropdown() {
 		if (disabled) return;
@@ -97,7 +99,7 @@
 	</button>
 
 	{#if isOpen}
-		<div class="monsan-select-dropdown" role="listbox" aria-label={placeholder}>
+		<div class="monsan-select-dropdown" role="listbox" aria-label={activePlaceholder}>
 			{#each options as option, i (option.value + '-' + i)}
 				{@const isSelected = option.value === value}
 				<button
@@ -268,5 +270,13 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-select-trigger,
+		.chevron-wrapper,
+		.select-option {
+			transition: none;
+		}
 	}
 </style>

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import Upload from './icons/Upload.svelte';
+	import X from './icons/X.svelte';
 
 	interface Props {
 		files?: FileList | null;
@@ -186,20 +188,7 @@
 				onclick={open}
 				aria-label={activeButtonLabel}
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="2.5"
-					stroke="currentColor"
-					class="compact-icon"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-					/>
-				</svg>
+				<Upload size={16} />
 				{activeButtonLabel}
 			</button>
 			{#if compactLabel}
@@ -222,16 +211,7 @@
 							onclick={(e) => removeFile(index, e)}
 							aria-label={i18n.t('fileUpload.removeFile')}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="2.5"
-								stroke="currentColor"
-								class="compact-remove-icon"
-							>
-								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-							</svg>
+							<X size={14} />
 						</button>
 					</div>
 				{/each}
@@ -241,20 +221,9 @@
 {:else if variant === 'overlay'}
 	<div class="monsan-file-upload-container">
 		<div class="overlay-hint" class:disabled>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				stroke="currentColor"
-				class="overlay-hint-icon"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-				/>
-			</svg>
+			<span class="overlay-hint-icon">
+				<Upload size={28} />
+			</span>
 			<span class="overlay-hint-text">{activePlaceholder}</span>
 			<button type="button" class="overlay-browse-btn" class:disabled {disabled} onclick={open}>
 				{activeButtonLabel}
@@ -264,20 +233,9 @@
 		{#if isWindowDragOver && !disabled}
 			<div class="overlay-fullscreen" role="region" aria-live="polite">
 				<div class="overlay-drop-zone">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke-width="2"
-						stroke="currentColor"
-						class="overlay-drop-icon"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-						/>
-					</svg>
+					<span class="overlay-drop-icon">
+						<Upload size={48} />
+					</span>
 					<p class="overlay-drop-text">{i18n.t('fileUpload.dropHere')}</p>
 				</div>
 			</div>
@@ -298,16 +256,7 @@
 							onclick={(e) => removeFile(index, e)}
 							aria-label={i18n.t('fileUpload.removeFile')}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="2.5"
-								stroke="currentColor"
-								class="remove-icon"
-							>
-								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-							</svg>
+							<X size={18} />
 						</button>
 					</div>
 				{/each}
@@ -326,20 +275,9 @@
 			ondrop={handleDrop}
 		>
 			<div class="dropzone-content">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="2.5"
-					stroke="currentColor"
-					class="upload-icon"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-					/>
-				</svg>
+				<span class="upload-icon">
+					<Upload size={32} />
+				</span>
 				<span class="placeholder-text">{activePlaceholder}</span>
 			</div>
 		</label>
@@ -359,16 +297,7 @@
 							onclick={(e) => removeFile(index, e)}
 							aria-label={i18n.t('fileUpload.removeFile')}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="2.5"
-								stroke="currentColor"
-								class="remove-icon"
-							>
-								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-							</svg>
+							<X size={18} />
 						</button>
 					</div>
 				{/each}
@@ -453,8 +382,7 @@
 	}
 
 	.upload-icon {
-		width: 32px;
-		height: 32px;
+		display: inline-flex;
 		color: var(--text-secondary);
 	}
 
@@ -529,11 +457,6 @@
 		cursor: not-allowed;
 	}
 
-	.remove-icon {
-		width: 18px;
-		height: 18px;
-	}
-
 	/* ============================================================
 	   COMPACT VARIANT
 	   ============================================================ */
@@ -585,12 +508,6 @@
 	.compact-btn:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
-	}
-
-	.compact-icon {
-		width: 16px;
-		height: 16px;
-		flex-shrink: 0;
 	}
 
 	.compact-file-label {
@@ -662,11 +579,6 @@
 		cursor: not-allowed;
 	}
 
-	.compact-remove-icon {
-		width: 14px;
-		height: 14px;
-	}
-
 	/* ============================================================
 	   OVERLAY VARIANT
 	   ============================================================ */
@@ -688,8 +600,7 @@
 	}
 
 	.overlay-hint-icon {
-		width: 28px;
-		height: 28px;
+		display: inline-flex;
 		color: var(--text-secondary);
 	}
 
@@ -785,8 +696,7 @@
 	}
 
 	.overlay-drop-icon {
-		width: 48px;
-		height: 48px;
+		display: inline-flex;
 		color: var(--accent-primary);
 	}
 
@@ -797,5 +707,18 @@
 		font-weight: 700;
 		color: var(--text-primary);
 		text-align: center;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-file-dropzone,
+		.file-remove-btn,
+		.compact-btn,
+		.compact-remove-btn,
+		.overlay-browse-btn,
+		.overlay-fullscreen,
+		.overlay-drop-zone {
+			transition: none;
+			animation: none;
+		}
 	}
 </style>

@@ -11,7 +11,13 @@
 	let { value, label, children, onclick }: Props = $props();
 </script>
 
-<button class="monsan-metric-button" title={label} aria-label={`${label}: ${value}`} {onclick}>
+<button
+	type="button"
+	class="monsan-metric-button"
+	title={label}
+	aria-label={`${label}: ${value}`}
+	{onclick}
+>
 	<span class="metric-value">{value}</span>
 	{#if children}
 		<span class="metric-icon" aria-hidden="true">{@render children()}</span>
@@ -33,6 +39,10 @@
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
+		cursor: pointer;
+		transition:
+			transform var(--duration-fast) var(--ease-out),
+			box-shadow var(--duration-fast) var(--ease-out);
 	}
 
 	:global([data-theme='dark']) .monsan-metric-button {
@@ -60,5 +70,11 @@
 	.monsan-metric-button:active {
 		transform: translate(2px, 2px);
 		box-shadow: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-metric-button {
+			transition: none;
+		}
 	}
 </style>

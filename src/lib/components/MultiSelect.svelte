@@ -11,7 +11,7 @@
 	let {
 		value = $bindable([]),
 		options = [],
-		placeholder = 'Selecione...',
+		placeholder,
 		id = '',
 		disabled = false,
 		width = 'full',
@@ -28,6 +28,7 @@
 
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
+	let activePlaceholder = $derived(placeholder ?? i18n.t('select.placeholder'));
 
 	function toggleDropdown() {
 		if (disabled) return;
@@ -80,7 +81,7 @@
 		const selectedValues = value.filter((v: string | number) => v !== '');
 		if (selectedValues.length === 0) {
 			const allOption = options.find((opt: Option) => opt.value === '');
-			return allOption ? allOption.label : placeholder;
+			return allOption ? allOption.label : activePlaceholder;
 		}
 
 		const selectedOptions = options.filter(
@@ -88,7 +89,7 @@
 		);
 		if (selectedOptions.length === 0) {
 			const allOption = options.find((opt: Option) => opt.value === '');
-			return allOption ? allOption.label : placeholder;
+			return allOption ? allOption.label : activePlaceholder;
 		}
 
 		if (selectedOptions.length === 1) {
@@ -130,7 +131,7 @@
 			class="monsan-multiselect-dropdown"
 			role="listbox"
 			aria-multiselectable="true"
-			aria-label={placeholder}
+			aria-label={activePlaceholder}
 		>
 			{#each options as option, i (option.value + '-' + i)}
 				{@const isOptionChecked =
@@ -291,5 +292,13 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-multiselect-trigger,
+		.chevron-wrapper,
+		.multiselect-option {
+			transition: none;
+		}
 	}
 </style>

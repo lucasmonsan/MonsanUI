@@ -1,4 +1,7 @@
 <script lang="ts">
+	import X from './icons/X.svelte';
+	import { i18n } from '../utils/i18n.svelte';
+
 	interface Props {
 		value?: string[];
 		placeholder?: string;
@@ -13,13 +16,13 @@
 
 	let {
 		value = $bindable([]),
-		placeholder = 'Adicionar tag...',
+		placeholder,
 		disabled = false,
 		id,
 		name,
 		ariaLabel,
 		ariaDescribedby,
-		removeLabel = (tag: string) => `Remover tag ${tag}`,
+		removeLabel,
 		oninput
 	}: Props = $props();
 
@@ -27,6 +30,10 @@
 	let inputEl = $state<HTMLInputElement>();
 	let containerEl = $state<HTMLDivElement>();
 	let isFocused = $state(false);
+	let activePlaceholder = $derived(placeholder ?? i18n.t('chips.placeholder'));
+	let activeRemoveLabel = $derived(
+		removeLabel ?? ((tag: string) => i18n.t('chips.remove', { tag }))
+	);
 
 	function addTag() {
 		const cleanTag = inputValue.trim().replace(/,$/, '');
@@ -48,7 +55,7 @@
 	}
 
 	function removeTag(index: number, e: MouseEvent) {
-		e.stopPropagation(); // Evita focar no input ao clicar para remover
+		e.stopPropagation();
 		if (disabled) return;
 		value = value.filter((_, i) => i !== index);
 	}
@@ -71,18 +78,9 @@
 					class="chip-remove-btn"
 					{disabled}
 					onclick={(e) => removeTag(index, e)}
-					aria-label={removeLabel(tag)}
+					aria-label={activeRemoveLabel(tag)}
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke-width="3"
-						stroke="currentColor"
-						class="chip-remove-icon"
-					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-					</svg>
+					<X size={12} />
 				</button>
 			</div>
 		{/each}
@@ -93,7 +91,7 @@
 			bind:value={inputValue}
 			{id}
 			{name}
-			placeholder={value.length === 0 ? placeholder : ''}
+			placeholder={value.length === 0 ? activePlaceholder : ''}
 			{disabled}
 			aria-label={ariaLabel}
 			aria-describedby={ariaDescribedby}
@@ -101,7 +99,7 @@
 			onfocus={() => (isFocused = true)}
 			onblur={() => {
 				isFocused = false;
-				addTag(); // Adiciona se o usuário desfocar com texto digitado
+				addTag();
 			}}
 			onkeydown={handleKeyDown}
 			{oninput}
@@ -144,7 +142,6 @@
 		opacity: 0.6;
 	}
 
-	/* Chips List Layout */
 	.chips-list {
 		display: flex;
 		flex-wrap: wrap;
@@ -153,7 +150,6 @@
 		width: 100%;
 	}
 
-	/* Individual Chip Item */
 	.chip-item {
 		display: flex;
 		align-items: center;
@@ -180,7 +176,6 @@
 		white-space: nowrap;
 	}
 
-	/* Chip Remove Button */
 	.chip-remove-btn {
 		background: transparent;
 		border: none;
@@ -205,12 +200,6 @@
 		cursor: not-allowed;
 	}
 
-	.chip-remove-icon {
-		width: 12px;
-		height: 12px;
-	}
-
-	/* Inner Input */
 	.chips-input {
 		flex: 1;
 		min-width: 80px;
@@ -225,5 +214,13 @@
 
 	.chips-input:disabled {
 		cursor: not-allowed;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-chips-input-container,
+		.chip-item,
+		.chip-remove-btn {
+			transition: none;
+		}
 	}
 </style>

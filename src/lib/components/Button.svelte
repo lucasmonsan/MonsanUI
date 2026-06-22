@@ -55,9 +55,9 @@
 	aria-pressed={ariaPressed}
 	aria-controls={ariaControls}
 	data-deck-theme={deckTheme}
-	class="monsan-button {variant} size-{size} shape-{shape} {block ? 'block' : ''} {square
-		? 'square'
-		: ''}"
+	class="monsan-button {variant} size-{size} shape-{shape}"
+	class:block
+	class:square
 >
 	{@render children?.()}
 </button>
@@ -74,7 +74,12 @@
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		cursor: pointer;
-		transition: all 0.1s ease;
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.1s var(--ease-out),
+			border-color 0.1s var(--ease-out),
+			color 0.1s var(--ease-out);
 		box-shadow: var(--shadow-sm);
 		display: inline-flex;
 		align-items: center;
@@ -163,5 +168,11 @@
 		opacity: 0.5;
 		cursor: not-allowed;
 		filter: grayscale(0.5);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-button {
+			transition: none;
+		}
 	}
 </style>

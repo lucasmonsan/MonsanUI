@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Check from './icons/Check.svelte';
+
 	interface Props {
 		checked?: boolean;
 		disabled?: boolean;
@@ -28,9 +30,7 @@
 	}: Props = $props();
 </script>
 
-<label
-	class="monsan-checkbox-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled ? 'disabled' : ''}"
->
+<label class="monsan-checkbox-wrapper" class:size-sm={size === 'sm'} class:disabled>
 	<input
 		type="checkbox"
 		bind:checked
@@ -46,17 +46,9 @@
 	/>
 	<div class="checkbox-box" class:checked>
 		{#if checked}
-			<svg
-				class="check-icon"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="3.5"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<polyline points="20 6 9 17 4 12"></polyline>
-			</svg>
+			<span class="check-icon">
+				<Check size={size === 'sm' ? 11 : 16} />
+			</span>
 		{/if}
 	</div>
 	{#if label}
@@ -81,7 +73,6 @@
 		opacity: 0.6;
 	}
 
-	/* Hidden native input for accessibility */
 	.sr-only {
 		position: absolute;
 		width: 1px;
@@ -94,7 +85,6 @@
 		border: 0;
 	}
 
-	/* Custom Checkbox Box */
 	.checkbox-box {
 		width: 24px;
 		height: 24px;
@@ -114,31 +104,24 @@
 			border-color 0.2s var(--ease-out);
 	}
 
-	/* Sizes */
 	.monsan-checkbox-wrapper.size-sm .checkbox-box {
 		width: 18px;
 		height: 18px;
 		border-radius: 4px;
 	}
 
-	.monsan-checkbox-wrapper.size-sm .check-icon {
-		width: 11px;
-		height: 11px;
-	}
-
 	.check-icon {
-		width: 16px;
-		height: 16px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 	}
 
-	/* Hover State */
 	.monsan-checkbox-wrapper:hover:not(.disabled) .checkbox-box {
 		border-color: var(--accent-primary);
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
-	/* Checked State */
 	.checkbox-box.checked {
 		background-color: var(--accent-primary);
 		border-color: var(--border-color);
@@ -150,13 +133,11 @@
 		box-shadow: 3px 3px 0px var(--border-color);
 	}
 
-	/* Focus State via Keyboard */
 	input:focus-visible + .checkbox-box {
 		outline: 2px solid var(--accent-primary);
 		outline-offset: 2px;
 	}
 
-	/* Label Text */
 	.checkbox-label {
 		font-size: var(--text-md);
 		font-weight: 500;
@@ -164,5 +145,12 @@
 
 	.monsan-checkbox-wrapper.size-sm .checkbox-label {
 		font-size: var(--text-sm);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-checkbox-wrapper,
+		.checkbox-box {
+			transition: none;
+		}
 	}
 </style>

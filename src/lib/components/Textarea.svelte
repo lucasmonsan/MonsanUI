@@ -77,7 +77,7 @@
 		{onkeydown}
 		{onfocus}
 		{onblur}
-		style="--rows: {rows};"
+		style:--rows={rows}
 	></textarea>
 {:else}
 	<textarea
@@ -101,7 +101,7 @@
 		{onkeydown}
 		{onfocus}
 		{onblur}
-		style="--rows: {rows};"
+		style:--rows={rows}
 	></textarea>
 {/if}
 
@@ -137,5 +137,11 @@
 		border-color: var(--accent-primary);
 		box-shadow: 3px 3px 0px var(--accent-primary);
 		transform: translate(-1px, -1px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-textarea {
+			transition: none;
+		}
 	}
 </style>
