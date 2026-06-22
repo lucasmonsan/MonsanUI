@@ -12,7 +12,9 @@
 		onSelectResult,
 		title,
 		placeholder,
-		noResultsMessage
+		noResultsMessage,
+		loading = false,
+		loadingMessage
 	} = $props<{
 		open: boolean;
 		items: SearchResultItem[];
@@ -20,26 +22,41 @@
 		title?: string;
 		placeholder?: string;
 		noResultsMessage?: string;
+		loading?: boolean;
+		loadingMessage?: string;
 	}>();
 
+	const fallbackId = `search-${Math.random().toString(36).slice(2, 11)}`;
+
 	let searchQuery = $state('');
-	let selectedIndex = $state(0);
+	let selectedIndex = $state(-1);
 	let inputEl = $state<{ focus: () => void }>();
 	let activeTitle = $derived(title ?? i18n.t('search.title'));
 	let activePlaceholder = $derived(placeholder ?? i18n.t('search.placeholder'));
 	let activeNoResultsMessage = $derived(noResultsMessage ?? i18n.t('search.noResults'));
+	let activeLoadingMessage = $derived(loadingMessage ?? i18n.t('loading.message'));
+	let inputId = $derived(`${fallbackId}-input`);
+	let listboxId = $derived(`${fallbackId}-results`);
+	let hasQuery = $derived(searchQuery.trim() !== '');
 
 	const results = $derived<SearchResultItem[]>(
-		searchQuery.trim() === ''
+		!hasQuery
 			? []
 			: items.filter((item: SearchResultItem) =>
 					item.name.toLowerCase().includes(searchQuery.toLowerCase())
 				)
 	);
+	let hasResults = $derived(results.length > 0);
+	let isExpanded = $derived(hasQuery && (hasResults || loading));
+	let activeDescendant = $derived(
+		hasResults && selectedIndex >= 0 ? `${listboxId}-option-${selectedIndex}` : undefined
+	);
 
 	$effect(() => {
-		if (searchQuery !== undefined) {
-			selectedIndex = 0;
+		if (hasResults) {
+			selectedIndex = selectedIndex >= results.length ? 0 : Math.max(selectedIndex, 0);
+		} else if (selectedIndex !== -1) {
+			selectedIndex = -1;
 		}
 	});
 
@@ -52,14 +69,17 @@
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'ArrowDown') {
 			e.preventDefault();
-			selectedIndex = results.length > 0 ? (selectedIndex + 1) % results.length : 0;
+			selectedIndex = hasResults ? (selectedIndex + 1) % results.length : -1;
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
-			selectedIndex =
-				results.length > 0 ? (selectedIndex - 1 + results.length) % results.length : 0;
+			selectedIndex = hasResults
+				? selectedIndex <= 0
+					? results.length - 1
+					: selectedIndex - 1
+				: -1;
 		} else if (e.key === 'Enter') {
 			e.preventDefault();
-			if (results[selectedIndex]) {
+			if (selectedIndex >= 0 && results[selectedIndex]) {
 				selectResult(results[selectedIndex]);
 			}
 		} else if (e.key === 'Escape') {
@@ -80,15 +100,27 @@
 			bind:value={searchQuery}
 			bind:this={inputEl}
 			onkeydown={handleKeyDown}
+			id={inputId}
+			role="combobox"
+			ariaAutocomplete="list"
+			ariaExpanded={isExpanded}
+			ariaControls={listboxId}
+			ariaActivedescendant={activeDescendant}
 			placeholder={activePlaceholder}
 		/>
 
-		{#if results.length > 0}
-			<div class="results-list" role="listbox">
+		{#if loading && hasQuery}
+			<p class="search-status" role="status" aria-live="polite">{activeLoadingMessage}</p>
+		{/if}
+
+		{#if hasResults}
+			<div id={listboxId} class="results-list" role="listbox" aria-label={activeTitle}>
 				{#each results as result, i (result.type + result.id)}
 					<button
+						id={`${listboxId}-option-${i}`}
 						class="result-item"
 						class:selected={i === selectedIndex}
+						onmousedown={(event) => event.preventDefault()}
 						onclick={() => selectResult(result)}
 						role="option"
 						aria-selected={i === selectedIndex}
@@ -105,7 +137,7 @@
 					</button>
 				{/each}
 			</div>
-		{:else if searchQuery.trim() !== ''}
+		{:else if hasQuery && !loading}
 			<p class="no-results">{activeNoResultsMessage}</p>
 		{/if}
 	</div>
@@ -166,9 +198,11 @@
 		font-weight: bold;
 	}
 
+	.search-status,
 	.no-results {
 		text-align: center;
 		color: var(--text-secondary);
 		padding: var(--space-md);
+		margin: 0;
 	}
 </style>

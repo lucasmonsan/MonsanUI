@@ -25,9 +25,14 @@
 		maxlength?: number;
 		pattern?: string;
 		title?: string;
+		role?: string;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
 		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+		ariaAutocomplete?: 'none' | 'inline' | 'list' | 'both';
+		ariaControls?: string;
+		ariaExpanded?: boolean | 'false' | 'true';
+		ariaActivedescendant?: string;
 		oninput?: (event: Event) => void;
 		onchange?: (event: Event) => void;
 		onkeydown?: (event: KeyboardEvent) => void;
@@ -58,9 +63,14 @@
 		maxlength,
 		pattern,
 		title,
+		role,
 		ariaLabel,
 		ariaDescribedby,
 		ariaInvalid,
+		ariaAutocomplete,
+		ariaControls,
+		ariaExpanded,
+		ariaActivedescendant,
 		oninput,
 		onchange,
 		onkeydown,
@@ -103,9 +113,14 @@
 		{maxlength}
 		{pattern}
 		{title}
+		{role}
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
 		aria-invalid={ariaInvalid}
+		aria-autocomplete={ariaAutocomplete}
+		aria-controls={ariaControls}
+		aria-expanded={ariaExpanded}
+		aria-activedescendant={ariaActivedescendant}
 		{oninput}
 		{onchange}
 		{onkeydown}
