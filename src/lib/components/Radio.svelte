@@ -30,9 +30,10 @@
 	}: Props = $props();
 
 	let checked = $derived(group === value);
+	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 </script>
 
-<label class="monsan-radio-wrapper" class:size-sm={size === 'sm'} class:disabled>
+<label class="monsan-radio-wrapper" class:size-sm={size === 'sm'} class:disabled class:invalid>
 	<input
 		type="radio"
 		bind:group
@@ -43,7 +44,6 @@
 		{required}
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
-		aria-invalid={ariaInvalid}
 		{onchange}
 		class="sr-only"
 	/>
@@ -150,7 +150,7 @@
 		outline-offset: 2px;
 	}
 
-	input[aria-invalid='true'] + .radio-circle {
+	.monsan-radio-wrapper.invalid .radio-circle {
 		border-color: var(--error);
 		box-shadow: 3px 3px 0px var(--error);
 	}
