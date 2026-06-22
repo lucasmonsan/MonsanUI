@@ -10,6 +10,7 @@
 		required?: boolean;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 		onchange?: (event: Event) => void;
 	}
 
@@ -24,6 +25,7 @@
 		required = false,
 		ariaLabel,
 		ariaDescribedby,
+		ariaInvalid,
 		onchange
 	}: Props = $props();
 
@@ -41,6 +43,7 @@
 		{required}
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
+		aria-invalid={ariaInvalid}
 		{onchange}
 		class="sr-only"
 	/>
@@ -145,6 +148,11 @@
 	input:focus-visible + .radio-circle {
 		outline: 2px solid var(--accent-primary);
 		outline-offset: 2px;
+	}
+
+	input[aria-invalid='true'] + .radio-circle {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.radio-label {

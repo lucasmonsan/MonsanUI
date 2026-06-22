@@ -12,6 +12,7 @@
 		required?: boolean;
 		ariaLabel?: string;
 		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 		onchange?: (event: Event) => void;
 	}
 
@@ -26,6 +27,7 @@
 		required = false,
 		ariaLabel,
 		ariaDescribedby,
+		ariaInvalid,
 		onchange
 	}: Props = $props();
 </script>
@@ -41,6 +43,7 @@
 		{required}
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
+		aria-invalid={ariaInvalid}
 		{onchange}
 		class="sr-only"
 	/>
@@ -136,6 +139,11 @@
 	input:focus-visible + .checkbox-box {
 		outline: 2px solid var(--accent-primary);
 		outline-offset: 2px;
+	}
+
+	input[aria-invalid='true'] + .checkbox-box {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.checkbox-label {

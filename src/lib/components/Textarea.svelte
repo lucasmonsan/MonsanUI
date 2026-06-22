@@ -139,6 +139,11 @@
 		transform: translate(-1px, -1px);
 	}
 
+	.monsan-textarea[aria-invalid='true'] {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.monsan-textarea {
 			transition: none;

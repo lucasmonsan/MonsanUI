@@ -198,6 +198,11 @@
 		transform: translate(-1px, -1px);
 	}
 
+	.monsan-input[aria-invalid='true']:not(.variant-unstyled) {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
+	}
+
 	.monsan-input.variant-title {
 		font-family: var(--font-display);
 		font-size: var(--text-lg);
