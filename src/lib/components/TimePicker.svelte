@@ -10,16 +10,34 @@
 		id?: string;
 		title?: string;
 		ariaLabel?: string;
+		ariaDescribedby?: string;
+		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 	}
 
-	let { value = $bindable('12:00'), disabled = false, id, title, ariaLabel }: Props = $props();
+	let {
+		value = $bindable('12:00'),
+		disabled = false,
+		id,
+		title,
+		ariaLabel,
+		ariaDescribedby,
+		ariaInvalid
+	}: Props = $props();
+
+	const fallbackId = `timepicker-${Math.random().toString(36).slice(2, 11)}`;
 
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
+	let triggerEl = $state<HTMLButtonElement>();
 	let prefersReducedMotion = $state(false);
 
 	let hours = $derived(value.split(':')[0] || '12');
 	let minutes = $derived(value.split(':')[1] || '00');
+	let triggerId = $derived(id || fallbackId);
+	let panelId = $derived(`${triggerId}-panel`);
+	let hoursListId = $derived(`${triggerId}-hours`);
+	let minutesListId = $derived(`${triggerId}-minutes`);
+	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 
 	const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 	const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
@@ -48,9 +66,67 @@
 		value = `${hours}:${m}`;
 	}
 
+	function moveHour(delta: number) {
+		const index = hourOptions.indexOf(hours);
+		const nextIndex = (index + delta + hourOptions.length) % hourOptions.length;
+		selectHour(hourOptions[nextIndex]);
+	}
+
+	function moveMinute(delta: number) {
+		const index = minuteOptions.indexOf(minutes);
+		const nextIndex = (index + delta + minuteOptions.length) % minuteOptions.length;
+		selectMinute(minuteOptions[nextIndex]);
+	}
+
 	function handleOutsideClick(event: MouseEvent) {
 		if (isOpen && containerEl && !containerEl.contains(event.target as Node)) {
-			isOpen = false;
+			closePopover();
+		}
+	}
+
+	function closePopover(focusTrigger = false) {
+		isOpen = false;
+		if (focusTrigger) {
+			triggerEl?.focus();
+		}
+	}
+
+	function handleRootKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && isOpen) {
+			event.preventDefault();
+			closePopover(true);
+		}
+	}
+
+	function handleHourKeyDown(event: KeyboardEvent) {
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			moveHour(1);
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			moveHour(-1);
+		} else if (event.key === 'Home') {
+			event.preventDefault();
+			selectHour(hourOptions[0]);
+		} else if (event.key === 'End') {
+			event.preventDefault();
+			selectHour(hourOptions[hourOptions.length - 1]);
+		}
+	}
+
+	function handleMinuteKeyDown(event: KeyboardEvent) {
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			moveMinute(1);
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			moveMinute(-1);
+		} else if (event.key === 'Home') {
+			event.preventDefault();
+			selectMinute(minuteOptions[0]);
+		} else if (event.key === 'End') {
+			event.preventDefault();
+			selectMinute(minuteOptions[minuteOptions.length - 1]);
 		}
 	}
 
@@ -72,15 +148,20 @@
 	}
 </script>
 
-<div bind:this={containerEl} class="monsan-time-picker-container">
+<div bind:this={containerEl} class="monsan-time-picker-container" onkeydown={handleRootKeyDown}>
 	<button
+		bind:this={triggerEl}
 		type="button"
 		class="time-picker-trigger"
-		{id}
+		class:invalid
+		id={triggerId}
 		{disabled}
 		{title}
 		aria-label={ariaLabel}
+		aria-describedby={ariaDescribedby}
+		aria-haspopup="dialog"
 		aria-expanded={isOpen}
+		aria-controls={panelId}
 		onclick={() => !disabled && (isOpen = !isOpen)}
 	>
 		<svg
@@ -102,6 +183,7 @@
 
 	{#if isOpen}
 		<div
+			id={panelId}
 			class="time-picker-dropdown panel"
 			transition:scale={{
 				duration: prefersReducedMotion ? 0 : 200,
@@ -115,14 +197,22 @@
 
 			<div class="picker-columns">
 				<div class="picker-column scrollbar-custom">
-					<div class="column-title">{i18n.t('timePicker.hours')}</div>
-					<div class="column-list">
+					<div id={`${hoursListId}-label`} class="column-title">{i18n.t('timePicker.hours')}</div>
+					<div
+						id={hoursListId}
+						class="column-list"
+						role="listbox"
+						aria-labelledby={`${hoursListId}-label`}
+					>
 						{#each hourOptions as h (h)}
 							<button
 								type="button"
 								class="number-btn"
 								class:active={hours === h}
 								use:scrollToSelected={hours === h}
+								role="option"
+								aria-selected={hours === h}
+								onkeydown={handleHourKeyDown}
 								onclick={() => selectHour(h)}
 							>
 								{h}
@@ -132,14 +222,24 @@
 				</div>
 
 				<div class="picker-column scrollbar-custom">
-					<div class="column-title">{i18n.t('timePicker.minutes')}</div>
-					<div class="column-list">
+					<div id={`${minutesListId}-label`} class="column-title">
+						{i18n.t('timePicker.minutes')}
+					</div>
+					<div
+						id={minutesListId}
+						class="column-list"
+						role="listbox"
+						aria-labelledby={`${minutesListId}-label`}
+					>
 						{#each minuteOptions as m (m)}
 							<button
 								type="button"
 								class="number-btn"
 								class:active={minutes === m}
 								use:scrollToSelected={minutes === m}
+								role="option"
+								aria-selected={minutes === m}
+								onkeydown={handleMinuteKeyDown}
 								onclick={() => selectMinute(m)}
 							>
 								{m}
@@ -149,7 +249,7 @@
 				</div>
 			</div>
 
-			<button type="button" class="confirm-time-btn" onclick={() => (isOpen = false)}>
+			<button type="button" class="confirm-time-btn" onclick={() => closePopover(true)}>
 				{i18n.t('timePicker.confirm')}
 			</button>
 		</div>
@@ -185,6 +285,11 @@
 		border-color: var(--accent-primary);
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0px var(--accent-primary);
+	}
+
+	.time-picker-trigger.invalid {
+		border-color: var(--error);
+		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.time-picker-trigger:disabled {
