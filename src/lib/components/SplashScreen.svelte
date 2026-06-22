@@ -85,7 +85,14 @@
 </script>
 
 {#if !hidden}
-	<div class="monsan-splash-screen" class:hiding style:z-index={zIndex}>
+	<div
+		class="monsan-splash-screen"
+		class:hiding
+		style:z-index={zIndex}
+		role="status"
+		aria-live="polite"
+		aria-busy={loading || !canHide}
+	>
 		<div class="splash-content" class:visible={contentVisible}>
 			{#if children}
 				{@render children()}
@@ -204,7 +211,7 @@
 		font-weight: 900;
 		text-transform: uppercase;
 		margin: 0;
-		letter-spacing: -0.02em;
+		letter-spacing: 0;
 		color: var(--text-primary);
 	}
 

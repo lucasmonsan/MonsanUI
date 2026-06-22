@@ -14,19 +14,27 @@
 		position?: 'top-right' | 'bottom-center';
 		role?: string;
 		ariaLive?: 'polite' | 'assertive' | 'off';
+		ariaLabel?: string;
 	}
 
 	let {
 		toasts,
 		position = 'bottom-center',
 		role = 'alert',
-		ariaLive = 'assertive'
+		ariaLive = 'assertive',
+		ariaLabel
 	}: Props = $props();
 </script>
 
-<section class="monsan-toast-viewport position-{position}" aria-live={ariaLive} aria-atomic="false">
+<section
+	class="monsan-toast-viewport position-{position}"
+	{role}
+	aria-live={ariaLive}
+	aria-atomic="false"
+	aria-label={ariaLabel}
+>
 	{#each toasts as toast (toast.id)}
-		<Toast {toast} {role} {ariaLive} />
+		<Toast {toast} {role} {ariaLive} announce={false} />
 	{/each}
 </section>
 

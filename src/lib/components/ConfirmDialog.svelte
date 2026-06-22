@@ -25,6 +25,7 @@
 
 	let activeConfirmText = $derived(confirmText ?? i18n.t('confirmDialog.confirm'));
 	let activeCancelText = $derived(cancelText ?? i18n.t('confirmDialog.cancel'));
+	const messageId = `confirm-dialog-${Math.random().toString(36).slice(2, 9)}-message`;
 
 	function handleClose() {
 		open = false;
@@ -38,10 +39,13 @@
 	onClose={handleClose}
 	closeLabel={activeCancelText}
 	{closeOnBackNavigation}
+	ariaDescribedby={messageId}
 >
 	<div class="confirm-content">
-		<p class="modal-body">{message}</p>
+		<p id={messageId} class="modal-body">{message}</p>
+	</div>
 
+	{#snippet footer()}
 		<div class="modal-actions">
 			<Button variant="secondary" onclick={handleClose} title={activeCancelText}>
 				{activeCancelText}
@@ -57,7 +61,7 @@
 				{activeConfirmText}
 			</Button>
 		</div>
-	</div>
+	{/snippet}
 </Dialog>
 
 <style>
@@ -80,7 +84,7 @@
 	.modal-actions {
 		display: flex;
 		gap: var(--space-md);
-		margin-top: var(--space-sm);
+		width: 100%;
 	}
 
 	.modal-actions :global(button) {

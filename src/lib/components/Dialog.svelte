@@ -15,12 +15,15 @@
 		footer,
 		closeLabel = 'Fechar',
 		closeOnBackNavigation = true,
+		closeOnOutsideClick = true,
+		closeOnEscape = true,
 		size = 'md',
 		animation = 'pop',
 		padding = 'var(--space-md)',
 		compactHeader = false,
 		showSubheader = true,
-		showFooter = true
+		showFooter = true,
+		ariaDescribedby
 	} = $props<{
 		open: boolean;
 		title: string;
@@ -31,23 +34,32 @@
 		footer?: import('svelte').Snippet;
 		closeLabel?: string;
 		closeOnBackNavigation?: boolean;
+		closeOnOutsideClick?: boolean;
+		closeOnEscape?: boolean;
 		size?: 'sm' | 'md' | 'lg';
 		animation?: 'pop' | 'slide' | 'fade' | 'scale';
 		padding?: PaddingPreset;
 		compactHeader?: boolean;
 		showSubheader?: boolean;
 		showFooter?: boolean;
+		ariaDescribedby?: string;
 	}>();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
 
 	const dialogId = Math.random().toString(36).substring(2, 9);
+	const titleId = `dialog-${dialogId}-title`;
+	const subheaderId = `dialog-${dialogId}-description`;
 	const closeAnimationMs = 180;
 	let dialogRef = $state<HTMLDialogElement>();
+	let previousActiveElement: HTMLElement | null = null;
 	let historyAdded = false;
 	let mounted = $state(open);
 	let closing = $state(false);
 	let closeAnimationTimer: ReturnType<typeof setTimeout> | undefined;
+	let activeDescribedby = $derived(
+		ariaDescribedby ?? (subheader && showSubheader ? subheaderId : undefined)
+	);
 
 	function clearCloseAnimationTimer() {
 		if (closeAnimationTimer) {
@@ -61,6 +73,7 @@
 		if (dialogRef?.open) {
 			dialogRef.close();
 		}
+		restoreFocus();
 		mounted = false;
 		closing = false;
 		closeAnimationTimer = undefined;
@@ -82,11 +95,30 @@
 	// Control native dialog modal display state after the element is rendered.
 	$effect(() => {
 		if (mounted && dialogRef && !dialogRef.open) {
+			if (
+				document.activeElement instanceof HTMLElement &&
+				!dialogRef.contains(document.activeElement)
+			) {
+				previousActiveElement = document.activeElement;
+			}
 			dialogRef.showModal();
 		}
 	});
 
-	onDestroy(clearCloseAnimationTimer);
+	onDestroy(() => {
+		clearCloseAnimationTimer();
+		if (dialogRef?.open) {
+			dialogRef.close();
+		}
+		restoreFocus();
+	});
+
+	function restoreFocus() {
+		if (previousActiveElement?.isConnected) {
+			previousActiveElement.focus();
+		}
+		previousActiveElement = null;
+	}
 
 	function close() {
 		open = false;
@@ -95,6 +127,9 @@
 
 	function handleCancel(e: Event) {
 		e.preventDefault();
+		if (!closeOnEscape) {
+			return;
+		}
 		close();
 	}
 
@@ -105,7 +140,7 @@
 	}
 
 	function handlePointerDown(e: PointerEvent) {
-		if (e.target === dialogRef) {
+		if (closeOnOutsideClick && e.target === dialogRef) {
 			close();
 		}
 	}
@@ -138,13 +173,14 @@
 		onpointerdown={handlePointerDown}
 		class="dialog-wrapper"
 		class:closing
-		aria-labelledby="modal-title"
+		aria-labelledby={titleId}
+		aria-describedby={activeDescribedby}
 	>
 		<!-- Dialog Content Container -->
 		<div class="modal-container anim-{animation} size-{size}" class:closing role="document">
 			<!-- Header -->
 			<header class="modal-header" class:compact={compactHeader}>
-				<h2 id="modal-title">{title}</h2>
+				<h2 id={titleId}>{title}</h2>
 				<div class="modal-header-actions">
 					{#if headerActions}
 						{@render headerActions()}
@@ -156,7 +192,7 @@
 			</header>
 
 			{#if subheader && showSubheader}
-				<div class="modal-subheader">
+				<div id={subheaderId} class="modal-subheader">
 					{@render subheader()}
 				</div>
 			{/if}

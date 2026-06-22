@@ -51,6 +51,10 @@
 	let isNativeVideo = $derived(
 		mediaType === 'video_native' || (mediaType === 'video' && !isYoutube)
 	);
+	let isUnsupported = $derived(
+		mediaType !== 'image' && !isYoutube && !isNativeVideo && mediaType !== 'audio'
+	);
+	const mediaDescriptionId = `media-dialog-${Math.random().toString(36).slice(2, 9)}-description`;
 </script>
 
 <Dialog
@@ -59,6 +63,7 @@
 	{onClose}
 	closeLabel={activeCloseAriaLabel}
 	size="lg"
+	ariaDescribedby={isUnsupported ? mediaDescriptionId : undefined}
 >
 	<div class="media-container">
 		{#if mediaType === 'image'}
@@ -82,7 +87,7 @@
 				{activeNotSupportedMessage}
 			</audio>
 		{:else}
-			<p class="error-msg">{activeNotSupportedMessage}</p>
+			<p id={mediaDescriptionId} class="error-msg">{activeNotSupportedMessage}</p>
 		{/if}
 	</div>
 </Dialog>
