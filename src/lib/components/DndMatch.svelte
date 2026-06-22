@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { i18n } from '../utils/i18n.svelte';
+	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { scale } from 'svelte/transition';
 
@@ -67,6 +68,21 @@
 	let dropTarget = $state<string | 'pool' | null>(null);
 	let isTouchDragging = $state(false);
 	let selectedItem = $state<{ item: string; source: string | 'pool' } | null>(null);
+	let prefersReducedMotion = $state(false);
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 
 	function moveItem(item: string, source: string | 'pool', target: string | 'pool') {
 		if (source === target) return;
@@ -357,13 +373,13 @@
 		<h4 class="area-title">{mergedLabels.poolTitle}</h4>
 		<div class="items-grid">
 			{#if poolItems.length === 0}
-				<div transition:scale={{ duration: 150 }} class="empty-msg">
+				<div transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }} class="empty-msg">
 					{mergedLabels.allClassified}
 				</div>
 			{/if}
 			{#each poolItems as item (item)}
 				<div
-					transition:scale={{ duration: 150 }}
+					transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }}
 					class="dnd-chip glass-panel"
 					class:dragging={draggedItem?.item === item && !isTouchDragging}
 					class:touch-dragging={draggedItem?.item === item && isTouchDragging}
@@ -419,13 +435,13 @@
 				<h4 class="bucket-title">{bucket}</h4>
 				<div class="bucket-content">
 					{#if !value || !value[bucket] || value[bucket].length === 0}
-						<div transition:scale={{ duration: 150 }} class="empty-msg">
+						<div transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }} class="empty-msg">
 							{mergedLabels.dropHere}
 						</div>
 					{/if}
 					{#each value[bucket] || [] as item (item)}
 						<div
-							transition:scale={{ duration: 150 }}
+							transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }}
 							class="dnd-chip bucket-chip"
 							class:dragging={draggedItem?.item === item && !isTouchDragging}
 							class:touch-dragging={draggedItem?.item === item && isTouchDragging}
@@ -721,6 +737,14 @@
 			color: var(--text-secondary);
 			width: 100%;
 			padding: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pool-area,
+		.bucket-area,
+		.dnd-chip {
+			transition: none;
 		}
 	}
 </style>

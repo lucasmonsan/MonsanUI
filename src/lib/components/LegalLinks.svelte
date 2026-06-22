@@ -118,4 +118,10 @@
 		font-size: calc(var(--text-xs) * 0.82);
 		line-height: 1.3;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.legal-link {
+			transition: none;
+		}
+	}
 </style>

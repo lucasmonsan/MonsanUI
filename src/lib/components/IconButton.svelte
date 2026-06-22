@@ -54,6 +54,13 @@
 		flex-shrink: 0;
 		color: var(--text-primary);
 		background: var(--bg-secondary);
+		cursor: pointer;
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.1s var(--ease-out),
+			border-color 0.1s var(--ease-out),
+			color 0.1s var(--ease-out);
 	}
 
 	.primary,
@@ -97,5 +104,11 @@
 	.monsan-icon-button:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-icon-button {
+			transition: none;
+		}
 	}
 </style>

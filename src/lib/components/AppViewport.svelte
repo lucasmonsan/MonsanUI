@@ -95,7 +95,11 @@
 <section
 	class="monsan-app-viewport gap-{gap}"
 	class:is-animated={animate}
-	style="--app-viewport-padding: {resolvedPadding}; --app-viewport-header-max-width: {resolvedHeaderMaxWidth}; --app-viewport-content-max-width: {resolvedContentMaxWidth}; --app-viewport-toolbar-max-width: {resolvedToolbarMaxWidth}; --app-viewport-footer-max-width: {resolvedFooterMaxWidth};"
+	style:--app-viewport-padding={resolvedPadding}
+	style:--app-viewport-header-max-width={resolvedHeaderMaxWidth}
+	style:--app-viewport-content-max-width={resolvedContentMaxWidth}
+	style:--app-viewport-toolbar-max-width={resolvedToolbarMaxWidth}
+	style:--app-viewport-footer-max-width={resolvedFooterMaxWidth}
 >
 	{#if header || toolbar}
 		<div class="app-viewport-fixed toolbar-gap-{toolbar ? toolbarGap : 'none'}">

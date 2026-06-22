@@ -162,7 +162,7 @@
 			{/if}
 
 			<!-- Content -->
-			<div class="modal-content" style="padding: {resolvedPadding}">
+			<div class="modal-content" style:padding={resolvedPadding}>
 				{@render children()}
 			</div>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
 	import PageContainer from './PageContainer.svelte';
@@ -19,14 +20,32 @@
 		padding = 'app',
 		animate = true
 	}: Props = $props();
+
+	let prefersReducedMotion = $state(false);
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 </script>
 
 <section class="monsan-route-viewport">
 	{#key routeKey}
 		<div
 			class="route-container"
-			in:fade={animate ? { duration: 200, delay: 150 } : undefined}
-			out:fade={animate ? { duration: 150 } : undefined}
+			in:fade={animate
+				? { duration: prefersReducedMotion ? 0 : 200, delay: prefersReducedMotion ? 0 : 150 }
+				: undefined}
+			out:fade={animate ? { duration: prefersReducedMotion ? 0 : 150 } : undefined}
 		>
 			<div class="page-content-wrapper">
 				<PageContainer {maxWidth} {padding}>

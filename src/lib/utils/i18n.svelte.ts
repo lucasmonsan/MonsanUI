@@ -20,6 +20,15 @@ class I18n {
 			datePicker: {
 				placeholder: 'Selecione uma data'
 			},
+			colorPicker: {
+				triggerLabel: 'Seletor de cor. Cor atual: {color}',
+				palette: 'Paleta de cores',
+				customize: 'Personalizar...'
+			},
+			chips: {
+				placeholder: 'Adicionar tag...',
+				remove: 'Remover tag {tag}'
+			},
 			credits: {
 				madeWithText: 'Feito com ⚡ por',
 				createdWithText: 'Criado com'
@@ -44,8 +53,28 @@ class I18n {
 			alert: {
 				close: 'Fechar alerta'
 			},
+			input: {
+				showPassword: 'Mostrar senha',
+				hidePassword: 'Ocultar senha'
+			},
+			select: {
+				placeholder: 'Selecione...'
+			},
+			search: {
+				title: 'Buscar',
+				placeholder: 'Buscar...',
+				noResults: 'Nenhum resultado encontrado'
+			},
+			searchBar: {
+				placeholder: 'Pesquisar...',
+				clear: 'Limpar pesquisa'
+			},
 			quickActions: {
 				open: 'Abrir ações'
+			},
+			tabs: {
+				scrollLeft: 'Rolar abas para a esquerda',
+				scrollRight: 'Rolar abas para a direita'
 			},
 			mediaDialog: {
 				closeAriaLabel: 'Fechar',
@@ -74,6 +103,15 @@ class I18n {
 			datePicker: {
 				placeholder: 'Select a date'
 			},
+			colorPicker: {
+				triggerLabel: 'Color picker. Current color: {color}',
+				palette: 'Color palette',
+				customize: 'Customize...'
+			},
+			chips: {
+				placeholder: 'Add tag...',
+				remove: 'Remove tag {tag}'
+			},
 			credits: {
 				madeWithText: 'Made with ⚡ by',
 				createdWithText: 'Created with'
@@ -98,8 +136,28 @@ class I18n {
 			alert: {
 				close: 'Close alert'
 			},
+			input: {
+				showPassword: 'Show password',
+				hidePassword: 'Hide password'
+			},
+			select: {
+				placeholder: 'Select...'
+			},
+			search: {
+				title: 'Search',
+				placeholder: 'Search...',
+				noResults: 'No results found'
+			},
+			searchBar: {
+				placeholder: 'Search...',
+				clear: 'Clear search'
+			},
 			quickActions: {
 				open: 'Open actions'
+			},
+			tabs: {
+				scrollLeft: 'Scroll tabs left',
+				scrollRight: 'Scroll tabs right'
 			},
 			mediaDialog: {
 				closeAriaLabel: 'Close',
@@ -128,6 +186,15 @@ class I18n {
 			datePicker: {
 				placeholder: 'Seleccione una fecha'
 			},
+			colorPicker: {
+				triggerLabel: 'Selector de color. Color actual: {color}',
+				palette: 'Paleta de colores',
+				customize: 'Personalizar...'
+			},
+			chips: {
+				placeholder: 'Agregar etiqueta...',
+				remove: 'Eliminar etiqueta {tag}'
+			},
 			credits: {
 				madeWithText: 'Hecho con ⚡ por',
 				createdWithText: 'Creado con'
@@ -152,8 +219,28 @@ class I18n {
 			alert: {
 				close: 'Cerrar alerta'
 			},
+			input: {
+				showPassword: 'Mostrar contraseña',
+				hidePassword: 'Ocultar contraseña'
+			},
+			select: {
+				placeholder: 'Seleccione...'
+			},
+			search: {
+				title: 'Buscar',
+				placeholder: 'Buscar...',
+				noResults: 'No se encontraron resultados'
+			},
+			searchBar: {
+				placeholder: 'Buscar...',
+				clear: 'Limpiar busqueda'
+			},
 			quickActions: {
 				open: 'Abrir acciones'
+			},
+			tabs: {
+				scrollLeft: 'Desplazar pestañas a la izquierda',
+				scrollRight: 'Desplazar pestañas a la derecha'
 			},
 			mediaDialog: {
 				closeAriaLabel: 'Cerrar',

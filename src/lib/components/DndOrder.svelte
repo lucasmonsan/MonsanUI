@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
+	import { i18n } from '../utils/i18n.svelte';
 	import GripVertical from './icons/GripVertical.svelte';
 
 	interface Props {
@@ -33,6 +35,7 @@
 	let draggedIndex = $state<number | null>(null);
 	let isTouchDragging = $state(false);
 	let lastReorderTime = $state(0);
+	let prefersReducedMotion = $state(false);
 	const REORDER_COOLDOWN = 120;
 
 	function handleDragStart(e: DragEvent, index: number) {
@@ -150,9 +153,21 @@
 		}
 	}
 
-	import { i18n } from '../utils/i18n.svelte';
-
 	let srAnnouncement = $state('');
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 
 	function handleKeyDown(e: KeyboardEvent, index: number) {
 		if (disabled) return;
@@ -214,11 +229,11 @@
 	class="dnd-order-list"
 	class:disabled
 	role="listbox"
-	style="grid-template-columns: repeat({columns}, minmax(0, 1fr));"
+	style:grid-template-columns={`repeat(${columns}, minmax(0, 1fr))`}
 >
 	{#each items as item, index (item)}
 		<div
-			animate:flip={{ duration: 250, easing: quintOut }}
+			animate:flip={{ duration: prefersReducedMotion ? 0 : 250, easing: quintOut }}
 			class="dnd-item glass-panel"
 			class:dragging={draggedIndex === index && !isTouchDragging}
 			class:touch-dragging={draggedIndex === index && isTouchDragging}
@@ -354,5 +369,11 @@
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border: 0;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dnd-item {
+			transition: none;
+		}
 	}
 </style>

@@ -27,14 +27,12 @@
 		onchange
 	}: Props = $props();
 
-	// Calcula a porcentagem para preencher o trilho dinamicamente
-	let percentage = $derived(((value - min) / (max - min)) * 100);
+	let percentage = $derived(
+		max === min ? 0 : Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100))
+	);
 </script>
 
-<div
-	class="monsan-range-container {disabled ? 'disabled' : ''}"
-	style="--range-percentage: {percentage}%"
->
+<div class="monsan-range-container" class:disabled style:--range-percentage={`${percentage}%`}>
 	<input
 		type="range"
 		bind:value
@@ -89,7 +87,6 @@
 		background: var(--bg-secondary) !important;
 	}
 
-	/* Webkit browsers (Chrome, Safari, Edge, Opera) - Slider Thumb */
 	.monsan-range::-webkit-slider-thumb {
 		-webkit-appearance: none;
 		appearance: none;
@@ -123,7 +120,6 @@
 		box-shadow: 1px 1px 0px var(--border-color);
 	}
 
-	/* Firefox - Slider Thumb */
 	.monsan-range::-moz-range-thumb {
 		width: 18px;
 		height: 28px;
@@ -155,9 +151,15 @@
 		box-shadow: 1px 1px 0px var(--border-color);
 	}
 
-	/* Focus state */
 	.monsan-range:focus-visible {
 		outline: 2px solid var(--accent-primary);
 		outline-offset: 4px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-range::-webkit-slider-thumb,
+		.monsan-range::-moz-range-thumb {
+			transition: none;
+		}
 	}
 </style>

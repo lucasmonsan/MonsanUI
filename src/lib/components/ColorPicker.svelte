@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
 		value?: string;
@@ -14,21 +16,36 @@
 	let isOpen = $state(false);
 	let colorInputEl = $state<HTMLInputElement>();
 	let containerEl = $state<HTMLDivElement>();
+	let prefersReducedMotion = $state(false);
 
 	const presetColors = [
-		'#c44933', // Rust Accent
-		'#e06666', // Soft Red
-		'#f6b26b', // Orange
-		'#ffd966', // Yellow
-		'#93c47d', // Green
-		'#76a5af', // Teal
-		'#6fa8dc', // Light Blue
-		'#8e7cc3', // Violet
-		'#c27ba0', // Magenta
-		'#ffffff', // White
-		'#888888', // Gray
-		'#222222' // Black
+		'#c44933',
+		'#e06666',
+		'#f6b26b',
+		'#ffd966',
+		'#93c47d',
+		'#76a5af',
+		'#6fa8dc',
+		'#8e7cc3',
+		'#c27ba0',
+		'#ffffff',
+		'#888888',
+		'#222222'
 	];
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 
 	function selectPreset(color: string) {
 		if (disabled) return;
@@ -50,8 +67,6 @@
 			};
 		}
 	});
-
-	import { i18n } from '../utils/i18n.svelte';
 
 	const colorNames: Record<string, Record<string, string>> = {
 		'#c44933': { pt: 'Ferrugem', en: 'Rust', es: 'Óxido' },
@@ -76,11 +91,8 @@
 	}
 
 	let triggerAriaLabel = $derived.by(() => {
-		const locale = i18n.locale || 'pt';
 		const colorLabel = getColorAriaLabel(value);
-		if (locale === 'pt') return `Seletor de cor. Cor atual: ${colorLabel}`;
-		if (locale === 'es') return `Selector de color. Color actual: ${colorLabel}`;
-		return `Color picker. Current color: ${colorLabel}`;
+		return i18n.t('colorPicker.triggerLabel', { color: colorLabel });
 	});
 </script>
 
@@ -94,25 +106,28 @@
 		aria-label={ariaLabel ?? triggerAriaLabel}
 		aria-expanded={isOpen}
 	>
-		<div class="color-preview" style="background-color: {value};"></div>
+		<div class="color-preview" style:background-color={value}></div>
 		<span class="color-hex">{value.toUpperCase()}</span>
 	</button>
 
-	<!-- Input nativo invisível para picker customizado -->
 	<input bind:this={colorInputEl} type="color" bind:value class="sr-only" {disabled} />
 
 	{#if isOpen}
 		<div
 			class="color-picker-dropdown panel"
-			transition:scale={{ duration: 200, easing: backOut, start: 0.9 }}
+			transition:scale={{
+				duration: prefersReducedMotion ? 0 : 200,
+				easing: backOut,
+				start: prefersReducedMotion ? 1 : 0.9
+			}}
 		>
-			<span class="dropdown-title">Paleta de Cores</span>
+			<span class="dropdown-title">{i18n.t('colorPicker.palette')}</span>
 			<div class="preset-grid">
 				{#each presetColors as color (color)}
 					<button
 						type="button"
 						class="preset-btn"
-						style="background-color: {color};"
+						style:background-color={color}
 						class:active={value.toLowerCase() === color.toLowerCase()}
 						title={getColorAriaLabel(color)}
 						aria-label={getColorAriaLabel(color)}
@@ -129,7 +144,7 @@
 					isOpen = false;
 				}}
 			>
-				Personalizar...
+				{i18n.t('colorPicker.customize')}
 			</button>
 		</div>
 	{/if}
@@ -185,7 +200,6 @@
 		letter-spacing: 0;
 	}
 
-	/* Hidden native color input */
 	.sr-only {
 		position: absolute;
 		width: 1px;
@@ -198,7 +212,6 @@
 		border: 0;
 	}
 
-	/* Dropdown Popover */
 	.color-picker-dropdown {
 		position: absolute;
 		top: calc(100% + var(--space-xs));
@@ -223,7 +236,6 @@
 		letter-spacing: 0;
 	}
 
-	/* Preset Grid */
 	.preset-grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
@@ -254,7 +266,6 @@
 		border-color: var(--accent-primary);
 	}
 
-	/* Custom Color Button */
 	.custom-color-btn {
 		background-color: var(--bg-secondary);
 		border: 2px solid var(--border-color);
@@ -274,5 +285,13 @@
 		background-color: var(--bg-primary);
 		transform: translate(-1px, -1px);
 		box-shadow: 2px 2px 0px var(--border-color);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.color-picker-trigger,
+		.preset-btn,
+		.custom-color-btn {
+			transition: none;
+		}
 	}
 </style>

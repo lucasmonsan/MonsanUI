@@ -2,6 +2,10 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
+	import Search from './icons/Search.svelte';
+	import X from './icons/X.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
 		value?: string;
@@ -21,7 +25,7 @@
 
 	let {
 		value = $bindable(''),
-		placeholder = 'Pesquisar...',
+		placeholder,
 		disabled = false,
 		suggestions = [],
 		id,
@@ -29,7 +33,7 @@
 		autocomplete,
 		ariaLabel,
 		ariaDescribedby,
-		clearLabel = 'Limpar pesquisa',
+		clearLabel,
 		oninput,
 		onfocus,
 		onblur
@@ -39,6 +43,9 @@
 	let containerEl = $state<HTMLDivElement>();
 	let isFocused = $state(false);
 	let showSuggestions = $state(false);
+	let prefersReducedMotion = $state(false);
+	let activePlaceholder = $derived(placeholder ?? i18n.t('searchBar.placeholder'));
+	let activeClearLabel = $derived(clearLabel ?? i18n.t('searchBar.clear'));
 
 	let filteredSuggestions = $derived(
 		value.trim() === ''
@@ -47,6 +54,20 @@
 	);
 
 	let displayDropdown = $derived(showSuggestions && filteredSuggestions.length > 0 && !disabled);
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 
 	function handleOutsideClick(event: MouseEvent) {
 		if (containerEl && !containerEl.contains(event.target as Node)) {
@@ -88,20 +109,9 @@
 
 <div bind:this={containerEl} class="monsan-searchbar-container">
 	<div class="searchbar-wrapper" class:focused={isFocused} class:disabled>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke-width="2.5"
-			stroke="currentColor"
-			class="search-icon"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z"
-			/>
-		</svg>
+		<span class="search-icon">
+			<Search size={20} />
+		</span>
 
 		<input
 			bind:this={inputEl}
@@ -109,7 +119,7 @@
 			bind:value
 			{id}
 			{name}
-			{placeholder}
+			placeholder={activePlaceholder}
 			{disabled}
 			{autocomplete}
 			aria-label={ariaLabel}
@@ -130,18 +140,9 @@
 					showSuggestions = true;
 					inputEl?.focus();
 				}}
-				aria-label={clearLabel}
+				aria-label={activeClearLabel}
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="2.5"
-					stroke="currentColor"
-					class="clear-icon"
-				>
-					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-				</svg>
+				<X size={16} />
 			</button>
 		{/if}
 	</div>
@@ -149,7 +150,11 @@
 	{#if displayDropdown}
 		<div
 			class="suggestions-dropdown panel"
-			transition:scale={{ duration: 150, easing: backOut, start: 0.98 }}
+			transition:scale={{
+				duration: prefersReducedMotion ? 0 : 150,
+				easing: backOut,
+				start: prefersReducedMotion ? 1 : 0.98
+			}}
 		>
 			{#each filteredSuggestions as suggestion (suggestion)}
 				<button type="button" class="suggestion-item" onclick={() => selectSuggestion(suggestion)}>
@@ -223,7 +228,6 @@
 		cursor: not-allowed;
 	}
 
-	/* Clear button */
 	.clear-btn {
 		background: transparent;
 		border: none;
@@ -246,12 +250,6 @@
 		cursor: not-allowed;
 	}
 
-	.clear-icon {
-		width: 16px;
-		height: 16px;
-	}
-
-	/* Suggestions Dropdown */
 	.suggestions-dropdown {
 		position: absolute;
 		top: calc(100% + var(--space-xs));
@@ -290,5 +288,13 @@
 		background-color: var(--bg-secondary);
 		color: var(--accent-primary);
 		font-weight: bold;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.searchbar-wrapper,
+		.clear-btn,
+		.suggestion-item {
+			transition: none;
+		}
 	}
 </style>

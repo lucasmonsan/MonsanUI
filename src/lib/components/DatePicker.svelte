@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
 	import Calendar from './Calendar.svelte';
+	import CalendarBlank from './icons/CalendarBlank.svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
@@ -27,12 +29,26 @@
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
 	let selectedDateString = $state<string | null>(null);
+	let prefersReducedMotion = $state(false);
 
 	let formattedDate = $derived(formatDate(value));
 
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
+
 	function formatDate(d: Date | null): string {
 		if (!d) return activePlaceholder;
-		// Garante data local
 		const day = d.getDate().toString().padStart(2, '0');
 		const month = (d.getMonth() + 1).toString().padStart(2, '0');
 		const year = d.getFullYear();
@@ -45,7 +61,6 @@
 		}
 	}
 
-	// Sincroniza de Date para String (Calendar)
 	$effect(() => {
 		if (value) {
 			const year = value.getFullYear();
@@ -57,7 +72,6 @@
 		}
 	});
 
-	// Sincroniza de String (Calendar) para Date
 	$effect(() => {
 		if (selectedDateString) {
 			const [year, month, day] = selectedDateString.split('-').map(Number);
@@ -79,10 +93,8 @@
 		}
 	});
 
-	// Fecha o popover automaticamente quando o usuário seleciona um dia no calendário
 	$effect(() => {
 		if (value) {
-			// Pequeno delay para a transição visual de seleção ser vista antes de fechar
 			const timer = setTimeout(() => {
 				isOpen = false;
 			}, 150);
@@ -103,27 +115,20 @@
 		aria-expanded={isOpen}
 		onclick={() => !disabled && (isOpen = !isOpen)}
 	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke-width="2.5"
-			stroke="currentColor"
-			class="calendar-icon"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-			/>
-		</svg>
+		<span class="calendar-icon">
+			<CalendarBlank size={20} />
+		</span>
 		<span class="datepicker-text">{formattedDate}</span>
 	</button>
 
 	{#if isOpen}
 		<div
 			class="datepicker-dropdown"
-			transition:scale={{ duration: 200, easing: backOut, start: 0.95 }}
+			transition:scale={{
+				duration: prefersReducedMotion ? 0 : 200,
+				easing: backOut,
+				start: prefersReducedMotion ? 1 : 0.95
+			}}
 		>
 			<Calendar bind:selectedDate={selectedDateString} />
 		</div>
@@ -189,11 +194,16 @@
 		letter-spacing: 0;
 	}
 
-	/* Dropdown Popover */
 	.datepicker-dropdown {
 		position: absolute;
 		top: calc(100% + var(--space-xs));
 		left: 0;
 		z-index: 1000;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.datepicker-trigger {
+			transition: none;
+		}
 	}
 </style>

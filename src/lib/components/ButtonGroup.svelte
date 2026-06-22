@@ -9,7 +9,11 @@
 	let { children, direction = 'column' }: Props = $props();
 </script>
 
-<div class="monsan-button-group {direction}">
+<div
+	class="monsan-button-group"
+	class:column={direction === 'column'}
+	class:row={direction === 'row'}
+>
 	{@render children()}
 </div>
 

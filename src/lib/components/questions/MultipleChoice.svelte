@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Check from '../icons/Check.svelte';
+
 	interface Props {
 		options: string[];
 		value?: string[];
@@ -26,26 +28,23 @@
 	}
 </script>
 
-<div class="options-list size-{size}" style="--cols: {columns};">
+<div class="options-list size-{size}" role="group" style:--cols={String(columns)}>
 	{#each options as option (option)}
+		{@const selected = Array.isArray(value) && value.includes(option)}
 		<button
-			class="option-btn {Array.isArray(value) && value.includes(option) ? 'selected' : ''}"
+			type="button"
+			class="option-btn"
+			class:selected
+			role="checkbox"
+			aria-checked={selected}
 			onclick={() => toggleChoice(option)}
 			{disabled}
 		>
 			<div class="checkbox-square">
-				{#if Array.isArray(value) && value.includes(option)}
-					<svg
-						class="check-icon"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="3"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<polyline points="20 6 9 17 4 12"></polyline>
-					</svg>
+				{#if selected}
+					<span class="check-icon">
+						<Check size="100%" />
+					</span>
 				{/if}
 			</div>
 			<span>{option}</span>
@@ -61,7 +60,6 @@
 		width: 100%;
 	}
 
-	/* Responsive fallback: on small devices, show in single column */
 	@media (max-width: 600px) {
 		.options-list {
 			grid-template-columns: 1fr !important;
@@ -79,7 +77,12 @@
 		color: var(--text-primary);
 		text-align: left;
 		box-shadow: var(--shadow-sm);
-		transition: all 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease,
+			background-color 0.2s ease,
+			border-color 0.2s ease,
+			color 0.2s ease;
 		cursor: pointer;
 		font-family: var(--font-body);
 	}
@@ -162,5 +165,11 @@
 	.options-list.size-sm .check-icon {
 		width: 10px;
 		height: 10px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.option-btn {
+			transition: none;
+		}
 	}
 </style>

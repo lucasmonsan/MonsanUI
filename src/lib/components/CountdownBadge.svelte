@@ -29,6 +29,12 @@
 		animation: pulse 0.5s infinite alternate;
 	}
 
+	@media (prefers-reduced-motion: reduce) {
+		.warning {
+			animation: none;
+		}
+	}
+
 	@keyframes pulse {
 		from {
 			transform: scale(1);

@@ -30,4 +30,10 @@
 		transform: scale(0.95);
 		opacity: 0.75;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-prompt-panel {
+			transition: none;
+		}
+	}
 </style>

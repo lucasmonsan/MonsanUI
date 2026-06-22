@@ -158,4 +158,10 @@
 		color: var(--text-primary);
 		opacity: 0.9;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dropdown-item {
+			transition: none;
+		}
+	}
 </style>

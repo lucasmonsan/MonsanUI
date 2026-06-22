@@ -169,4 +169,11 @@
 	.fade-auto.has-overflow-bottom::after {
 		opacity: 1;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.fade-auto::before,
+		.fade-auto::after {
+			transition: none;
+		}
+	}
 </style>

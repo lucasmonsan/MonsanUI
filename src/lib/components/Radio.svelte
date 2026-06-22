@@ -30,7 +30,7 @@
 	let checked = $derived(group === value);
 </script>
 
-<label class="monsan-radio-wrapper {size === 'sm' ? 'size-sm' : ''} {disabled ? 'disabled' : ''}">
+<label class="monsan-radio-wrapper" class:size-sm={size === 'sm'} class:disabled>
 	<input
 		type="radio"
 		bind:group
@@ -69,7 +69,6 @@
 		opacity: 0.6;
 	}
 
-	/* Hidden native input for accessibility */
 	.sr-only {
 		position: absolute;
 		width: 1px;
@@ -82,7 +81,6 @@
 		border: 0;
 	}
 
-	/* Custom Radio Circle */
 	.radio-circle {
 		width: 24px;
 		height: 24px;
@@ -114,7 +112,6 @@
 		transform: scale(1) translate(-0.5px, 0px);
 	}
 
-	/* Sizes */
 	.monsan-radio-wrapper.size-sm .radio-circle {
 		width: 18px;
 		height: 18px;
@@ -130,14 +127,12 @@
 		transform: scale(1) translate(-0.5px, 0px);
 	}
 
-	/* Hover State */
 	.monsan-radio-wrapper:hover:not(.disabled) .radio-circle {
 		border-color: var(--accent-primary);
 		transform: translate(-1px, -1px);
 		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
-	/* Checked State */
 	.radio-circle.checked {
 		border-color: var(--border-color);
 	}
@@ -147,13 +142,11 @@
 		box-shadow: 3px 3px 0px var(--border-color);
 	}
 
-	/* Focus State via Keyboard */
 	input:focus-visible + .radio-circle {
 		outline: 2px solid var(--accent-primary);
 		outline-offset: 2px;
 	}
 
-	/* Label Text */
 	.radio-label {
 		font-size: var(--text-md);
 		font-weight: 500;
@@ -161,5 +154,13 @@
 
 	.monsan-radio-wrapper.size-sm .radio-label {
 		font-size: var(--text-sm);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-radio-wrapper,
+		.radio-circle,
+		.radio-inner-dot {
+			transition: none;
+		}
 	}
 </style>

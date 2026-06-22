@@ -3,14 +3,16 @@
 	import Input from './Input.svelte';
 	import type { SearchResultItem } from '../types.js';
 	import FileText from './icons/FileText.svelte';
+	import Folder from './icons/Folder.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	let {
 		open = $bindable(false),
 		items = [],
 		onSelectResult,
-		title = 'Buscar',
-		placeholder = 'Buscar...',
-		noResultsMessage = 'Nenhum resultado encontrado'
+		title,
+		placeholder,
+		noResultsMessage
 	} = $props<{
 		open: boolean;
 		items: SearchResultItem[];
@@ -23,8 +25,10 @@
 	let searchQuery = $state('');
 	let selectedIndex = $state(0);
 	let inputEl = $state<{ focus: () => void }>();
+	let activeTitle = $derived(title ?? i18n.t('search.title'));
+	let activePlaceholder = $derived(placeholder ?? i18n.t('search.placeholder'));
+	let activeNoResultsMessage = $derived(noResultsMessage ?? i18n.t('search.noResults'));
 
-	// Filtrar itens com base na query
 	const results = $derived<SearchResultItem[]>(
 		searchQuery.trim() === ''
 			? []
@@ -34,14 +38,12 @@
 	);
 
 	$effect(() => {
-		// Resetar seleção quando a query mudar
 		if (searchQuery !== undefined) {
 			selectedIndex = 0;
 		}
 	});
 
 	$effect(() => {
-		// Focar no input quando abrir
 		if (open && inputEl) {
 			setTimeout(() => inputEl?.focus(), 50);
 		}
@@ -71,14 +73,14 @@
 	}
 </script>
 
-<Dialog bind:open {title}>
+<Dialog bind:open title={activeTitle}>
 	<div class="search-container" role="search">
 		<Input
 			type="text"
 			bind:value={searchQuery}
 			bind:this={inputEl}
 			onkeydown={handleKeyDown}
-			{placeholder}
+			placeholder={activePlaceholder}
 		/>
 
 		{#if results.length > 0}
@@ -94,20 +96,7 @@
 					>
 						<span class="result-type">
 							{#if result.type === 'folder'}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									><path
-										d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"
-									/></svg
-								>
+								<Folder size={16} />
 							{:else}
 								<FileText size={16} />
 							{/if}
@@ -117,7 +106,7 @@
 				{/each}
 			</div>
 		{:else if searchQuery.trim() !== ''}
-			<p class="no-results">{noResultsMessage}</p>
+			<p class="no-results">{activeNoResultsMessage}</p>
 		{/if}
 	</div>
 </Dialog>

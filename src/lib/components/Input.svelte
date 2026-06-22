@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
 		value?: string | number | null;
@@ -39,8 +40,8 @@
 		size = 'md',
 		variant = 'default',
 		showPasswordToggle = false,
-		showPasswordLabel = 'Show password',
-		hidePasswordLabel = 'Hide password',
+		showPasswordLabel,
+		hidePasswordLabel,
 		type = 'text',
 		id,
 		name,
@@ -73,6 +74,8 @@
 	let currentType = $derived(
 		type === 'password' && showPasswordToggle && isPasswordVisible ? 'text' : type
 	);
+	let activeShowPasswordLabel = $derived(showPasswordLabel ?? i18n.t('input.showPassword'));
+	let activeHidePasswordLabel = $derived(hidePasswordLabel ?? i18n.t('input.hidePassword'));
 
 	// Expõe o método focus para ser usado via bind:this
 	export function focus() {
@@ -116,7 +119,7 @@
 			class="password-toggle-btn"
 			class:size-sm={size === 'sm'}
 			onclick={() => (isPasswordVisible = !isPasswordVisible)}
-			aria-label={isPasswordVisible ? hidePasswordLabel : showPasswordLabel}
+			aria-label={isPasswordVisible ? activeHidePasswordLabel : activeShowPasswordLabel}
 		>
 			{#if !isPasswordVisible}
 				<svg
@@ -258,5 +261,12 @@
 	.password-toggle-btn.size-sm .toggle-icon {
 		width: 16px;
 		height: 16px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-input,
+		.password-toggle-btn {
+			transition: none;
+		}
 	}
 </style>

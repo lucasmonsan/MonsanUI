@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
@@ -15,14 +16,27 @@
 
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
+	let prefersReducedMotion = $state(false);
 
-	// Divide o valor em horas e minutos
 	let hours = $derived(value.split(':')[0] || '12');
 	let minutes = $derived(value.split(':')[1] || '00');
 
-	// Gera arrays para a seleção
 	const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
 	const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 
 	function selectHour(h: string) {
 		if (disabled) return;
@@ -49,10 +63,8 @@
 		}
 	});
 
-	// Função de scroll suave automático para o item selecionado
 	function scrollToSelected(node: HTMLElement, isSelected: boolean) {
 		if (isSelected && node.parentElement) {
-			// Executa após a renderização inicial para alinhar
 			setTimeout(() => {
 				node.scrollIntoView({ block: 'nearest', behavior: 'auto' });
 			}, 50);
@@ -91,14 +103,17 @@
 	{#if isOpen}
 		<div
 			class="time-picker-dropdown panel"
-			transition:scale={{ duration: 200, easing: backOut, start: 0.9 }}
+			transition:scale={{
+				duration: prefersReducedMotion ? 0 : 200,
+				easing: backOut,
+				start: prefersReducedMotion ? 1 : 0.9
+			}}
 		>
 			<div class="dropdown-header">
 				<span>{i18n.t('timePicker.selectTime')}</span>
 			</div>
 
 			<div class="picker-columns">
-				<!-- Coluna de Horas -->
 				<div class="picker-column scrollbar-custom">
 					<div class="column-title">{i18n.t('timePicker.hours')}</div>
 					<div class="column-list">
@@ -116,7 +131,6 @@
 					</div>
 				</div>
 
-				<!-- Coluna de Minutos -->
 				<div class="picker-column scrollbar-custom">
 					<div class="column-title">{i18n.t('timePicker.minutes')}</div>
 					<div class="column-list">
@@ -190,7 +204,6 @@
 		letter-spacing: 0;
 	}
 
-	/* Dropdown Popover */
 	.time-picker-dropdown {
 		position: absolute;
 		top: calc(100% + var(--space-xs));
@@ -218,7 +231,6 @@
 		padding-bottom: var(--space-xs);
 	}
 
-	/* Picker Columns */
 	.picker-columns {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -252,7 +264,6 @@
 		flex-direction: column;
 	}
 
-	/* Number Button */
 	.number-btn {
 		width: 100%;
 		padding: 6px 0;
@@ -276,7 +287,6 @@
 		font-weight: bold;
 	}
 
-	/* Confirm Button */
 	.confirm-time-btn {
 		background-color: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
@@ -298,7 +308,6 @@
 		box-shadow: 2px 2px 0px var(--border-color);
 	}
 
-	/* Custom Scrollbar */
 	.scrollbar-custom .column-list {
 		scrollbar-width: thin;
 		scrollbar-color: var(--border-color) transparent;
@@ -315,5 +324,13 @@
 	.scrollbar-custom .column-list::-webkit-scrollbar-thumb {
 		background-color: var(--border-color);
 		border-radius: var(--radius-full);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.time-picker-trigger,
+		.number-btn,
+		.confirm-time-btn {
+			transition: none;
+		}
 	}
 </style>

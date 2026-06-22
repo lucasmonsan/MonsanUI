@@ -2,6 +2,7 @@
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
 	import { SvelteDate } from 'svelte/reactivity';
+	import { onMount } from 'svelte';
 	import Badge from './Badge.svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
@@ -157,8 +158,23 @@
 	}
 
 	let showMonthYearPicker = $state(false);
+	let prefersReducedMotion = $state(false);
 	let selectedDayEvents = $derived(selectedDate ? events[selectedDate] || [] : []);
 	let selectedDayActivity = $derived(selectedDate ? studyLogs[selectedDate] || 0 : 0);
+
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+
+		function updateMotionPreference(event: MediaQueryListEvent) {
+			prefersReducedMotion = event.matches;
+		}
+
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+		};
+	});
 
 	function formatDisplayDate(dateStr: string) {
 		const parts = dateStr.split('-');
@@ -278,7 +294,11 @@
 			{#if showMonthYearPicker && (mode === 'calendar' || mode === 'list' || mode === 'heatmap')}
 				<div
 					class="month-year-popover panel"
-					transition:scale={{ duration: 180, start: 0.94, easing: backOut }}
+					transition:scale={{
+						duration: prefersReducedMotion ? 0 : 180,
+						start: prefersReducedMotion ? 1 : 0.94,
+						easing: backOut
+					}}
 					onclick={(e) => e.stopPropagation()}
 					onkeydown={(e) => e.stopPropagation()}
 					role="dialog"
@@ -353,7 +373,7 @@
 
 		<div class="nav-buttons">
 			{#if mode !== 'week'}
-				<button class="nav-btn" onclick={prevMonth} aria-label="Mês anterior">
+				<button type="button" class="nav-btn" onclick={prevMonth} aria-label="Mês anterior">
 					<svg
 						width="14"
 						height="14"
@@ -367,7 +387,7 @@
 						<path d="m15 18-6-6 6-6" />
 					</svg>
 				</button>
-				<button class="nav-btn" onclick={nextMonth} aria-label="Próximo mês">
+				<button type="button" class="nav-btn" onclick={nextMonth} aria-label="Próximo mês">
 					<svg
 						width="14"
 						height="14"
@@ -512,6 +532,7 @@
 			<div class="details-header">
 				<h4>{i18n.t('calendar.dayDetails')} — {formatDisplayDate(selectedDate)}</h4>
 				<button
+					type="button"
 					class="close-details-btn"
 					onclick={() => (selectedDate = null)}
 					aria-label="Fechar detalhes"
@@ -603,7 +624,11 @@
 		padding: 4px var(--space-sm);
 		border-radius: var(--radius-sm);
 		border: var(--border-width) solid transparent;
-		transition: all 0.15s var(--ease-out);
+		transition:
+			transform 0.15s var(--ease-out),
+			box-shadow 0.15s var(--ease-out),
+			background-color 0.15s var(--ease-out),
+			border-color 0.15s var(--ease-out);
 		white-space: nowrap;
 	}
 
@@ -693,7 +718,12 @@
 		cursor: pointer;
 		color: var(--text-primary);
 		box-shadow: var(--shadow-sm);
-		transition: all 0.1s var(--ease-out);
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.1s var(--ease-out),
+			border-color 0.1s var(--ease-out),
+			color 0.1s var(--ease-out);
 	}
 
 	.year-nav-btn:hover {
@@ -723,7 +753,12 @@
 		cursor: pointer;
 		color: var(--text-primary);
 		box-shadow: var(--shadow-sm);
-		transition: all 0.1s var(--ease-out);
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.1s var(--ease-out),
+			border-color 0.1s var(--ease-out),
+			color 0.1s var(--ease-out);
 		text-align: center;
 	}
 
@@ -760,7 +795,12 @@
 		justify-content: center;
 		cursor: pointer;
 		box-shadow: var(--shadow-sm);
-		transition: all 0.1s var(--ease-out);
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.1s var(--ease-out),
+			border-color 0.1s var(--ease-out),
+			color 0.1s var(--ease-out);
 		color: var(--text-primary);
 	}
 
@@ -1015,7 +1055,12 @@
 		background: var(--bg-primary);
 		border-radius: var(--radius-md);
 		cursor: pointer;
-		transition: all 0.1s var(--ease-out);
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.1s var(--ease-out),
+			border-color 0.1s var(--ease-out),
+			color 0.1s var(--ease-out);
 		text-align: left;
 		text-transform: none;
 		font-family: inherit;
@@ -1080,6 +1125,19 @@
 		.heatmap-cell,
 		.calendar-cell {
 			font-size: var(--text-sm);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.calendar-title,
+		.picker-icon,
+		.year-nav-btn,
+		.month-btn,
+		.nav-btn,
+		.heatmap-cell,
+		.calendar-cell,
+		.list-day-item {
+			transition: none;
 		}
 	}
 </style>
