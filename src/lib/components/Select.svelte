@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ChevronDown from './icons/ChevronDown.svelte';
-	import { onMount } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
 	interface Option {
@@ -28,29 +27,63 @@
 		width?: 'full' | 'auto';
 	}>();
 
+	const fallbackId = `select-${Math.random().toString(36).slice(2, 11)}`;
+
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
+	let triggerEl = $state<HTMLButtonElement>();
+	let activeIndex = $state(-1);
 	let activePlaceholder = $derived(placeholder ?? i18n.t('select.placeholder'));
+	let triggerId = $derived(id || fallbackId);
+	let listboxId = $derived(`${triggerId}-listbox`);
 
 	let selectedOption = $derived(options.find((option: Option) => option.value === value));
+	let selectedIndex = $derived(options.findIndex((option: Option) => option.value === value));
 	let displayLabel = $derived(selectedOption?.label ?? activePlaceholder);
+	let activeDescendant = $derived(
+		isOpen && activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
+	);
+
+	function getInitialIndex(direction: 'first' | 'last' = 'first') {
+		if (options.length === 0) return -1;
+		if (selectedIndex >= 0) return selectedIndex;
+		return direction === 'last' ? options.length - 1 : 0;
+	}
+
+	function openDropdown(direction: 'first' | 'last' = 'first') {
+		if (disabled) return;
+		isOpen = true;
+		activeIndex = getInitialIndex(direction);
+	}
+
+	function closeDropdown(focusTrigger = false) {
+		isOpen = false;
+		activeIndex = -1;
+		if (focusTrigger) {
+			triggerEl?.focus();
+		}
+	}
 
 	function toggleDropdown() {
 		if (disabled) return;
-		isOpen = !isOpen;
+		if (isOpen) {
+			closeDropdown();
+		} else {
+			openDropdown();
+		}
 	}
 
 	function selectOption(optionValue: string | number) {
 		if (disabled) return;
 		value = optionValue;
-		isOpen = false;
+		closeDropdown(true);
 	}
 
 	function handleOutsideClick(e: MouseEvent) {
 		if (!isOpen) return;
 		const target = e.target as HTMLElement;
 		if (containerEl && !containerEl.contains(target)) {
-			isOpen = false;
+			closeDropdown();
 		}
 	}
 
@@ -58,17 +91,46 @@
 		if (disabled) return;
 
 		if (e.key === 'Escape' && isOpen) {
-			isOpen = false;
+			closeDropdown(true);
 			e.preventDefault();
-		} else if ((e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') && !isOpen) {
-			isOpen = true;
+		} else if (!isOpen && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown')) {
+			openDropdown();
+			e.preventDefault();
+		} else if (!isOpen && e.key === 'ArrowUp') {
+			openDropdown('last');
+			e.preventDefault();
+		} else if (isOpen && e.key === 'ArrowDown') {
+			activeIndex = options.length === 0 ? -1 : (activeIndex + 1) % options.length;
+			e.preventDefault();
+		} else if (isOpen && e.key === 'ArrowUp') {
+			activeIndex =
+				options.length === 0 ? -1 : activeIndex <= 0 ? options.length - 1 : activeIndex - 1;
+			e.preventDefault();
+		} else if (isOpen && e.key === 'Home') {
+			activeIndex = options.length === 0 ? -1 : 0;
+			e.preventDefault();
+		} else if (isOpen && e.key === 'End') {
+			activeIndex = options.length - 1;
+			e.preventDefault();
+		} else if (isOpen && (e.key === 'Enter' || e.key === ' ') && activeIndex >= 0) {
+			selectOption(options[activeIndex].value);
 			e.preventDefault();
 		}
 	}
 
-	onMount(() => {
-		document.addEventListener('click', handleOutsideClick, { capture: true });
-		return () => document.removeEventListener('click', handleOutsideClick, { capture: true });
+	$effect(() => {
+		if (isOpen) {
+			document.addEventListener('click', handleOutsideClick, { capture: true });
+			return () => document.removeEventListener('click', handleOutsideClick, { capture: true });
+		}
+	});
+
+	$effect(() => {
+		if (!isOpen && activeIndex !== -1) {
+			activeIndex = -1;
+		} else if (isOpen && activeIndex >= options.length) {
+			activeIndex = getInitialIndex();
+		}
 	});
 </script>
 
@@ -79,15 +141,19 @@
 	role="none"
 >
 	<button
+		bind:this={triggerEl}
 		type="button"
-		{id}
+		id={triggerId}
 		class="monsan-select-trigger align-{textAlign}"
 		class:has-chevron={showChevron}
 		class:open={isOpen}
 		onclick={toggleDropdown}
 		{disabled}
+		role="combobox"
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
+		aria-controls={listboxId}
+		aria-activedescendant={activeDescendant}
 	>
 		<span class="label-text">{displayLabel}</span>
 
@@ -99,13 +165,21 @@
 	</button>
 
 	{#if isOpen}
-		<div class="monsan-select-dropdown" role="listbox" aria-label={activePlaceholder}>
+		<div
+			id={listboxId}
+			class="monsan-select-dropdown"
+			role="listbox"
+			aria-label={activePlaceholder}
+		>
 			{#each options as option, i (option.value + '-' + i)}
 				{@const isSelected = option.value === value}
 				<button
+					id={`${listboxId}-option-${i}`}
 					type="button"
 					class="select-option"
 					class:selected={isSelected}
+					class:active={i === activeIndex}
+					onmouseenter={() => (activeIndex = i)}
 					onclick={() => selectOption(option.value)}
 					role="option"
 					aria-selected={isSelected}
@@ -244,7 +318,8 @@
 		box-sizing: border-box;
 	}
 
-	.select-option:hover:not(:disabled) {
+	.select-option:hover:not(:disabled),
+	.select-option.active:not(:disabled) {
 		background: var(--bg-secondary);
 		border-color: var(--border-color);
 	}
