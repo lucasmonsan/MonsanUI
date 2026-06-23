@@ -36,6 +36,7 @@
 	let isTouchDragging = $state(false);
 	let lastReorderTime = $state(0);
 	let prefersReducedMotion = $state(false);
+	let listEl = $state<HTMLDivElement>();
 	const REORDER_COOLDOWN = 120;
 
 	function handleDragStart(e: DragEvent, index: number) {
@@ -180,17 +181,10 @@
 				newItems.splice(index - 1, 0, removed);
 				value = [...newItems];
 
-				const locale = i18n?.locale || 'pt';
-				if (locale === 'pt') {
-					srAnnouncement = `Item ${itemMoved} movido para cima. Nova posição: ${index}.`;
-				} else if (locale === 'es') {
-					srAnnouncement = `Elemento ${itemMoved} movido hacia arriba. Nueva posición: ${index}.`;
-				} else {
-					srAnnouncement = `Item ${itemMoved} moved up. New position: ${index}.`;
-				}
+				srAnnouncement = i18n.t('dndOrder.movedUp', { item: itemMoved, position: index });
 
 				setTimeout(() => {
-					const el = document.querySelector(`[data-index="${index - 1}"]`) as HTMLElement;
+					const el = listEl?.querySelector(`[data-index="${index - 1}"]`) as HTMLElement;
 					el?.focus();
 				}, 20);
 			}
@@ -203,17 +197,13 @@
 				newItems.splice(index + 1, 0, removed);
 				value = [...newItems];
 
-				const locale = i18n?.locale || 'pt';
-				if (locale === 'pt') {
-					srAnnouncement = `Item ${itemMoved} movido para baixo. Nova posição: ${index + 2}.`;
-				} else if (locale === 'es') {
-					srAnnouncement = `Elemento ${itemMoved} movido hacia abajo. Nueva posición: ${index + 2}.`;
-				} else {
-					srAnnouncement = `Item ${itemMoved} moved down. New position: ${index + 2}.`;
-				}
+				srAnnouncement = i18n.t('dndOrder.movedDown', {
+					item: itemMoved,
+					position: index + 2
+				});
 
 				setTimeout(() => {
-					const el = document.querySelector(`[data-index="${index + 1}"]`) as HTMLElement;
+					const el = listEl?.querySelector(`[data-index="${index + 1}"]`) as HTMLElement;
 					el?.focus();
 				}, 20);
 			}
@@ -226,6 +216,7 @@
 </div>
 
 <div
+	bind:this={listEl}
 	class="dnd-order-list"
 	class:disabled
 	role="listbox"
@@ -251,11 +242,11 @@
 			aria-selected={draggedIndex === index}
 			tabindex="0"
 			onkeydown={(e) => handleKeyDown(e, index)}
-			aria-label={i18n?.locale === 'pt'
-				? `${item}. Item ${index + 1} de ${items.length}. Use as setas para cima e para baixo para reordenar.`
-				: i18n?.locale === 'es'
-					? `${item}. Elemento ${index + 1} de ${items.length}. Use las flechas arriba y abajo para reordenar.`
-					: `${item}. Item ${index + 1} of ${items.length}. Use up and down arrow keys to reorder.`}
+			aria-label={i18n.t('dndOrder.itemLabel', {
+				item,
+				position: index + 1,
+				total: items.length
+			})}
 		>
 			<div class="drag-handle">
 				<GripVertical size={18} />

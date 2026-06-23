@@ -69,6 +69,22 @@ class I18n {
 				colorOrange: 'Laranja',
 				colorRed: 'Vermelho'
 			},
+			dndOrder: {
+				movedUp: 'Item {item} movido para cima. Nova posição: {position}.',
+				movedDown: 'Item {item} movido para baixo. Nova posição: {position}.',
+				itemLabel:
+					'{item}. Item {position} de {total}. Use as setas para cima e para baixo para reordenar.'
+			},
+			dndMatch: {
+				poolTitle: 'Opções disponíveis',
+				allClassified: 'Nenhuma opção restante',
+				dropHere: 'Solte aqui',
+				moved: 'Item "{item}" movido de "{from}" para "{to}".',
+				availableOptionLabel:
+					'{item}. Opção disponível. Use as setas esquerda e direita ou números de 1 a {count} para mover para uma categoria.',
+				classifiedOptionLabel:
+					'{item}. Classificado em {bucket}. Use as setas esquerda e direita, ou 0, Escape ou Backspace para retornar à pilha de opções disponíveis.'
+			},
 			timePicker: {
 				selectTime: 'Selecionar Horário',
 				hours: 'Horas',
@@ -210,6 +226,21 @@ class I18n {
 				colorOrange: 'Orange',
 				colorRed: 'Red'
 			},
+			dndOrder: {
+				movedUp: 'Item {item} moved up. New position: {position}.',
+				movedDown: 'Item {item} moved down. New position: {position}.',
+				itemLabel: '{item}. Item {position} of {total}. Use up and down arrow keys to reorder.'
+			},
+			dndMatch: {
+				poolTitle: 'Available options',
+				allClassified: 'No options remaining',
+				dropHere: 'Drop here',
+				moved: 'Item "{item}" moved from "{from}" to "{to}".',
+				availableOptionLabel:
+					'{item}. Available option. Use left and right arrow keys or numbers 1 to {count} to move to a category.',
+				classifiedOptionLabel:
+					'{item}. Classified in {bucket}. Use left and right arrow keys, or 0, Escape or Backspace to return to available options.'
+			},
 			timePicker: {
 				selectTime: 'Select Time',
 				hours: 'Hours',
@@ -350,6 +381,22 @@ class I18n {
 				colorPurple: 'Morado',
 				colorOrange: 'Naranja',
 				colorRed: 'Rojo'
+			},
+			dndOrder: {
+				movedUp: 'Elemento {item} movido hacia arriba. Nueva posición: {position}.',
+				movedDown: 'Elemento {item} movido hacia abajo. Nueva posición: {position}.',
+				itemLabel:
+					'{item}. Elemento {position} de {total}. Use las flechas arriba y abajo para reordenar.'
+			},
+			dndMatch: {
+				poolTitle: 'Opciones disponibles',
+				allClassified: 'No quedan opciones',
+				dropHere: 'Suelte aquí',
+				moved: 'Elemento "{item}" movido de "{from}" a "{to}".',
+				availableOptionLabel:
+					'{item}. Opción disponible. Use las flechas izquierda y derecha o los números de 1 a {count} para mover a una categoría.',
+				classifiedOptionLabel:
+					'{item}. Clasificado en {bucket}. Use las flechas izquierda y derecha, o 0, Escape o Backspace para volver a la pila de opciones disponibles.'
 			},
 			timePicker: {
 				selectTime: 'Seleccionar Hora',
