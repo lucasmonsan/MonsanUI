@@ -27,9 +27,9 @@
 	}: Props = $props();
 
 	const mergedLabels = $derived({
-		poolTitle: labels.poolTitle || 'Opções Disponíveis',
-		allClassified: labels.allClassified || 'Nenhuma opção restante',
-		dropHere: labels.dropHere || 'Solte aqui'
+		poolTitle: labels.poolTitle || i18n.t('dndMatch.poolTitle'),
+		allClassified: labels.allClassified || i18n.t('dndMatch.allClassified'),
+		dropHere: labels.dropHere || i18n.t('dndMatch.dropHere')
 	});
 
 	// Initialize value if it's null or invalid
@@ -235,17 +235,10 @@
 	let srAnnouncement = $state('');
 
 	function announceMove(item: string, from: string | 'pool', to: string | 'pool') {
-		const locale = i18n?.locale || 'pt';
 		const fromLabel = from === 'pool' ? mergedLabels.poolTitle : from;
 		const toLabel = to === 'pool' ? mergedLabels.poolTitle : to;
 
-		if (locale === 'pt') {
-			srAnnouncement = `Item "${item}" movido de "${fromLabel}" para "${toLabel}".`;
-		} else if (locale === 'es') {
-			srAnnouncement = `Elemento "${item}" movido de "${fromLabel}" a "${toLabel}".`;
-		} else {
-			srAnnouncement = `Item "${item}" moved from "${fromLabel}" to "${toLabel}".`;
-		}
+		srAnnouncement = i18n.t('dndMatch.moved', { item, from: fromLabel, to: toLabel });
 	}
 
 	function handleKeyDown(e: KeyboardEvent, item: string, source: string | 'pool') {
@@ -399,11 +392,10 @@
 					aria-selected={draggedItem?.item === item}
 					tabindex="0"
 					onkeydown={(e) => handleKeyDown(e, item, 'pool')}
-					aria-label={i18n?.locale === 'pt'
-						? `${item}. Opção disponível. Use as setas esquerda e direita ou números de 1 a ${buckets.length} para mover para uma categoria.`
-						: i18n?.locale === 'es'
-							? `${item}. Opción disponible. Use las flechas izquierda y derecha o los números de 1 a ${buckets.length} para mover a una categoría.`
-							: `${item}. Available option. Use left and right arrow keys or numbers 1 to ${buckets.length} to move to a category.`}
+					aria-label={i18n.t('dndMatch.availableOptionLabel', {
+						item,
+						count: buckets.length
+					})}
 				>
 					<span>{item}</span>
 				</div>
@@ -461,11 +453,7 @@
 							aria-selected={draggedItem?.item === item}
 							tabindex="0"
 							onkeydown={(e) => handleKeyDown(e, item, bucket)}
-							aria-label={i18n?.locale === 'pt'
-								? `${item}. Classificado em ${bucket}. Use as setas esquerda e direita, ou 0, Escape ou Backspace para retornar à pilha de opções disponíveis.`
-								: i18n?.locale === 'es'
-									? `${item}. Clasificado en ${bucket}. Use las flechas izquierda y derecha, o 0, Escape o Backspace para volver a la pila de opciones disponibles.`
-									: `${item}. Classified in ${bucket}. Use left and right arrow keys, or 0, Escape or Backspace to return to available options.`}
+							aria-label={i18n.t('dndMatch.classifiedOptionLabel', { item, bucket })}
 						>
 							{item}
 						</div>

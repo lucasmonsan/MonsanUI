@@ -8,9 +8,27 @@
 		summary?: string;
 		expanded?: boolean;
 		disabled?: boolean;
+		contentId?: string;
 	}
 
-	let { children, title, summary, expanded = $bindable(false), disabled = false }: Props = $props();
+	let {
+		children,
+		title,
+		summary,
+		expanded = $bindable(false),
+		disabled = false,
+		contentId
+	}: Props = $props();
+
+	const fallbackContentId = $derived(
+		`monsan-meta-disclosure-${title
+			.toLowerCase()
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-|-$/g, '')}`
+	);
+	const resolvedContentId = $derived(contentId ?? fallbackContentId);
 </script>
 
 <section class="monsan-meta-disclosure" class:is-open={expanded}>
@@ -18,6 +36,7 @@
 		type="button"
 		class="meta-disclosure-trigger"
 		aria-expanded={expanded}
+		aria-controls={resolvedContentId}
 		{disabled}
 		onclick={() => {
 			if (disabled) return;
@@ -35,7 +54,7 @@
 		</span>
 	</button>
 
-	<div class="meta-disclosure-content">
+	<div id={resolvedContentId} class="meta-disclosure-content">
 		<div class="meta-disclosure-inner">
 			{@render children()}
 		</div>

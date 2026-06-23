@@ -10,7 +10,8 @@
 		createdWithText,
 		copyright = '',
 		placement = 'inline',
-		variant = 'default'
+		variant = 'default',
+		spacing = 'none'
 	} = $props<{
 		authorName?: string;
 		svelteVersion?: string;
@@ -21,13 +22,14 @@
 		copyright?: string;
 		placement?: 'inline' | 'page-bottom';
 		variant?: 'default' | 'compact';
+		spacing?: 'none' | 'default';
 	}>();
 
 	let activeMadeWithText = $derived(madeWithText ?? i18n.t('credits.madeWithText'));
 	let activeCreatedWithText = $derived(createdWithText ?? i18n.t('credits.createdWithText'));
 </script>
 
-<footer class="monsan-credits placement-{placement} variant-{variant}">
+<footer class="monsan-credits placement-{placement} variant-{variant} spacing-{spacing}">
 	<div class="credits-inner">
 		{#if copyright}
 			<div class="credits-copyright">{copyright}</div>
@@ -64,7 +66,7 @@
 	.monsan-credits {
 		width: fit-content;
 		max-width: calc(100% - var(--space-lg));
-		margin: var(--space-md) auto var(--space-md) auto;
+		margin: 0 auto;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -81,7 +83,11 @@
 		line-height: 1.3;
 	}
 
-	.placement-page-bottom {
+	.spacing-default {
+		margin: var(--space-md) auto;
+	}
+
+	.spacing-default.placement-page-bottom {
 		margin-top: auto;
 		margin-bottom: var(--space-md);
 	}
@@ -143,11 +149,14 @@
 
 	.variant-compact {
 		max-width: calc(100% - var(--space-md));
-		margin-top: var(--space-sm);
-		margin-bottom: var(--space-sm);
 		padding: calc(var(--space-xs) * 0.75) var(--space-md);
 		font-size: calc(var(--base) * 0.72);
 		font-weight: 600;
+	}
+
+	.spacing-default.variant-compact {
+		margin-top: var(--space-sm);
+		margin-bottom: var(--space-sm);
 	}
 
 	.variant-compact .credits-inner,

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	export type VFSNode = { type: 'dir'; children: Record<string, VFSNode> } | { type: 'file' };
 
@@ -31,6 +32,9 @@
 		explorerHeader?: string;
 		explorerRoot?: string;
 		itemExists?: (target: string) => string;
+		helpLinux?: string;
+		helpWindows?: string;
+		inputLabel?: string;
 	}
 
 	interface Props {
@@ -51,40 +55,43 @@
 		messages = {}
 	}: Props = $props();
 
-	// Merged messages with Portuguese/English fallback defaults
 	const mergedMessages = $derived({
-		welcome:
-			messages.welcome ||
-			((mode: string) => `Bem-vindo ao simulador de terminal interativo!${mode}`),
-		unrecognized: messages.unrecognized || ((cmd: string) => `Comando '${cmd}' não reconhecido.`),
-		pathNotFound: messages.pathNotFound || 'Caminho não encontrado.',
-		destExists: messages.destExists || 'Destino já existe.',
-		originalNotFound: messages.originalNotFound || 'Origem não encontrada.',
-		usageMv: messages.usageMv || 'Uso: mv <origem> <destino>',
-		fileNotFoundSimple: messages.fileNotFoundSimple || 'Arquivo não encontrado.',
-		usageRm: messages.usageRm || 'Uso: rm <nome_do_arquivo>',
-		fileNotFound: messages.fileNotFound || 'Arquivo não encontrado.',
+		welcome: messages.welcome || ((mode: string) => i18n.t('terminal.welcome', { mode })),
+		unrecognized:
+			messages.unrecognized || ((cmd: string) => i18n.t('terminal.unrecognized', { cmd })),
+		pathNotFound: messages.pathNotFound || i18n.t('terminal.pathNotFound'),
+		destExists: messages.destExists || i18n.t('terminal.destExists'),
+		originalNotFound: messages.originalNotFound || i18n.t('terminal.originalNotFound'),
+		usageMv: messages.usageMv || i18n.t('terminal.usageMv'),
+		fileNotFoundSimple: messages.fileNotFoundSimple || i18n.t('terminal.fileNotFoundSimple'),
+		usageRm: messages.usageRm || i18n.t('terminal.usageRm'),
+		fileNotFound: messages.fileNotFound || i18n.t('terminal.fileNotFound'),
 		contentDisplayed:
-			messages.contentDisplayed || ((file: string) => `[Conteúdo do arquivo ${file}]`),
-		usageType: messages.usageType || 'Uso: type <nome_do_arquivo>',
-		usageTouch: messages.usageTouch || 'Uso: touch <nome_do_arquivo>',
-		dirNotFound: messages.dirNotFound || 'Diretório não encontrado.',
-		notEmpty: messages.notEmpty || ((target: string) => `Diretório '${target}' não está vazio.`),
-		cannotRemoveHome: messages.cannotRemoveHome || 'Não é possível remover a pasta home.',
-		usageRmdir: messages.usageRmdir || 'Uso: rmdir <nome_da_pasta>',
-		exists: messages.exists || ((name: string) => `'${name}' já existe.`),
-		usageMkdir: messages.usageMkdir || 'Uso: mkdir <nome_da_pasta>',
-		emptyDir: messages.emptyDir || '[Diretório vazio]',
-		lostDir: messages.lostDir || 'Diretório atual não encontrado. Retornando para /home.',
+			messages.contentDisplayed ||
+			((file: string) => i18n.t('terminal.contentDisplayed', { file })),
+		usageType: messages.usageType || i18n.t('terminal.usageType'),
+		usageTouch: messages.usageTouch || i18n.t('terminal.usageTouch'),
+		dirNotFound: messages.dirNotFound || i18n.t('terminal.dirNotFound'),
+		notEmpty: messages.notEmpty || ((target: string) => i18n.t('terminal.notEmpty', { target })),
+		cannotRemoveHome: messages.cannotRemoveHome || i18n.t('terminal.cannotRemoveHome'),
+		usageRmdir: messages.usageRmdir || i18n.t('terminal.usageRmdir'),
+		exists: messages.exists || ((name: string) => i18n.t('terminal.exists', { name })),
+		usageMkdir: messages.usageMkdir || i18n.t('terminal.usageMkdir'),
+		emptyDir: messages.emptyDir || i18n.t('terminal.emptyDir'),
+		lostDir: messages.lostDir || i18n.t('terminal.lostDir'),
 		cmdNotAvailable:
 			messages.cmdNotAvailable ||
-			((cmd: string, mode: string) => `Comando '${cmd}' não disponível no modo ${mode}.`),
-		errorProcess: messages.errorProcess || 'Erro ao processar comando.',
-		tabTerminal: messages.tabTerminal || 'Terminal',
-		tabFiles: messages.tabFiles || 'Arquivos',
-		explorerHeader: messages.explorerHeader || 'Explorador de Arquivos',
-		explorerRoot: messages.explorerRoot || 'raiz',
-		itemExists: messages.itemExists || ((target: string) => `Destino '${target}' já existe.`)
+			((cmd: string, mode: string) => i18n.t('terminal.cmdNotAvailable', { cmd, mode })),
+		errorProcess: messages.errorProcess || i18n.t('terminal.errorProcess'),
+		tabTerminal: messages.tabTerminal || i18n.t('terminal.tabTerminal'),
+		tabFiles: messages.tabFiles || i18n.t('terminal.tabFiles'),
+		explorerHeader: messages.explorerHeader || i18n.t('terminal.explorerHeader'),
+		explorerRoot: messages.explorerRoot || i18n.t('terminal.explorerRoot'),
+		itemExists:
+			messages.itemExists || ((target: string) => i18n.t('terminal.itemExists', { target })),
+		helpLinux: messages.helpLinux || i18n.t('terminal.helpLinux'),
+		helpWindows: messages.helpWindows || i18n.t('terminal.helpWindows'),
+		inputLabel: messages.inputLabel || i18n.t('terminal.inputLabel')
 	});
 
 	let vfs = $state(createInitialVFS());
@@ -92,6 +99,7 @@
 	let history = $state<{ id: string; type: 'cmd' | 'output' | 'error'; text: string }[]>([]);
 	let currentInput = $state('');
 	let terminalElement = $state<HTMLElement | null>(null);
+	let inputElement = $state<HTMLInputElement>();
 	let activeTab = $state<'terminal' | 'explorer'>('terminal');
 
 	function createInitialVFS(): Record<string, VFSNode> {
@@ -205,13 +213,13 @@
 					history.push({
 						id: Math.random().toString(36),
 						type: 'output',
-						text: 'Linux: ls, cd, mkdir, rmdir, touch, rm, mv, clear'
+						text: mergedMessages.helpLinux
 					});
 				if (osMode === 'windows' || osMode === 'both')
 					history.push({
 						id: Math.random().toString(36),
 						type: 'output',
-						text: 'Windows: dir, cd, md, rd, type, del, ren, cls'
+						text: mergedMessages.helpWindows
 					});
 				break;
 			}
@@ -403,7 +411,7 @@
 				isFirstEffectRun = false;
 				return;
 			}
-			document.getElementById('term-input')?.focus();
+			inputElement?.focus();
 		}
 	});
 
@@ -411,7 +419,7 @@
 	$effect(() => {
 		if (terminalWrapperEl) {
 			const listener = () => {
-				document.getElementById('term-input')?.focus();
+				inputElement?.focus();
 			};
 			terminalWrapperEl.addEventListener('click', listener);
 			return () => terminalWrapperEl?.removeEventListener('click', listener);
@@ -484,18 +492,21 @@
 		class:hidden-mobile={activeTab === 'explorer'}
 	>
 		<div class="terminal-content" bind:this={terminalElement}>
-			{#each history as line (line.id)}
-				<div class="line {line.type}">{line.text}</div>
-			{/each}
+			<div class="terminal-history" role="log" aria-live="polite" aria-relevant="additions text">
+				{#each history as line (line.id)}
+					<div class="line {line.type}">{line.text}</div>
+				{/each}
+			</div>
 			<div class="input-line">
 				<span class="prompt">{pathString}$</span>
 				<input
-					id="term-input"
+					bind:this={inputElement}
 					type="text"
 					bind:value={currentInput}
 					onkeydown={handleCommand}
 					autocomplete="off"
 					spellcheck="false"
+					aria-label={mergedMessages.inputLabel}
 					{disabled}
 				/>
 			</div>

@@ -7,6 +7,8 @@
 		disabled?: boolean;
 		columns?: number;
 		size?: 'sm' | 'md' | 'lg';
+		ariaLabel?: string;
+		ariaLabelledby?: string;
 	}
 
 	let {
@@ -14,8 +16,12 @@
 		value = $bindable([]),
 		disabled = false,
 		columns = 1,
-		size = 'lg'
+		size = 'lg',
+		ariaLabel,
+		ariaLabelledby
 	}: Props = $props();
+
+	let optionsListEl = $state<HTMLDivElement>();
 
 	function toggleChoice(option: string) {
 		if (disabled) return;
@@ -26,10 +32,45 @@
 			value = [...value, option];
 		}
 	}
+
+	function focusOption(index: number) {
+		const optionButtons = Array.from(
+			optionsListEl?.querySelectorAll<HTMLButtonElement>('.option-btn:not(:disabled)') ?? []
+		);
+		const target = optionButtons[index];
+		target?.focus();
+	}
+
+	function handleOptionKeydown(event: KeyboardEvent, index: number) {
+		if (disabled) return;
+
+		let nextIndex: number | null = null;
+		if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+			nextIndex = (index + 1) % options.length;
+		} else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+			nextIndex = (index - 1 + options.length) % options.length;
+		} else if (event.key === 'Home') {
+			nextIndex = 0;
+		} else if (event.key === 'End') {
+			nextIndex = options.length - 1;
+		}
+
+		if (nextIndex === null) return;
+
+		event.preventDefault();
+		focusOption(nextIndex);
+	}
 </script>
 
-<div class="options-list size-{size}" role="group" style:--cols={String(columns)}>
-	{#each options as option (option)}
+<div
+	bind:this={optionsListEl}
+	class="options-list size-{size}"
+	role="group"
+	aria-label={ariaLabel}
+	aria-labelledby={ariaLabelledby}
+	style:--cols={String(columns)}
+>
+	{#each options as option, index (option)}
 		{@const selected = Array.isArray(value) && value.includes(option)}
 		<button
 			type="button"
@@ -38,6 +79,7 @@
 			role="checkbox"
 			aria-checked={selected}
 			onclick={() => toggleChoice(option)}
+			onkeydown={(event) => handleOptionKeydown(event, index)}
 			{disabled}
 		>
 			<div class="checkbox-square">

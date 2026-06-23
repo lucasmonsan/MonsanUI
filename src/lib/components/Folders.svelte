@@ -6,6 +6,7 @@
 	import Pencil from './icons/Pencil.svelte';
 	import QuickActions from './QuickActions.svelte';
 	import Trash from './icons/Trash.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Folder {
 		id: string;
@@ -40,6 +41,7 @@
 			edit?: string;
 			delete?: string;
 			options?: string;
+			colorLabel?: (color: string) => string;
 		};
 	}
 
@@ -69,19 +71,19 @@
 	let wasModalOpen = false;
 
 	const l = $derived({
-		allFolders: labels?.allFolders ?? 'Todas',
-		newFolder: labels?.newFolder ?? 'Nova Pasta',
-		editFolder: labels?.editFolder ?? 'Editar Pasta',
-		folderNameLabel: labels?.folderNameLabel ?? 'Nome da Pasta',
-		folderNamePlaceholder: labels?.folderNamePlaceholder ?? 'Digite o nome...',
-		folderColorLabel: labels?.folderColorLabel ?? 'Cor',
-		cancel: labels?.cancel ?? 'Cancelar',
-		save: labels?.save ?? 'Salvar',
-		create: labels?.create ?? 'Criar',
-		cannotDeleteAllFolder: labels?.cannotDeleteAllFolder ?? 'Não é possível excluir a pasta padrão',
-		edit: labels?.edit ?? 'Editar',
-		delete: labels?.delete ?? 'Excluir',
-		options: labels?.options ?? 'Opções'
+		allFolders: labels?.allFolders ?? i18n.t('folders.allFolders'),
+		newFolder: labels?.newFolder ?? i18n.t('folders.newFolder'),
+		editFolder: labels?.editFolder ?? i18n.t('folders.editFolder'),
+		folderNameLabel: labels?.folderNameLabel ?? i18n.t('folders.folderNameLabel'),
+		folderNamePlaceholder: labels?.folderNamePlaceholder ?? i18n.t('folders.folderNamePlaceholder'),
+		folderColorLabel: labels?.folderColorLabel ?? i18n.t('folders.folderColorLabel'),
+		cancel: labels?.cancel ?? i18n.t('folders.cancel'),
+		save: labels?.save ?? i18n.t('folders.save'),
+		create: labels?.create ?? i18n.t('folders.create'),
+		cannotDeleteAllFolder: labels?.cannotDeleteAllFolder ?? i18n.t('folders.cannotDeleteAllFolder'),
+		edit: labels?.edit ?? i18n.t('folders.edit'),
+		delete: labels?.delete ?? i18n.t('folders.delete'),
+		options: labels?.options ?? i18n.t('folders.options')
 	});
 
 	let sortedFolders = $derived.by(() => {
@@ -128,6 +130,23 @@
 		showModal = false;
 		showCreateModal = false;
 		editingFolderId = null;
+	}
+
+	function getColorLabel(color: string) {
+		const override = labels?.colorLabel?.(color);
+		if (override) return override;
+
+		const keyByColor: Record<string, string> = {
+			default: 'folders.colorDefault',
+			blue: 'folders.colorBlue',
+			green: 'folders.colorGreen',
+			yellow: 'folders.colorYellow',
+			purple: 'folders.colorPurple',
+			orange: 'folders.colorOrange',
+			red: 'folders.colorRed'
+		};
+
+		return i18n.t(keyByColor[color] ?? 'folders.colorDefault');
 	}
 
 	$effect(() => {
@@ -267,6 +286,7 @@
 				showCreateModal = true;
 			}}
 			title={l.newFolder}
+			aria-label={l.newFolder}
 		>
 			<Plus size={16} />
 		</button>
@@ -306,7 +326,8 @@
 						class:red={color === 'red'}
 						class:selected={newFolderColor === color}
 						onclick={() => (newFolderColor = color)}
-						title={color}
+						title={getColorLabel(color)}
+						aria-label={getColorLabel(color)}
 					></button>
 				{/each}
 			</div>
