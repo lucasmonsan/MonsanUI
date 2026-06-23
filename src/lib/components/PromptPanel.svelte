@@ -5,12 +5,13 @@
 	interface Props {
 		children: Snippet;
 		condensed?: boolean;
+		spacing?: 'none' | 'bottom';
 	}
 
-	let { children, condensed = false }: Props = $props();
+	let { children, condensed = false, spacing = 'none' }: Props = $props();
 </script>
 
-<div class="monsan-prompt-panel" class:condensed>
+<div class="monsan-prompt-panel spacing-{spacing}" class:condensed>
 	<Panel variant="secondary" maxWidth="100%">
 		{@render children()}
 	</Panel>
@@ -19,11 +20,14 @@
 <style>
 	.monsan-prompt-panel {
 		width: 100%;
-		margin-bottom: var(--space-xl);
 		box-sizing: border-box;
 		transition:
 			transform 0.3s ease-in-out,
 			opacity 0.3s ease-in-out;
+	}
+
+	.spacing-bottom {
+		margin-bottom: var(--space-xl);
 	}
 
 	.condensed {

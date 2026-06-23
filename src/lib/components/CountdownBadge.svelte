@@ -4,12 +4,21 @@
 	interface Props {
 		children: Snippet;
 		warning?: boolean;
+		role?: string;
+		ariaLive?: 'off' | 'polite' | 'assertive';
+		ariaLabel?: string;
 	}
 
-	let { children, warning = false }: Props = $props();
+	let { children, warning = false, role, ariaLive, ariaLabel }: Props = $props();
 </script>
 
-<span class="monsan-countdown-badge" class:warning>
+<span
+	class="monsan-countdown-badge"
+	class:warning
+	{role}
+	aria-live={ariaLive}
+	aria-label={ariaLabel}
+>
 	{@render children()}
 </span>
 

@@ -10,6 +10,7 @@
 		disabled?: boolean;
 		onclick?: () => void;
 		icon?: Component<{ size?: number }>;
+		ariaLabel?: string;
 	}
 
 	let {
@@ -19,15 +20,20 @@
 		variant = 'default',
 		disabled = false,
 		onclick,
-		icon
+		icon,
+		ariaLabel
 	}: Props = $props();
+
+	const resolvedAriaLabel = $derived(
+		ariaLabel ?? (actionLabel ? `${title}. ${actionLabel}` : title)
+	);
 </script>
 
 <button
 	type="button"
 	class="monsan-choice-card {variant}"
 	{disabled}
-	aria-label={actionLabel ? `${title}. ${actionLabel}` : title}
+	aria-label={resolvedAriaLabel}
 	{onclick}
 >
 	{#if icon}

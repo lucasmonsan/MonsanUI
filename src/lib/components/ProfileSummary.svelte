@@ -8,15 +8,16 @@
 		image?: string | null;
 		imageAlt?: string;
 		framed?: boolean;
+		nameTag?: 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div';
 	}
 
-	let { name, email, image, imageAlt = name, framed = true }: Props = $props();
+	let { name, email, image, imageAlt = name, framed = true, nameTag = 'h2' }: Props = $props();
 </script>
 
 <div class="monsan-profile-summary" class:framed>
 	<Avatar src={image ?? undefined} {name} alt={imageAlt} size="md" />
 	<div class="profile-details">
-		<Text tag="h2" family="display" size="md" weight="bold">{name}</Text>
+		<Text tag={nameTag} family="display" size="md" weight="bold">{name}</Text>
 		{#if email}
 			<Text tag="p" size="sm" variant="secondary">{email}</Text>
 		{/if}

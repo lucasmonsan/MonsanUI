@@ -44,7 +44,9 @@
 				class="brand-logo"
 				class:adaptive={adaptiveLogo}
 				style:--brand-logo-mask={`url("${logoSrc}") no-repeat center / contain`}
-				aria-label={logoAlt}
+				role={logoAlt ? 'img' : undefined}
+				aria-label={logoAlt || undefined}
+				aria-hidden={logoAlt ? undefined : 'true'}
 			></span>
 		{/if}
 	{/if}
