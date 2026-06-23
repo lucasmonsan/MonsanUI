@@ -9,6 +9,7 @@
 	import Trash from './icons/Trash.svelte';
 	import Minus from './icons/Minus.svelte';
 	import Plus from './icons/Plus.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Field {
 		id: string;
@@ -43,24 +44,6 @@
 		};
 	}
 
-	const defaultFields: Field[] = [
-		{
-			id: 'front',
-			label: 'Pergunta',
-			placeholder: 'Digite a pergunta...',
-			type: 'textarea',
-			rows: 1
-		},
-		{
-			id: 'back',
-			label: 'Resposta',
-			placeholder: 'Digite a resposta...',
-			type: 'textarea',
-			rows: 2
-		},
-		{ id: 'hint', label: 'Dica', placeholder: 'Digite uma dica...', type: 'text', optional: true }
-	];
-
 	let {
 		value = $bindable(),
 		index,
@@ -73,12 +56,38 @@
 		onDragOver,
 		onDragEnd,
 		dragDisabled = false,
-		fields = defaultFields,
+		fields,
 		labels
 	}: Props = $props();
 
 	let isTouchDragging = $state(false);
 	let dragAllowed = $state(false);
+
+	const defaultFields: Field[] = $derived([
+		{
+			id: 'front',
+			label: i18n.t('cardEditor.frontLabel'),
+			placeholder: i18n.t('cardEditor.frontPlaceholder'),
+			type: 'textarea',
+			rows: 1
+		},
+		{
+			id: 'back',
+			label: i18n.t('cardEditor.backLabel'),
+			placeholder: i18n.t('cardEditor.backPlaceholder'),
+			type: 'textarea',
+			rows: 2
+		},
+		{
+			id: 'hint',
+			label: i18n.t('cardEditor.hintLabel'),
+			placeholder: i18n.t('cardEditor.hintPlaceholder'),
+			type: 'text',
+			optional: true
+		}
+	]);
+
+	const activeFields = $derived(fields ?? defaultFields);
 
 	function handleDragStart(e: DragEvent) {
 		if (!dragAllowed) {
@@ -141,13 +150,18 @@
 	}
 
 	const l = $derived({
-		cardNumber: labels?.cardNumber ?? ((n: number) => `Card ${n}`),
-		moveUp: labels?.moveUp ?? 'Mover para cima',
-		moveDown: labels?.moveDown ?? 'Mover para baixo',
-		duplicateCard: labels?.duplicateCard ?? 'Duplicar',
-		deleteCard: labels?.deleteCard ?? 'Excluir',
-		addOptionalField: labels?.addOptionalField ?? ((label: string) => `Adicionar ${label}`),
-		removeOptionalField: labels?.removeOptionalField ?? ((label: string) => `Remover ${label}`)
+		cardNumber:
+			labels?.cardNumber ?? ((n: number) => i18n.t('cardEditor.cardNumber', { number: n })),
+		moveUp: labels?.moveUp ?? i18n.t('cardEditor.moveUp'),
+		moveDown: labels?.moveDown ?? i18n.t('cardEditor.moveDown'),
+		duplicateCard: labels?.duplicateCard ?? i18n.t('cardEditor.duplicateCard'),
+		deleteCard: labels?.deleteCard ?? i18n.t('cardEditor.deleteCard'),
+		addOptionalField:
+			labels?.addOptionalField ??
+			((label: string) => i18n.t('cardEditor.addOptionalField', { label })),
+		removeOptionalField:
+			labels?.removeOptionalField ??
+			((label: string) => i18n.t('cardEditor.removeOptionalField', { label }))
 	});
 
 	function getVisibilityKey(field: Field) {
@@ -233,12 +247,24 @@
 		</div>
 		<div class="card-actions">
 			{#if index > 0}
-				<button type="button" class="btn-icon" title={l.moveUp} onclick={() => onMove(index, -1)}>
+				<button
+					type="button"
+					class="btn-icon"
+					title={l.moveUp}
+					aria-label={l.moveUp}
+					onclick={() => onMove(index, -1)}
+				>
 					<ChevronUp size={14} />
 				</button>
 			{/if}
 			{#if index < totalCards - 1}
-				<button type="button" class="btn-icon" title={l.moveDown} onclick={() => onMove(index, 1)}>
+				<button
+					type="button"
+					class="btn-icon"
+					title={l.moveDown}
+					aria-label={l.moveDown}
+					onclick={() => onMove(index, 1)}
+				>
 					<ChevronDown size={14} />
 				</button>
 			{/if}
@@ -246,6 +272,7 @@
 				type="button"
 				class="btn-icon"
 				title={l.duplicateCard}
+				aria-label={l.duplicateCard}
 				onclick={() => onDuplicate(index)}
 			>
 				<Copy size={14} />
@@ -256,6 +283,7 @@
 					class="btn-icon btn-delete"
 					onclick={() => onRemove(index)}
 					title={l.deleteCard}
+					aria-label={l.deleteCard}
 				>
 					<Trash size={14} />
 				</button>
@@ -264,7 +292,7 @@
 	</div>
 
 	<div class="inputs-stack">
-		{#each fields as field (field.id)}
+		{#each activeFields as field (field.id)}
 			{#if field.optional}
 				<div class="hint-group">
 					<div class="hint-header">
@@ -273,6 +301,9 @@
 							type="button"
 							class="btn-toggle-hint-icon"
 							title={isFieldVisible(field)
+								? l.removeOptionalField(field.label)
+								: l.addOptionalField(field.label)}
+							aria-label={isFieldVisible(field)
 								? l.removeOptionalField(field.label)
 								: l.addOptionalField(field.label)}
 							onclick={() => toggleFieldVisibility(field)}

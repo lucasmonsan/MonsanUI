@@ -195,23 +195,11 @@
 
 		let suffix = '';
 		if (count > 0) {
-			if (locale === 'pt') {
-				suffix = `, ${count} ${count === 1 ? 'revisão pendente' : 'revisões pendentes'}`;
-			} else if (locale === 'es') {
-				suffix = `, ${count} ${count === 1 ? 'revisión pendiente' : 'revisiones pendientes'}`;
-			} else {
-				suffix = `, ${count} ${count === 1 ? 'pending review' : 'pending reviews'}`;
-			}
+			suffix = `, ${count} ${i18n.t(count === 1 ? 'calendar.pendingReview' : 'calendar.pendingReviews')}`;
 		}
 
 		if (hasEvents) {
-			if (locale === 'pt') {
-				suffix += ', possui eventos';
-			} else if (locale === 'es') {
-				suffix += ', tiene eventos';
-			} else {
-				suffix += ', has events';
-			}
+			suffix += `, ${i18n.t('calendar.hasEvents')}`;
 		}
 
 		return `${formattedDate}${suffix}`;
@@ -259,13 +247,7 @@
 					</svg>
 				</h3>
 			{:else if mode === 'week'}
-				<h3 class="calendar-title">
-					{i18n.locale === 'pt'
-						? 'Semana Atual'
-						: i18n.locale === 'en'
-							? 'Current Week'
-							: 'Semana Actual'}
-				</h3>
+				<h3 class="calendar-title">{i18n.t('calendar.currentWeek')}</h3>
 			{:else if mode === 'list'}
 				<h3 class="calendar-title">
 					{i18n.t('calendar.agenda')} — {monthNames[currentMonth]}
@@ -302,7 +284,7 @@
 					onclick={(e) => e.stopPropagation()}
 					onkeydown={(e) => e.stopPropagation()}
 					role="dialog"
-					aria-label="Selecionar mês e ano"
+					aria-label={i18n.t('calendar.selectMonthYear')}
 					tabindex="-1"
 				>
 					<div class="popover-header">
@@ -310,7 +292,7 @@
 							type="button"
 							class="year-nav-btn"
 							onclick={() => currentYear--}
-							aria-label="Ano Anterior"
+							aria-label={i18n.t('calendar.previousYear')}
 						>
 							<svg
 								width="14"
@@ -336,7 +318,7 @@
 							type="button"
 							class="year-nav-btn"
 							onclick={() => currentYear++}
-							aria-label="Próximo Ano"
+							aria-label={i18n.t('calendar.nextYear')}
 						>
 							<svg
 								width="14"
@@ -373,7 +355,12 @@
 
 		<div class="nav-buttons">
 			{#if mode !== 'week'}
-				<button type="button" class="nav-btn" onclick={prevMonth} aria-label="Mês anterior">
+				<button
+					type="button"
+					class="nav-btn"
+					onclick={prevMonth}
+					aria-label={i18n.t('calendar.previousMonth')}
+				>
 					<svg
 						width="14"
 						height="14"
@@ -387,7 +374,12 @@
 						<path d="m15 18-6-6 6-6" />
 					</svg>
 				</button>
-				<button type="button" class="nav-btn" onclick={nextMonth} aria-label="Próximo mês">
+				<button
+					type="button"
+					class="nav-btn"
+					onclick={nextMonth}
+					aria-label={i18n.t('calendar.nextMonth')}
+				>
 					<svg
 						width="14"
 						height="14"
@@ -424,7 +416,7 @@
 					class:selected={selectedDate === day.dateStr}
 					disabled={day.day === ''}
 					onclick={() => handleDayClick(day.dateStr)}
-					title={day.dateStr ? `${day.dateStr}: ${day.count} revisões` : ''}
+					title={day.dateStr ? getAriaLabelForDay(day.dateStr, day.count, day.hasEvents) : ''}
 					aria-label={day.dateStr
 						? getAriaLabelForDay(day.dateStr, day.count, day.hasEvents)
 						: undefined}
@@ -508,7 +500,7 @@
 						<div class="list-day-header">
 							<span class="list-day-date">{formatDisplayDate(day.dateStr)}</span>
 							{#if day.activity > 0}
-								<Badge variant="due">{day.activity} {i18n.locale === 'pt' ? 'revs' : 'revs'}</Badge>
+								<Badge variant="due">{day.activity} {i18n.t('calendar.revisionsShort')}</Badge>
 							{/if}
 						</div>
 						{#if day.events.length > 0}
@@ -535,7 +527,7 @@
 					type="button"
 					class="close-details-btn"
 					onclick={() => (selectedDate = null)}
-					aria-label="Fechar detalhes"
+					aria-label={i18n.t('calendar.closeDetails')}
 				>
 					<svg
 						width="14"

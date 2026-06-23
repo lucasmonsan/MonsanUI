@@ -5,6 +5,7 @@
 	import Copy from './icons/Copy.svelte';
 	import Pencil from './icons/Pencil.svelte';
 	import Trash from './icons/Trash.svelte';
+	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
 		deck: { id: string; name: string; cards?: import('../types.js').Card[] };
@@ -21,6 +22,8 @@
 			duplicate?: string;
 			edit?: string;
 			delete?: string;
+			moreOptions?: string;
+			closePopover?: string;
 		};
 		onSelect?: () => void;
 		onContextMenu?: (e: MouseEvent) => void;
@@ -59,14 +62,24 @@
 
 	let isLongPress = false;
 	let touchTimer: ReturnType<typeof setTimeout> | null = null;
+	let deckEl = $state<HTMLDivElement>();
 
-	// Close popover and context menu when clicking outside the deck card
+	const l = $derived({
+		cards: labels?.cards ?? i18n.t('deck.cards'),
+		due: labels?.due ?? i18n.t('deck.due'),
+		new: labels?.new ?? i18n.t('deck.new'),
+		duplicate: labels?.duplicate ?? i18n.t('deck.duplicate'),
+		edit: labels?.edit ?? i18n.t('deck.edit'),
+		delete: labels?.delete ?? i18n.t('deck.delete'),
+		moreOptions: labels?.moreOptions ?? i18n.t('deck.moreOptions'),
+		closePopover: labels?.closePopover ?? i18n.t('deck.closePopover')
+	});
+
 	$effect(() => {
 		if (!isPopoverOpen && !isMenuOpen) return;
 
 		const handleClickOutside = (e: MouseEvent) => {
 			const target = e.target as HTMLElement;
-			const deckEl = document.getElementById(deck.id);
 			if (deckEl && !deckEl.contains(target)) {
 				isPopoverOpen = false;
 				isMenuOpen = false;
@@ -81,8 +94,10 @@
 </script>
 
 <div
+	bind:this={deckEl}
 	id={deck.id}
-	class="deck-card panel appear-animation {isPopoverOpen || isMenuOpen ? 'selected-for-play' : ''}"
+	class="deck-card panel appear-animation"
+	class:selected-for-play={isPopoverOpen || isMenuOpen}
 	data-theme={folderColor}
 	role="button"
 	tabindex="0"
@@ -115,31 +130,30 @@
 			onSelect?.();
 		}
 	}}
-	style="--delay: {index * 0.1}s; cursor: pointer; position: relative;"
+	style:--delay={`${index * 0.1}s`}
 >
 	<div class="deck-info">
 		<h3>{deck.name}</h3>
 		<div class="deck-subtitle-row">
 			<p>
 				{deck.cards?.length ?? 0}
-				{labels?.cards ?? 'cartas'}
+				{l.cards}
 			</p>
 			<div class="deck-badges">
 				{#if badgesSnippet}
 					{@render badgesSnippet()}
 				{:else if stats}
 					{#if stats.dueCount > 0}
-						<Badge variant="due">{stats.dueCount} {labels?.due ?? 'due'}</Badge>
+						<Badge variant="due">{stats.dueCount} {l.due}</Badge>
 					{/if}
 					{#if stats.newCount > 0}
-						<Badge variant="new">{stats.newCount} {labels?.new ?? 'new'}</Badge>
+						<Badge variant="new">{stats.newCount} {l.new}</Badge>
 					{/if}
 				{/if}
 			</div>
 		</div>
 	</div>
 
-	<!-- Menu de Contexto -->
 	{#if actionsSnippet}
 		{@render actionsSnippet()}
 	{:else}
@@ -156,12 +170,15 @@
 			>
 				{#snippet trigger()}
 					<button
+						type="button"
 						class="context-menu-btn"
 						onclick={(e: MouseEvent) => {
 							e.stopPropagation();
 							onOpenMenu?.();
 						}}
-						aria-label="Mais opções"
+						aria-label={l.moreOptions}
+						aria-haspopup="menu"
+						aria-expanded={isMenuOpen}
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -190,7 +207,8 @@
 							e.stopPropagation();
 							onDuplicate?.();
 						}}
-						title={labels?.duplicate ?? 'Duplicate'}
+						title={l.duplicate}
+						ariaLabel={l.duplicate}
 					>
 						<Copy size={20} />
 					</Button>
@@ -203,7 +221,8 @@
 							e.stopPropagation();
 							onEdit?.();
 						}}
-						title={labels?.edit ?? 'Edit'}
+						title={l.edit}
+						ariaLabel={l.edit}
 					>
 						<Pencil size={20} />
 					</Button>
@@ -215,7 +234,8 @@
 							e.stopPropagation();
 							onDelete?.();
 						}}
-						title={labels?.delete ?? 'Delete'}
+						title={l.delete}
+						ariaLabel={l.delete}
 					>
 						<Trash size={20} />
 					</Button>
@@ -236,7 +256,7 @@
 				onclick={() => {
 					isPopoverOpen = false;
 				}}
-				aria-label="Close popover"
+				aria-label={l.closePopover}
 			></button>
 			<div class="popover-buttons">
 				{#each modes as mode (mode.id)}
@@ -262,6 +282,7 @@
 		align-items: center;
 		position: relative;
 		width: 100%;
+		cursor: pointer;
 	}
 
 	.mode-popover {
@@ -417,5 +438,18 @@
 
 	:global(.btn-delete) {
 		color: var(--error) !important;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.mode-popover,
+		.context-menu-btn {
+			transition: none;
+		}
+
+		.appear-animation {
+			animation: none;
+			opacity: 1;
+			transform: none;
+		}
 	}
 </style>
