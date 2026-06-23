@@ -19,7 +19,7 @@
 		align = 'center',
 		animate = true,
 		fullHeight = true,
-		padding = 'var(--space-lg)'
+		padding = 'none'
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
