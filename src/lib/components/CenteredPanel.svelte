@@ -19,7 +19,7 @@
 		align = 'center',
 		animate = true,
 		fullHeight = true,
-		padding = 'var(--space-lg)'
+		padding = 'none'
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -54,13 +54,6 @@
 	.is-full-height {
 		flex: 1 1 auto;
 		height: 100%;
-		overflow-y: auto;
-		overflow-x: hidden;
-		scrollbar-width: none;
-	}
-
-	.is-full-height::-webkit-scrollbar {
-		display: none;
 	}
 
 	.monsan-centered-panel :global(.centered-panel-surface) {
