@@ -1270,7 +1270,7 @@
 \tThemeSelector
 } from 'monsan-ui';
 
-<AppHeader title="Examster" subtitle="Student Panel" logoSrc="/favicon.svg" sticky>
+<AppHeader tag="header" title="Examster" subtitle="Student Panel" logoSrc="/favicon.svg" sticky>
 \t{#snippet actions()}
 \t\t<AvatarMenu name="Lucas Monsan" shape="square" ariaLabel="Open user menu">
 \t\t\t<IconButton label="Open profile">
@@ -5938,6 +5938,7 @@
 							<div class="preview-box app-header-preview">
 								<span class="box-label">{i18n.t('common.preview')}</span>
 								<AppHeader
+									tag="header"
 									title="Examster"
 									subtitle={i18n.locale === 'pt'
 										? 'Painel do aluno'

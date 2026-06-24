@@ -4,6 +4,7 @@
 
 	interface Props {
 		title: string;
+		tag?: 'div' | 'header';
 		subtitle?: string;
 		logoSrc?: string;
 		logoAlt?: string;
@@ -21,6 +22,7 @@
 
 	let {
 		title,
+		tag = 'div',
 		subtitle,
 		logoSrc,
 		logoAlt = '',
@@ -37,7 +39,8 @@
 	}: Props = $props();
 </script>
 
-<header
+<svelte:element
+	this={tag}
 	class="monsan-app-header"
 	class:with-border={border}
 	class:is-sticky={sticky}
@@ -92,7 +95,7 @@
 			</div>
 		{/if}
 	</div>
-</header>
+</svelte:element>
 
 <style>
 	.monsan-app-header {
