@@ -18,6 +18,7 @@ export type MaxWidthPreset =
 	| '760px'
 	| '1000px'
 	| '1200px'
+	| '1280px'
 	| '1400px'
 	| '100%';
 
@@ -65,7 +66,7 @@ const maxWidthValues: Record<MaxWidthPreset, string> = {
 	sm: '600px',
 	md: '760px',
 	lg: '1000px',
-	xl: '1200px',
+	xl: '1280px',
 	'2xl': '1400px',
 	full: '100%',
 	none: 'none',
@@ -77,6 +78,7 @@ const maxWidthValues: Record<MaxWidthPreset, string> = {
 	'760px': '760px',
 	'1000px': '1000px',
 	'1200px': '1200px',
+	'1280px': '1280px',
 	'1400px': '1400px',
 	'100%': '100%'
 };
