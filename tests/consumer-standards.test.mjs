@@ -55,6 +55,39 @@ await withFixture(
 
 await withFixture(
 	{
+		'src/app.css': "@import 'monsan-ui/monsan-ui.css';\n",
+		'src/routes/+page.svelte':
+			'<script>const example = "<main>Example</main>";</script>\n<AppShell><main>Content</main></AppShell>\n'
+	},
+	async (root) => {
+		const violations = await checkConsumerStandards({ root });
+		const report = violations.join('\n');
+
+		assert(
+			report.includes('nested <main> landmark inside AppShell'),
+			`Expected nested main landmark violation: ${report}`
+		);
+	}
+);
+
+await withFixture(
+	{
+		'src/app.css': "@import 'monsan-ui/monsan-ui.css';\n",
+		'src/routes/+page.svelte':
+			'<script>const example = "<main>Example</main>";</script>\n<AppShell><section>Content</section></AppShell>\n'
+	},
+	async (root) => {
+		const violations = await checkConsumerStandards({ root });
+
+		assert(
+			violations.length === 0,
+			`Expected script example and section content to pass, got ${violations}.`
+		);
+	}
+);
+
+await withFixture(
+	{
 		'src/app.css': "@import 'monsan-ui/monsan-ui.css';\nbody { color: red; }\n",
 		'src/routes/+page.svelte': '<div class="local"><style>.local { color: red; }</style></div>\n'
 	},
