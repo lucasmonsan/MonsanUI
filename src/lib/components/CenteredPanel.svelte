@@ -53,7 +53,6 @@
 
 	.is-full-height {
 		flex: 1 1 auto;
-		height: 100%;
 	}
 
 	.monsan-centered-panel :global(.centered-panel-surface) {
