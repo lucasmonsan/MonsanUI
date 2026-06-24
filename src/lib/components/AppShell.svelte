@@ -222,10 +222,6 @@
 		position: relative;
 	}
 
-	.app-shell-content > :global(.monsan-centered-panel) {
-		flex: 1 1 auto;
-	}
-
 	.app-shell-content::before,
 	.app-shell-content::after {
 		content: '';
