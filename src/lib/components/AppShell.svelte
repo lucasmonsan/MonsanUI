@@ -8,9 +8,10 @@
 		top?: Snippet;
 		bottom?: Snippet;
 		footer?: Snippet;
+		contentId?: string;
 	}
 
-	let { children, header, top, bottom, footer }: Props = $props();
+	let { children, header, top, bottom, footer, contentId = 'main-content' }: Props = $props();
 
 	let scrollEl = $state<HTMLElement>();
 	let contentEl = $state<HTMLElement>();
@@ -108,10 +109,12 @@
 	{/if}
 
 	<div
+		id={contentId}
 		bind:this={scrollEl}
 		class="app-shell-scroll"
 		class:has-overflow-top={hasOverflowTop}
 		class:has-overflow-bottom={hasOverflowBottom}
+		tabindex="-1"
 		onscroll={updateOverflowFade}
 	>
 		<div bind:this={contentEl} class="app-shell-content">
