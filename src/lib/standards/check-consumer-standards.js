@@ -93,7 +93,14 @@ function hasNonMonsanCss(content) {
  * @returns {string[]}
  */
 function collectSvelteViolations(content) {
-	return rules.filter((rule) => rule.pattern.test(content)).map((rule) => rule.name);
+	const violations = rules.filter((rule) => rule.pattern.test(content)).map((rule) => rule.name);
+	const markup = content.replace(/<script(?:\s[^>]*)?>[\s\S]*?<\/script>/gi, '');
+
+	if (/<AppShell(?:\s|>)[\s\S]*?<main(?:\s|>)[\s\S]*?<\/AppShell>/.test(markup)) {
+		violations.push('nested <main> landmark inside AppShell');
+	}
+
+	return violations;
 }
 
 /**
