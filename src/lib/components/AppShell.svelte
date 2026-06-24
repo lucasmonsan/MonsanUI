@@ -13,8 +13,35 @@
 	let { children, header, top, bottom, footer }: Props = $props();
 
 	let scrollEl = $state<HTMLElement>();
+	let contentEl = $state<HTMLElement>();
 	let hasOverflowTop = $state(false);
 	let hasOverflowBottom = $state(false);
+
+	function getScrollableContentBounds() {
+		if (!scrollEl || !contentEl) {
+			return null;
+		}
+
+		const children = Array.from(contentEl.children).filter(
+			(child): child is HTMLElement => child instanceof HTMLElement
+		);
+
+		if (children.length === 0) {
+			return null;
+		}
+
+		const scrollRect = scrollEl.getBoundingClientRect();
+		let top = Number.POSITIVE_INFINITY;
+		let bottom = Number.NEGATIVE_INFINITY;
+
+		for (const child of children) {
+			const childRect = child.getBoundingClientRect();
+			top = Math.min(top, childRect.top - scrollRect.top + scrollEl.scrollTop);
+			bottom = Math.max(bottom, childRect.bottom - scrollRect.top + scrollEl.scrollTop);
+		}
+
+		return { top, bottom };
+	}
 
 	function updateOverflowFade() {
 		if (!scrollEl) {
@@ -23,10 +50,19 @@
 			return;
 		}
 
-		const threshold = 1;
-		hasOverflowTop = scrollEl.scrollTop > threshold;
+		const threshold = 2;
+		const contentBounds = getScrollableContentBounds();
+
+		if (!contentBounds) {
+			hasOverflowTop = scrollEl.scrollTop > threshold;
+			hasOverflowBottom =
+				scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - threshold;
+			return;
+		}
+
+		hasOverflowTop = contentBounds.top < scrollEl.scrollTop - threshold;
 		hasOverflowBottom =
-			scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - threshold;
+			contentBounds.bottom > scrollEl.scrollTop + scrollEl.clientHeight + threshold;
 	}
 
 	onMount(() => {
@@ -38,6 +74,10 @@
 		if (scrollEl) {
 			resizeObserver.observe(scrollEl);
 			mutationObserver.observe(scrollEl, { childList: true, subtree: true });
+		}
+
+		if (contentEl) {
+			resizeObserver.observe(contentEl);
 		}
 
 		window.addEventListener('resize', updateOverflowFade);
@@ -74,7 +114,7 @@
 		class:has-overflow-bottom={hasOverflowBottom}
 		onscroll={updateOverflowFade}
 	>
-		<div class="app-shell-content">
+		<div bind:this={contentEl} class="app-shell-content">
 			{@render children()}
 		</div>
 	</div>
