@@ -208,4 +208,29 @@ console.log('Running Visualg Dialect Execution tests...');
 	assertEquals(outputs[0], 'resultado maior que 3: 3.3333333333333335');
 }
 
+console.log('Running Visualg leia undeclared variable check...');
+{
+	const lexer = new Lexer(`
+		algoritmo "ErroLeia"
+		var
+		inicio
+			leia(nome)
+		fimalgoritmo
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+
+	let threw = false;
+	try {
+		gen.next();
+	} catch (e) {
+		threw = true;
+		assert(e.message.includes('não foi declarada'), 'Should throw variable not declared error');
+	}
+	assert(threw, 'Should have thrown an error before prompt');
+}
+
 console.log('All Portugol core tests passed successfully.');

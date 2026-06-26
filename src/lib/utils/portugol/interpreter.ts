@@ -1445,11 +1445,12 @@ export class Interpreter {
 				);
 			}
 			const varName = (node.args[0] as IdentifierNode).name;
+			// Verifica se a variável existe antes de solicitar input
+			const currentVal = env.get(varName, node.line);
 			// Yielda um evento de entrada solicitando o dado ao usuário.
 			// O runner interceptará isso, mostrará a tela de entrada e chamará .next(valor) para prosseguir
 			const input = yield { type: 'read', variable: varName };
 			// Faz o parse do input correspondente ao tipo original
-			const currentVal = env.get(varName, node.line);
 			let parsedInput: unknown = input;
 			if (typeof currentVal === 'number') {
 				parsedInput = Number(input);
