@@ -49,7 +49,7 @@
 	let isRunning = $state(false);
 	let isPaused = $state(false);
 	let isStepMode = $state(false);
-	let variables = $state<Record<string, unknown>>({});
+	let variables = $state<Record<string, { value: unknown; type: string }>>({});
 	let outputs = $state<string[]>([]);
 	let errorMsg = $state('');
 
@@ -119,7 +119,7 @@
 					value?: string;
 					variable?: string;
 					line?: number;
-					variables?: Record<string, unknown>;
+					variables?: Record<string, { value: unknown; type: string }>;
 				} | null;
 				if (val && val.type === 'step') {
 					activeLine = val.line || 0;
@@ -248,42 +248,39 @@
 
 			<!-- Terminal de I/O e inspetor de variáveis -->
 			<div class="sidebar-col">
-				<Stack gap="md">
-					<!-- Console/Terminal -->
-					<Panel variant="accent">
-						<div class="panel-header">Terminal / Console</div>
-						<div class="terminal-box">
-							<div class="terminal-content">
-								{#each outputs as output, index (index)}
-									<div class="terminal-line">{output}</div>
-								{/each}
+				<!-- Console/Terminal (Sem Panel) -->
+				<div class="terminal-box">
+					<div class="terminal-content">
+						{#each outputs as output, index (index)}
+							<div class="terminal-line">{output}</div>
+						{/each}
 
-								{#if pendingInputVar}
-									<div class="terminal-input-prompt">
-										<form onsubmit={submitInput} class="input-form">
-											<Text size="sm" variant="neutral">
-												leia({pendingInputVar}):
-											</Text>
-											<input
-												type="text"
-												bind:value={currentInputValue}
-												placeholder="Digite um valor e pressione Enter"
-												class="terminal-text-input"
-											/>
-											<button type="submit" aria-label="Enviar" style="display: none;"></button>
-										</form>
-									</div>
-								{/if}
-
-								{#if outputs.length === 0 && !pendingInputVar}
-									<div class="terminal-empty">Console vazio. Clique em Executar.</div>
-								{/if}
+						{#if pendingInputVar}
+							<div class="terminal-input-prompt">
+								<form onsubmit={submitInput} class="input-form">
+									<Text size="sm" variant="neutral">
+										leia({pendingInputVar}):
+									</Text>
+									<input
+										type="text"
+										bind:value={currentInputValue}
+										placeholder="Digite um valor e pressione Enter"
+										class="terminal-text-input"
+									/>
+									<button type="submit" aria-label="Enviar" style="display: none;"></button>
+								</form>
 							</div>
-						</div>
-					</Panel>
+						{/if}
 
-					<!-- Inspetor de Variáveis -->
-					<Panel>
+						{#if outputs.length === 0 && !pendingInputVar}
+							<div class="terminal-empty">Console vazio. Clique em Executar.</div>
+						{/if}
+					</div>
+				</div>
+
+				<!-- Inspetor de Variáveis -->
+				<div class="variables-panel-wrapper">
+					<Panel maxWidth="none" fullHeight={true}>
 						<div class="panel-header">Variáveis de Execução</div>
 						<div class="variables-box">
 							{#if Object.keys(variables).length > 0}
@@ -291,15 +288,17 @@
 									<thead>
 										<tr>
 											<th>Nome</th>
+											<th>Tipo</th>
 											<th>Valor</th>
 										</tr>
 									</thead>
 									<tbody>
-										{#each Object.entries(variables) as [name, val] (name)}
+										{#each Object.entries(variables) as [name, info] (name)}
 											<tr>
 												<td class="var-name">{name}</td>
+												<td class="var-type">{info.type}</td>
 												<td class="var-value">
-													{val === undefined ? 'vazio' : String(val)}
+													{info.value === undefined ? 'vazio' : String(info.value)}
 												</td>
 											</tr>
 										{/each}
@@ -310,7 +309,7 @@
 							{/if}
 						</div>
 					</Panel>
-				</Stack>
+				</div>
 			</div>
 		</div>
 
@@ -344,19 +343,35 @@
 		gap: 16px;
 	}
 
+	@media (min-width: 901px) {
+		.workspace-grid {
+			height: 480px;
+		}
+	}
+
 	@media (max-width: 900px) {
 		.workspace-grid {
 			grid-template-columns: 1fr;
+			height: auto;
+		}
+		.editor-col {
+			height: 400px;
+		}
+		.sidebar-col {
+			height: 400px;
 		}
 	}
 
 	.editor-col {
 		min-width: 0;
+		height: 100%;
 	}
 
 	.sidebar-col {
 		display: flex;
 		flex-direction: column;
+		gap: 16px;
+		height: 100%;
 		min-width: 0;
 	}
 
@@ -366,11 +381,12 @@
 		font-family: var(--font-mono);
 		font-size: 13px;
 		line-height: 18px;
-		height: 180px;
 		padding: 12px;
 		border-radius: var(--radius-md);
 		overflow-y: auto;
 		border: var(--border-width) solid var(--border-color);
+		flex: 1;
+		min-height: 0;
 	}
 
 	.terminal-content {
@@ -419,8 +435,13 @@
 		border-color: var(--accent-primary);
 	}
 
+	.variables-panel-wrapper {
+		flex: 1;
+		min-height: 0;
+	}
+
 	.variables-box {
-		max-height: 160px;
+		height: calc(100% - 32px);
 		overflow-y: auto;
 	}
 
@@ -452,6 +473,11 @@
 	.var-name {
 		font-family: var(--font-mono);
 		color: var(--accent-primary);
+	}
+
+	.var-type {
+		font-family: var(--font-mono);
+		color: var(--text-secondary);
 	}
 
 	.var-value {

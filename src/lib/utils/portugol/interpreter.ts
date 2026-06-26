@@ -1156,14 +1156,18 @@ export class Parser {
 // Environment Scope
 export class Environment {
 	private values = new Map<string, unknown>();
+	private types = new Map<string, string>();
 	private parent?: Environment;
 
 	constructor(parent?: Environment) {
 		this.parent = parent;
 	}
 
-	public define(name: string, value: unknown) {
+	public define(name: string, value: unknown, varType?: string) {
 		this.values.set(name, value);
+		if (varType) {
+			this.types.set(name, varType);
+		}
 	}
 
 	public get(name: string, line: number): unknown {
@@ -1192,14 +1196,24 @@ export class Environment {
 		);
 	}
 
-	public getVariables(): Record<string, unknown> {
-		const vars: Record<string, unknown> = {};
-		// Mescla escopos recursivamente (mais interno sobrescreve externo se mesmo nome)
+	public getType(name: string): string | undefined {
+		if (this.types.has(name)) {
+			return this.types.get(name);
+		}
+		if (this.parent) {
+			return this.parent.getType(name);
+		}
+		return undefined;
+	}
+
+	public getVariables(): Record<string, { value: unknown; type: string }> {
+		const vars: Record<string, { value: unknown; type: string }> = {};
 		if (this.parent) {
 			Object.assign(vars, this.parent.getVariables());
 		}
 		for (const [k, v] of this.values.entries()) {
-			vars[k] = v;
+			const type = this.getType(k) || 'desconhecido';
+			vars[k] = { value: v, type };
 		}
 		return vars;
 	}
@@ -1246,7 +1260,7 @@ export class Interpreter {
 				const value = decl.initializer
 					? yield* this.evaluate(decl.initializer, this.globalEnv)
 					: undefined;
-				this.globalEnv.define(decl.name, value);
+				this.globalEnv.define(decl.name, value, decl.varType);
 			}
 		}
 
@@ -1272,7 +1286,7 @@ export class Interpreter {
 
 		// Vincula parâmetros
 		for (let i = 0; i < func.params.length; i++) {
-			env.define(func.params[i].name, args[i]);
+			env.define(func.params[i].name, args[i], func.params[i].type);
 		}
 
 		yield* this.executeBlock(func.body, env);
@@ -1300,7 +1314,7 @@ export class Interpreter {
 				break;
 			case 'VarDecl': {
 				const value = node.initializer ? yield* this.evaluate(node.initializer, env) : undefined;
-				env.define(node.name, value);
+				env.define(node.name, value, node.varType);
 				break;
 			}
 			case 'Assign': {

@@ -56,7 +56,7 @@
 	}
 
 	function highlight(src: string): string {
-		// Escape HTML
+		// Escape HTML first
 		let html = src.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 		// Keywords list
@@ -104,29 +104,33 @@
 			'limpa'
 		];
 
-		// Strings (double quotes)
-		html = html.replace(/("[^"\\]*(?:\\.[^"\\]*)*")/g, '<span class="hl-string">$1</span>');
+		const keywordsSet = new Set(keywords);
 
-		// Chars (single quotes)
-		html = html.replace(/('[^'\\]*(?:\\.[^'\\]*)*')/g, '<span class="hl-char">$1</span>');
+		// Single-pass regex to avoid token coloring inside comments or string literals
+		const regex =
+			/(\/\/.*)|("[^"\\]*(?:\\.[^"\\]*)*")|('[^'\\]*(?:\\.[^'\\]*)*')|(\b\d+(?:\.\d+)?\b)|(\b[a-zA-Z_áéíóúçãõâêîôûA-ZÁÉÍÓÚÇÃÕÂÊÎÔÛ][a-zA-Z0-9_áéíóúçãõâêîôûA-ZÁÉÍÓÚÇÃÕÂÊÎÔÛ]*\b)/g;
 
-		// Comments (single line)
-		html = html.replace(/(\/\/.*)/g, '<span class="hl-comment">$1</span>');
-
-		// Numbers
-		html = html.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="hl-number">$1</span>');
-
-		// Keywords - match only outside HTML tags
-		const keywordRegex = new RegExp(`\\b(${keywords.join('|')})\\b`, 'gi');
-		html = html
-			.split(/(<[^>]*>)/)
-			.map((part) => {
-				if (part.startsWith('<')) return part;
-				return part.replace(keywordRegex, '<span class="hl-keyword">$1</span>');
-			})
-			.join('');
-
-		return html;
+		return html.replace(regex, (match, comment, string, char, number, word) => {
+			if (comment !== undefined) {
+				return `<span class="hl-comment">${comment}</span>`;
+			}
+			if (string !== undefined) {
+				return `<span class="hl-string">${string}</span>`;
+			}
+			if (char !== undefined) {
+				return `<span class="hl-char">${char}</span>`;
+			}
+			if (number !== undefined) {
+				return `<span class="hl-number">${number}</span>`;
+			}
+			if (word !== undefined) {
+				if (keywordsSet.has(word.toLowerCase())) {
+					return `<span class="hl-keyword">${word}</span>`;
+				}
+				return word;
+			}
+			return match;
+		});
 	}
 
 	let highlightedCode = $derived(highlight(code));
@@ -191,7 +195,7 @@
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
-		height: 400px;
+		height: 100%;
 		position: relative;
 	}
 
