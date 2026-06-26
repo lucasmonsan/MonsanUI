@@ -34,6 +34,19 @@ export type TokenType =
 	| 'RPAREN'
 	| 'COMMA'
 	| 'SEMICOLON'
+	| 'ALGORITMO'
+	| 'VAR'
+	| 'INICIO'
+	| 'FIMALGORITMO'
+	| 'FIMSE'
+	| 'FIMENQUANTO'
+	| 'FIMPARA'
+	| 'ENTAO'
+	| 'FACA'
+	| 'DE'
+	| 'ATE'
+	| 'PASSO'
+	| 'COLON'
 	| 'EOF';
 
 export interface Token {
@@ -70,6 +83,7 @@ export class Lexer {
 	}
 
 	public tokenize(): Token[] {
+		const isVisualg = /algoritmo|fimalgoritmo/i.test(this.input);
 		const tokens: Token[] = [];
 		while (this.pos < this.input.length) {
 			const char = this.peek();
@@ -135,6 +149,21 @@ export class Lexer {
 
 			// Operators & Delimiters
 			const twoChar = char + (this.input[this.pos + 1] || '');
+
+			// Visualg specific double char tokens
+			if (isVisualg && twoChar === '<-') {
+				tokens.push({ type: 'ASSIGN', value: '<-', line: this.line, column: this.column });
+				this.advance();
+				this.advance();
+				continue;
+			}
+			if (isVisualg && twoChar === '<>') {
+				tokens.push({ type: 'NEQ', value: '<>', line: this.line, column: this.column });
+				this.advance();
+				this.advance();
+				continue;
+			}
+
 			if (twoChar === '==') {
 				tokens.push({ type: 'EQ', value: '==', line: this.line, column: this.column });
 				this.advance();
@@ -162,7 +191,17 @@ export class Lexer {
 
 			// Single character tokens
 			if (char === '=') {
-				tokens.push({ type: 'ASSIGN', value: '=', line: this.line, column: this.column });
+				if (isVisualg) {
+					// Em Visualg, o caractere '=' é comparação de igualdade. Atribuição é '<-'.
+					tokens.push({ type: 'EQ', value: '=', line: this.line, column: this.column });
+				} else {
+					tokens.push({ type: 'ASSIGN', value: '=', line: this.line, column: this.column });
+				}
+				this.advance();
+				continue;
+			}
+			if (isVisualg && char === ':') {
+				tokens.push({ type: 'COLON', value: ':', line: this.line, column: this.column });
 				this.advance();
 				continue;
 			}
@@ -260,34 +299,90 @@ export class Lexer {
 				}
 
 				const lowerId = id.toLowerCase();
-				if (lowerId === 'programa') {
-					tokens.push({ type: 'PROGRAM', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'funcao' || lowerId === 'função') {
-					tokens.push({ type: 'FUNCTION', value: id, line: startLine, column: startCol });
-				} else if (['inteiro', 'real', 'caracter', 'logico', 'cadeia'].includes(lowerId)) {
-					tokens.push({ type: 'TYPE', value: lowerId, line: startLine, column: startCol });
-				} else if (lowerId === 'se') {
-					tokens.push({ type: 'IF', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'senao' || lowerId === 'senão') {
-					tokens.push({ type: 'ELSE', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'enquanto') {
-					tokens.push({ type: 'WHILE', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'para') {
-					tokens.push({ type: 'FOR', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'retorne') {
-					tokens.push({ type: 'RETURN', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'verdadeiro') {
-					tokens.push({ type: 'TRUE', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'falso') {
-					tokens.push({ type: 'FALSE', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'e') {
-					tokens.push({ type: 'AND', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'ou') {
-					tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
-				} else if (lowerId === 'nao' || lowerId === 'não') {
-					tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
+				if (isVisualg) {
+					if (lowerId === 'algoritmo') {
+						tokens.push({ type: 'ALGORITMO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'var') {
+						tokens.push({ type: 'VAR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'inicio') {
+						tokens.push({ type: 'INICIO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'fimalgoritmo') {
+						tokens.push({ type: 'FIMALGORITMO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'fimse') {
+						tokens.push({ type: 'FIMSE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'fimenquanto') {
+						tokens.push({ type: 'FIMENQUANTO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'fimpara') {
+						tokens.push({ type: 'FIMPARA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'entao' || lowerId === 'então') {
+						tokens.push({ type: 'ENTAO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'faca' || lowerId === 'faça') {
+						tokens.push({ type: 'FACA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'de') {
+						tokens.push({ type: 'DE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'ate' || lowerId === 'até') {
+						tokens.push({ type: 'ATE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'passo') {
+						tokens.push({ type: 'PASSO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'se') {
+						tokens.push({ type: 'IF', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'senao' || lowerId === 'senão') {
+						tokens.push({ type: 'ELSE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'enquanto') {
+						tokens.push({ type: 'WHILE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'para') {
+						tokens.push({ type: 'FOR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'retorne') {
+						tokens.push({ type: 'RETURN', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'verdadeiro') {
+						tokens.push({ type: 'TRUE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'falso') {
+						tokens.push({ type: 'FALSE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'e') {
+						tokens.push({ type: 'AND', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'ou') {
+						tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'nao' || lowerId === 'não') {
+						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
+					} else if (
+						['inteiro', 'real', 'caractere', 'caracter', 'logico', 'cadeia'].includes(lowerId)
+					) {
+						const normalizedType = lowerId === 'caractere' ? 'caracter' : lowerId;
+						tokens.push({ type: 'TYPE', value: normalizedType, line: startLine, column: startCol });
+					} else {
+						tokens.push({ type: 'IDENTIFIER', value: id, line: startLine, column: startCol });
+					}
 				} else {
-					tokens.push({ type: 'IDENTIFIER', value: id, line: startLine, column: startCol });
+					// Portugol Studio
+					if (lowerId === 'programa') {
+						tokens.push({ type: 'PROGRAM', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'funcao' || lowerId === 'função') {
+						tokens.push({ type: 'FUNCTION', value: id, line: startLine, column: startCol });
+					} else if (['inteiro', 'real', 'caracter', 'logico', 'cadeia'].includes(lowerId)) {
+						tokens.push({ type: 'TYPE', value: lowerId, line: startLine, column: startCol });
+					} else if (lowerId === 'se') {
+						tokens.push({ type: 'IF', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'senao' || lowerId === 'senão') {
+						tokens.push({ type: 'ELSE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'enquanto') {
+						tokens.push({ type: 'WHILE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'para') {
+						tokens.push({ type: 'FOR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'retorne') {
+						tokens.push({ type: 'RETURN', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'verdadeiro') {
+						tokens.push({ type: 'TRUE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'falso') {
+						tokens.push({ type: 'FALSE', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'e') {
+						tokens.push({ type: 'AND', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'ou') {
+						tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'nao' || lowerId === 'não') {
+						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
+					} else {
+						tokens.push({ type: 'IDENTIFIER', value: id, line: startLine, column: startCol });
+					}
 				}
 				continue;
 			}
@@ -465,6 +560,10 @@ export class Parser {
 	}
 
 	public parse(): ProgramNode {
+		if (this.check('ALGORITMO')) {
+			return this.parseVisualg();
+		}
+
 		let line = 1;
 		const declarations: (FunctionDeclNode | VarDeclNode)[] = [];
 
@@ -823,6 +922,235 @@ export class Parser {
 			`Erro de Sintaxe na linha ${t.line}: Expressão esperada, encontrado '${t.value}'`
 		);
 	}
+
+	// ==========================================
+	// Visualg Dialect Parser Extensions
+	// ==========================================
+
+	private parseVisualg(): ProgramNode {
+		const declarations: (FunctionDeclNode | VarDeclNode)[] = [];
+
+		const algoToken = this.consume('ALGORITMO', "Esperado palavra-chave 'algoritmo'");
+		const line = algoToken.line;
+
+		// Nome do algoritmo opcional
+		if (this.check('STRING') || this.check('IDENTIFIER')) {
+			this.advance();
+		}
+
+		// Seção de declaração de variáveis
+		if (this.match('VAR')) {
+			while (!this.check('INICIO') && !this.isAtEnd()) {
+				// Ignora quebras de linha/semicolons soltos
+				if (this.match('SEMICOLON')) continue;
+				declarations.push(...this.parseVisualgVarDecls());
+			}
+		}
+
+		this.consume('INICIO', "Esperado palavra-chave 'inicio'");
+
+		const statements: ASTNode[] = [];
+		while (!this.check('FIMALGORITMO') && !this.isAtEnd()) {
+			if (this.match('SEMICOLON')) continue;
+			statements.push(this.parseVisualgStatement());
+		}
+
+		this.consume('FIMALGORITMO', "Esperado palavra-chave 'fimalgoritmo'");
+
+		// Embrulha os statements em uma função principal 'inicio()'
+		const mainFunc: FunctionDeclNode = {
+			type: 'FunctionDecl',
+			name: 'inicio',
+			returnType: 'vazio',
+			params: [],
+			body: {
+				type: 'Block',
+				statements,
+				line: algoToken.line
+			},
+			line: algoToken.line
+		};
+
+		declarations.push(mainFunc);
+
+		return { type: 'Program', declarations, line };
+	}
+
+	private parseVisualgVarDecls(): VarDeclNode[] {
+		const ids: Token[] = [];
+		do {
+			ids.push(this.consume('IDENTIFIER', 'Esperado identificador de variável'));
+		} while (this.match('COMMA'));
+
+		this.consume('COLON', "Esperado ':' após identificadores de variáveis");
+		const typeToken = this.consume('TYPE', 'Esperado tipo da variável');
+
+		return ids.map((id) => ({
+			type: 'VarDecl',
+			varType: typeToken.value,
+			name: id.value,
+			line: id.line
+		}));
+	}
+
+	private parseVisualgStatement(): ASTNode {
+		const t = this.peek();
+
+		if (t.type === 'VAR') {
+			throw new Error(
+				`Erro na linha ${t.line}: Declarações de variáveis devem estar no bloco 'var'.`
+			);
+		}
+		if (t.type === 'IF') {
+			return this.parseVisualgIf();
+		}
+		if (t.type === 'WHILE') {
+			return this.parseVisualgWhile();
+		}
+		if (t.type === 'FOR') {
+			return this.parseVisualgFor();
+		}
+
+		const expr = this.parseExpression();
+		return expr;
+	}
+
+	private parseVisualgIf(): IfNode {
+		const ifToken = this.consume('IF', "Esperado 'se'");
+		const condition = this.parseExpression();
+		this.consume('ENTAO', "Esperado 'entao' após a condição do 'se'");
+
+		const thenStatements: ASTNode[] = [];
+		while (!this.check('ELSE') && !this.check('FIMSE') && !this.isAtEnd()) {
+			thenStatements.push(this.parseVisualgStatement());
+		}
+
+		const thenBranch: BlockNode = {
+			type: 'Block',
+			statements: thenStatements,
+			line: ifToken.line
+		};
+
+		let elseBranch: ASTNode | undefined;
+		if (this.match('ELSE')) {
+			const elseStatements: ASTNode[] = [];
+			while (!this.check('FIMSE') && !this.isAtEnd()) {
+				elseStatements.push(this.parseVisualgStatement());
+			}
+			elseBranch = {
+				type: 'Block',
+				statements: elseStatements,
+				line: ifToken.line
+			};
+		}
+
+		this.consume('FIMSE', "Esperado 'fimse' para fechar o bloco 'se'");
+
+		return {
+			type: 'If',
+			condition,
+			thenBranch,
+			elseBranch,
+			line: ifToken.line
+		};
+	}
+
+	private parseVisualgWhile(): WhileNode {
+		const whileToken = this.consume('WHILE', "Esperado 'enquanto'");
+		const condition = this.parseExpression();
+		this.consume('FACA', "Esperado 'faca' após a condição do 'enquanto'");
+
+		const bodyStatements: ASTNode[] = [];
+		while (!this.check('FIMENQUANTO') && !this.isAtEnd()) {
+			bodyStatements.push(this.parseVisualgStatement());
+		}
+		this.consume('FIMENQUANTO', "Esperado 'fimenquanto' para fechar o bloco 'enquanto'");
+
+		const body: BlockNode = {
+			type: 'Block',
+			statements: bodyStatements,
+			line: whileToken.line
+		};
+
+		return {
+			type: 'While',
+			condition,
+			body,
+			line: whileToken.line
+		};
+	}
+
+	private parseVisualgFor(): ForNode {
+		const forToken = this.consume('FOR', "Esperado 'para'");
+		const idToken = this.consume('IDENTIFIER', "Esperado identificador na inicialização do 'para'");
+		this.consume('DE', "Esperado 'de' após identificador");
+		const startExpr = this.parseExpression();
+		this.consume('ATE', "Esperado 'ate' após a expressão inicial");
+		const endExpr = this.parseExpression();
+
+		let stepExpr: ASTNode = {
+			type: 'Literal',
+			value: 1,
+			valueType: 'inteiro',
+			line: forToken.line
+		};
+
+		if (this.match('PASSO')) {
+			stepExpr = this.parseExpression();
+		}
+
+		this.consume('FACA', "Esperado 'faca' antes do bloco de comandos do 'para'");
+
+		const bodyStatements: ASTNode[] = [];
+		while (!this.check('FIMPARA') && !this.isAtEnd()) {
+			bodyStatements.push(this.parseVisualgStatement());
+		}
+		this.consume('FIMPARA', "Esperado 'fimpara' para fechar o bloco 'para'");
+
+		// Transpila a lógica do loop para a estrutura AST do clássico ForNode
+		const initializer: AssignNode = {
+			type: 'Assign',
+			name: idToken.value,
+			value: startExpr,
+			line: forToken.line
+		};
+
+		const condition: BinaryNode = {
+			type: 'Binary',
+			left: { type: 'Identifier', name: idToken.value, line: forToken.line },
+			operator: '<=',
+			right: endExpr,
+			line: forToken.line
+		};
+
+		const update: AssignNode = {
+			type: 'Assign',
+			name: idToken.value,
+			value: {
+				type: 'Binary',
+				left: { type: 'Identifier', name: idToken.value, line: forToken.line },
+				operator: '+',
+				right: stepExpr,
+				line: forToken.line
+			},
+			line: forToken.line
+		};
+
+		const body: BlockNode = {
+			type: 'Block',
+			statements: bodyStatements,
+			line: forToken.line
+		};
+
+		return {
+			type: 'For',
+			initializer,
+			condition,
+			update,
+			body,
+			line: forToken.line
+		};
+	}
 }
 
 // Environment Scope
@@ -1052,8 +1380,10 @@ export class Interpreter {
 					case '%':
 						return (left as number) % (right as number);
 					case '==':
+					case '=':
 						return left === right;
 					case '!=':
+					case '<>':
 						return left !== right;
 					case '<':
 						return (left as number) < (right as number);
@@ -1092,11 +1422,14 @@ export class Interpreter {
 	private *evaluateCall(node: CallNode, env: Environment): Generator<unknown, unknown, unknown> {
 		// Funções embutidas
 		const lowerCallee = node.callee.toLowerCase();
-		if (lowerCallee === 'escreva') {
+		if (lowerCallee === 'escreva' || lowerCallee === 'escreval') {
 			const outputs: string[] = [];
 			for (const arg of node.args) {
 				const val = yield* this.evaluate(arg, env);
 				outputs.push(val === undefined ? 'vazio' : String(val));
+			}
+			if (lowerCallee === 'escreval') {
+				outputs.push('\n');
 			}
 			const printed = outputs.join('');
 			this.outputs.push(printed);

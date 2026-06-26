@@ -153,4 +153,59 @@ console.log('Running Portugol Interpreter I/O (leia) tests...');
 	assertEquals(outputs[1], 'Idade mais 5: 30');
 }
 
+console.log('Running Visualg Dialect Execution tests...');
+{
+	const lexer = new Lexer(`
+		algoritmo "Nome"
+		var
+
+		inicio
+			escreval("Lucas Monsan")
+		fimalgoritmo
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+	let result = gen.next();
+	while (!result.done) {
+		result = gen.next();
+	}
+	const outputs = interpreter.getOutputs();
+	assertEquals(outputs.length, 1);
+	assertEquals(outputs[0], 'Lucas Monsan\n');
+}
+
+{
+	const lexer = new Lexer(`
+		algoritmo "Calculo"
+		var
+			a, b : inteiro
+			resultado : real
+		inicio
+			a <- 10
+			b <- 3
+			resultado <- a / b
+			se resultado > 3 entao
+				escreva("resultado maior que 3: ", resultado)
+			senao
+				escreva("resultado menor: ", resultado)
+			fimse
+		fimalgoritmo
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+	let result = gen.next();
+	while (!result.done) {
+		result = gen.next();
+	}
+	const outputs = interpreter.getOutputs();
+	assertEquals(outputs.length, 1);
+	assertEquals(outputs[0], 'resultado maior que 3: 3.3333333333333335');
+}
+
 console.log('All Portugol core tests passed successfully.');

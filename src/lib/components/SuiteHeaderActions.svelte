@@ -70,7 +70,7 @@
 		logoutDisabled = false,
 		userMenuPanelShadow = 'default',
 		userMenuPanelPadding = 'xs',
-		userMenuPanelGap = 'sm',
+		userMenuPanelGap = 'xs',
 		onThemeChange,
 		onLocaleChange,
 		onProfile,

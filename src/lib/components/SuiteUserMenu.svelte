@@ -72,7 +72,7 @@
 		variant = 'dropdown',
 		panelShadow = 'default',
 		panelPadding = 'xs',
-		panelGap = 'sm',
+		panelGap = 'xs',
 		profileDisabled = false,
 		logoutDisabled = false,
 		onProfile,

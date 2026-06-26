@@ -318,8 +318,8 @@
 		box-sizing: border-box;
 	}
 
-	.select-option:hover:not(:disabled),
-	.select-option.active:not(:disabled) {
+	.select-option:hover:not(.selected):not(:disabled),
+	.select-option.active:not(.selected):not(:disabled) {
 		background: var(--bg-secondary);
 		border-color: var(--border-color);
 	}
@@ -336,9 +336,11 @@
 		color: var(--bg-primary);
 	}
 
-	.select-option.selected:hover:not(:disabled) {
+	.select-option.selected:hover:not(:disabled),
+	.select-option.selected.active:not(:disabled) {
 		background-color: var(--accent-primary);
 		border-color: var(--border-color);
+		color: var(--bg-primary);
 	}
 
 	.option-label {

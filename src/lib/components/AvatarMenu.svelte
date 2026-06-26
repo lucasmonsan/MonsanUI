@@ -20,7 +20,7 @@
 		variant = 'floating',
 		panelShadow = 'default',
 		panelPadding = 'xs',
-		panelGap = 'sm',
+		panelGap = 'xs',
 		children
 	}: {
 		src?: string;
