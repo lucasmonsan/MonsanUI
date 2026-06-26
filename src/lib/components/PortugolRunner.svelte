@@ -9,7 +9,7 @@
 	import ZapIcon from './icons/Zap.svelte';
 	import RotateCwIcon from './icons/RotateCw.svelte';
 	import TriangleAlertIcon from './icons/TriangleAlert.svelte';
-	import { Lexer, Parser, Interpreter } from '../utils/portugol/interpreter.js';
+	import { Lexer, Parser, Interpreter, SemanticValidator } from '../utils/portugol/interpreter.js';
 
 	interface Props {
 		code?: string;
@@ -37,6 +37,7 @@
 	}: Props = $props();
 
 	let activeLine = $state(0);
+	let errorLine = $state(0);
 	let isRunning = $state(false);
 	let isPaused = $state(false);
 	let isStepMode = $state(false);
@@ -53,6 +54,7 @@
 
 	function startExecution(step = false) {
 		errorMsg = '';
+		errorLine = 0;
 		outputs = [];
 		variables = {};
 		activeLine = 0;
@@ -65,6 +67,10 @@
 			const parser = new Parser(tokens);
 			const ast = parser.parse();
 
+			// Validador Semântico
+			const validator = new SemanticValidator();
+			validator.validate(ast);
+
 			interpreter = new Interpreter(true); // true = debug/step mode enabled
 			generator = interpreter.run(ast);
 			isRunning = true;
@@ -74,7 +80,11 @@
 		} catch (e: unknown) {
 			const err = e as Error;
 			errorMsg = err.message || String(e);
+			const lineMatch = errorMsg.match(/(?:linha|line)\s+(\d+)/i);
+			errorLine = lineMatch ? parseInt(lineMatch[1], 10) : 0;
 			isRunning = false;
+			isStepMode = false;
+			isPaused = false;
 			onFailure?.(errorMsg);
 		}
 	}
@@ -127,6 +137,8 @@
 		} catch (e: unknown) {
 			const err = e as Error;
 			errorMsg = err.message || String(e);
+			const lineMatch = errorMsg.match(/(?:linha|line)\s+(\d+)/i);
+			errorLine = lineMatch ? parseInt(lineMatch[1], 10) : 0;
 			isRunning = false;
 			isStepMode = false;
 			isPaused = false;
@@ -156,6 +168,7 @@
 
 	function handleReset() {
 		activeLine = 0;
+		errorLine = 0;
 		isRunning = false;
 		isPaused = false;
 		isStepMode = false;
@@ -202,7 +215,12 @@
 		<div class="workspace-grid">
 			<!-- Editor de Código -->
 			<div class="editor-col">
-				<PortugolEditor bind:code {activeLine} disabled={disabled || (isRunning && !isPaused)} />
+				<PortugolEditor
+					bind:code
+					{activeLine}
+					{errorLine}
+					disabled={disabled || (isRunning && !isPaused)}
+				/>
 			</div>
 
 			<!-- Terminal de I/O e inspetor de variáveis -->

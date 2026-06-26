@@ -1,4 +1,9 @@
-import { Lexer, Parser, Interpreter } from '../dist/utils/portugol/interpreter.js';
+import {
+	Lexer,
+	Parser,
+	Interpreter,
+	SemanticValidator
+} from '../dist/utils/portugol/interpreter.js';
 
 function assert(condition, message) {
 	if (!condition) throw new Error(message);
@@ -231,6 +236,57 @@ console.log('Running Visualg leia undeclared variable check...');
 		assert(e.message.includes('não foi declarada'), 'Should throw variable not declared error');
 	}
 	assert(threw, 'Should have thrown an error before prompt');
+}
+
+console.log('Running SemanticValidator tests...');
+{
+	const lexer = new Lexer(`
+		algoritmo "ErroSemantico"
+		var
+			x : inteiro
+		inicio
+			x <- 10
+			y <- 20
+		fimalgoritmo
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const validator = new SemanticValidator();
+
+	let threw = false;
+	try {
+		validator.validate(ast);
+	} catch (e) {
+		threw = true;
+		assert(e.message.includes('y'), 'Should detect y as undeclared');
+		assert(e.message.includes('Erro de Semântica'), 'Should flag as Erro de Semântica');
+	}
+	assert(threw, 'Should throw semantic error on validation phase');
+}
+
+{
+	const lexer = new Lexer(`
+		algoritmo "SemanticoSucesso"
+		var
+			x, y : inteiro
+		inicio
+			x <- 10
+			y <- x + 5
+		fimalgoritmo
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const validator = new SemanticValidator();
+
+	let threw = false;
+	try {
+		validator.validate(ast);
+	} catch {
+		threw = true;
+	}
+	assert(!threw, 'Valid program should validate without errors');
 }
 
 console.log('All Portugol core tests passed successfully.');

@@ -2,11 +2,13 @@
 	let {
 		code = $bindable(''),
 		activeLine = 0,
+		errorLine = 0,
 		disabled = false,
 		placeholder = 'Escreva seu código Portugol aqui...'
 	} = $props<{
 		code: string;
 		activeLine?: number;
+		errorLine?: number;
 		disabled?: boolean;
 		placeholder?: string;
 	}>();
@@ -42,9 +44,12 @@
 		{#each lines as line, index (index)}
 			{@const lineNum = index + 1}
 			{@const isActive = activeLine === lineNum}
-			<div class="line-number-row" class:active={isActive}>
+			{@const isError = errorLine === lineNum}
+			<div class="line-number-row" class:active={isActive} class:error={isError}>
 				{#if isActive}
 					<span class="active-indicator">▶</span>
+				{:else if isError}
+					<span class="error-indicator">❌</span>
 				{/if}
 				<span class="num" title={line}>{lineNum}</span>
 			</div>
@@ -111,11 +116,24 @@
 		background: rgba(249, 226, 175, 0.15);
 	}
 
+	.line-number-row.error {
+		color: var(--color-error, #f38ba8);
+		font-weight: bold;
+		background: rgba(243, 139, 168, 0.15);
+	}
+
 	.active-indicator {
 		position: absolute;
 		left: 4px;
 		font-size: 10px;
 		color: var(--color-warning, #f9e2af);
+	}
+
+	.error-indicator {
+		position: absolute;
+		left: 4px;
+		font-size: 10px;
+		color: var(--color-error, #f38ba8);
 	}
 
 	.num {

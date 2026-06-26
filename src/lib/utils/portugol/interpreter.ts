@@ -1496,3 +1496,148 @@ export class Interpreter {
 		return undefined;
 	}
 }
+
+// AST Semantic Analyzer / Validator
+export class SemanticValidator {
+	private scopes: Set<string>[] = [];
+
+	constructor() {}
+
+	private pushScope() {
+		this.scopes.push(new Set());
+	}
+
+	private popScope() {
+		this.scopes.pop();
+	}
+
+	private declare(name: string) {
+		if (this.scopes.length === 0) {
+			this.pushScope();
+		}
+		const current = this.scopes[this.scopes.length - 1];
+		current.add(name);
+	}
+
+	private isDeclared(name: string): boolean {
+		for (let i = this.scopes.length - 1; i >= 0; i--) {
+			if (this.scopes[i].has(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public validate(program: ProgramNode) {
+		this.scopes = [];
+		this.pushScope(); // Global scope
+
+		// Primeiro, registra variáveis globais
+		for (const decl of program.declarations) {
+			if (decl.type === 'VarDecl') {
+				this.declare(decl.name);
+			}
+		}
+
+		// Valida funções
+		for (const decl of program.declarations) {
+			if (decl.type === 'FunctionDecl') {
+				this.validateFunction(decl);
+			}
+		}
+	}
+
+	private validateFunction(func: FunctionDeclNode) {
+		this.pushScope(); // Escopo da função
+		for (const param of func.params) {
+			this.declare(param.name);
+		}
+		this.validateNode(func.body);
+		this.popScope();
+	}
+
+	private validateNode(node: ASTNode) {
+		switch (node.type) {
+			case 'Block':
+				for (const stmt of node.statements) {
+					this.validateNode(stmt);
+				}
+				break;
+			case 'VarDecl':
+				if (node.initializer) {
+					this.validateNode(node.initializer);
+				}
+				this.declare(node.name);
+				break;
+			case 'Assign':
+				if (!this.isDeclared(node.name)) {
+					throw new Error(
+						`Erro de Semântica na linha ${node.line}: A variável '${node.name}' não foi declarada.`
+					);
+				}
+				this.validateNode(node.value);
+				break;
+			case 'If':
+				this.validateNode(node.condition);
+				this.validateNode(node.thenBranch);
+				if (node.elseBranch) {
+					this.validateNode(node.elseBranch);
+				}
+				break;
+			case 'While':
+				this.validateNode(node.condition);
+				this.validateNode(node.body);
+				break;
+			case 'For':
+				this.pushScope();
+				if (node.initializer) this.validateNode(node.initializer);
+				if (node.condition) this.validateNode(node.condition);
+				if (node.update) this.validateNode(node.update);
+				this.validateNode(node.body);
+				this.popScope();
+				break;
+			case 'Return':
+				if (node.value) {
+					this.validateNode(node.value);
+				}
+				break;
+			case 'Call': {
+				const lowerCallee = node.callee.toLowerCase();
+				if (lowerCallee === 'leia') {
+					if (node.args.length !== 1 || node.args[0].type !== 'Identifier') {
+						throw new Error(
+							`Erro na linha ${node.line}: O comando 'leia' deve receber exatamente um identificador.`
+						);
+					}
+					const varName = (node.args[0] as IdentifierNode).name;
+					if (!this.isDeclared(varName)) {
+						throw new Error(
+							`Erro de Semântica na linha ${node.line}: A variável '${varName}' não foi declarada.`
+						);
+					}
+				} else {
+					for (const arg of node.args) {
+						this.validateNode(arg);
+					}
+				}
+				break;
+			}
+			case 'Binary':
+				this.validateNode(node.left);
+				this.validateNode(node.right);
+				break;
+			case 'Unary':
+				this.validateNode(node.right);
+				break;
+			case 'Identifier':
+				if (!this.isDeclared(node.name)) {
+					throw new Error(
+						`Erro de Semântica na linha ${node.line}: A variável '${node.name}' não foi declarada.`
+					);
+				}
+				break;
+			case 'Literal':
+				break;
+		}
+	}
+}
