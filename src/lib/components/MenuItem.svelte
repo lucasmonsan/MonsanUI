@@ -66,9 +66,9 @@
 		padding: var(--space-sm) var(--space-md);
 		min-height: calc(var(--control-height) * 0.85);
 		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-md);
-		box-shadow: var(--shadow-sm);
-		background: var(--bg-secondary);
+		border-radius: var(--radius-sm);
+		box-shadow: none;
+		background: transparent;
 		color: var(--text-primary);
 		display: flex;
 		align-items: center;
@@ -82,6 +82,11 @@
 		text-decoration: none;
 		white-space: nowrap;
 		cursor: pointer;
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.12s var(--ease-out),
+			border-color 0.12s var(--ease-out);
 	}
 
 	.align-left {
@@ -100,31 +105,29 @@
 	}
 
 	.monsan-menu-item:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--accent-primary) 10%, var(--bg-secondary));
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0 var(--text-primary);
+		background: var(--bg-secondary);
+		border-color: var(--border-color);
 	}
 
 	.error {
-		background: var(--error);
-		color: var(--bg-primary);
+		color: var(--error);
 	}
 
 	.selected {
 		background: var(--accent-primary);
-		color: var(--text-primary);
-	}
-
-	:global([data-theme='dark']) .error {
-		color: var(--text-primary);
+		border-color: var(--border-color);
+		color: var(--bg-primary);
 	}
 
 	.error:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--error) 18%, var(--bg-primary));
+		background: color-mix(in srgb, var(--error) 12%, var(--bg-primary));
+		border-color: var(--error);
 	}
 
 	.selected:hover:not(:disabled) {
 		background: var(--accent-primary);
+		border-color: var(--border-color);
+		color: var(--bg-primary);
 	}
 
 	.monsan-menu-item:disabled {
@@ -134,7 +137,7 @@
 	}
 
 	.monsan-menu-item:active:not(:disabled) {
-		transform: translate(2px, 2px);
+		transform: none;
 		box-shadow: none;
 	}
 
@@ -143,8 +146,9 @@
 		outline-offset: 2px;
 	}
 
-	:global([data-theme='light']) .error {
-		color: var(--error);
-		background: color-mix(in srgb, var(--error) 12%, var(--bg-primary));
+	@media (prefers-reduced-motion: reduce) {
+		.monsan-menu-item {
+			transition: none;
+		}
 	}
 </style>

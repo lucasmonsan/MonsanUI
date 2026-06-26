@@ -23,7 +23,7 @@
 		panelLayout = 'vertical',
 		placement = 'below',
 		panelPadding = 'xs',
-		panelGap = 'sm',
+		panelGap = 'xs',
 		panelRole = 'menu',
 		surface = variant === 'reveal' ? 'gradient' : 'panel',
 		panelShadow = 'default',
@@ -271,11 +271,11 @@
 	}
 
 	.quick-actions-panel.variant-dropdown.placement-below {
-		top: calc(100% + var(--space-sm));
+		top: calc(100% + var(--space-xs));
 	}
 
 	.quick-actions-panel.variant-dropdown.placement-above {
-		bottom: calc(100% + var(--space-sm));
+		bottom: calc(100% + var(--space-xs));
 	}
 
 	.quick-actions-panel.variant-dropdown.align-right {

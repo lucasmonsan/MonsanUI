@@ -335,8 +335,8 @@
 		box-sizing: border-box;
 	}
 
-	.multiselect-option:hover:not(:disabled),
-	.multiselect-option.active:not(:disabled) {
+	.multiselect-option:hover:not(.selected):not(:disabled),
+	.multiselect-option.active:not(.selected):not(:disabled) {
 		background: var(--bg-secondary);
 		border-color: var(--border-color);
 	}
@@ -353,9 +353,11 @@
 		color: var(--bg-primary);
 	}
 
-	.multiselect-option.selected:hover:not(:disabled) {
+	.multiselect-option.selected:hover:not(:disabled),
+	.multiselect-option.selected.active:not(:disabled) {
 		background-color: var(--accent-primary);
 		border-color: var(--border-color);
+		color: var(--bg-primary);
 	}
 
 	.option-label {

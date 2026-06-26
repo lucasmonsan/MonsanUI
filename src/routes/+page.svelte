@@ -36,6 +36,7 @@
 	import Text from '$lib/components/Text.svelte';
 
 	// Novos Componentes
+	import PortugolRunner from '$lib/components/PortugolRunner.svelte';
 	import Checkbox from '$lib/components/Checkbox.svelte';
 	import Loading from '$lib/components/Loading.svelte';
 	import Radio from '$lib/components/Radio.svelte';
@@ -4917,6 +4918,35 @@
 							</div>
 							<pre><code
 									>{`import Terminal from '$lib/components/Terminal.svelte';\n\n<Terminal initialVFS={vfs} bind:filesystem={terminalFilesystem} osMode="both" />`}</code
+								></pre>
+						</div>
+					</div>
+
+					<!-- Portugol Showcase -->
+					<div class="component-card panel">
+						<div class="component-info">
+							<h3>Portugol IDE Runner</h3>
+							<p>
+								{i18n.locale === 'pt'
+									? 'Ambiente de desenvolvimento e execução passo a passo para a pseudo-linguagem Portugol.'
+									: i18n.locale === 'en'
+										? 'Development environment and step-by-step execution for the Portugol pseudo-language.'
+										: 'Entorno de desarrollo y ejecución paso a paso para el pseudo-lenguaje Portugol.'}
+							</p>
+						</div>
+						<div class="component-showcase-grid layout-vertical">
+							<div class="preview-box" style="min-height: 480px;">
+								<span class="box-label">{i18n.t('common.preview')}</span>
+								<div class="preview-render full-width-render">
+									<PortugolRunner />
+								</div>
+							</div>
+						</div>
+						<div class="code-container">
+							<div class="code-header">
+								<span>Svelte 5</span>
+							</div>
+							<pre><code>{`import { PortugolRunner } from 'monsan-ui';\n\n<PortugolRunner />`}</code
 								></pre>
 						</div>
 					</div>
