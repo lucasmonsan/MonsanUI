@@ -2,7 +2,8 @@ import {
 	Lexer,
 	Parser,
 	Interpreter,
-	SemanticValidator
+	SemanticValidator,
+	checkIndentation
 } from '../dist/utils/portugol/interpreter.js';
 
 function assert(condition, message) {
@@ -287,6 +288,30 @@ console.log('Running SemanticValidator tests...');
 		threw = true;
 	}
 	assert(!threw, 'Valid program should validate without errors');
+}
+
+console.log('Running Indentation Checker tests...');
+{
+	const code = `algoritmo "Sucesso"
+var
+	x : inteiro
+inicio
+	x <- 10
+fimalgoritmo`;
+	const result = checkIndentation(code);
+	assert(result.ok, 'Should pass on correctly indented code');
+}
+
+{
+	const code = `algoritmo "Erro"
+var
+x : inteiro
+inicio
+	x <- 10
+fimalgoritmo`;
+	const result = checkIndentation(code);
+	assert(!result.ok, 'Should fail on incorrectly indented code');
+	assertEquals(result.line, 3, 'Should detect error on line 3');
 }
 
 console.log('All Portugol core tests passed successfully.');

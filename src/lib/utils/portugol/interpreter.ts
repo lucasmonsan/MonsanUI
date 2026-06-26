@@ -1641,3 +1641,96 @@ export class SemanticValidator {
 		}
 	}
 }
+
+// Identation Checker
+export function checkIndentation(code: string): {
+	ok: boolean;
+	line?: number;
+	expected?: number;
+	actual?: number;
+	errorMsg?: string;
+} {
+	const lines = code.split('\n');
+	let expected = 0;
+
+	// Detect if tabs or spaces are primarily used
+	let usesTabs = false;
+	let usesSpaces = false;
+	for (const line of lines) {
+		if (line.startsWith('\t')) usesTabs = true;
+		else if (line.startsWith(' ')) usesSpaces = true;
+	}
+
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		const trimmed = line.trim();
+		if (!trimmed) continue; // Skip empty lines
+
+		const lower = trimmed.toLowerCase();
+
+		// Reduce indent level if block closer
+		if (
+			lower.startsWith('fimalgoritmo') ||
+			lower === 'var' ||
+			lower === 'inicio' ||
+			lower === 'fimse' ||
+			lower === 'fimenquanto' ||
+			lower === 'fimpara' ||
+			lower === '}' ||
+			lower.startsWith('senao') ||
+			lower.startsWith('senão')
+		) {
+			if (lower.startsWith('fimalgoritmo') || lower === 'var' || lower === 'inicio') {
+				expected = 0;
+			} else {
+				expected = Math.max(0, expected - 1);
+			}
+		}
+
+		// Count actual indent levels
+		let actual = 0;
+		if (usesTabs) {
+			let j = 0;
+			while (j < line.length && line[j] === '\t') {
+				actual++;
+				j++;
+			}
+		} else if (usesSpaces) {
+			let j = 0;
+			while (j < line.length && line[j] === ' ') {
+				actual++;
+				j++;
+			}
+			actual = Math.floor(actual / 4);
+		}
+
+		if (actual !== expected) {
+			const indentCharName = usesTabs ? 'TABs' : 'espaços (múltiplos de 4)';
+			return {
+				ok: false,
+				line: i + 1,
+				expected,
+				actual,
+				errorMsg: `Erro de Formatação na linha ${i + 1}: Indentação incorreta. Esperado ${expected} ${indentCharName}, obtido ${actual}.`
+			};
+		}
+
+		// Increase indent level for subsequent lines if block opener
+		if (
+			lower.startsWith('algoritmo') ||
+			lower === 'var' ||
+			lower === 'inicio' ||
+			lower.endsWith('{') ||
+			lower.endsWith('entao') ||
+			lower.endsWith('então') ||
+			lower.endsWith('faca') ||
+			lower.endsWith('faça') ||
+			lower.startsWith('senao') ||
+			lower.startsWith('senão')
+		) {
+			expected++;
+		}
+	}
+
+	return { ok: true };
+}

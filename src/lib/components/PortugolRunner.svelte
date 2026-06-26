@@ -6,10 +6,17 @@
 	import Inline from './Inline.svelte';
 	import Alert from './Alert.svelte';
 	import Text from './Text.svelte';
+	import Checkbox from './Checkbox.svelte';
 	import ZapIcon from './icons/Zap.svelte';
 	import RotateCwIcon from './icons/RotateCw.svelte';
 	import TriangleAlertIcon from './icons/TriangleAlert.svelte';
-	import { Lexer, Parser, Interpreter, SemanticValidator } from '../utils/portugol/interpreter.js';
+	import {
+		Lexer,
+		Parser,
+		Interpreter,
+		SemanticValidator,
+		checkIndentation
+	} from '../utils/portugol/interpreter.js';
 
 	interface Props {
 		code?: string;
@@ -38,6 +45,7 @@
 
 	let activeLine = $state(0);
 	let errorLine = $state(0);
+	let strictIndent = $state(false);
 	let isRunning = $state(false);
 	let isPaused = $state(false);
 	let isStepMode = $state(false);
@@ -60,6 +68,16 @@
 		activeLine = 0;
 		pendingInputVar = null;
 		isStepMode = step;
+
+		if (strictIndent) {
+			const indentResult = checkIndentation(code);
+			if (!indentResult.ok) {
+				errorMsg = indentResult.errorMsg || 'Erro de Indentação.';
+				errorLine = indentResult.line || 0;
+				onFailure?.(errorMsg);
+				return;
+			}
+		}
 
 		try {
 			const lexer = new Lexer(code);
@@ -208,6 +226,11 @@
 					<RotateCwIcon size="16" />
 					Reiniciar
 				</Button>
+				<Checkbox
+					bind:checked={strictIndent}
+					label="Identação Estrita"
+					disabled={disabled || isRunning}
+				/>
 			</Inline>
 		</div>
 

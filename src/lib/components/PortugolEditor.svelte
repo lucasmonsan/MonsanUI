@@ -16,10 +16,26 @@
 	let lines = $derived(code.split('\n'));
 	let textareaElement = $state<HTMLTextAreaElement | null>(null);
 	let lineNumbersElement = $state<HTMLDivElement | null>(null);
+	let highlightOverlayElement = $state<HTMLPreElement | null>(null);
+	let activeCursorLine = $state(1);
 
 	function handleScroll() {
-		if (textareaElement && lineNumbersElement) {
-			lineNumbersElement.scrollTop = textareaElement.scrollTop;
+		if (textareaElement) {
+			if (lineNumbersElement) {
+				lineNumbersElement.scrollTop = textareaElement.scrollTop;
+			}
+			if (highlightOverlayElement) {
+				highlightOverlayElement.scrollTop = textareaElement.scrollTop;
+				highlightOverlayElement.scrollLeft = textareaElement.scrollLeft;
+			}
+		}
+	}
+
+	function updateCursorLine() {
+		if (textareaElement) {
+			const selectionStart = textareaElement.selectionStart;
+			const textBeforeCursor = code.substring(0, selectionStart);
+			activeCursorLine = textBeforeCursor.split('\n').length;
 		}
 	}
 
@@ -33,10 +49,87 @@
 			setTimeout(() => {
 				if (textareaElement) {
 					textareaElement.selectionStart = textareaElement.selectionEnd = start + 1;
+					updateCursorLine();
 				}
 			}, 0);
 		}
 	}
+
+	function highlight(src: string): string {
+		// Escape HTML
+		let html = src.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+		// Keywords list
+		const keywords = [
+			'programa',
+			'funcao',
+			'função',
+			'inteiro',
+			'real',
+			'caracter',
+			'caractere',
+			'logico',
+			'lógico',
+			'cadeia',
+			'se',
+			'senao',
+			'senão',
+			'enquanto',
+			'para',
+			'retorne',
+			'verdadeiro',
+			'falso',
+			'e',
+			'ou',
+			'nao',
+			'não',
+			'algoritmo',
+			'var',
+			'inicio',
+			'fimalgoritmo',
+			'fimse',
+			'fimenquanto',
+			'fimpara',
+			'entao',
+			'então',
+			'faca',
+			'faça',
+			'de',
+			'ate',
+			'até',
+			'passo',
+			'escreva',
+			'escreval',
+			'leia',
+			'limpa'
+		];
+
+		// Strings (double quotes)
+		html = html.replace(/("[^"\\]*(?:\\.[^"\\]*)*")/g, '<span class="hl-string">$1</span>');
+
+		// Chars (single quotes)
+		html = html.replace(/('[^'\\]*(?:\\.[^'\\]*)*')/g, '<span class="hl-char">$1</span>');
+
+		// Comments (single line)
+		html = html.replace(/(\/\/.*)/g, '<span class="hl-comment">$1</span>');
+
+		// Numbers
+		html = html.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="hl-number">$1</span>');
+
+		// Keywords - match only outside HTML tags
+		const keywordRegex = new RegExp(`\\b(${keywords.join('|')})\\b`, 'gi');
+		html = html
+			.split(/(<[^>]*>)/)
+			.map((part) => {
+				if (part.startsWith('<')) return part;
+				return part.replace(keywordRegex, '<span class="hl-keyword">$1</span>');
+			})
+			.join('');
+
+		return html;
+	}
+
+	let highlightedCode = $derived(highlight(code));
 </script>
 
 <div class="portugol-editor-container" class:disabled>
@@ -45,7 +138,13 @@
 			{@const lineNum = index + 1}
 			{@const isActive = activeLine === lineNum}
 			{@const isError = errorLine === lineNum}
-			<div class="line-number-row" class:active={isActive} class:error={isError}>
+			{@const isCursor = activeCursorLine === lineNum}
+			<div
+				class="line-number-row"
+				class:active={isActive}
+				class:error={isError}
+				class:cursor={isCursor}
+			>
 				{#if isActive}
 					<span class="active-indicator">▶</span>
 				{:else if isError}
@@ -55,17 +154,29 @@
 			</div>
 		{/each}
 	</div>
-	<textarea
-		bind:value={code}
-		bind:this={textareaElement}
-		onscroll={handleScroll}
-		onkeydown={handleKeyDown}
-		{disabled}
-		{placeholder}
-		spellcheck="false"
-		autocomplete="off"
-		autocapitalize="off"
-	></textarea>
+	<div class="editor-wrapper">
+		<!-- eslint-disable svelte/no-at-html-tags -->
+		<pre
+			class="highlight-overlay"
+			bind:this={highlightOverlayElement}
+			aria-hidden="true">{@html highlightedCode}</pre>
+		<!-- eslint-enable svelte/no-at-html-tags -->
+		<textarea
+			bind:value={code}
+			bind:this={textareaElement}
+			onscroll={handleScroll}
+			onkeydown={handleKeyDown}
+			oninput={updateCursorLine}
+			onkeyup={updateCursorLine}
+			onclick={updateCursorLine}
+			onfocus={updateCursorLine}
+			{disabled}
+			{placeholder}
+			spellcheck="false"
+			autocomplete="off"
+			autocapitalize="off"
+		></textarea>
+	</div>
 </div>
 
 <style>
@@ -122,6 +233,15 @@
 		background: rgba(155, 34, 38, 0.12);
 	}
 
+	.line-number-row.cursor:not(.active):not(.error) {
+		background: rgba(45, 36, 34, 0.05);
+		color: var(--text-primary);
+	}
+
+	:root[data-theme='dark'] .line-number-row.cursor:not(.active):not(.error) {
+		background: rgba(253, 251, 247, 0.06);
+	}
+
 	.active-indicator {
 		position: absolute;
 		left: 4px;
@@ -140,11 +260,49 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	textarea {
+	.editor-wrapper {
 		flex: 1;
+		position: relative;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.highlight-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
 		padding: 12px;
+		margin: 0;
 		background: transparent;
-		color: inherit;
+		color: var(--text-primary);
+		font-family: inherit;
+		font-size: inherit;
+		line-height: inherit;
+		white-space: pre;
+		overflow: auto;
+		pointer-events: none;
+		box-sizing: border-box;
+		border: none;
+		scrollbar-width: none;
+	}
+
+	.highlight-overlay::-webkit-scrollbar {
+		display: none;
+	}
+
+	textarea {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		padding: 12px;
+		margin: 0;
+		background: transparent;
+		color: transparent;
+		caret-color: var(--text-primary);
 		border: none;
 		outline: none;
 		resize: none;
@@ -154,9 +312,33 @@
 		white-space: pre;
 		overflow: auto;
 		tab-size: 4;
+		box-sizing: border-box;
 	}
 
 	textarea:disabled {
 		cursor: not-allowed;
+	}
+
+	/* Code Highlighting Token Classes */
+	:global(.hl-keyword) {
+		color: var(--accent-primary);
+		font-weight: bold;
+	}
+
+	:global(.hl-string) {
+		color: var(--success);
+	}
+
+	:global(.hl-char) {
+		color: var(--success);
+	}
+
+	:global(.hl-number) {
+		color: var(--warning);
+	}
+
+	:global(.hl-comment) {
+		color: var(--text-secondary);
+		font-style: italic;
 	}
 </style>
