@@ -24,6 +24,7 @@
 		onOutputsChange?: (outputs: string[]) => void;
 		onSuccess?: () => void;
 		onFailure?: (error: string) => void;
+		onsave?: () => void;
 	}
 
 	let {
@@ -40,7 +41,8 @@
 		disabled = false,
 		onOutputsChange,
 		onSuccess,
-		onFailure
+		onFailure,
+		onsave
 	}: Props = $props();
 
 	let activeLine = $state(0);
@@ -226,6 +228,11 @@
 					<RotateCwIcon size="16" />
 					Reiniciar
 				</Button>
+				{#if onsave}
+					<Button variant="secondary" size="sm" onclick={onsave} disabled={disabled || isRunning}>
+						Salvar
+					</Button>
+				{/if}
 				<Checkbox
 					bind:checked={strictIndent}
 					label="Identação Estrita"
