@@ -72,13 +72,13 @@
 	.portugol-editor-container {
 		display: flex;
 		flex-direction: row;
-		font-family: 'Fira Code', 'Courier New', Courier, monospace;
+		font-family: var(--font-mono);
 		font-size: 14px;
 		line-height: 20px;
-		background: var(--color-bg-dark, #1e1e2e);
-		color: var(--color-text-light, #cdd6f4);
-		border: 1px solid var(--color-border-dark, #313244);
-		border-radius: 8px;
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-lg);
 		overflow: hidden;
 		height: 400px;
 		position: relative;
@@ -93,8 +93,8 @@
 		flex-direction: column;
 		width: 48px;
 		padding: 12px 0;
-		background: var(--color-bg-sidebar, #11111b);
-		border-right: 1px solid var(--color-border-dark, #313244);
+		background: var(--bg-secondary);
+		border-right: var(--border-width) solid var(--border-color);
 		user-select: none;
 		overflow: hidden;
 		text-align: right;
@@ -103,7 +103,7 @@
 	.line-number-row {
 		height: 20px;
 		padding-right: 8px;
-		color: var(--color-text-muted, #585b70);
+		color: var(--text-secondary);
 		position: relative;
 		display: flex;
 		justify-content: flex-end;
@@ -111,29 +111,29 @@
 	}
 
 	.line-number-row.active {
-		color: var(--color-warning, #f9e2af);
+		color: var(--warning);
 		font-weight: bold;
-		background: rgba(249, 226, 175, 0.15);
+		background: rgba(224, 123, 57, 0.12);
 	}
 
 	.line-number-row.error {
-		color: var(--color-error, #f38ba8);
+		color: var(--error);
 		font-weight: bold;
-		background: rgba(243, 139, 168, 0.15);
+		background: rgba(155, 34, 38, 0.12);
 	}
 
 	.active-indicator {
 		position: absolute;
 		left: 4px;
 		font-size: 10px;
-		color: var(--color-warning, #f9e2af);
+		color: var(--warning);
 	}
 
 	.error-indicator {
 		position: absolute;
 		left: 4px;
 		font-size: 10px;
-		color: var(--color-error, #f38ba8);
+		color: var(--error);
 	}
 
 	.num {

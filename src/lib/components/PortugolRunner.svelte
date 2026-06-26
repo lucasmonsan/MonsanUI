@@ -310,9 +310,9 @@
 
 	.toolbar {
 		padding: 8px;
-		background: var(--color-bg-panel, #24273a);
-		border: 1px solid var(--color-border, #36394f);
-		border-radius: 8px;
+		background: var(--bg-secondary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-lg);
 	}
 
 	.workspace-grid {
@@ -338,16 +338,16 @@
 	}
 
 	.terminal-box {
-		background: #11111b;
-		color: #a6adc8;
-		font-family: 'Fira Code', 'Courier New', Courier, monospace;
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		font-family: var(--font-mono);
 		font-size: 13px;
 		line-height: 18px;
 		height: 180px;
 		padding: 12px;
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		overflow-y: auto;
-		border: 1px solid #313244;
+		border: var(--border-width) solid var(--border-color);
 	}
 
 	.terminal-content {
@@ -362,7 +362,7 @@
 	}
 
 	.terminal-empty {
-		color: #585b70;
+		color: var(--text-secondary);
 		font-style: italic;
 		margin: auto;
 		text-align: center;
@@ -370,7 +370,7 @@
 
 	.terminal-input-prompt {
 		margin-top: 8px;
-		border-top: 1px dashed #313244;
+		border-top: 1px dashed var(--border-color);
 		padding-top: 8px;
 	}
 
@@ -382,18 +382,18 @@
 
 	.terminal-text-input {
 		flex: 1;
-		background: #1e1e2e;
-		border: 1px solid #45475a;
-		color: #cdd6f4;
+		background: var(--bg-secondary);
+		border: var(--border-width) solid var(--border-color);
+		color: var(--text-primary);
 		padding: 4px 8px;
 		font-family: inherit;
 		font-size: inherit;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		outline: none;
 	}
 
 	.terminal-text-input:focus {
-		border-color: var(--color-primary, #b4befe);
+		border-color: var(--accent-primary);
 	}
 
 	.variables-box {
@@ -402,7 +402,7 @@
 	}
 
 	.variables-empty {
-		color: var(--color-text-muted, #a6adc8);
+		color: var(--text-secondary);
 		font-style: italic;
 		text-align: center;
 		padding: 12px 0;
@@ -418,22 +418,22 @@
 	.variables-table td {
 		padding: 6px 12px;
 		text-align: left;
-		border-bottom: 1px solid var(--color-border, #36394f);
+		border-bottom: 1px solid var(--border-color);
 	}
 
 	.variables-table th {
-		color: var(--color-text-muted, #a6adc8);
+		color: var(--text-secondary);
 		font-weight: 500;
 	}
 
 	.var-name {
-		font-family: 'Fira Code', monospace;
-		color: var(--color-primary, #b4befe);
+		font-family: var(--font-mono);
+		color: var(--accent-primary);
 	}
 
 	.var-value {
-		font-family: 'Fira Code', monospace;
-		color: var(--color-text, #cdd6f4);
+		font-family: var(--font-mono);
+		color: var(--text-primary);
 	}
 
 	.error-msg-box {
@@ -445,7 +445,7 @@
 		font-weight: 600;
 		font-size: 14px;
 		margin-bottom: 12px;
-		color: var(--color-text, #cdd6f4);
+		color: var(--text-primary);
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
