@@ -56,6 +56,8 @@ export { default as MultipleChoice } from './components/questions/MultipleChoice
 export { default as DndOrder } from './components/DndOrder.svelte';
 export { default as DndMatch } from './components/DndMatch.svelte';
 export { default as Terminal } from './components/Terminal.svelte';
+export { default as PortugolEditor } from './components/PortugolEditor.svelte';
+export { default as PortugolRunner } from './components/PortugolRunner.svelte';
 export { default as Checkbox } from './components/Checkbox.svelte';
 export { default as Chips } from './components/Chips.svelte';
 export { default as ColorPicker } from './components/ColorPicker.svelte';
@@ -146,3 +148,6 @@ export * from './types.js';
 export { slideFade } from './utils/transitions.js';
 export { autoResizeAction } from './utils/actions.js';
 export { i18n } from './utils/i18n.svelte.js';
+
+// Portugol Compiler & Interpreter
+export * from './utils/portugol/interpreter.js';

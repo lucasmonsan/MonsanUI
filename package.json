@@ -24,7 +24,7 @@
 		"test:standards": "node tests/consumer-standards.test.mjs",
 		"test:tooling": "node tests/tooling-standards.test.mjs",
 		"format": "prettier --write .",
-		"test": "pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm run test:tooling && pnpm build && pnpm run build:package && pnpm run lint:package",
+		"test": "pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm run test:tooling && pnpm build && pnpm run build:package && pnpm run lint:package && node tests/portugol.test.mjs",
 		"test:latest": "pnpm update && pnpm test"
 	},
 	"files": [
