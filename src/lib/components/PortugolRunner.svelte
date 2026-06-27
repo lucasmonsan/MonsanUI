@@ -594,7 +594,6 @@
 		flex-direction: column;
 		min-height: 0;
 		height: 100%;
-		padding: 12px;
 		box-sizing: border-box;
 	}
 
@@ -659,7 +658,6 @@
 		flex-direction: column;
 		min-height: 0;
 		height: 100%;
-		padding: 12px;
 		box-sizing: border-box;
 	}
 
