@@ -381,7 +381,7 @@
 				<!-- Console/Terminal -->
 				{#if !isConsoleCollapsed}
 					<div class="terminal-card" style="grid-row: 1;">
-						<Panel padding="md" maxWidth="none" fullHeight={true}>
+						<Panel padding="none" maxWidth="none" fullHeight={true}>
 							<div class="panel-header">
 								<span>Console</span>
 								<button
@@ -438,7 +438,7 @@
 				<!-- Inspetor de Variáveis -->
 				{#if !isVariablesCollapsed}
 					<div class="variables-panel-wrapper" style="grid-row: {isConsoleCollapsed ? 1 : 3};">
-						<Panel padding="md" maxWidth="none" fullHeight={true}>
+						<Panel padding="none" maxWidth="none" fullHeight={true}>
 							<div class="panel-header">
 								<span>Variáveis</span>
 								<button
@@ -509,10 +509,6 @@
 		display: grid;
 		gap: 0px;
 		width: 100%;
-		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-lg);
-		background: var(--bg-primary);
-		overflow: hidden;
 	}
 
 	@media (min-width: 901px) {
@@ -605,6 +601,7 @@
 		overflow-y: auto;
 		flex: 1;
 		min-height: 0;
+		padding: 16px;
 	}
 
 	.terminal-content {
@@ -665,6 +662,7 @@
 		flex: 1;
 		min-height: 0;
 		overflow-y: auto;
+		padding: 16px;
 	}
 
 	.variables-empty {
@@ -716,28 +714,37 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-weight: 600;
-		font-size: 13px;
-		margin-bottom: 12px;
+		background: var(--bg-secondary);
+		border-bottom: var(--border-width) solid var(--border-color);
+		padding: 12px 16px;
 		color: var(--text-primary);
+		font-family: var(--font-display);
+		font-size: var(--text-xs);
+		font-weight: 800;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+		user-select: none;
 	}
 
 	.collapse-btn {
 		background: transparent;
 		border: none;
-		color: var(--accent-primary);
+		color: var(--text-secondary);
 		font-family: inherit;
 		font-size: 11px;
 		cursor: pointer;
-		text-transform: none;
+		text-transform: uppercase;
+		font-weight: 800;
 		padding: 2px 6px;
 		border-radius: var(--radius-sm);
+		transition:
+			color 0.15s ease,
+			background-color 0.15s ease;
 	}
 
 	.collapse-btn:hover {
-		background: rgba(224, 123, 57, 0.08);
+		color: var(--text-primary);
+		background: rgba(0, 0, 0, 0.05);
 	}
 
 	.horizontal-resize-bar {
