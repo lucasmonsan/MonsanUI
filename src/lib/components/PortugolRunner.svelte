@@ -666,6 +666,7 @@
 
 	.editor-col {
 		min-width: 0;
+		min-height: 0;
 		height: 100%;
 	}
 
@@ -708,6 +709,7 @@
 		gap: 0px;
 		height: 100%;
 		min-width: 0;
+		min-height: 0;
 	}
 
 	.sidebar-col.hidden {
@@ -720,6 +722,7 @@
 		min-height: 0;
 		height: 100%;
 		padding: 12px;
+		box-sizing: border-box;
 	}
 
 	.terminal-box {
@@ -788,13 +791,13 @@
 		min-height: 0;
 		height: 100%;
 		padding: 12px;
+		box-sizing: border-box;
 	}
 
 	.variables-box {
-		height: calc(100% - 32px);
-		overflow-y: auto;
 		flex: 1;
 		min-height: 0;
+		overflow-y: auto;
 	}
 
 	.variables-empty {

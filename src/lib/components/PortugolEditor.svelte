@@ -426,6 +426,7 @@
 		border-radius: var(--radius-lg);
 		overflow: hidden;
 		height: 100%;
+		min-height: 0;
 		position: relative;
 	}
 
@@ -436,6 +437,7 @@
 	.editor-wrapper {
 		width: 100%;
 		height: 100%;
+		min-height: 0;
 		overflow: hidden;
 	}
 

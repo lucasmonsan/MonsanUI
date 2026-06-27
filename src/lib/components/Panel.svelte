@@ -55,6 +55,7 @@
 	this={tag}
 	class="monsan-panel {variant} overflow-{overflow}"
 	class:is-interactive={interactive}
+	class:full-height={fullHeight}
 	style:padding={resolvedPadding}
 	style:max-width={resolvedMaxWidth}
 	style:height={fullHeight ? '100%' : undefined}
@@ -77,6 +78,12 @@
 			transform 0.2s var(--ease-out),
 			box-shadow 0.2s var(--ease-out),
 			background-color 0.2s var(--ease-out);
+	}
+
+	.monsan-panel.full-height {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
 	}
 
 	.overflow-x {
