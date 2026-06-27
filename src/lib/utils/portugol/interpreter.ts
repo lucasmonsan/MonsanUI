@@ -574,7 +574,10 @@ export class Parser {
 			while (!this.check('RBRACE') && !this.isAtEnd()) {
 				declarations.push(this.parseDeclaration());
 			}
-			this.consume('RBRACE', "Esperado '}' no fim do programa");
+			this.consume(
+				'RBRACE',
+				`Esperado '}' para fechar o bloco 'programa' iniciado na linha ${progToken.line}`
+			);
 		} else {
 			// Permite escrever funções diretamente sem a casca "programa" para simplicidade
 			while (!this.isAtEnd()) {
@@ -656,7 +659,7 @@ export class Parser {
 		while (!this.check('RBRACE') && !this.isAtEnd()) {
 			statements.push(this.parseStatement());
 		}
-		this.consume('RBRACE', "Esperado '}'");
+		this.consume('RBRACE', `Esperado '}' para fechar o bloco iniciado na linha ${braceToken.line}`);
 		return { type: 'Block', statements, line: braceToken.line };
 	}
 
@@ -955,7 +958,10 @@ export class Parser {
 			statements.push(this.parseVisualgStatement());
 		}
 
-		this.consume('FIMALGORITMO', "Esperado palavra-chave 'fimalgoritmo'");
+		this.consume(
+			'FIMALGORITMO',
+			`Esperado 'fimalgoritmo' para fechar o algoritmo iniciado na linha ${algoToken.line}`
+		);
 
 		// Embrulha os statements em uma função principal 'inicio()'
 		const mainFunc: FunctionDeclNode = {
@@ -1044,7 +1050,10 @@ export class Parser {
 			};
 		}
 
-		this.consume('FIMSE', "Esperado 'fimse' para fechar o bloco 'se'");
+		this.consume(
+			'FIMSE',
+			`Esperado 'fimse' para fechar o bloco 'se' iniciado na linha ${ifToken.line}`
+		);
 
 		return {
 			type: 'If',
@@ -1064,7 +1073,10 @@ export class Parser {
 		while (!this.check('FIMENQUANTO') && !this.isAtEnd()) {
 			bodyStatements.push(this.parseVisualgStatement());
 		}
-		this.consume('FIMENQUANTO', "Esperado 'fimenquanto' para fechar o bloco 'enquanto'");
+		this.consume(
+			'FIMENQUANTO',
+			`Esperado 'fimenquanto' para fechar o loop 'enquanto' iniciado na linha ${whileToken.line}`
+		);
 
 		const body: BlockNode = {
 			type: 'Block',
@@ -1105,7 +1117,10 @@ export class Parser {
 		while (!this.check('FIMPARA') && !this.isAtEnd()) {
 			bodyStatements.push(this.parseVisualgStatement());
 		}
-		this.consume('FIMPARA', "Esperado 'fimpara' para fechar o bloco 'para'");
+		this.consume(
+			'FIMPARA',
+			`Esperado 'fimpara' para fechar o loop 'para' iniciado na linha ${forToken.line}`
+		);
 
 		// Transpila a lógica do loop para a estrutura AST do clássico ForNode
 		const initializer: AssignNode = {
