@@ -8,7 +8,8 @@
 		GutterMarker,
 		Decoration,
 		placeholder as cmPlaceholder,
-		ViewUpdate
+		ViewUpdate,
+		highlightActiveLine
 	} from '@codemirror/view';
 	import {
 		EditorState,
@@ -233,6 +234,47 @@
 
 			stream.next();
 			return null;
+		},
+		indent(_state: unknown, textAfter: string, cx: { state: EditorState }) {
+			const doc = cx.state.doc;
+			const pos = cx.state.selection.main.head;
+			const line = doc.lineAt(pos);
+			if (line.number <= 1) return 0;
+
+			const prevLine = doc.line(line.number - 1);
+			const prevText = prevLine.text.trim();
+
+			const prevIndentMatch = prevLine.text.match(/^[\t ]*/);
+			const prevIndent = prevIndentMatch ? prevIndentMatch[0] : '';
+
+			let indentLevel = 0;
+			for (let i = 0; i < prevIndent.length; i++) {
+				if (prevIndent[i] === '\t') {
+					indentLevel += 4;
+				} else {
+					indentLevel += 1;
+				}
+			}
+
+			// Se a linha anterior abriu um bloco, aumenta indentação
+			const opensBlock =
+				/[{(]$|\b(inicio|var|entao|então|faca|faça|se|enquanto|para|algoritmo|funcao|função)\b/i.test(
+					prevText
+				);
+			if (opensBlock) {
+				indentLevel += 4;
+			}
+
+			// Se a linha atual (que está sendo inserida) fecha um bloco, reduz indentação
+			const closesBlock =
+				/^\s*([})]|\b(fimse|fimenquanto|fimpara|fimalgoritmo|senao|senão)\b)/i.test(
+					textAfter.trim().toLowerCase()
+				);
+			if (closesBlock) {
+				indentLevel = Math.max(0, indentLevel - 4);
+			}
+
+			return indentLevel;
 		}
 	});
 
@@ -278,6 +320,9 @@
 				minWidth: '16px',
 				paddingLeft: '4px'
 			},
+			'.cm-activeLine': {
+				backgroundColor: 'rgba(224, 123, 57, 0.06) !important'
+			},
 			'.cm-active-line': {
 				backgroundColor: 'rgba(224, 123, 57, 0.08) !important'
 			},
@@ -285,7 +330,7 @@
 				backgroundColor: 'rgba(155, 34, 38, 0.08) !important'
 			},
 			'.cm-cursor': {
-				borderLeftColor: 'var(--text-primary)'
+				borderLeftColor: 'var(--text-primary) !important'
 			}
 		},
 		{ dark: false }
@@ -301,6 +346,7 @@
 					portugolLanguage,
 					cmPlaceholder(placeholder),
 					lineNumbers(),
+					highlightActiveLine(),
 					indicatorGutter,
 					lineMarkersField,
 					lineHighlightField,
