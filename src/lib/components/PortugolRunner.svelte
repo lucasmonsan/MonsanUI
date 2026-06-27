@@ -59,6 +59,41 @@
 	let pendingInputVar = $state<string | null>(null);
 	let currentInputValue = $state('');
 
+	// Collapsible state
+	let isConsoleCollapsed = $state(false);
+	let isVariablesCollapsed = $state(false);
+
+	// Resizable state
+	let editorWidthPercent = $state(60);
+	let isDragging = $state(false);
+
+	function startResize(e: MouseEvent) {
+		e.preventDefault();
+		isDragging = true;
+		const gridElement = (e.currentTarget as HTMLElement).parentElement;
+		if (!gridElement) return;
+
+		const startX = e.clientX;
+		const rect = gridElement.getBoundingClientRect();
+		const totalWidth = rect.width;
+		const initialPercent = editorWidthPercent;
+
+		function onMouseMove(moveEvent: MouseEvent) {
+			const deltaX = moveEvent.clientX - startX;
+			const deltaPercent = (deltaX / totalWidth) * 100;
+			editorWidthPercent = Math.min(Math.max(initialPercent + deltaPercent, 20), 80);
+		}
+
+		function onMouseUp() {
+			isDragging = false;
+			window.removeEventListener('mousemove', onMouseMove);
+			window.removeEventListener('mouseup', onMouseUp);
+		}
+
+		window.addEventListener('mousemove', onMouseMove);
+		window.addEventListener('mouseup', onMouseUp);
+	}
+
 	let interpreter: Interpreter | null = null;
 	let generator: Generator<unknown, unknown, unknown> | null = null;
 
@@ -242,7 +277,11 @@
 		</div>
 
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
-		<div class="workspace-grid">
+		<div
+			class="workspace-grid"
+			style="grid-template-columns: {editorWidthPercent}% 12px calc({100 -
+				editorWidthPercent}% - 12px)"
+		>
 			<!-- Editor de Código -->
 			<div class="editor-col">
 				<PortugolEditor
@@ -253,68 +292,103 @@
 				/>
 			</div>
 
+			<!-- Barra de redimensionamento -->
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+			<div
+				class="resize-bar"
+				class:dragging={isDragging}
+				onmousedown={startResize}
+				role="separator"
+				aria-valuenow={editorWidthPercent}
+			></div>
+
 			<!-- Terminal de I/O e inspetor de variáveis -->
 			<div class="sidebar-col">
-				<!-- Console/Terminal (Sem Panel) -->
-				<div class="terminal-box">
-					<div class="terminal-content">
-						{#each outputs as output, index (index)}
-							<div class="terminal-line">{output}</div>
-						{/each}
-
-						{#if pendingInputVar}
-							<div class="terminal-input-prompt">
-								<form onsubmit={submitInput} class="input-form">
-									<Text size="sm" variant="neutral">
-										leia({pendingInputVar}):
-									</Text>
-									<input
-										type="text"
-										bind:value={currentInputValue}
-										placeholder="Digite um valor e pressione Enter"
-										class="terminal-text-input"
-									/>
-									<button type="submit" aria-label="Enviar" style="display: none;"></button>
-								</form>
-							</div>
-						{/if}
-
-						{#if outputs.length === 0 && !pendingInputVar}
-							<div class="terminal-empty">Console vazio. Clique em Executar.</div>
-						{/if}
+				<!-- Console/Terminal -->
+				<div class="terminal-card" class:collapsed={isConsoleCollapsed}>
+					<div class="panel-header">
+						<span>Terminal / Console</span>
+						<button
+							type="button"
+							class="collapse-btn"
+							onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
+						>
+							{isConsoleCollapsed ? 'Mostrar' : 'Ocultar'}
+						</button>
 					</div>
+					{#if !isConsoleCollapsed}
+						<div class="terminal-box">
+							<div class="terminal-content">
+								{#each outputs as output, index (index)}
+									<div class="terminal-line">{output}</div>
+								{/each}
+
+								{#if pendingInputVar}
+									<div class="terminal-input-prompt">
+										<form onsubmit={submitInput} class="input-form">
+											<Text size="sm" variant="neutral">
+												leia({pendingInputVar}):
+											</Text>
+											<input
+												type="text"
+												bind:value={currentInputValue}
+												placeholder="Digite um valor e pressione Enter"
+												class="terminal-text-input"
+											/>
+											<button type="submit" aria-label="Enviar" style="display: none;"></button>
+										</form>
+									</div>
+								{/if}
+
+								{#if outputs.length === 0 && !pendingInputVar}
+									<div class="terminal-empty">Console vazio. Clique em Executar.</div>
+								{/if}
+							</div>
+						</div>
+					{/if}
 				</div>
 
 				<!-- Inspetor de Variáveis -->
-				<div class="variables-panel-wrapper">
+				<div class="variables-panel-wrapper" class:collapsed={isVariablesCollapsed}>
 					<Panel maxWidth="none" fullHeight={true}>
-						<div class="panel-header">Variáveis de Execução</div>
-						<div class="variables-box">
-							{#if Object.keys(variables).length > 0}
-								<table class="variables-table">
-									<thead>
-										<tr>
-											<th>Nome</th>
-											<th>Tipo</th>
-											<th>Valor</th>
-										</tr>
-									</thead>
-									<tbody>
-										{#each Object.entries(variables) as [name, info] (name)}
-											<tr>
-												<td class="var-name">{name}</td>
-												<td class="var-type">{info.type}</td>
-												<td class="var-value">
-													{info.value === undefined ? 'vazio' : String(info.value)}
-												</td>
-											</tr>
-										{/each}
-									</tbody>
-								</table>
-							{:else}
-								<div class="variables-empty">Nenhuma variável ativa.</div>
-							{/if}
+						<div class="panel-header">
+							<span>Variáveis de Execução</span>
+							<button
+								type="button"
+								class="collapse-btn"
+								onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
+							>
+								{isVariablesCollapsed ? 'Mostrar' : 'Ocultar'}
+							</button>
 						</div>
+						{#if !isVariablesCollapsed}
+							<div class="variables-box">
+								{#if Object.keys(variables).length > 0}
+									<table class="variables-table">
+										<thead>
+											<tr>
+												<th>Nome</th>
+												<th>Tipo</th>
+												<th>Valor</th>
+											</tr>
+										</thead>
+										<tbody>
+											{#each Object.entries(variables) as [name, info] (name)}
+												<tr>
+													<td class="var-name">{name}</td>
+													<td class="var-type">{info.type}</td>
+													<td class="var-value">
+														{info.value === undefined ? 'vazio' : String(info.value)}
+													</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								{:else}
+									<div class="variables-empty">Nenhuma variável ativa.</div>
+								{/if}
+							</div>
+						{/if}
 					</Panel>
 				</div>
 			</div>
@@ -346,8 +420,7 @@
 
 	.workspace-grid {
 		display: grid;
-		grid-template-columns: 3fr 2fr;
-		gap: 16px;
+		gap: 0px;
 	}
 
 	@media (min-width: 901px) {
@@ -358,14 +431,16 @@
 
 	@media (max-width: 900px) {
 		.workspace-grid {
-			grid-template-columns: 1fr;
+			display: flex;
+			flex-direction: column;
 			height: auto;
+			gap: 16px;
 		}
 		.editor-col {
 			height: 400px;
 		}
 		.sidebar-col {
-			height: 400px;
+			height: 500px;
 		}
 	}
 
@@ -374,12 +449,41 @@
 		height: 100%;
 	}
 
+	.resize-bar {
+		grid-column: 2;
+		width: 8px;
+		margin: 0 2px;
+		cursor: col-resize;
+		background: transparent;
+		border-left: 1px dashed var(--border-color);
+		transition: border-color 0.2s;
+		align-self: stretch;
+		z-index: 10;
+	}
+
+	.resize-bar:hover,
+	.resize-bar.dragging {
+		border-left: 2px solid var(--accent-primary);
+	}
+
 	.sidebar-col {
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
 		height: 100%;
 		min-width: 0;
+	}
+
+	.terminal-card {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		transition: flex 0.2s ease;
+	}
+
+	.terminal-card.collapsed {
+		flex: none;
 	}
 
 	.terminal-box {
@@ -443,13 +547,22 @@
 	}
 
 	.variables-panel-wrapper {
+		display: flex;
+		flex-direction: column;
 		flex: 1;
 		min-height: 0;
+		transition: flex 0.2s ease;
+	}
+
+	.variables-panel-wrapper.collapsed {
+		flex: none;
 	}
 
 	.variables-box {
 		height: calc(100% - 32px);
 		overflow-y: auto;
+		flex: 1;
+		min-height: 0;
 	}
 
 	.variables-empty {
@@ -498,11 +611,30 @@
 	}
 
 	.panel-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		font-weight: 600;
 		font-size: 14px;
 		margin-bottom: 12px;
 		color: var(--text-primary);
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+	}
+
+	.collapse-btn {
+		background: transparent;
+		border: none;
+		color: var(--accent-primary);
+		font-family: inherit;
+		font-size: 12px;
+		cursor: pointer;
+		text-transform: none;
+		padding: 2px 6px;
+		border-radius: var(--radius-sm);
+	}
+
+	.collapse-btn:hover {
+		background: rgba(224, 123, 57, 0.08);
 	}
 </style>
