@@ -6,8 +6,6 @@
 	import Inline from './Inline.svelte';
 	import Alert from './Alert.svelte';
 	import Text from './Text.svelte';
-	import Checkbox from './Checkbox.svelte';
-	import ZapIcon from './icons/Zap.svelte';
 	import RotateCwIcon from './icons/RotateCw.svelte';
 	import TriangleAlertIcon from './icons/TriangleAlert.svelte';
 	import {
@@ -66,6 +64,37 @@
 	// Resizable state
 	let editorWidthPercent = $state(60);
 	let isDragging = $state(false);
+
+	// Horizontal split state
+	let consoleHeightPercent = $state(50);
+	let isHorizontalDragging = $state(false);
+
+	function startHorizontalResize(e: MouseEvent) {
+		e.preventDefault();
+		isHorizontalDragging = true;
+		const sidebarElement = (e.currentTarget as HTMLElement).parentElement;
+		if (!sidebarElement) return;
+
+		const startY = e.clientY;
+		const rect = sidebarElement.getBoundingClientRect();
+		const totalHeight = rect.height;
+		const initialPercent = consoleHeightPercent;
+
+		function onMouseMove(moveEvent: MouseEvent) {
+			const deltaY = moveEvent.clientY - startY;
+			const deltaPercent = (deltaY / totalHeight) * 100;
+			consoleHeightPercent = Math.min(Math.max(initialPercent + deltaPercent, 20), 80);
+		}
+
+		function onMouseUp() {
+			isHorizontalDragging = false;
+			window.removeEventListener('mousemove', onMouseMove);
+			window.removeEventListener('mouseup', onMouseUp);
+		}
+
+		window.addEventListener('mousemove', onMouseMove);
+		window.addEventListener('mouseup', onMouseUp);
+	}
 
 	function startResize(e: MouseEvent) {
 		e.preventDefault();
@@ -241,78 +270,246 @@
 	<Stack gap="md">
 		<!-- Toolbar de controle -->
 		<div class="toolbar">
-			<Inline gap="sm">
-				<Button
-					variant="primary"
-					size="sm"
-					onclick={() => startExecution(false)}
-					disabled={disabled || (isRunning && !isStepMode)}
-				>
-					<ZapIcon size="16" />
-					Executar
-				</Button>
-				<Button
-					variant="secondary"
-					size="sm"
-					onclick={handleStep}
-					disabled={disabled || (isRunning && !isStepMode && !isPaused)}
-				>
-					Passo a Passo
-				</Button>
-				<Button variant="secondary" size="sm" onclick={handleReset} {disabled}>
-					<RotateCwIcon size="16" />
-					Reiniciar
-				</Button>
-				{#if onsave}
-					<Button variant="secondary" size="sm" onclick={onsave} disabled={disabled || isRunning}>
-						Salvar
+			<Inline justify="between" align="center" fullWidth={true}>
+				<!-- Controles de Execução (Esquerda) -->
+				<Inline gap="xs">
+					<Button
+						variant="primary"
+						size="sm"
+						onclick={() => startExecution(false)}
+						disabled={disabled || (isRunning && !isStepMode)}
+					>
+						<!-- Play icon SVG -->
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							fill="currentColor"
+							viewBox="0 0 256 256"
+						>
+							<rect width="256" height="256" fill="none" />
+							<polygon points="80 56 200 128 80 200 80 56" fill="currentColor" />
+						</svg>
+						Executar
 					</Button>
-				{/if}
-				<Checkbox
-					bind:checked={strictIndent}
-					label="Identação Estrita"
-					disabled={disabled || isRunning}
-				/>
+					<Button
+						variant="secondary"
+						size="sm"
+						onclick={handleStep}
+						disabled={disabled || (isRunning && !isStepMode && !isPaused)}
+					>
+						<!-- Step icon SVG -->
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							fill="currentColor"
+							viewBox="0 0 256 256"
+						>
+							<rect width="256" height="256" fill="none" />
+							<polygon points="64 48 184 128 64 208 64 48" fill="currentColor" />
+							<line
+								x1="208"
+								y1="48"
+								x2="208"
+								y2="208"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+						</svg>
+						Passo a Passo
+					</Button>
+					<Button variant="secondary" size="sm" onclick={handleReset} {disabled}>
+						<RotateCwIcon size="16" />
+						Reiniciar
+					</Button>
+					{#if onsave}
+						<Button variant="secondary" size="sm" onclick={onsave} disabled={disabled || isRunning}>
+							Salvar
+						</Button>
+					{/if}
+					<Button
+						variant={strictIndent ? 'primary' : 'secondary'}
+						size="sm"
+						onclick={() => (strictIndent = !strictIndent)}
+						disabled={disabled || isRunning}
+					>
+						<!-- Indent Icon SVG -->
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							fill="currentColor"
+							viewBox="0 0 256 256"
+						>
+							<rect width="256" height="256" fill="none" />
+							<line
+								x1="120"
+								y1="56"
+								x2="224"
+								y2="56"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+							<line
+								x1="120"
+								y1="128"
+								x2="224"
+								y2="128"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+							<line
+								x1="120"
+								y1="200"
+								x2="224"
+								y2="200"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+							<polyline
+								points="40 88 80 128 40 168"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+						</svg>
+						Identação Estrita
+					</Button>
+				</Inline>
+
+				<!-- Alternadores de Visibilidade de Painéis (Direita) -->
+				<Inline gap="xs">
+					<Button
+						variant={!isConsoleCollapsed ? 'primary' : 'secondary'}
+						size="sm"
+						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
+					>
+						<!-- Terminal/Console Icon -->
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							fill="currentColor"
+							viewBox="0 0 256 256"
+						>
+							<rect width="256" height="256" fill="none" />
+							<polyline
+								points="40 64 112 128 40 192"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+							<line
+								x1="120"
+								y1="192"
+								x2="216"
+								y2="192"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+						</svg>
+						Console
+					</Button>
+					<Button
+						variant={!isVariablesCollapsed ? 'primary' : 'secondary'}
+						size="sm"
+						onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
+					>
+						<!-- Variables Icon -->
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							fill="currentColor"
+							viewBox="0 0 256 256"
+						>
+							<rect width="256" height="256" fill="none" />
+							<path
+								d="M80,40c-24,0-24,24-24,24v32c0,16-16,24-16,24s16,8,16,24v32c0,0,0,24,24,24"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+							<path
+								d="M176,40c24,0,24,24,24,24v32c0,16,16,24,16,24s-16,8-16,24v32c0,0,0,24-24,24"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="16"
+							/>
+						</svg>
+						Variáveis
+					</Button>
+				</Inline>
 			</Inline>
 		</div>
 
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
-		<div class="runner-layout-wrapper">
+		<div
+			class="workspace-grid"
+			style={isConsoleCollapsed && isVariablesCollapsed
+				? 'grid-template-columns: 100% 0px 0px'
+				: 'grid-template-columns: ' +
+					editorWidthPercent +
+					'% 12px calc(' +
+					(100 - editorWidthPercent) +
+					'% - 12px)'}
+		>
+			<!-- Editor de Código -->
+			<div class="editor-col">
+				<PortugolEditor
+					bind:code
+					{activeLine}
+					{errorLine}
+					disabled={disabled || (isRunning && !isPaused)}
+				/>
+			</div>
+
+			<!-- Barra de redimensionamento -->
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<div
-				class="workspace-grid"
-				style={isConsoleCollapsed && isVariablesCollapsed
-					? 'grid-template-columns: 100% 0px 0px'
-					: 'grid-template-columns: ' +
-						editorWidthPercent +
-						'% 12px calc(' +
-						(100 - editorWidthPercent) +
-						'% - 12px)'}
+				class="resize-bar"
+				class:dragging={isDragging}
+				class:hidden={isConsoleCollapsed && isVariablesCollapsed}
+				onmousedown={startResize}
+				role="separator"
+				aria-valuenow={editorWidthPercent}
+			></div>
+
+			<!-- Terminal de I/O e inspetor de variáveis -->
+			<div
+				class="sidebar-col"
+				class:hidden={isConsoleCollapsed && isVariablesCollapsed}
+				style="grid-template-rows: {isConsoleCollapsed || isVariablesCollapsed
+					? '1fr'
+					: `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`}"
 			>
-				<!-- Editor de Código -->
-				<div class="editor-col">
-					<PortugolEditor
-						bind:code
-						{activeLine}
-						{errorLine}
-						disabled={disabled || (isRunning && !isPaused)}
-					/>
-				</div>
-
-				<!-- Barra de redimensionamento -->
-				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-				<div
-					class="resize-bar"
-					class:dragging={isDragging}
-					class:hidden={isConsoleCollapsed && isVariablesCollapsed}
-					onmousedown={startResize}
-					role="separator"
-					aria-valuenow={editorWidthPercent}
-				></div>
-
-				<!-- Terminal de I/O e inspetor de variáveis -->
-				<div class="sidebar-col" class:hidden={isConsoleCollapsed && isVariablesCollapsed}>
-					<!-- Console/Terminal -->
-					<div class="terminal-card" class:collapsed={isConsoleCollapsed}>
+				<!-- Console/Terminal -->
+				{#if !isConsoleCollapsed}
+					<div class="terminal-card" style="grid-row: 1;">
 						<div class="panel-header">
 							<span>Console</span>
 							<button
@@ -323,38 +520,51 @@
 								Ocultar
 							</button>
 						</div>
-						{#if !isConsoleCollapsed}
-							<div class="terminal-box">
-								<div class="terminal-content">
-									{#each outputs as output, index (index)}
-										<div class="terminal-line">{output}</div>
-									{/each}
+						<div class="terminal-box">
+							<div class="terminal-content">
+								{#each outputs as output, index (index)}
+									<div class="terminal-line">{output}</div>
+								{/each}
 
-									{#if pendingInputVar}
-										<div class="terminal-input-prompt">
-											<form onsubmit={submitInput} class="input-form">
-												<Text size="sm" variant="neutral">leia({pendingInputVar}):</Text>
-												<input
-													type="text"
-													bind:value={currentInputValue}
-													placeholder="Digite um valor e pressione Enter"
-													class="terminal-text-input"
-												/>
-												<button type="submit" aria-label="Enviar" style="display: none;"></button>
-											</form>
-										</div>
-									{/if}
+								{#if pendingInputVar}
+									<div class="terminal-input-prompt">
+										<form onsubmit={submitInput} class="input-form">
+											<Text size="sm" variant="neutral">leia({pendingInputVar}):</Text>
+											<input
+												type="text"
+												bind:value={currentInputValue}
+												placeholder="Digite um valor e pressione Enter"
+												class="terminal-text-input"
+											/>
+											<button type="submit" aria-label="Enviar" style="display: none;"></button>
+										</form>
+									</div>
+								{/if}
 
-									{#if outputs.length === 0 && !pendingInputVar}
-										<div class="terminal-empty">Console vazio. Clique em Executar.</div>
-									{/if}
-								</div>
+								{#if outputs.length === 0 && !pendingInputVar}
+									<div class="terminal-empty">Console vazio. Clique em Executar.</div>
+								{/if}
 							</div>
-						{/if}
+						</div>
 					</div>
+				{/if}
 
-					<!-- Inspetor de Variáveis -->
-					<div class="variables-panel-wrapper" class:collapsed={isVariablesCollapsed}>
+				<!-- Barra de redimensionamento horizontal -->
+				{#if !isConsoleCollapsed && !isVariablesCollapsed}
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<div
+						class="horizontal-resize-bar"
+						class:dragging={isHorizontalDragging}
+						onmousedown={startHorizontalResize}
+						role="separator"
+						aria-valuenow={consoleHeightPercent}
+						style="grid-row: 2;"
+					></div>
+				{/if}
+
+				<!-- Inspetor de Variáveis -->
+				{#if !isVariablesCollapsed}
+					<div class="variables-panel-wrapper" style="grid-row: {isConsoleCollapsed ? 1 : 3};">
 						<Panel maxWidth="none" fullHeight={true}>
 							<div class="panel-header">
 								<span>Variáveis</span>
@@ -366,112 +576,35 @@
 									Ocultar
 								</button>
 							</div>
-							{#if !isVariablesCollapsed}
-								<div class="variables-box">
-									{#if Object.keys(variables).length > 0}
-										<table class="variables-table">
-											<thead>
+							<div class="variables-box">
+								{#if Object.keys(variables).length > 0}
+									<table class="variables-table">
+										<thead>
+											<tr>
+												<th>Nome</th>
+												<th>Tipo</th>
+												<th>Valor</th>
+											</tr>
+										</thead>
+										<tbody>
+											{#each Object.entries(variables) as [name, info] (name)}
 												<tr>
-													<th>Nome</th>
-													<th>Tipo</th>
-													<th>Valor</th>
+													<td class="var-name">{name}</td>
+													<td class="var-type">{info.type}</td>
+													<td class="var-value">
+														{info.value === undefined ? 'vazio' : String(info.value)}
+													</td>
 												</tr>
-											</thead>
-											<tbody>
-												{#each Object.entries(variables) as [name, info] (name)}
-													<tr>
-														<td class="var-name">{name}</td>
-														<td class="var-type">{info.type}</td>
-														<td class="var-value">
-															{info.value === undefined ? 'vazio' : String(info.value)}
-														</td>
-													</tr>
-												{/each}
-											</tbody>
-										</table>
-									{:else}
-										<div class="variables-empty">Nenhuma variável ativa.</div>
-									{/if}
-								</div>
-							{/if}
+											{/each}
+										</tbody>
+									</table>
+								{:else}
+									<div class="variables-empty">Nenhuma variável ativa.</div>
+								{/if}
+							</div>
 						</Panel>
 					</div>
-				</div>
-			</div>
-
-			<!-- Barra Dock Lateral Direita -->
-			<div class="dock-bar">
-				<button
-					type="button"
-					class="dock-btn"
-					class:active={!isConsoleCollapsed}
-					onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
-					title={isConsoleCollapsed ? 'Mostrar Console' : 'Ocultar Console'}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						fill="currentColor"
-						viewBox="0 0 256 256"
-					>
-						<rect width="256" height="256" fill="none" />
-						<polyline
-							points="40 64 112 128 40 192"
-							fill="none"
-							stroke="currentColor"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="16"
-						/>
-						<line
-							x1="120"
-							y1="192"
-							x2="216"
-							y2="192"
-							fill="none"
-							stroke="currentColor"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="16"
-						/>
-					</svg>
-					<span class="dock-label">Console</span>
-				</button>
-				<button
-					type="button"
-					class="dock-btn"
-					class:active={!isVariablesCollapsed}
-					onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
-					title={isVariablesCollapsed ? 'Mostrar Variáveis' : 'Ocultar Variáveis'}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						fill="currentColor"
-						viewBox="0 0 256 256"
-					>
-						<rect width="256" height="256" fill="none" />
-						<path
-							d="M80,40c-24,0-24,24-24,24v32c0,16-16,24-16,24s16,8,16,24v32c0,0,0,24,24,24"
-							fill="none"
-							stroke="currentColor"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="16"
-						/>
-						<path
-							d="M176,40c24,0,24,24,24,24v32c0,16,16,24,16,24s-16,8-16,24v32c0,0,0,24-24,24"
-							fill="none"
-							stroke="currentColor"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="16"
-						/>
-					</svg>
-					<span class="dock-label">Variáveis</span>
-				</button>
+				{/if}
 			</div>
 		</div>
 
@@ -499,35 +632,23 @@
 		border-radius: var(--radius-lg);
 	}
 
-	.runner-layout-wrapper {
-		display: flex;
-		flex-direction: row;
-		gap: 0;
+	.workspace-grid {
+		display: grid;
+		gap: 0px;
 		width: 100%;
-		border-radius: var(--radius-lg);
 		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-lg);
 		background: var(--bg-primary);
 		overflow: hidden;
 	}
 
-	.workspace-grid {
-		display: grid;
-		gap: 0px;
-		flex: 1;
-		min-width: 0;
-	}
-
 	@media (min-width: 901px) {
-		.runner-layout-wrapper {
+		.workspace-grid {
 			height: 480px;
 		}
 	}
 
 	@media (max-width: 900px) {
-		.runner-layout-wrapper {
-			flex-direction: column;
-			height: auto;
-		}
 		.workspace-grid {
 			display: flex;
 			flex-direction: column;
@@ -539,7 +660,7 @@
 			height: 400px;
 		}
 		.sidebar-col {
-			height: 500px;
+			height: 600px;
 		}
 	}
 
@@ -583,12 +704,10 @@
 	}
 
 	.sidebar-col {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
+		display: grid;
+		gap: 0px;
 		height: 100%;
 		min-width: 0;
-		padding: 12px;
 	}
 
 	.sidebar-col.hidden {
@@ -598,13 +717,9 @@
 	.terminal-card {
 		display: flex;
 		flex-direction: column;
-		flex: 1;
 		min-height: 0;
-		transition: flex 0.2s ease;
-	}
-
-	.terminal-card.collapsed {
-		flex: none;
+		height: 100%;
+		padding: 12px;
 	}
 
 	.terminal-box {
@@ -670,13 +785,9 @@
 	.variables-panel-wrapper {
 		display: flex;
 		flex-direction: column;
-		flex: 1;
 		min-height: 0;
-		transition: flex 0.2s ease;
-	}
-
-	.variables-panel-wrapper.collapsed {
-		flex: none;
+		height: 100%;
+		padding: 12px;
 	}
 
 	.variables-box {
@@ -759,86 +870,33 @@
 		background: rgba(224, 123, 57, 0.08);
 	}
 
-	.dock-bar {
-		display: flex;
-		flex-direction: column;
-		width: 48px;
-		border-left: var(--border-width) solid var(--border-color);
-		background: var(--bg-secondary);
-		align-items: center;
-		padding: 12px 0;
-		gap: 16px;
-		flex-shrink: 0;
-	}
-
-	.dock-btn {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+	.horizontal-resize-bar {
+		grid-row: 2;
+		height: 12px;
+		cursor: row-resize;
 		background: transparent;
-		border: none;
-		color: var(--text-secondary);
-		cursor: pointer;
-		gap: 6px;
-		font-family: inherit;
-		width: 100%;
-		padding: 8px 0;
-		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 10;
 		position: relative;
 	}
 
-	.dock-btn:hover {
-		color: var(--text-primary);
-	}
-
-	.dock-btn.active {
-		color: var(--accent-primary);
-	}
-
-	.dock-btn.active::after {
+	.horizontal-resize-bar::before {
 		content: '';
-		position: absolute;
-		right: 0;
-		top: 20%;
-		bottom: 20%;
-		width: 3px;
+		height: 1px;
+		width: 100%;
+		background-image: linear-gradient(to right, var(--border-color) 60%, transparent 40%);
+		background-size: 10px 1px;
+		transition:
+			background-color 0.2s,
+			height 0.2s;
+	}
+
+	.horizontal-resize-bar:hover::before,
+	.horizontal-resize-bar.dragging::before {
+		background-image: none;
 		background-color: var(--accent-primary);
-		border-radius: 3px 0 0 3px;
-	}
-
-	.dock-label {
-		font-size: 9px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
-	@media (max-width: 900px) {
-		.dock-bar {
-			flex-direction: row;
-			width: 100%;
-			height: 48px;
-			border-left: none;
-			border-top: var(--border-width) solid var(--border-color);
-			padding: 0 12px;
-			justify-content: space-around;
-			gap: 0;
-		}
-		.dock-btn {
-			flex-direction: row;
-			justify-content: center;
-			width: auto;
-			padding: 0 12px;
-			height: 100%;
-		}
-		.dock-btn.active::after {
-			right: 20%;
-			left: 20%;
-			top: auto;
-			bottom: 0;
-			height: 3px;
-			width: auto;
-			border-radius: 3px 3px 0 0;
-		}
+		height: 2px;
 	}
 </style>
