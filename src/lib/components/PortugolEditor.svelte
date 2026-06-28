@@ -20,7 +20,7 @@
 		Compartment,
 		Transaction
 	} from '@codemirror/state';
-	import { history, historyKeymap, indentWithTab } from '@codemirror/commands';
+	import { history, historyKeymap, indentWithTab, defaultKeymap } from '@codemirror/commands';
 	import {
 		indentUnit,
 		syntaxHighlighting,
@@ -35,13 +35,17 @@
 		activeLine = 0,
 		errorLine = 0,
 		disabled = false,
-		placeholder = 'Escreva seu código Portugol aqui...'
+		showLineNumbers = true,
+		placeholder = 'Escreva seu código Portugol aqui...',
+		onsave
 	} = $props<{
 		code: string;
 		activeLine?: number;
 		errorLine?: number;
 		disabled?: boolean;
+		showLineNumbers?: boolean;
 		placeholder?: string;
+		onsave?: (isShortcut?: boolean) => void;
 	}>();
 
 	let editorContainer = $state<HTMLDivElement | null>(null);
@@ -49,6 +53,7 @@
 
 	// Compartment to allow dynamic read-only toggling
 	const readOnlyCompartment = new Compartment();
+	const lineNumbersCompartment = new Compartment();
 
 	// Effect to dispatch active line / error line highlights
 	const highlightEffect = StateEffect.define<{ activeLine: number; errorLine: number }>();
@@ -157,6 +162,10 @@
 		},
 		initialSpacer: () => new ActiveLineMarker()
 	});
+
+	function getGutterExtensions() {
+		return showLineNumbers ? [lineNumbers(), indicatorGutter] : [];
+	}
 
 	// Custom Portugol language syntax highlighter
 	const portugolLanguage = StreamLanguage.define({
@@ -345,13 +354,44 @@
 					syntaxHighlighting(portugolHighlightStyle),
 					portugolLanguage,
 					cmPlaceholder(placeholder),
-					lineNumbers(),
+					lineNumbersCompartment.of(getGutterExtensions()),
 					highlightActiveLine(),
-					indicatorGutter,
 					lineMarkersField,
 					lineHighlightField,
 					history(),
-					keymap.of([...historyKeymap, indentWithTab]),
+					keymap.of([
+						{
+							key: 'Mod-s',
+							run() {
+								if (onsave) {
+									onsave(true);
+									return true;
+								}
+								return false;
+							}
+						},
+						{
+							key: 'Mod-d',
+							run(view) {
+								let changes = [];
+								for (let range of view.state.selection.ranges) {
+									let line = view.state.doc.lineAt(range.head);
+									changes.push({
+										from: line.to,
+										insert: '\n' + line.text
+									});
+								}
+								view.dispatch({
+									changes,
+									scrollIntoView: true
+								});
+								return true;
+							}
+						},
+						...defaultKeymap,
+						...historyKeymap,
+						indentWithTab
+					]),
 					indentUnit.of('\t'),
 					EditorView.lineWrapping,
 					EditorView.updateListener.of((update: ViewUpdate) => {
@@ -395,6 +435,15 @@
 		if (view) {
 			view.dispatch({
 				effects: readOnlyCompartment.reconfigure(EditorState.readOnly.of(disabled))
+			});
+		}
+	});
+
+	// Reactive update for line number visibility
+	$effect(() => {
+		if (view) {
+			view.dispatch({
+				effects: lineNumbersCompartment.reconfigure(getGutterExtensions())
 			});
 		}
 	});

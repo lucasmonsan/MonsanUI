@@ -5,12 +5,13 @@
 		children: Snippet;
 		pulse?: boolean;
 		role?: 'status' | 'alert';
+		variant?: 'default' | 'subtle';
 	}
 
-	let { children, pulse = false, role = 'status' }: Props = $props();
+	let { children, pulse = false, role = 'status', variant = 'default' }: Props = $props();
 </script>
 
-<div class="monsan-status-banner" {role}>
+<div class="monsan-status-banner variant-{variant}" {role}>
 	{#if pulse}
 		<span class="status-dot" aria-hidden="true"></span>
 	{/if}
@@ -29,6 +30,28 @@
 		font-family: var(--font-body);
 		font-size: var(--text-sm);
 		font-weight: 700;
+	}
+
+	.variant-subtle {
+		background: var(--bg-primary);
+		color: var(--text-secondary);
+		padding-inline: var(--space-sm);
+	}
+
+	:global(.monsan-status-banner a),
+	:global(.monsan-status-banner a:visited) {
+		color: var(--text-primary);
+		text-decoration: none;
+	}
+
+	:global(.monsan-status-banner a:hover) {
+		color: var(--accent-primary);
+	}
+
+	:global(.monsan-status-banner a:focus-visible) {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+		border-radius: var(--radius-xs);
 	}
 
 	.status-dot {
