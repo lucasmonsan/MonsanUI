@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import X from '$lib/components/icons/X.svelte';
+	import Button from './Button.svelte';
 	import type { PaddingPreset } from '$lib/utils/layout.js';
 	import { resolvePadding } from '$lib/utils/layout.js';
 	import { pushDialog, popDialog } from '../utils/dialogStack.js';
@@ -185,9 +186,16 @@
 					{#if headerActions}
 						{@render headerActions()}
 					{/if}
-					<button type="button" class="close-btn" onclick={close} aria-label={closeLabel}>
-						<X size={24} />
-					</button>
+					<Button
+						size="sm"
+						square
+						variant="secondary"
+						title={closeLabel}
+						ariaLabel={closeLabel}
+						onclick={close}
+					>
+						<X size={18} />
+					</Button>
 				</div>
 			</header>
 
@@ -297,33 +305,6 @@
 
 	.modal-header.compact h2 {
 		font-size: var(--text-lg);
-	}
-
-	.close-btn {
-		background: var(--bg-primary);
-		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-sm);
-		cursor: pointer;
-		color: var(--text-primary);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: calc(var(--base) * 2.3);
-		height: calc(var(--base) * 2.3);
-		transition:
-			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out);
-		box-shadow: var(--shadow-sm);
-	}
-
-	.close-btn:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--text-primary);
-	}
-
-	.close-btn:active {
-		transform: translate(2px, 2px);
-		box-shadow: none;
 	}
 
 	.modal-content {

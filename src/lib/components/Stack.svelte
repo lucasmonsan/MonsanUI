@@ -9,6 +9,7 @@
 		textAlign?: 'start' | 'center';
 		fullWidth?: boolean;
 		fullHeight?: boolean;
+		growLastChild?: boolean;
 	}
 
 	let {
@@ -18,7 +19,8 @@
 		justify = 'start',
 		textAlign = 'start',
 		fullWidth = false,
-		fullHeight = false
+		fullHeight = false,
+		growLastChild = false
 	}: Props = $props();
 </script>
 
@@ -26,6 +28,7 @@
 	class="monsan-stack gap-{gap} align-{align} justify-{justify} text-{textAlign}"
 	class:full-width={fullWidth}
 	class:full-height={fullHeight}
+	class:grow-last-child={growLastChild}
 >
 	{@render children()}
 </div>
@@ -42,6 +45,11 @@
 	}
 	.full-height {
 		height: 100%;
+		min-height: 0;
+	}
+	.grow-last-child > :global(:last-child) {
+		flex: 1 1 auto;
+		min-height: 0;
 	}
 
 	.gap-xs {

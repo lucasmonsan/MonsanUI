@@ -66,7 +66,15 @@
 			</span>
 		</Button>
 	{:else}
-		<QuickActions bind:open={isOpen} variant="dropdown" align="right" triggerBehavior="child">
+		<QuickActions
+			bind:open={isOpen}
+			variant="dropdown"
+			align="right"
+			triggerBehavior="child"
+			panelShadow="none"
+			panelPadding="sm"
+			panelGap="sm"
+		>
 			{#snippet trigger(toggleMenu)}
 				<Button
 					variant="secondary"

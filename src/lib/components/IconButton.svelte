@@ -7,6 +7,7 @@
 		title?: string;
 		type?: 'button' | 'submit' | 'reset';
 		variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error';
+		size?: 'sm' | 'md';
 		selected?: boolean;
 		disabled?: boolean;
 		onclick?: (event: MouseEvent) => void;
@@ -19,6 +20,7 @@
 		title = label,
 		type = 'button',
 		variant = 'secondary',
+		size = 'md',
 		selected,
 		disabled = false,
 		onclick,
@@ -32,7 +34,7 @@
 	{disabled}
 	{onclick}
 	{role}
-	class="monsan-icon-button {variant}"
+	class="monsan-icon-button {variant} size-{size}"
 	class:selected
 	aria-label={label}
 	aria-pressed={selected}
@@ -115,5 +117,21 @@
 		.monsan-icon-button {
 			transition: none;
 		}
+	}
+
+	.size-sm {
+		width: calc(var(--control-height) * 0.8);
+		height: calc(var(--control-height) * 0.8);
+		box-shadow: 2px 2px 0 var(--text-primary);
+	}
+
+	.size-sm:hover:not(:disabled) {
+		transform: translate(-1px, -1px);
+		box-shadow: 2px 2px 0 var(--text-primary);
+	}
+
+	.size-sm:active:not(:disabled) {
+		transform: translate(1px, 1px);
+		box-shadow: none;
 	}
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import PortugolEditor from './PortugolEditor.svelte';
 	import Button from './Button.svelte';
 	import Panel from './Panel.svelte';
@@ -9,10 +10,12 @@
 	import RotateCwIcon from './icons/RotateCw.svelte';
 	import TriangleAlertIcon from './icons/TriangleAlert.svelte';
 	import PlayIcon from './icons/Play.svelte';
+	import SaveIcon from './icons/Save.svelte';
 	import SkipForwardIcon from './icons/SkipForward.svelte';
 	import TextIndentIcon from './icons/TextIndent.svelte';
 	import TerminalIcon from './icons/Terminal.svelte';
 	import BracketsCurlyIcon from './icons/BracketsCurly.svelte';
+	import ListBulletsIcon from './icons/ListBullets.svelte';
 	import {
 		Lexer,
 		Parser,
@@ -27,7 +30,8 @@
 		onOutputsChange?: (outputs: string[]) => void;
 		onSuccess?: () => void;
 		onFailure?: (error: string) => void;
-		onsave?: () => void;
+		onsave?: (isShortcut?: boolean) => void;
+		floatingActions?: Snippet;
 	}
 
 	let {
@@ -45,7 +49,8 @@
 		onOutputsChange,
 		onSuccess,
 		onFailure,
-		onsave
+		onsave,
+		floatingActions
 	}: Props = $props();
 
 	let activeLine = $state(0);
@@ -65,6 +70,7 @@
 	// Collapsible state
 	let isConsoleCollapsed = $state(false);
 	let isVariablesCollapsed = $state(false);
+	let showLineNumbers = $state(true);
 
 	// Resizable state
 	let editorWidthPercent = $state(60);
@@ -76,10 +82,12 @@
 
 	function startHorizontalResize(e: MouseEvent) {
 		e.preventDefault();
-		isHorizontalDragging = true;
+		if (window.matchMedia('(max-width: 900px)').matches) return;
+
 		const sidebarElement = (e.currentTarget as HTMLElement).parentElement;
 		if (!sidebarElement) return;
 
+		isHorizontalDragging = true;
 		const startY = e.clientY;
 		const rect = sidebarElement.getBoundingClientRect();
 		const totalHeight = rect.height;
@@ -103,10 +111,12 @@
 
 	function startResize(e: MouseEvent) {
 		e.preventDefault();
-		isDragging = true;
+		if (window.matchMedia('(max-width: 900px)').matches) return;
+
 		const gridElement = (e.currentTarget as HTMLElement).parentElement;
 		if (!gridElement) return;
 
+		isDragging = true;
 		const startX = e.clientX;
 		const rect = gridElement.getBoundingClientRect();
 		const totalWidth = rect.width;
@@ -271,213 +281,159 @@
 	}
 </script>
 
-<div class="portugol-runner">
-	<Stack gap="md">
-		<!-- Toolbar de controle -->
-		<div class="toolbar">
-			<Inline justify="between" align="center" fullWidth={true}>
-				<!-- Controles de Execução (Esquerda) -->
-				<Inline gap="xs">
-					<Button
-						variant="primary"
-						size="sm"
-						onclick={() => startExecution(false)}
-						disabled={disabled || (isRunning && !isStepMode)}
-					>
-						<PlayIcon size="16" />
-						Executar
-					</Button>
-					<Button
-						variant="secondary"
-						size="sm"
-						onclick={handleStep}
-						disabled={disabled || (isRunning && !isStepMode && !isPaused)}
-					>
-						<SkipForwardIcon size="16" />
-						Passo a Passo
-					</Button>
-					<Button variant="secondary" size="sm" onclick={handleReset} {disabled}>
-						<RotateCwIcon size="16" />
-						Reiniciar
-					</Button>
-					{#if onsave}
-						<Button variant="secondary" size="sm" onclick={onsave} disabled={disabled || isRunning}>
-							Salvar
-						</Button>
-					{/if}
-					<Button
-						variant={strictIndent ? 'primary' : 'secondary'}
-						size="sm"
-						onclick={() => (strictIndent = !strictIndent)}
-						disabled={disabled || isRunning}
-					>
-						<TextIndentIcon size="16" />
-						Identação Estrita
-					</Button>
-				</Inline>
-
-				<!-- Alternadores de Visibilidade de Painéis (Direita) -->
-				<Inline gap="xs">
-					<Button
-						variant={!isConsoleCollapsed ? 'primary' : 'secondary'}
-						size="sm"
-						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
-					>
-						<TerminalIcon size="16" />
-						Console
-					</Button>
-					<Button
-						variant={!isVariablesCollapsed ? 'primary' : 'secondary'}
-						size="sm"
-						onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
-					>
-						<BracketsCurlyIcon size="16" />
-						Variáveis
-					</Button>
-				</Inline>
-			</Inline>
-		</div>
-
+<div class="portugol-runner" class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}>
+	<Stack gap="md" fullHeight={true}>
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
-		<div
-			class="workspace-grid"
-			style={isConsoleCollapsed && isVariablesCollapsed
-				? 'grid-template-columns: 100% 0px 0px'
-				: 'grid-template-columns: ' +
-					editorWidthPercent +
-					'% 12px calc(' +
-					(100 - editorWidthPercent) +
-					'% - 12px)'}
-		>
-			<!-- Editor de Código -->
-			<div class="editor-col">
-				<PortugolEditor
-					bind:code
-					{activeLine}
-					{errorLine}
-					disabled={disabled || (isRunning && !isPaused)}
-				/>
-			</div>
-
-			<!-- Barra de redimensionamento -->
-			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<div class="runner-workspace">
 			<div
-				class="resize-bar"
-				class:dragging={isDragging}
-				class:hidden={isConsoleCollapsed && isVariablesCollapsed}
-				onmousedown={startResize}
-				role="separator"
-				aria-valuenow={editorWidthPercent}
-			></div>
-
-			<!-- Terminal de I/O e inspetor de variáveis -->
-			<div
-				class="sidebar-col"
-				class:hidden={isConsoleCollapsed && isVariablesCollapsed}
-				style="grid-template-rows: {isConsoleCollapsed || isVariablesCollapsed
-					? '1fr'
-					: `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`}"
+				class="workspace-grid"
+				class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}
+				class:all-panels-collapsed={isConsoleCollapsed && isVariablesCollapsed}
+				style={isConsoleCollapsed && isVariablesCollapsed
+					? 'grid-template-columns: 100% 0px 0px'
+					: 'grid-template-columns: ' +
+						editorWidthPercent +
+						'% 12px calc(' +
+						(100 - editorWidthPercent) +
+						'% - 12px)'}
 			>
-				<!-- Console/Terminal -->
-				{#if !isConsoleCollapsed}
-					<div class="terminal-card" style="grid-row: 1;">
-						<Panel padding="none" maxWidth="none" fullHeight={true}>
-							<div class="panel-header">
-								<span>Console</span>
-								<button
-									type="button"
-									class="collapse-btn"
-									onclick={() => (isConsoleCollapsed = true)}
-								>
-									Ocultar
-								</button>
-							</div>
-							<div class="terminal-box">
-								<div class="terminal-content">
-									{#each outputs as output, index (index)}
-										<div class="terminal-line">{output}</div>
-									{/each}
+				<!-- Editor de Código -->
+				<div class="editor-col">
+					{#if floatingActions}
+						<div class="runner-floating-actions">
+							{@render floatingActions()}
+						</div>
+					{/if}
+					<PortugolEditor
+						bind:code
+						{activeLine}
+						{errorLine}
+						{showLineNumbers}
+						disabled={disabled || (isRunning && !isPaused)}
+						{onsave}
+					/>
+				</div>
 
-									{#if pendingInputVar}
-										<div class="terminal-input-prompt">
-											<form onsubmit={submitInput} class="input-form">
-												<Text size="sm" variant="neutral">leia({pendingInputVar}):</Text>
-												<input
-													type="text"
-													bind:value={currentInputValue}
-													placeholder="Digite um valor e pressione Enter"
-													class="terminal-text-input"
-												/>
-												<button type="submit" aria-label="Enviar" style="display: none;"></button>
-											</form>
-										</div>
-									{/if}
+				<!-- Barra de redimensionamento -->
+				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+				<div
+					class="resize-bar"
+					class:dragging={isDragging}
+					class:hidden={isConsoleCollapsed && isVariablesCollapsed}
+					onmousedown={startResize}
+					role="separator"
+					aria-valuenow={editorWidthPercent}
+				></div>
 
-									{#if outputs.length === 0 && !pendingInputVar}
-										<div class="terminal-empty">Console vazio. Clique em Executar.</div>
+				<!-- Terminal de I/O e inspetor de variáveis -->
+				<div
+					class="sidebar-col"
+					class:hidden={isConsoleCollapsed && isVariablesCollapsed}
+					style="grid-template-rows: {isConsoleCollapsed || isVariablesCollapsed
+						? '1fr'
+						: `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`}"
+				>
+					<!-- Console/Terminal -->
+					{#if !isConsoleCollapsed}
+						<div class="terminal-card" style="grid-row: 1;">
+							<Panel padding="none" maxWidth="none" fullHeight={true}>
+								<div class="panel-header">
+									<span>Console</span>
+									<button
+										type="button"
+										class="collapse-btn"
+										onclick={() => (isConsoleCollapsed = true)}
+									>
+										Ocultar
+									</button>
+								</div>
+								<div class="terminal-box">
+									<div class="terminal-content">
+										{#each outputs as output, index (index)}
+											<div class="terminal-line">{output}</div>
+										{/each}
+
+										{#if pendingInputVar}
+											<div class="terminal-input-prompt">
+												<form onsubmit={submitInput} class="input-form">
+													<Text size="sm" variant="neutral">leia({pendingInputVar}):</Text>
+													<input
+														type="text"
+														bind:value={currentInputValue}
+														placeholder="Digite um valor e pressione Enter"
+														class="terminal-text-input"
+													/>
+													<button type="submit" aria-label="Enviar" style="display: none;"></button>
+												</form>
+											</div>
+										{/if}
+
+										{#if outputs.length === 0 && !pendingInputVar}
+											<div class="terminal-empty">Console vazio. Clique em Executar.</div>
+										{/if}
+									</div>
+								</div>
+							</Panel>
+						</div>
+					{/if}
+
+					<!-- Barra de redimensionamento horizontal -->
+					{#if !isConsoleCollapsed && !isVariablesCollapsed}
+						<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+						<div
+							class="horizontal-resize-bar"
+							class:dragging={isHorizontalDragging}
+							onmousedown={startHorizontalResize}
+							role="separator"
+							aria-valuenow={consoleHeightPercent}
+							style="grid-row: 2;"
+						></div>
+					{/if}
+
+					<!-- Inspetor de Variáveis -->
+					{#if !isVariablesCollapsed}
+						<div class="variables-panel-wrapper" style="grid-row: {isConsoleCollapsed ? 1 : 3};">
+							<Panel padding="none" maxWidth="none" fullHeight={true}>
+								<div class="panel-header">
+									<span>Variáveis</span>
+									<button
+										type="button"
+										class="collapse-btn"
+										onclick={() => (isVariablesCollapsed = true)}
+									>
+										Ocultar
+									</button>
+								</div>
+								<div class="variables-box">
+									{#if Object.keys(variables).length > 0}
+										<table class="variables-table">
+											<thead>
+												<tr>
+													<th>Nome</th>
+													<th>Tipo</th>
+													<th>Valor</th>
+												</tr>
+											</thead>
+											<tbody>
+												{#each Object.entries(variables) as [name, info] (name)}
+													<tr>
+														<td class="var-name">{name}</td>
+														<td class="var-type">{info.type}</td>
+														<td class="var-value">
+															{info.value === undefined ? 'vazio' : String(info.value)}
+														</td>
+													</tr>
+												{/each}
+											</tbody>
+										</table>
+									{:else}
+										<div class="variables-empty">Nenhuma variável ativa.</div>
 									{/if}
 								</div>
-							</div>
-						</Panel>
-					</div>
-				{/if}
-
-				<!-- Barra de redimensionamento horizontal -->
-				{#if !isConsoleCollapsed && !isVariablesCollapsed}
-					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-					<div
-						class="horizontal-resize-bar"
-						class:dragging={isHorizontalDragging}
-						onmousedown={startHorizontalResize}
-						role="separator"
-						aria-valuenow={consoleHeightPercent}
-						style="grid-row: 2;"
-					></div>
-				{/if}
-
-				<!-- Inspetor de Variáveis -->
-				{#if !isVariablesCollapsed}
-					<div class="variables-panel-wrapper" style="grid-row: {isConsoleCollapsed ? 1 : 3};">
-						<Panel padding="none" maxWidth="none" fullHeight={true}>
-							<div class="panel-header">
-								<span>Variáveis</span>
-								<button
-									type="button"
-									class="collapse-btn"
-									onclick={() => (isVariablesCollapsed = true)}
-								>
-									Ocultar
-								</button>
-							</div>
-							<div class="variables-box">
-								{#if Object.keys(variables).length > 0}
-									<table class="variables-table">
-										<thead>
-											<tr>
-												<th>Nome</th>
-												<th>Tipo</th>
-												<th>Valor</th>
-											</tr>
-										</thead>
-										<tbody>
-											{#each Object.entries(variables) as [name, info] (name)}
-												<tr>
-													<td class="var-name">{name}</td>
-													<td class="var-type">{info.type}</td>
-													<td class="var-value">
-														{info.value === undefined ? 'vazio' : String(info.value)}
-													</td>
-												</tr>
-											{/each}
-										</tbody>
-									</table>
-								{:else}
-									<div class="variables-empty">Nenhuma variável ativa.</div>
-								{/if}
-							</div>
-						</Panel>
-					</div>
-				{/if}
+							</Panel>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 
@@ -490,50 +446,138 @@
 				</div>
 			</Alert>
 		{/if}
+
+		<!-- Toolbar de controle -->
+		<div class="toolbar">
+			<Inline justify="between" align="center" fullWidth={true} wrap>
+				<!-- Controles de Execução (Esquerda) -->
+				<Inline gap="sm" wrap>
+					<Button
+						variant="primary"
+						size="sm"
+						onclick={() => startExecution(false)}
+						disabled={disabled || (isRunning && !isStepMode)}
+					>
+						<PlayIcon size="16" />
+						<span class="toolbar-label">Executar</span>
+					</Button>
+					<Button
+						variant="secondary"
+						size="sm"
+						onclick={handleStep}
+						disabled={disabled || (isRunning && !isStepMode && !isPaused)}
+					>
+						<SkipForwardIcon size="16" />
+						<span class="toolbar-label">Passo a Passo</span>
+					</Button>
+					<Button variant="secondary" size="sm" onclick={handleReset} {disabled}>
+						<RotateCwIcon size="16" />
+						<span class="toolbar-label">Reiniciar</span>
+					</Button>
+					{#if onsave}
+						<Button
+							variant="secondary"
+							size="sm"
+							onclick={() => onsave?.(false)}
+							disabled={disabled || isRunning}
+						>
+							<SaveIcon size="16" />
+							<span class="toolbar-label">Salvar</span>
+						</Button>
+					{/if}
+					<Button
+						variant={strictIndent ? 'primary' : 'secondary'}
+						size="sm"
+						onclick={() => (strictIndent = !strictIndent)}
+						disabled={disabled || isRunning}
+					>
+						<TextIndentIcon size="16" />
+						<span class="toolbar-label">Identação</span>
+					</Button>
+				</Inline>
+
+				<!-- Alternadores de Visibilidade de Painéis (Direita) -->
+				<Inline gap="sm" wrap>
+					<Button
+						variant={showLineNumbers ? 'primary' : 'secondary'}
+						size="sm"
+						onclick={() => (showLineNumbers = !showLineNumbers)}
+						disabled={disabled || isRunning}
+						ariaPressed={showLineNumbers}
+					>
+						<ListBulletsIcon size="16" />
+						<span class="toolbar-label">Linhas</span>
+					</Button>
+					<Button
+						variant={!isConsoleCollapsed ? 'primary' : 'secondary'}
+						size="sm"
+						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
+					>
+						<TerminalIcon size="16" />
+						<span class="toolbar-label">Console</span>
+					</Button>
+					<Button
+						variant={!isVariablesCollapsed ? 'primary' : 'secondary'}
+						size="sm"
+						onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
+					>
+						<BracketsCurlyIcon size="16" />
+						<span class="toolbar-label">Variáveis</span>
+					</Button>
+				</Inline>
+			</Inline>
+		</div>
 	</Stack>
 </div>
 
 <style>
 	.portugol-runner {
 		width: 100%;
+		height: 100%;
+		min-height: 0;
+	}
+
+	.runner-workspace {
+		position: relative;
+		flex: 1;
+		min-height: 0;
+		width: 100%;
+	}
+
+	.runner-floating-actions {
+		position: absolute;
+		top: var(--space-sm);
+		right: var(--space-sm);
+		z-index: 20;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
 	}
 
 	.toolbar {
-		padding: 8px;
-		background: var(--bg-secondary);
-		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-lg);
+		padding: 0;
+		background: transparent;
+		border: 0;
+		border-radius: 0;
 	}
 
 	.workspace-grid {
 		display: grid;
 		gap: 0px;
 		width: 100%;
+		height: 100%;
+		flex: 1;
+		min-height: 0;
 	}
 
-	@media (min-width: 901px) {
-		.workspace-grid {
-			height: 480px;
-		}
-	}
-
-	@media (max-width: 900px) {
-		.workspace-grid {
-			display: flex;
-			flex-direction: column;
-			height: auto;
-			gap: 16px;
-			padding: 12px;
-		}
-		.editor-col {
-			height: 400px;
-		}
-		.sidebar-col {
-			height: 600px;
+	@media (max-width: 600px) {
+		.toolbar-label {
+			display: none;
 		}
 	}
 
 	.editor-col {
+		position: relative;
 		min-width: 0;
 		min-height: 0;
 		height: 100%;
@@ -549,6 +593,13 @@
 		align-self: stretch;
 		z-index: 10;
 		position: relative;
+		opacity: 0.25;
+		transition: opacity 0.2s ease;
+	}
+
+	.resize-bar:hover,
+	.resize-bar.dragging {
+		opacity: 1;
 	}
 
 	.resize-bar::before {
@@ -716,14 +767,21 @@
 		align-items: center;
 		background: var(--bg-secondary);
 		border-bottom: var(--border-width) solid var(--border-color);
-		padding: 12px 16px;
+		padding: 8px 12px;
 		color: var(--text-primary);
-		font-family: var(--font-display);
+		font-family: var(--font-body);
 		font-size: var(--text-xs);
 		font-weight: 800;
+		line-height: 1.25;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0;
 		user-select: none;
+	}
+
+	.panel-header span {
+		display: inline-flex;
+		align-items: center;
+		min-height: 1.25em;
 	}
 
 	.collapse-btn {
@@ -757,6 +815,13 @@
 		justify-content: center;
 		z-index: 10;
 		position: relative;
+		opacity: 0.25;
+		transition: opacity 0.2s ease;
+	}
+
+	.horizontal-resize-bar:hover,
+	.horizontal-resize-bar.dragging {
+		opacity: 1;
 	}
 
 	.horizontal-resize-bar::before {
@@ -775,5 +840,109 @@
 		background-image: none;
 		background-color: var(--accent-primary);
 		height: 2px;
+	}
+
+	@media (max-width: 900px) {
+		.portugol-runner {
+			height: 100%;
+			min-height: 0;
+		}
+
+		.runner-workspace {
+			display: flex;
+			flex-direction: column;
+			flex: 1 1 auto;
+			min-height: 0;
+			overflow: hidden;
+		}
+
+		.workspace-grid {
+			display: flex;
+			flex-direction: column;
+			flex: 1 1 auto;
+			height: 100%;
+			gap: var(--space-sm);
+			min-height: 0;
+			overflow: hidden;
+			padding: 0;
+		}
+
+		.workspace-grid.has-collapsed-panel {
+			flex: 1 1 auto;
+			height: auto;
+			min-height: 0;
+			overflow: hidden;
+		}
+
+		.workspace-grid.has-collapsed-panel .editor-col {
+			height: auto;
+			min-height: 0;
+			flex: 1 1 0;
+		}
+
+		.workspace-grid.all-panels-collapsed {
+			height: auto;
+		}
+
+		.workspace-grid.all-panels-collapsed .editor-col {
+			height: auto;
+			flex: 1 1 0;
+		}
+
+		.workspace-grid.all-panels-collapsed .resize-bar {
+			display: none;
+		}
+
+		.runner-floating-actions {
+			position: absolute;
+			top: var(--space-sm);
+			right: var(--space-sm);
+			justify-content: flex-end;
+		}
+
+		.editor-col {
+			height: auto;
+			flex: 1 1 0;
+		}
+
+		.resize-bar {
+			display: none;
+		}
+
+		.sidebar-col {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-sm);
+			height: auto;
+			min-height: 0;
+		}
+
+		.workspace-grid.has-collapsed-panel .sidebar-col {
+			flex: 1 1 0;
+			height: auto;
+			min-height: 0;
+			overflow: hidden;
+		}
+
+		.terminal-card {
+			height: 180px;
+			flex: 0 0 180px;
+		}
+
+		.variables-panel-wrapper {
+			height: 160px;
+			flex: 0 0 160px;
+		}
+
+		.workspace-grid.has-collapsed-panel .terminal-card,
+		.workspace-grid.has-collapsed-panel .variables-panel-wrapper {
+			height: auto;
+			min-height: 0;
+			flex: 1 1 0;
+		}
+
+		.horizontal-resize-bar {
+			display: none;
+		}
 	}
 </style>

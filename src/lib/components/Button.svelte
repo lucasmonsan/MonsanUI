@@ -11,6 +11,7 @@
 		disabled?: boolean;
 		block?: boolean;
 		square?: boolean;
+		iconOnlyBelow?: 'sm' | 'md';
 		title?: string;
 		ariaLabel?: string;
 		ariaBusy?: boolean;
@@ -32,6 +33,7 @@
 		disabled = false,
 		block = false,
 		square = false,
+		iconOnlyBelow,
 		title,
 		ariaLabel,
 		ariaBusy,
@@ -42,6 +44,8 @@
 		'aria-busy': ariaBusyAttr,
 		deckTheme
 	}: Props = $props();
+
+	const responsiveIconClass = $derived(iconOnlyBelow ? `icon-only-${iconOnlyBelow}` : '');
 </script>
 
 <button
@@ -55,7 +59,7 @@
 	aria-pressed={ariaPressed}
 	aria-controls={ariaControls}
 	data-deck-theme={deckTheme}
-	class="monsan-button {variant} size-{size} shape-{shape}"
+	class="monsan-button {variant} size-{size} shape-{shape} {responsiveIconClass}"
 	class:block
 	class:square
 >
@@ -99,9 +103,18 @@
 	}
 
 	.size-sm {
+		height: calc(var(--control-height) * 0.8);
 		min-height: calc(var(--control-height) * 0.8);
-		padding: var(--space-sm) var(--space-sm);
+		padding: 0 var(--space-sm);
 		font-size: var(--text-sm);
+		line-height: 1;
+	}
+
+	.size-sm.square {
+		width: calc(var(--control-height) * 0.8);
+		height: calc(var(--control-height) * 0.8);
+		min-height: calc(var(--control-height) * 0.8);
+		padding: 0;
 	}
 
 	.shape-pill {
@@ -178,6 +191,30 @@
 	@media (prefers-reduced-motion: reduce) {
 		.monsan-button {
 			transition: none;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.icon-only-sm {
+			width: calc(var(--control-height) * 0.8);
+			min-height: calc(var(--control-height) * 0.8);
+			padding: 0;
+		}
+
+		.icon-only-sm :global(.monsan-button-label) {
+			display: none;
+		}
+	}
+
+	@media (max-width: 900px) {
+		.icon-only-md {
+			width: calc(var(--control-height) * 0.8);
+			min-height: calc(var(--control-height) * 0.8);
+			padding: 0;
+		}
+
+		.icon-only-md :global(.monsan-button-label) {
+			display: none;
 		}
 	}
 </style>
