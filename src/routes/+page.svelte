@@ -1223,7 +1223,7 @@
 	let progressAnimated = $state(true);
 
 	let avatarSize = $state<'sm' | 'md' | 'lg'>('md');
-	let avatarShape = $state<'circle' | 'square'>('circle');
+	let avatarShape = $state<'circle' | 'square'>('square');
 	let avatarName = $state('Lucas Monsan');
 	let avatarSrc = $state(
 		'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=60'

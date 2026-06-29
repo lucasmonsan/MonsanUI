@@ -9,7 +9,7 @@
 		name = '',
 		alt = '',
 		size = 'sm',
-		shape = 'circle',
+		shape = 'square',
 		ariaLabel,
 		title,
 		open = $bindable(false),
