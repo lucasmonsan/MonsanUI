@@ -6,7 +6,7 @@
 		onclick?: (e: MouseEvent) => void;
 		type?: 'button' | 'submit' | 'reset';
 		variant?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'neutral';
-		size?: 'sm' | 'md';
+		size?: 'sm' | 'md' | 'compact';
 		shape?: 'default' | 'pill';
 		disabled?: boolean;
 		block?: boolean;
@@ -108,6 +108,13 @@
 		padding: 0 var(--space-sm);
 		font-size: var(--text-sm);
 		line-height: 1;
+	}
+
+	.size-compact {
+		min-height: 0;
+		padding: var(--space-sm);
+		font-size: var(--text-sm);
+		line-height: 1.1;
 	}
 
 	.size-sm.square {

@@ -67,6 +67,7 @@ export { default as FileUpload } from './components/FileUpload.svelte';
 export { default as Radio } from './components/Radio.svelte';
 export { default as Range } from './components/Range.svelte';
 export { default as SearchBar } from './components/SearchBar.svelte';
+export { default as SSOLoginButton } from './components/SSOLoginButton.svelte';
 export { default as TimePicker } from './components/TimePicker.svelte';
 export { default as Text } from './components/Text.svelte';
 export { default as Loading } from './components/Loading.svelte';

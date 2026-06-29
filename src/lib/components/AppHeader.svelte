@@ -32,7 +32,7 @@
 		actionsLabel,
 		titleId,
 		maxWidth = 'content',
-		size = 'comfortable',
+		size = 'compact',
 		border = true,
 		sticky = false,
 		horizontalPadding = 'none'

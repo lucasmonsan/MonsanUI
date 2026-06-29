@@ -1,6 +1,6 @@
 # Phase 0 Diff Triage
 
-Workspace: `/home/lucasmonsan/Dev/MonsanUI`
+Workspace: `MonsanUI`
 
 Branch atual: `fix/exam-badge-mobile-scaling`
 

@@ -4,7 +4,7 @@
 	interface Props {
 		children: Snippet;
 		gap?: 'xs' | 'sm' | 'md' | 'lg';
-		align?: 'start' | 'center' | 'end';
+		align?: 'start' | 'center' | 'end' | 'stretch';
 		justify?: 'start' | 'center' | 'between' | 'end';
 		wrap?: boolean;
 		fullWidth?: boolean;
@@ -80,6 +80,9 @@
 	}
 	.align-end {
 		align-items: flex-end;
+	}
+	.align-stretch {
+		align-items: stretch;
 	}
 	.justify-start {
 		justify-content: flex-start;
