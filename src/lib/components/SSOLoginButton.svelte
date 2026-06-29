@@ -85,22 +85,6 @@
 
 {#if user}
 	<div class="monsan-sso-account" class:block>
-		{#if onProfile}
-			<button
-				type="button"
-				class="account-main"
-				{disabled}
-				aria-label={ariaLabel ?? accountName}
-				onclick={onProfile}
-			>
-				{@render accountContent()}
-			</button>
-		{:else}
-			<div class="account-main" aria-label={ariaLabel ?? accountName}>
-				{@render accountContent()}
-			</div>
-		{/if}
-
 		<QuickActions
 			bind:open={menuOpen}
 			variant="dropdown"
@@ -113,17 +97,18 @@
 			triggerLabel={accountMenuLabel}
 		>
 			{#snippet trigger(toggle)}
-				<Button
-					variant="secondary"
-					size="sm"
-					square
+				<button
+					type="button"
+					class="account-main"
 					{disabled}
-					ariaLabel={accountMenuLabel}
-					ariaExpanded={menuOpen}
+					aria-label={ariaLabel ?? accountMenuLabel}
+					aria-haspopup="menu"
+					aria-expanded={menuOpen}
 					onclick={toggle}
 				>
+					{@render accountContent()}
 					<DotsThreeVerticalIcon size={18} />
-				</Button>
+				</button>
 			{/snippet}
 
 			{#if profileLabel}
@@ -171,9 +156,7 @@
 
 <style>
 	.monsan-sso-account {
-		display: flex;
-		align-items: stretch;
-		gap: var(--space-sm);
+		display: inline-block;
 		min-width: 0;
 	}
 
@@ -181,8 +164,14 @@
 		width: 100%;
 	}
 
+	.monsan-sso-account.block :global(.monsan-quick-actions-wrapper),
+	.monsan-sso-account.block :global(.quick-actions-trigger) {
+		display: block;
+		width: 100%;
+	}
+
 	.account-main {
-		flex: 1 1 auto;
+		width: 100%;
 		min-width: 0;
 		min-height: var(--control-height);
 		display: flex;
@@ -197,9 +186,6 @@
 		box-sizing: border-box;
 		font: inherit;
 		text-align: left;
-	}
-
-	button.account-main {
 		cursor: pointer;
 		transition:
 			transform 0.1s var(--ease-out),
@@ -217,6 +203,7 @@
 	}
 
 	.account-copy {
+		flex: 1 1 auto;
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
@@ -243,6 +230,11 @@
 		font-weight: 600;
 		color: var(--text-secondary);
 		text-transform: none;
+	}
+
+	.account-main :global(svg) {
+		flex: 0 0 auto;
+		color: var(--text-secondary);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

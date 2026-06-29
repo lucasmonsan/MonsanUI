@@ -10,6 +10,7 @@ async function readComponent(path) {
 
 const appHeader = await readComponent('AppHeader.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
+const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
 const suiteHeaderActions = await readComponent('SuiteHeaderActions.svelte');
 const suiteUserMenu = await readComponent('SuiteUserMenu.svelte');
 
@@ -26,6 +27,18 @@ assert(
 assert(
 	avatarMenu.includes("shape = 'square'"),
 	'AvatarMenu default must be square to match the MonsanUI visual language.'
+);
+
+assert(
+	ssoLoginButton.includes('class="account-main"') &&
+		ssoLoginButton.includes('aria-haspopup="menu"') &&
+		ssoLoginButton.includes('<DotsThreeVerticalIcon size={18} />'),
+	'SSOLoginButton logged-in state must open its menu from the whole account button.'
+);
+
+assert(
+	!ssoLoginButton.includes('square\n\t\t\t\t\t{disabled}\n\t\t\t\t\tariaLabel={accountMenuLabel}'),
+	'SSOLoginButton logged-in state must not render a separate square menu button.'
 );
 
 for (const [name, source] of [
