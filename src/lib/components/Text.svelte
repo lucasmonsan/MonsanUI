@@ -8,7 +8,7 @@
 		/** Família tipográfica do MonsanUI. Padrão: 'body' (Plus Jakarta Sans) */
 		family?: 'body' | 'display';
 		/** Tamanho do texto mapeado na escala. Padrão: 'md' */
-		size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 		/** Peso da fonte. Padrão: 'normal' */
 		weight?: 'normal' | 'medium' | 'semibold' | 'bold';
 		/** Variante de cor do MonsanUI. Padrão: 'primary' */
@@ -69,6 +69,9 @@
 	}
 
 	/* Escala de Tamanhos */
+	.size-xs {
+		font-size: var(--text-xs);
+	}
 	.size-sm {
 		font-size: var(--text-sm);
 	}
