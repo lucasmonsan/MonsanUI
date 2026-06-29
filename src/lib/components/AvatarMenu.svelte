@@ -8,7 +8,7 @@
 		src,
 		name = '',
 		alt = '',
-		size = 'sm',
+		size = 'control',
 		shape = 'square',
 		ariaLabel,
 		title,
