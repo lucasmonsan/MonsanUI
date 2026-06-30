@@ -18,6 +18,15 @@ const rules = [
 	}
 ];
 
+const nonAllowlistableViolations = new Set([
+	'local <style> blocks',
+	'global selectors',
+	'inline style attributes',
+	'Svelte style directives',
+	'local class attributes',
+	'consumer CSS beyond MonsanUI import'
+]);
+
 /**
  * @typedef {{ allowlist?: string[] }} ConsumerStandardsConfig
  * @typedef {{ root?: string; allowlist?: string[] }} CheckConsumerStandardsOptions
@@ -124,7 +133,11 @@ export async function checkConsumerStandards(options = {}) {
 			fileViolations.push('consumer CSS beyond MonsanUI import');
 		}
 
-		if (fileViolations.length > 0 && !allowlist.has(projectPath)) {
+		const hasBlockingViolation = fileViolations.some((violation) =>
+			nonAllowlistableViolations.has(violation)
+		);
+
+		if (fileViolations.length > 0 && (hasBlockingViolation || !allowlist.has(projectPath))) {
 			violations.push(`${projectPath}: ${fileViolations.join(', ')}`);
 		}
 	}
