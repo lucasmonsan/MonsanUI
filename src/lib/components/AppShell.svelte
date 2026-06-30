@@ -54,6 +54,17 @@
 		const threshold = 2;
 		const contentBounds = getScrollableContentBounds();
 
+		if (contentBounds) {
+			const contentHeight = contentBounds.bottom - contentBounds.top;
+			const hasMeaningfulOverflow = contentHeight > scrollEl.clientHeight + threshold;
+
+			if (!hasMeaningfulOverflow) {
+				hasOverflowTop = false;
+				hasOverflowBottom = false;
+				return;
+			}
+		}
+
 		if (!contentBounds) {
 			hasOverflowTop = scrollEl.scrollTop > threshold;
 			hasOverflowBottom =

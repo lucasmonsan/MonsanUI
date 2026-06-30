@@ -22,7 +22,7 @@
 		layout = 'stacked',
 		compact = false,
 		titleWeight = 'semibold',
-		adaptiveLogo = true,
+		adaptiveLogo = false,
 		logoButtonLabel,
 		onLogoClick
 	}: Props = $props();
@@ -32,22 +32,31 @@
 	{#if logoSrc}
 		{#if onLogoClick && logoButtonLabel}
 			<button type="button" class="logo-button" aria-label={logoButtonLabel} onclick={onLogoClick}>
-				<span
-					class="brand-logo"
-					class:adaptive={adaptiveLogo}
-					style:--brand-logo-mask={`url("${logoSrc}") no-repeat center / contain`}
-					aria-hidden="true"
-				></span>
+				{#if adaptiveLogo}
+					<span
+						class="brand-logo brand-logo-mask"
+						style:--brand-logo-mask={`url("${logoSrc}") no-repeat center / contain`}
+						aria-hidden="true"
+					></span>
+				{:else}
+					<img class="brand-logo brand-logo-image" src={logoSrc} alt="" aria-hidden="true" />
+				{/if}
 			</button>
-		{:else}
+		{:else if adaptiveLogo}
 			<span
-				class="brand-logo"
-				class:adaptive={adaptiveLogo}
+				class="brand-logo brand-logo-mask"
 				style:--brand-logo-mask={`url("${logoSrc}") no-repeat center / contain`}
 				role={logoAlt ? 'img' : undefined}
 				aria-label={logoAlt || undefined}
 				aria-hidden={logoAlt ? undefined : 'true'}
 			></span>
+		{:else}
+			<img
+				class="brand-logo brand-logo-image"
+				src={logoSrc}
+				alt={logoAlt}
+				aria-hidden={logoAlt ? undefined : 'true'}
+			/>
 		{/if}
 	{/if}
 	<div class="brand-copy">
@@ -108,15 +117,18 @@
 		width: calc(var(--base) * 5);
 		height: calc(var(--base) * 5);
 		display: inline-block;
-		background-color: var(--text-primary);
-		mask: var(--brand-logo-mask);
-		-webkit-mask: var(--brand-logo-mask);
 		opacity: 1;
 		transition: opacity 0.3s var(--ease-out);
 	}
 
-	.brand-logo.adaptive {
-		opacity: 1;
+	.brand-logo-mask {
+		background-color: var(--text-primary);
+		mask: var(--brand-logo-mask);
+		-webkit-mask: var(--brand-logo-mask);
+	}
+
+	.brand-logo-image {
+		object-fit: contain;
 	}
 
 	.logo-button {
