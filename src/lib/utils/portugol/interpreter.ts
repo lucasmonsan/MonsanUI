@@ -1179,10 +1179,10 @@ export class Environment {
 	}
 
 	public define(name: string, value: unknown, varType?: string) {
-		this.values.set(name, value);
 		if (varType) {
 			this.types.set(name, varType);
 		}
+		this.values.set(name, this.coerceValue(name, value));
 	}
 
 	public get(name: string, line: number): unknown {
@@ -1199,7 +1199,7 @@ export class Environment {
 
 	public assign(name: string, value: unknown, line: number) {
 		if (this.values.has(name)) {
-			this.values.set(name, value);
+			this.values.set(name, this.coerceValue(name, value));
 			return;
 		}
 		if (this.parent) {
@@ -1219,6 +1219,34 @@ export class Environment {
 			return this.parent.getType(name);
 		}
 		return undefined;
+	}
+
+	private coerceValue(name: string, value: unknown): unknown {
+		if (value === undefined) return value;
+
+		const type = this.getType(name);
+		switch (type) {
+			case 'inteiro': {
+				const parsed = Number(value);
+				return Number.isNaN(parsed) ? 0 : Math.trunc(parsed);
+			}
+			case 'real': {
+				const parsed = Number(value);
+				return Number.isNaN(parsed) ? 0 : parsed;
+			}
+			case 'logico': {
+				if (typeof value === 'boolean') return value;
+				const normalized = String(value).trim().toLowerCase();
+				return normalized === 'verdadeiro' || normalized === 'true';
+			}
+			case 'caracter':
+			case 'caractere':
+				return String(value).charAt(0);
+			case 'cadeia':
+				return String(value);
+			default:
+				return value;
+		}
 	}
 
 	public getVariables(): Record<string, { value: unknown; type: string }> {
@@ -1475,19 +1503,11 @@ export class Interpreter {
 			}
 			const varName = (node.args[0] as IdentifierNode).name;
 			// Verifica se a variável existe antes de solicitar input
-			const currentVal = env.get(varName, node.line);
+			env.get(varName, node.line);
 			// Yielda um evento de entrada solicitando o dado ao usuário.
 			// O runner interceptará isso, mostrará a tela de entrada e chamará .next(valor) para prosseguir
 			const input = yield { type: 'read', variable: varName };
-			// Faz o parse do input correspondente ao tipo original
-			let parsedInput: unknown = input;
-			if (typeof currentVal === 'number') {
-				parsedInput = Number(input);
-				if (isNaN(parsedInput as number)) parsedInput = 0;
-			} else if (typeof currentVal === 'boolean') {
-				parsedInput = input === 'verdadeiro' || input === 'true';
-			}
-			env.assign(varName, parsedInput, node.line);
+			env.assign(varName, input, node.line);
 			return;
 		}
 
