@@ -1,6 +1,6 @@
 # MonsanUI Project Context
 
-MonsanUI is the private Svelte 5 visual and interaction library for the Monsan suite. Examster, Manki and Owlth must be built from MonsanUI components and tokens.
+MonsanUI is the private Svelte 5 visual and interaction library for the Monsan suite. Koalify, Manki and Owlth must be built from MonsanUI components and tokens.
 
 Use this file as compact context for another AI/chat. Use `README.md` for setup and operational commands. Use workspace root `AGENTS.md` as the canonical implementation rules.
 
@@ -21,7 +21,7 @@ Use this file as compact context for another AI/chat. Use `README.md` for setup 
 - Export shared CSS through `monsan-ui.css` and `variables.css`.
 - Own base normalize, tokens, layout primitives and app shell patterns.
 - Provide icons used by suite apps.
-- Provide question/input components used by Examster.
+- Provide question/input components used by Koalify.
 - Provide deck/card/study primitives used by Manki.
 - Provide strict consumer standards checkers.
 - Provide tooling standards checkers.

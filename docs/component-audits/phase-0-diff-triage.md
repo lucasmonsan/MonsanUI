@@ -81,13 +81,13 @@ Diagnostico:
 
 - A remocao do padding parece alinhada com a decisao de o `AppShell` controlar o
   espacamento estrutural.
-- Mesmo assim, isso afeta diretamente Manki/Examster e deve ser tratado como
+- Mesmo assim, isso afeta diretamente Manki/Koalify e deve ser tratado como
   mudanca de contrato de layout, nao como detalhe interno.
 
 Decisao recomendada:
 
 - Reescrever em um lote de `AppShell/top spacing`.
-- Validar visualmente Manki e Examster depois de atualizar consumidores.
+- Validar visualmente Manki e Koalify depois de atualizar consumidores.
 
 ### `QuickActions`
 

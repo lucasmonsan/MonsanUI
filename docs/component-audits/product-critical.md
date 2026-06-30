@@ -2,7 +2,7 @@
 
 Local branch: `fix/exam-badge-mobile-scaling`.
 
-This audit covers components directly tied to Examster/Manki product workflows.
+This audit covers components directly tied to Koalify/Manki product workflows.
 Changes here must be smaller and validated more often because regressions can
 break answer capture, study flows, drag/drop or calendar statistics.
 
@@ -95,19 +95,19 @@ break answer capture, study flows, drag/drop or calendar statistics.
 
 ## Current Consumer Notes
 
-- `SingleChoice` and `MultipleChoice` are used by Examster landing simulator,
+- `SingleChoice` and `MultipleChoice` are used by Koalify landing simulator,
   sandbox, exam route and admin preview.
-- `ChoiceCard` is used by Examster auth link selection.
+- `ChoiceCard` is used by Koalify auth link selection.
 - `Deck` is used by Manki home deck grid.
 - `CardEditor` is used by Manki deck create/edit flow.
 - `Folders` is used by Manki home folder filtering/management.
-- `DndOrder`, `DndMatch` and `Terminal` are used by Examster interactive
+- `DndOrder`, `DndMatch` and `Terminal` are used by Koalify interactive
   question/simulator flows.
 - `Calendar` is used by Manki stats/activity views.
 
 ## Pending
 
-- Validate Examster answer flows visually before merging package changes into
+- Validate Koalify answer flows visually before merging package changes into
   consumers.
 - Consider a shared internal option primitive for `SingleChoice` and
   `MultipleChoice` only after current behavior is locked by screenshots/tests.

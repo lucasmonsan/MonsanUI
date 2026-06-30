@@ -1092,7 +1092,7 @@
 	);
 	let panelPadding = $state<PaddingPreset>('lg');
 	let panelMaxWidth = $state<MaxWidthPreset>('panel');
-	let creditsCopyright = $state('© 2026 Examster. Todos os direitos reservados.');
+	let creditsCopyright = $state('© 2026 Koalify. Todos os direitos reservados.');
 	let creditsVariant = $state<'default' | 'compact'>('default');
 	let showSplashPreview = $state(false);
 	let splashKey = $state(0);
@@ -1271,7 +1271,7 @@
 \tThemeSelector
 } from 'monsan-ui';
 
-<AppHeader tag="header" title="Examster" subtitle="Student Panel" logoSrc="/favicon.svg" sticky>
+<AppHeader tag="header" title="Koalify" subtitle="Student Panel" logoSrc="/favicon.svg" sticky>
 \t{#snippet actions()}
 \t\t<AvatarMenu name="Lucas Monsan" shape="square" ariaLabel="Open user menu">
 \t\t\t<IconButton label="Open profile">
@@ -5969,7 +5969,7 @@
 								<span class="box-label">{i18n.t('common.preview')}</span>
 								<AppHeader
 									tag="header"
-									title="Examster"
+									title="Koalify"
 									subtitle={i18n.locale === 'pt'
 										? 'Painel do aluno'
 										: i18n.locale === 'en'

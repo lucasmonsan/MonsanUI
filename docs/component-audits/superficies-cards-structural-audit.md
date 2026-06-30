@@ -90,7 +90,7 @@ Uso observado nos apps consumidores:
   - `EmptyState`: stats.
   - `InlineNotice`: estudo.
   - `FlipCard`: estudo.
-- Examster
+- Koalify
   - `Panel`: landing, termos, privacidade, exam, sandbox, dashboard, admin.
   - `Alert`: landing, auth, exam, sandbox, admin/review.
   - `ConsolePanel`: sandbox, review, admin log.
@@ -646,7 +646,7 @@ Regras propostas:
 
 Consumidores atuais:
 
-- Examster admin usa `ExpandableCard expandOn="header" showIndicator={false}`.
+- Koalify admin usa `ExpandableCard expandOn="header" showIndicator={false}`.
 - O risco de mudar o default e baixo para os usos observados, mas ainda precisa
   ser validado.
 
@@ -745,7 +745,7 @@ Escopo:
 Validacao minima:
 
 - `pnpm test` em MonsanUI.
-- Atualizar e testar Examster, principalmente admin tabs.
+- Atualizar e testar Koalify, principalmente admin tabs.
 
 ## Validacao planejada para a fase implementada
 
@@ -756,7 +756,7 @@ Quando a implementacao for aprovada e executada:
 
 2. Consumidores afetados apos `pnpm update monsan-ui`
    - Manki: stats e study.
-   - Examster: admin tabs, sandbox/review, dashboard.
+   - Koalify: admin tabs, sandbox/review, dashboard.
    - Owlth: portal.
    - Frequence: landing/auth/dashboard basicos.
 
@@ -773,4 +773,4 @@ Antes de alterar codigo, preciso de aprovacao para:
 3. Remover ou tornar opt-in o `align-self` de `StatusBanner`.
 4. Adicionar nome acessivel explicito em `StatusPill indicatorOnly`.
 5. Recontratar `ExpandableCard` para evitar raiz `role="button"` contendo
-   controles interativos, preservando o comportamento usado pelo Examster.
+   controles interativos, preservando o comportamento usado pelo Koalify.

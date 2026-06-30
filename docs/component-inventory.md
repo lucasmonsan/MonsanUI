@@ -11,7 +11,7 @@ component rewrite.
 - Public component/icon exports in `src/lib/index.ts`: 130
 - Svelte files under `src/lib/components`: 131
 - Internal Svelte component not exported publicly: `StepPanel`
-- Consumers scanned: `Examster`, `Manki`, `Frequence`, `Owlth`.
+- Consumers scanned: `Koalify`, `Manki`, `Frequence`, `Owlth`.
 - `Shellfish` exists in the workspace, but no `Shellfish/package.json` was
   present during this pass, so it was not testable as a pnpm consumer.
 
@@ -24,13 +24,13 @@ Validation passed with:
 
 - `MonsanUI`: `pnpm test`
 - `Manki`: `pnpm test`
-- `Examster`: `pnpm test`
+- `Koalify`: `pnpm test`
 - `Frequence`: `pnpm test`
 
 Known non-blocking warnings observed:
 
 - `PLUGIN_TIMINGS` during Vite builds.
-- Directus SDK circular dependency warning in `Examster`.
+- Directus SDK circular dependency warning in `Koalify`.
 
 ## Local Refactor Progress
 
@@ -176,7 +176,7 @@ Audited without code changes in this pass:
   `AvatarMenu` remains a thin wrapper around `QuickActions`.
 - `Tabs` structural spacing: still needs a separate visual pass because the
   default variant mixes tab behavior with structural padding/margin/border and
-  affects Examster dashboard/admin, Manki stats and Owlth portal.
+  affects Koalify dashboard/admin, Manki stats and Owlth portal.
 - `FormField`, `FieldGroup`, `FormStack`: current structures are semantic and
   small; helper/error support for `FormField` should be a separate API step.
 - `ActionBar` roving tabindex state: should be revisited in a dedicated
@@ -220,7 +220,7 @@ Validation:
   batch and documentation updates with 0 Svelte errors and 0 Svelte warnings.
 - `Manki`: `pnpm run monsan-ui:link` followed by `pnpm test` passed with 0
   Svelte errors and 0 Svelte warnings.
-- `Examster`: `pnpm run monsan-ui:link` followed by `pnpm test` passed with 0
+- `Koalify`: `pnpm run monsan-ui:link` followed by `pnpm test` passed with 0
   Svelte errors and 0 Svelte warnings. Known non-blocking build warnings still
   appeared: `PLUGIN_TIMINGS` and the Directus SDK circular dependency warning.
 - `Frequence`: `pnpm run monsan-ui:link` followed by `pnpm test` passed with 0
@@ -257,7 +257,7 @@ Project concentration:
 
 | Project     | Highest-use components                                                                        |
 | :---------- | :-------------------------------------------------------------------------------------------- |
-| `Examster`  | `Stack`, `Text`, `Button`, `Inline`, `AppShell`, `Panel`, `Badge`, forms, question components |
+| `Koalify`   | `Stack`, `Text`, `Button`, `Inline`, `AppShell`, `Panel`, `Badge`, forms, question components |
 | `Manki`     | `Button`, `Stack`, `Text`, `AppShell`, `Dialog`, `Inline`, `Panel`, `Deck`, `Calendar`        |
 | `Frequence` | `AppShell`, `Button`, `LanguageSelector`, `Stack`, `Text`, `ThemeSelector`                    |
 | `Owlth`     | `AppViewport`, `AppHeader`, `Button`, `Stack`, auth surfaces                                  |
@@ -267,7 +267,7 @@ Risk implication:
 
 - `Stack`, `Inline`, `Button`, `Text`, `Panel`, `AppShell`, `AppHeader`,
   selectors and form fields are high-blast-radius components.
-- `Examster` is the broadest consumer and must be checked for most component
+- `Koalify` is the broadest consumer and must be checked for most component
   families.
 - `Manki` is the main consumer for deck, calendar and study interactions.
 - `Owlth` still uses legacy layout components and must be included when
@@ -354,7 +354,7 @@ Main risks:
 - `Panel`, `Dialog`, `Alert`, `EmptyState` and `CenteredPanel` have broad usage.
 - `Dialog` regressions can affect landing pages, admin flows and Manki deck
   flows.
-- `ConsolePanel` is important for Examster admin/debug flows.
+- `ConsolePanel` is important for Koalify admin/debug flows.
 
 ### Actions, Menus And Navigation
 
@@ -389,7 +389,7 @@ Main risks:
 
 - Header actions are visually sensitive across all apps.
 - Menus require keyboard, focus, escape and outside-click validation.
-- Tabs are used in Examster and Manki stats; spacing changes are visible.
+- Tabs are used in Koalify and Manki stats; spacing changes are visible.
 
 ### Forms And Inputs
 
@@ -423,7 +423,7 @@ Current read:
 
 Main risks:
 
-- Examster admin uses forms heavily.
+- Koalify admin uses forms heavily.
 - Select-like components require keyboard and aria validation.
 - File/date/time/color controls need separate audits because they have more
   interaction state than simple inputs.
@@ -455,7 +455,7 @@ Components:
 
 Current read:
 
-- Examster question components and Manki deck/study components should be treated
+- Koalify question components and Manki deck/study components should be treated
   as product-critical, not generic low-risk primitives.
 - `Calendar` is complex enough to get its own audit.
 - Icons are exported as components but should not be mixed into structural
@@ -481,7 +481,7 @@ To guide the simplification of MonsanUI without risking breaking changes across 
 
 - **Search and SearchBar**: Must remain separate.
   - `Search` represents a global/modal command palette interface (used in `Manki`).
-  - `SearchBar` represents an inline/contextual search bar (used in `Examster`).
+  - `SearchBar` represents an inline/contextual search bar (used in `Koalify`).
 
 ### 3. Card Strategy
 
@@ -521,7 +521,7 @@ Use this checklist before editing any component:
 6. Overlays:
    `Dialog`, `ConfirmDialog`, `MediaDialog`, `Loading`, toasts.
 7. Domain components:
-   Examster question controls, Manki deck/study components and `Calendar`.
+   Koalify question controls, Manki deck/study components and `Calendar`.
 8. Legacy layout cleanup:
    migrate remaining consumers off legacy wrappers, then deprecate or remove.
 
@@ -531,7 +531,7 @@ Move from automated validation to manual visual validation and final commit
 preparation:
 
 - Visually validate Manki deck/folder/card editor/calendar flows.
-- Visually validate Examster question controls, DnD and terminal flows.
+- Visually validate Koalify question controls, DnD and terminal flows.
 - Validate landing/auth footer areas that use `PreferenceBar`.
 - Re-audit or restore `Shellfish` package metadata before claiming Shellfish
   compatibility.

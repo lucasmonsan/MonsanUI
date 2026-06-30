@@ -128,7 +128,7 @@ Uso observado:
   - `Button`, `IconButton`, `ButtonGroup`, `ActionBar`, `Tabs`,
     `ThemeSelector`, `LanguageSelector`, `LegalLinks`, `PreferenceBar`,
     `QuickActions`, `MenuItem`, `Avatar`, `MetricButton`.
-- Examster
+- Koalify
   - `Button`, `IconButton`, `ButtonGroup`, `Tabs`, `ThemeSelector`,
     `LanguageSelector`, `LegalLinks`, `PreferenceBar`, `SuiteHeaderActions`.
 - Owlth
@@ -771,7 +771,7 @@ Diagnostico:
 - `gap` pertence ao grupo.
 - `padding-top` e `border-top` podem competir com o container pai ou com regioes
   `bottom/footer` do `AppShell`.
-- Hoje e usado em landing/auth de Manki, Examster, Owlth e Frequence.
+- Hoje e usado em landing/auth de Manki, Koalify, Owlth e Frequence.
 
 Recomendacao:
 
@@ -851,7 +851,7 @@ Decisoes necessarias:
 Validacao:
 
 - `pnpm test` em MonsanUI.
-- Manki, Examster, Owlth e Frequence nas landing/header pages.
+- Manki, Koalify, Owlth e Frequence nas landing/header pages.
 
 ### Commit 3 - QuickActions placement/align
 
@@ -866,7 +866,7 @@ Validacao:
 
 - `pnpm test` em MonsanUI.
 - Manki deck actions e avatar menu.
-- Suite header actions em Manki, Examster e Owlth.
+- Suite header actions em Manki, Koalify e Owlth.
 
 ### Commit 4 - Tabs e spacing estrutural
 
@@ -881,7 +881,7 @@ Validacao:
 
 - `pnpm test` em MonsanUI.
 - Manki stats.
-- Examster dashboard/admin.
+- Koalify dashboard/admin.
 - Owlth portal.
 - Validacao visual obrigatoria.
 

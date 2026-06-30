@@ -46,9 +46,9 @@ be removed until consumers have migrated away from legacy layout wrappers.
 ## Current Consumer Notes
 
 - `Owlth` still uses `PageShell`, `PageContainer` and `AppViewport`.
-- `Examster`, `Manki` and `Frequence` use `CenteredPanel` in landing/loading
+- `Koalify`, `Manki` and `Frequence` use `CenteredPanel` in landing/loading
   flows.
-- `Examster` uses `ContentRegion` in the landing simulator dialog/content flow.
+- `Koalify` uses `ContentRegion` in the landing simulator dialog/content flow.
 
 ## Pending
 
