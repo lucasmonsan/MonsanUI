@@ -113,12 +113,35 @@ await withFixture(
 			"export default { allowlist: ['src/routes/+page.svelte'] };\n",
 		'src/app.css': "@import 'monsan-ui/monsan-ui.css';\n",
 		'src/routes/+page.svelte':
-			'<div class="temporary"><style>.temporary { color: red; }</style></div>\n'
+			'<script>import { AppViewport } from "monsan-ui";</script><AppViewport padding="app-authenticated">Content</AppViewport>\n'
 	},
 	async (root) => {
 		const violations = await checkConsumerStandards({ root });
 
 		assert(violations.length === 0, `Expected allowlisted fixture to pass, got ${violations}.`);
+	}
+);
+
+await withFixture(
+	{
+		'monsan-ui.consumer-standards.mjs':
+			"export default { allowlist: ['src/routes/+page.svelte'] };\n",
+		'src/app.css': "@import 'monsan-ui/monsan-ui.css';\n",
+		'src/routes/+page.svelte':
+			'<div class="temporary"><style>.temporary { color: red; }</style></div>\n'
+	},
+	async (root) => {
+		const violations = await checkConsumerStandards({ root });
+		const report = violations.join('\n');
+
+		assert(
+			report.includes('local <style> blocks'),
+			`Expected allowlist not to bypass local style blocks: ${report}`
+		);
+		assert(
+			report.includes('local class attributes'),
+			`Expected allowlist not to bypass local class attributes: ${report}`
+		);
 	}
 );
 
