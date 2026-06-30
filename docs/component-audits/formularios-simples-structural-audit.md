@@ -125,7 +125,7 @@ controles:
 
 Uso observado:
 
-- Examster
+- Koalify
   - `FormField`, `FieldGroup`, `Input`, `Textarea`, `SearchBar`.
   - Uso forte em modais admin, onboarding, preview, benchmark e filtros de
     admin.
@@ -676,7 +676,7 @@ Classificacao: Recontratar parcialmente.
 - Validacao visual do showcase para `Input`, `Textarea`, `Checkbox`, `Radio`,
   `Range`, `SearchBar` e `Search`.
 - Atualizar e testar consumidores que usam a familia:
-  - Examster: `pnpm update monsan-ui` e `pnpm test`.
+  - Koalify: `pnpm update monsan-ui` e `pnpm test`.
   - Manki: `pnpm update monsan-ui` e `pnpm test`.
   - Owlth: `pnpm update monsan-ui` e `pnpm test`.
 - Frequence e Shellfish nao precisam entrar nesta fase se continuarem sem uso

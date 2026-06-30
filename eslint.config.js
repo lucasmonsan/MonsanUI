@@ -12,7 +12,7 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
 export default defineConfig(
 	{
-		ignores: ['dist/', '.svelte-kit/', 'build/', 'MonsanUIZero/', 'Manki/', 'Examster/']
+		ignores: ['dist/', '.svelte-kit/', 'build/', 'MonsanUIZero/', 'Manki/', 'Koalify/']
 	},
 	includeIgnoreFile(gitignorePath),
 	js.configs.recommended,

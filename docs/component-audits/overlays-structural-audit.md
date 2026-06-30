@@ -103,7 +103,7 @@ Regras:
 
 Uso observado:
 
-- Examster
+- Koalify
   - `Loading`: landing, sandbox, prova, dashboard, auth e admin.
   - `Dialog`: landing e modais admin.
   - `ConfirmDialog`: layout global, prova e admin.
@@ -525,7 +525,7 @@ Escopo:
 Validacao obrigatoria:
 
 - `pnpm test` no MonsanUI.
-- depois da integracao, atenção especial aos modais de Examster e Manki.
+- depois da integracao, atenção especial aos modais de Koalify e Manki.
 
 ### Commit 2 - Dialog wrappers
 
@@ -562,7 +562,7 @@ Escopo:
 Validacao obrigatoria:
 
 - `pnpm test` no MonsanUI.
-- na integracao, conferir layouts globais de Examster/Manki/Frequence e uso
+- na integracao, conferir layouts globais de Koalify/Manki/Frequence e uso
   direto do OwlthPortal.
 
 ### Commit 4 - Transient overlays
@@ -585,7 +585,7 @@ Validacao obrigatoria:
 
 ## Riscos e cuidados
 
-- `Dialog` tem uso amplo em Examster e Manki; mudancas devem ser internas e
+- `Dialog` tem uso amplo em Koalify e Manki; mudancas devem ser internas e
   conservadoras.
 - `ConfirmDialog` pode alterar layout visual se mover acoes para footer; manter
   espacamento e largura dos botoes equivalentes.

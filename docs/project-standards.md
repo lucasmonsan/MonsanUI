@@ -58,7 +58,7 @@ Use existing primitives before adding new ones:
 - `ActionFooter`, `ActionBar`, `ButtonGroup`, `QuickActions` and `Tabs` for actions and navigation.
 - `CenteredPanel`, `Panel`, `DataCard`, `ExpandableCard`, `ConsolePanel` and `EmptyState` for surfaces.
 - `Alert`, `InlineNotice`, `Toast`, `ToastViewport`, `FlashOverlay` and `SkipLink` for feedback and accessibility.
-- `QuestionPanel`, `MediaPreview`, `MediaDialog` and question controls for Examster question surfaces.
+- `QuestionPanel`, `MediaPreview`, `MediaDialog` and question controls for Koalify question surfaces.
 - Shared icons from `src/lib/components/icons/*`, exported through `src/lib/index.ts`.
 
 Only add new primitives when the existing API cannot express the required layout or behavior cleanly.

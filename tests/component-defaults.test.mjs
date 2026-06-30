@@ -16,7 +16,7 @@ const suiteUserMenu = await readComponent('SuiteUserMenu.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
-	'AppHeader default must be compact, matching the Manki/Examster suite header pattern.'
+	'AppHeader default must be compact, matching the Manki/Koalify suite header pattern.'
 );
 
 assert(

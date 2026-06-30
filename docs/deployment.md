@@ -2,7 +2,7 @@
 
 MonsanUI is the suite component package and visual language source. It is not a
 search-discoverable product service and normally has no production runtime like
-Examster, Manki or Owlth.
+Koalify, Manki or Owlth.
 
 ## Runtime
 

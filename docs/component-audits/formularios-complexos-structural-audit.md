@@ -124,7 +124,7 @@ Regras:
 
 Uso observado:
 
-- Examster
+- Koalify
   - `Select`: modais admin, preview, filtros de dashboard/admin.
   - `MultiSelect`: filtros de questoes no admin.
 - Manki
@@ -141,7 +141,7 @@ Uso observado:
     `FileUpload` e `Chips`.
 
 Conclusao: `Select` tem o maior raio de impacto real, especialmente em
-Examster. `MultiSelect` afeta filtros importantes. `FileUpload` afeta fluxo real
+Koalify. `MultiSelect` afeta filtros importantes. `FileUpload` afeta fluxo real
 de importacao no Manki. `DatePicker`, `TimePicker`, `ColorPicker` e `Chips`
 podem ser refatorados com menor risco de consumidor, mas ainda precisam manter
 API publica e showcase funcionando.
@@ -555,7 +555,7 @@ Classificacao: Simplificar.
 - `pnpm test` em MonsanUI.
 - Validacao visual do showcase para todos os sete componentes.
 - Atualizar e testar consumidores afetados:
-  - Examster: obrigatorio por `Select`/`MultiSelect`.
+  - Koalify: obrigatorio por `Select`/`MultiSelect`.
   - Manki: obrigatorio por `Select`/`FileUpload`.
   - Owlth: apenas se o update de MonsanUI for propagado nesta fase.
 - Validacao manual recomendada:

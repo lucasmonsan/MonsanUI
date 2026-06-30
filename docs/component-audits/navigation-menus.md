@@ -43,7 +43,7 @@ Current structure is already small. `AvatarMenu` remains a thin wrapper around
 - `border-bottom: var(--border-width) solid var(--border-color)`
 
 All current suite app usages found in this pass use `embedded`, which disables
-that structural border and large spacing. Because `Tabs` appears in Examster
+that structural border and large spacing. Because `Tabs` appears in Koalify
 dashboard/admin, Manki stats and Owlth portal, changing the default structural
 contract should be a separate visual pass with screenshots/checks, not bundled
 into the low-risk internal cleanup.

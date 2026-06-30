@@ -117,7 +117,7 @@ Uso observado:
   - `Calendar`: stats.
   - `ProgressSummary`, `CountdownBadge`, `PromptPanel`: estudo.
   - `ProfileSummary`: perfil do usuario.
-- Examster
+- Koalify
   - `BrandHeader`: landing.
   - `ProgressSummary`, `ProgressBar`: landing, prova, preview e review.
   - `SingleChoice`, `MultipleChoice`, `DndOrder`, `DndMatch`, `Terminal`:
@@ -132,7 +132,7 @@ Uso observado:
 - Shellfish
   - Nenhum uso encontrado em `src` nesta busca.
 
-Conclusao: o maior risco real esta em Examster (`SingleChoice`,
+Conclusao: o maior risco real esta em Koalify (`SingleChoice`,
 `MultipleChoice`, `DndOrder`, `DndMatch`, `Terminal`, `ProgressBar`) e Manki
 (`Deck`, `Folders`, `CardEditor`, `Calendar`). `BrandHeader` e
 `ProfileSummary` sao compartilhados entre apps, mas tem menor complexidade.
@@ -438,7 +438,7 @@ Proposta:
 - revisar roles: possivel contrato `list`/`listitem` + botoes/chips focusables,
   mantendo live region para movimento.
 - manter click-to-select como alternativa acessivel ao drag.
-- nao mexer em layout mobile sem teste em Examster.
+- nao mexer em layout mobile sem teste em Koalify.
 
 ### Terminal
 
@@ -588,7 +588,7 @@ Exportado: sim.
 
 Diagnostico:
 
-- usado por Manki, Examster, Owlth e Frequence;
+- usado por Manki, Koalify, Owlth e Frequence;
 - visual simples e adequado;
 - quando logo nao e clicavel, renderiza `span` mascarado com `aria-label`, mas
   `span` sem role pode nao comunicar imagem corretamente;
@@ -643,7 +643,7 @@ Escopo:
 Validacao:
 
 - `pnpm test` no MonsanUI;
-- depois da integracao, validar Examster prova, preview e sandbox.
+- depois da integracao, validar Koalify prova, preview e sandbox.
 
 ### Commit 3 - Terminal hardening
 
@@ -661,7 +661,7 @@ Escopo:
 Validacao:
 
 - `pnpm test` no MonsanUI;
-- depois da integracao, validar Examster terminal em prova/preview/sandbox.
+- depois da integracao, validar Koalify terminal em prova/preview/sandbox.
 
 ### Commit 4 - Small product primitives
 
@@ -691,7 +691,7 @@ Escopo:
 Validacao:
 
 - `pnpm test` no MonsanUI;
-- depois da integracao, validar Manki, Examster, Owlth e Frequence quando o outro
+- depois da integracao, validar Manki, Koalify, Owlth e Frequence quando o outro
   agente puder atualizar.
 
 ## Riscos e cuidados
@@ -699,7 +699,7 @@ Validacao:
 - `Deck` tem diff local antigo; nao usar `git add .` no MonsanUI sem revisar
   cuidadosamente.
 - `Calendar` afeta diretamente a pagina de stats do Manki.
-- `DndOrder`, `DndMatch` e `Terminal` afetam fluxos de prova do Examster; qualquer
+- `DndOrder`, `DndMatch` e `Terminal` afetam fluxos de prova do Koalify; qualquer
   mudanca deve preservar respostas ja serializadas.
 - Remover margem de `PromptPanel` pode mudar a tela de estudo do Manki; se
   aprovado, o espacamento deve ser corrigido no pai ou em componente de layout,
@@ -710,7 +710,7 @@ Validacao:
 ## Fora de escopo nesta fase
 
 - reescrever completamente o simulador de terminal;
-- trocar schema de respostas do Examster;
+- trocar schema de respostas do Koalify;
 - alterar modelo de dados de decks, pastas ou cards;
 - trocar `Calendar` por biblioteca externa;
 - nova engine DnD;

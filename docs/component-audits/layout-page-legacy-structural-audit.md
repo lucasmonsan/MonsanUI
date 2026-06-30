@@ -30,7 +30,7 @@ Esta auditoria trata essa remocao como proposta, nao como estado aprovado.
 
 ## Uso Atual Nos Consumidores
 
-### Examster
+### Koalify
 
 - Usa `AppShell` nas rotas principais, publicas e admin.
 - Usa `CenteredPanel` dentro de `AppShell` em landing, auth/link, exam loading e
@@ -329,7 +329,7 @@ Wrappers:
 Riscos:
 
 - Remover sem migracao pode afetar rotas antigas com transicao.
-- Nao apareceu como uso direto em Examster, Manki, Owlth ou Frequence nesta
+- Nao apareceu como uso direto em Koalify, Manki, Owlth ou Frequence nesta
   busca; o risco principal e compatibilidade de export publico.
 
 Classificacao: `Legado`.
@@ -500,16 +500,16 @@ Validacao:
 
 ### Etapa 3 - Consumidores Que Ja Usam AppShell
 
-1. Atualizar Manki e Examster com o novo MonsanUI.
+1. Atualizar Manki e Koalify com o novo MonsanUI.
 2. Validar especialmente:
    - Manki home com `ActionBar` em `top`;
    - Manki stats com `Tabs` em `top`;
-   - Examster landing/auth centered panels;
-   - Examster professor/admin pages com header/top/content.
+   - Koalify landing/auth centered panels;
+   - Koalify professor/admin pages com header/top/content.
 
 Validacao:
 
-- `pnpm test` em Manki e Examster.
+- `pnpm test` em Manki e Koalify.
 
 ## Decisoes Que Precisam De Aprovacao Antes De Codigo
 
