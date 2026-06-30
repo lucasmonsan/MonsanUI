@@ -159,6 +159,50 @@ console.log('Running Portugol Interpreter I/O (leia) tests...');
 	assertEquals(outputs[1], 'Idade mais 5: 30');
 }
 
+{
+	const lexer = new Lexer(`
+		programa {
+			funcao inicio() {
+				inteiro idade = 0
+				real preco = 0.0
+				cadeia nome = ""
+				caracter inicial = ""
+				logico ativo = falso
+
+				leia(idade)
+				leia(preco)
+				leia(nome)
+				leia(inicial)
+				leia(ativo)
+
+				escreva(idade + 1, "|", preco + 0.5, "|", nome + 1, "|", inicial, "|")
+				se (ativo) {
+					escreva("sim")
+				} senao {
+					escreva("nao")
+				}
+			}
+		}
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+	const inputs = ['14.9', '14.5', '14', 'Lucas', 'verdadeiro'];
+
+	let result = gen.next();
+	while (!result.done) {
+		const val = result.value;
+		result = val && val.type === 'read' ? gen.next(inputs.shift()) : gen.next();
+	}
+
+	const outputs = interpreter.getOutputs();
+	assertEquals(outputs.length, 2);
+	assertEquals(outputs[0], '15|15|141|L|');
+	assertEquals(outputs[1], 'sim');
+}
+
 console.log('Running Visualg Dialect Execution tests...');
 {
 	const lexer = new Lexer(`
@@ -237,6 +281,75 @@ console.log('Running Visualg leia undeclared variable check...');
 		assert(e.message.includes('não foi declarada'), 'Should throw variable not declared error');
 	}
 	assert(threw, 'Should have thrown an error before prompt');
+}
+
+console.log('Running Visualg typed assignment coercion tests...');
+{
+	const lexer = new Lexer(`
+		algoritmo "Tipos"
+		var
+			valor : inteiro
+		inicio
+			valor <- 14.9
+			escreva(valor + 1)
+		fimalgoritmo
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+
+	let result = gen.next();
+	while (!result.done) {
+		result = gen.next();
+	}
+
+	const outputs = interpreter.getOutputs();
+	assertEquals(outputs.length, 1);
+	assertEquals(outputs[0], '15');
+}
+
+{
+	const lexer = new Lexer(`
+		algoritmo "LeiaTipos"
+		var
+			idade : inteiro
+			preco : real
+			nome : cadeia
+			inicial : caractere
+			ativo : logico
+		inicio
+			leia(idade)
+			leia(preco)
+			leia(nome)
+			leia(inicial)
+			leia(ativo)
+			escreva(idade + 1, "|", preco + 0.5, "|", nome + 1, "|", inicial, "|")
+			se ativo entao
+				escreva("sim")
+			senao
+				escreva("nao")
+			fimse
+		fimalgoritmo
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+	const inputs = ['14.9', '14.5', '14', 'Lucas', 'verdadeiro'];
+
+	let result = gen.next();
+	while (!result.done) {
+		const val = result.value;
+		result = val && val.type === 'read' ? gen.next(inputs.shift()) : gen.next();
+	}
+
+	const outputs = interpreter.getOutputs();
+	assertEquals(outputs.length, 2);
+	assertEquals(outputs[0], '15|15|141|L|');
+	assertEquals(outputs[1], 'sim');
 }
 
 console.log('Running SemanticValidator tests...');
