@@ -33,15 +33,15 @@
 
 	let isOpen = $state(false);
 	let activeTheme = $derived(themes.find((theme) => theme.id === value));
-	let hasBinaryLightDarkTheme = $derived(
-		themes.length === 2 &&
-			themes.some((theme) => theme.id === 'light') &&
-			themes.some((theme) => theme.id === 'dark')
-	);
 
 	onMount(() => {
+		const documentTheme = document.documentElement.getAttribute('data-theme');
 		const saved = localStorage.getItem(storageKey);
 		let initialTheme: string = saved || '';
+
+		if (!initialTheme && documentTheme && themes.some((t: ThemeOption) => t.id === documentTheme)) {
+			initialTheme = documentTheme;
+		}
 
 		if (!initialTheme || !themes.some((t: ThemeOption) => t.id === initialTheme)) {
 			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -96,18 +96,9 @@
 {/snippet}
 
 {#snippet triggerIcon(size: number)}
-	{#if hasBinaryLightDarkTheme}
-		<span class="binary-theme-icons" aria-hidden="true">
-			<span class="theme-icon-light">
-				{@render generalIcon('light', size)}
-			</span>
-			<span class="theme-icon-dark">
-				{@render generalIcon('dark', size)}
-			</span>
-		</span>
-	{:else}
+	<span class="theme-icon-current" aria-hidden="true">
 		{@render generalIcon(value, size)}
-	{/if}
+	</span>
 {/snippet}
 
 {#snippet generalIcon(themeId: string, size: number)}
@@ -194,30 +185,12 @@
 		height: 1.2em;
 	}
 
-	.binary-theme-icons {
-		display: grid;
-		place-items: center;
-		width: 1em;
-		height: 1em;
-	}
-
-	.binary-theme-icons > span {
-		grid-area: 1 / 1;
+	.theme-icon-current {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-
-	.theme-icon-dark {
-		display: none;
-	}
-
-	:global([data-theme='dark']) .theme-icon-light {
-		display: none;
-	}
-
-	:global([data-theme='dark']) .theme-icon-dark {
-		display: flex;
+		width: 1em;
+		height: 1em;
 	}
 
 	.item-icon {

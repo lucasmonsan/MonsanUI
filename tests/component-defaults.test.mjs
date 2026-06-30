@@ -9,10 +9,13 @@ async function readComponent(path) {
 }
 
 const appHeader = await readComponent('AppHeader.svelte');
+const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
+const brandHeader = await readComponent('BrandHeader.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
 const suiteHeaderActions = await readComponent('SuiteHeaderActions.svelte');
 const suiteUserMenu = await readComponent('SuiteUserMenu.svelte');
+const themeSelector = await readComponent('ThemeSelector.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -27,6 +30,26 @@ assert(
 assert(
 	avatarMenu.includes("shape = 'square'"),
 	'AvatarMenu default must be square to match the MonsanUI visual language.'
+);
+
+assert(
+	brandHeader.includes('adaptiveLogo = false') &&
+		brandHeader.includes('class="brand-logo brand-logo-image"') &&
+		brandHeader.includes('class="brand-logo brand-logo-mask"'),
+	'BrandHeader must preserve source logo colors by default and reserve adaptive masking for explicit opt-in.'
+);
+
+assert(
+	!themeSelector.includes('binary-theme-icons') &&
+		themeSelector.includes('document.documentElement.getAttribute') &&
+		themeSelector.includes('theme-icon-current'),
+	'ThemeSelector must render one active icon and initialize from the document theme when available.'
+);
+
+assert(
+	appShell.includes('hasMeaningfulOverflow') &&
+		appShell.includes('contentHeight > scrollEl.clientHeight + threshold'),
+	'AppShell overflow fade must require meaningful content overflow before showing edge borders.'
 );
 
 assert(
