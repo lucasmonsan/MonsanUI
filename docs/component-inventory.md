@@ -467,24 +467,31 @@ Main risks:
 - Deck/card/editor components can regress Manki core workflows.
 - Calendar changes can affect stats layouts and visual density.
 
-## Legacy Candidates
+## Component Categorization and Refactoring Strategy
 
-Candidates to mark as legacy or migration-only after consumers move fully to
-`AppShell`:
+To guide the simplification of MonsanUI without risking breaking changes across consumers, components must be classified and refactored according to these rules:
 
-- `PageShell`
-- `PageContainer`
-- `AppViewport`
-- `RouteViewport`
-- `PageHeader`
+### 1. Structural Standards
 
-Do not remove these until every current consumer usage is migrated or explicitly
-accepted:
+- **AppShell + AppHeader**: Mandatory structural pattern for all route layouts across suite applications.
+- **PageShell, PageContainer, AppViewport, RouteViewport**: Confirmed legacy layout wrappers. They must be deprecated and cannot be removed until `Owlth` and remaining consumers are fully migrated to the `AppShell` contract.
+- **PageHeader**: Rotated page-header usage is frozen. It must not be used as a route header; future passes will decide if it is repurposed as a section header or deprecated in favor of `SectionHeading`.
 
-- `Owlth` still imports `PageContainer`, `PageShell` and `AppViewport`.
-- `Shellfish` must be re-audited before legacy layout removal because the local
-  copy has no package metadata in this pass.
-- `MonsanUI` showcase may still need examples while migration is active.
+### 2. Search Strategy
+
+- **Search and SearchBar**: Must remain separate.
+  - `Search` represents a global/modal command palette interface (used in `Manki`).
+  - `SearchBar` represents an inline/contextual search bar (used in `Examster`).
+
+### 3. Card Strategy
+
+- **Cards**: Do not force a unified behavioral abstraction. Avoid forcing `FlipCard` (which has 3D rotation), `CardEditor`, and other specialized cards into a single rigid wrapper. If useful, a lightweight visual primitive (`Card.svelte`) can be extracted to share CSS border/shadow tokens, but without dictating slot structures or inner behaviors.
+
+### 4. Components Without Direct External Usage
+
+- Do not automatically flag components as "dead code" or delete them solely for lacking direct imports in scanned applications. They must be categorized:
+  - **Internal-only/Supported**: Component is an atomic dependency of a larger public component (e.g., `SuiteUserMenu` is used by `SuiteHeaderActions`, `StepPanel` by `StepTransition`, `Credits` by `SplashScreen`, `StatusPill` by `ConsolePanel`).
+  - **Experimental/Design System**: Component is a standard design system element waiting for adoption (e.g., `Chips`, `ColorPicker`, `DatePicker`, `TimePicker`, `Radio`).
 
 ## Audit Checklist
 
