@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import Text from './Text.svelte';
 
@@ -33,6 +34,12 @@
 	let titleSize = $derived<'xl' | '2xl' | '3xl'>(
 		size === 'lg' ? '3xl' : size === 'sm' ? 'xl' : '2xl'
 	);
+
+	onMount(() => {
+		console.warn(
+			'[MonsanUI] <PageHeader> route layout usage is frozen. For page/route headers, use <AppHeader> inside AppShell.header instead. <PageHeader> should only be used as a section/content header.'
+		);
+	});
 </script>
 
 <header

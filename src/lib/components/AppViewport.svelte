@@ -64,6 +64,7 @@
 	}
 
 	onMount(() => {
+		console.warn('[MonsanUI] <AppViewport> is deprecated. Please migrate to <AppShell> instead.');
 		void tick().then(updateOverflowFade);
 
 		const resizeObserver = new ResizeObserver(updateOverflowFade);

@@ -24,6 +24,7 @@
 	let prefersReducedMotion = $state(false);
 
 	onMount(() => {
+		console.warn('[MonsanUI] <RouteViewport> is deprecated. Please migrate to <AppShell> instead.');
 		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 		prefersReducedMotion = motionQuery.matches;
 

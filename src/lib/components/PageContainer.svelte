@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
 	import { resolveMaxWidth, resolvePadding } from '$lib/utils/layout.js';
@@ -19,6 +20,10 @@
 
 	let resolvedMaxWidth = $derived(resolveMaxWidth(maxWidth));
 	let resolvedPadding = $derived(resolvePadding(padding));
+
+	onMount(() => {
+		console.warn('[MonsanUI] <PageContainer> is deprecated. Please migrate to <AppShell> instead.');
+	});
 </script>
 
 <div

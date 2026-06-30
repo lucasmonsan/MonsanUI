@@ -34,7 +34,7 @@ export { default as FlipCard } from './components/FlipCard.svelte';
 export { default as Tabs } from './components/Tabs.svelte';
 /** @deprecated Use AppShell for page structure. PageShell remains only for legacy migrations. */
 export { default as PageShell } from './components/PageShell.svelte';
-/** Use PageHeader only for section/content headers. Use AppHeader inside AppShell.header for page headers. */
+/** @deprecated Use AppHeader inside AppShell.header for page headers. PageHeader route usage is frozen and should only be used as a section/content header. */
 export { default as PageHeader } from './components/PageHeader.svelte';
 export { default as ContentRegion } from './components/ContentRegion.svelte';
 export { default as ResponsiveGrid } from './components/ResponsiveGrid.svelte';
