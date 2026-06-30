@@ -69,6 +69,32 @@ MonsanUI owns `modern-normalize`, global tokens and base CSS. Consumer apps impo
 
 ## Git Flow
 
+Run the full gate before PR:
+
+```bash
+pnpm test
+```
+
+No implementation, documentation, tooling or config change may be reported as complete, committed or pushed until the project gate passes. If the gate cannot be run in the current environment, the work must be reported as not validated.
+
+GitHub Actions runs the same gate on pull requests and branch pushes through `.github/workflows/ci.yml`.
+
+Install the versioned local hook once per checkout:
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit
+```
+
+The pre-commit hook runs:
+
+```bash
+pnpm test
+git diff --check
+```
+
+GitHub branch protection for `main` must require the `CI / Test` status check before merge.
+
 Use a new branch for each stage. Before committing, run the project gate and inspect `git status` so generated files, secrets and unrelated local changes are not included accidentally.
 
 Use `git add .` after confirming the worktree contains only changes intended for the commit.
