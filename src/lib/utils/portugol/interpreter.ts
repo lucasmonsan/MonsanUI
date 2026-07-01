@@ -1494,6 +1494,10 @@ export class Interpreter {
 		this.outputs = [];
 	}
 
+	public getGlobalVariables(): Record<string, { value: unknown; type: string }> {
+		return this.globalEnv.getVariables();
+	}
+
 	private runtimeType(value: unknown): string {
 		if (value === undefined || value === null) return 'vazio';
 		if (typeof value === 'number') return 'numero';

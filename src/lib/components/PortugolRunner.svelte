@@ -278,6 +278,9 @@
 			}
 
 			// Fim da execução limpa estados
+			if (interpreter) {
+				variables = interpreter.getGlobalVariables();
+			}
 			clearScheduledRun();
 			isRunning = false;
 			isStepMode = false;
@@ -288,6 +291,9 @@
 			generator = null;
 			onSuccess?.();
 		} catch (e: unknown) {
+			if (interpreter) {
+				variables = interpreter.getGlobalVariables();
+			}
 			clearScheduledRun();
 			const err = e as Error;
 			errorMsg = err.message || String(e);
@@ -485,7 +491,13 @@
 														<td class="var-name">{name}</td>
 														<td class="var-type">{info.type}</td>
 														<td class="var-value">
-															{info.value === undefined ? 'vazio' : String(info.value)}
+															{#if info.value === undefined}
+																vazio
+															{:else if ['caractere', 'caracter', 'cadeia'].includes(info.type)}
+																"{info.value}"
+															{:else}
+																{String(info.value)}
+															{/if}
 														</td>
 													</tr>
 												{/each}
