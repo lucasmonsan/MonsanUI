@@ -287,18 +287,20 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 	{
 		name: 'numpcarac',
 		category: 'string',
-		status: 'planned',
-		syntax: 'numpcarac(...)',
-		description: 'Conversão relacionada a número/caractere; direção exata pendente de confirmação.',
-		compatibility: 'Planned'
+		status: 'supported',
+		syntax: 'numpcarac(numero)',
+		description: 'Converte um número para texto sem formatação especial.',
+		example: 'escreva(numpcarac(28.165))',
+		compatibility: 'Crocode'
 	},
 	{
 		name: 'caracpnum',
 		category: 'string',
-		status: 'planned',
-		syntax: 'caracpnum(...)',
-		description: 'Conversão relacionada a caractere/número; direção exata pendente de confirmação.',
-		compatibility: 'Planned'
+		status: 'supported',
+		syntax: 'caracpnum(texto)',
+		description: 'Converte texto estritamente numérico para número usando ponto decimal.',
+		example: 'escreva(caracpnum("15"))',
+		compatibility: 'Crocode'
 	},
 	{
 		name: 'repita',
@@ -340,27 +342,30 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 	{
 		name: 'log',
 		category: 'math',
-		status: 'planned',
+		status: 'supported',
 		syntax: 'log(x)',
-		description: 'Função matemática planejada; semântica exata pendente de confirmação.',
-		compatibility: 'Planned'
+		description: 'Calcula o logaritmo natural de x.',
+		example: 'escreva(log(exp(1)))',
+		compatibility: 'Crocode'
 	},
 	{
 		name: 'exp',
 		category: 'math',
-		status: 'planned',
+		status: 'supported',
 		syntax: 'exp(x)',
-		description: 'Função exponencial planejada.',
-		compatibility: 'Planned'
+		description: 'Calcula a função exponencial natural.',
+		example: 'escreva(exp(1))',
+		compatibility: 'Crocode'
 	},
 	{
 		name: 'sen',
 		aliases: ['cos', 'tan', 'cotan', 'arcsen', 'arccos'],
 		category: 'math',
-		status: 'planned',
+		status: 'supported',
 		syntax: 'sen(x), cos(x), tan(x), cotan(x), arcsen(x), arccos(x)',
-		description: 'Funções trigonométricas planejadas; unidade angular pendente de confirmação.',
-		compatibility: 'Planned'
+		description: 'Funções trigonométricas usando radianos.',
+		example: 'escreva(sen(pi / 2))',
+		compatibility: 'Crocode'
 	},
 	{
 		name: 'mudacor',
