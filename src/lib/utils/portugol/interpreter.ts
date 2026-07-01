@@ -1431,7 +1431,6 @@ export class Environment {
 			}
 			case 'caracter':
 			case 'caractere':
-				return String(value).charAt(0);
 			case 'cadeia':
 				return String(value);
 			default:

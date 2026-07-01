@@ -78,7 +78,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		category: 'type',
 		status: 'supported',
 		syntax: 'nome : caractere',
-		description: 'Tipo textual. Caracter recebe apenas o primeiro caractere na atribuição.',
+		description: 'Tipo textual para armazenar textos de qualquer tamanho.',
 		compatibility: 'Visualg'
 	},
 	{
