@@ -44,6 +44,7 @@ export type TokenType =
 	| 'FIMPARA'
 	| 'ENTAO'
 	| 'FACA'
+	| 'REPITA'
 	| 'DE'
 	| 'ATE'
 	| 'PASSO'
@@ -332,6 +333,8 @@ export class Lexer {
 						tokens.push({ type: 'ENTAO', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'faca' || lowerId === 'faça') {
 						tokens.push({ type: 'FACA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'repita') {
+						tokens.push({ type: 'REPITA', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'de') {
 						tokens.push({ type: 'DE', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'ate' || lowerId === 'até') {
@@ -431,6 +434,7 @@ export type ASTNode =
 	| AssignNode
 	| IfNode
 	| WhileNode
+	| RepeatNode
 	| ForNode
 	| ReturnNode
 	| CallNode
@@ -487,6 +491,13 @@ export interface WhileNode {
 	type: 'While';
 	condition: ASTNode;
 	body: ASTNode;
+	line: number;
+}
+
+export interface RepeatNode {
+	type: 'Repeat';
+	body: ASTNode;
+	condition: ASTNode;
 	line: number;
 }
 
@@ -1070,6 +1081,9 @@ export class Parser {
 		if (t.type === 'WHILE') {
 			return this.parseVisualgWhile();
 		}
+		if (t.type === 'REPITA') {
+			return this.parseVisualgRepeat();
+		}
 		if (t.type === 'FOR') {
 			return this.parseVisualgFor();
 		}
@@ -1141,6 +1155,31 @@ export class Parser {
 			condition,
 			body,
 			line: whileToken.line
+		};
+	}
+
+	private parseVisualgRepeat(): RepeatNode {
+		const repeatToken = this.consume('REPITA', "Esperado 'repita'");
+		this.assertVisualgBlockStartsOnNextLine(repeatToken, repeatToken.value);
+
+		const bodyStatements = this.parseVisualgStatementListUntil('ATE');
+		this.consume(
+			'ATE',
+			`Esperado 'ate' para fechar o loop 'repita' iniciado na linha ${repeatToken.line}`
+		);
+		const condition = this.parseExpression();
+
+		const body: BlockNode = {
+			type: 'Block',
+			statements: bodyStatements,
+			line: repeatToken.line
+		};
+
+		return {
+			type: 'Repeat',
+			body,
+			condition,
+			line: repeatToken.line
 		};
 	}
 
@@ -1534,6 +1573,11 @@ export class Interpreter {
 				while (yield* this.evaluate(node.condition, env)) {
 					yield* this.execute(node.body, env);
 				}
+				break;
+			case 'Repeat':
+				do {
+					yield* this.execute(node.body, env);
+				} while (!(yield* this.evaluate(node.condition, env)));
 				break;
 			case 'For': {
 				const forEnv = new Environment(env);

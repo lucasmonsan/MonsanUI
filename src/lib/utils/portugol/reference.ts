@@ -261,10 +261,10 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		name: 'repita',
 		aliases: ['ate'],
 		category: 'control-flow',
-		status: 'planned',
+		status: 'supported',
 		syntax: 'repita\n  comandos\nate condicao',
 		description: 'Laço que executa pelo menos uma vez.',
-		compatibility: 'Planned'
+		compatibility: 'Visualg'
 	},
 	{
 		name: 'escolha',

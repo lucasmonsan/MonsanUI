@@ -626,6 +626,56 @@ console.log('Running Visualg xor operator tests...');
 	);
 }
 
+console.log('Running Visualg repeat loop tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "Repita"
+		var
+			contador : inteiro
+		inicio
+			contador <- 0
+			repita
+				contador <- contador + 1
+				escreva(contador)
+			ate contador = 3
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '123');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "RepitaUmaVez"
+		var
+			contador : inteiro
+		inicio
+			contador <- 5
+			repita
+				escreva("uma")
+			ate contador > 0
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'uma');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "RepitaInline"
+				var
+				inicio
+					repita escreva("invalido")
+					ate verdadeiro
+				fimalgoritmo
+			`),
+		"Depois de 'repita', comece o bloco na próxima linha.",
+		'Should reject inline command after repita'
+	);
+}
+
 console.log('Running Visualg essential function tests...');
 {
 	const outputs = runProgram(`
@@ -776,6 +826,7 @@ console.log('Running Visualg reference catalog tests...');
 		'enquanto',
 		'faca',
 		'fimenquanto',
+		'repita',
 		'para',
 		'de',
 		'ate',

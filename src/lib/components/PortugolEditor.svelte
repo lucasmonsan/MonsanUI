@@ -228,6 +228,7 @@
 					'então',
 					'faca',
 					'faça',
+					'repita',
 					'de',
 					'ate',
 					'até',
