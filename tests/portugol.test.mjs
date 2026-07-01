@@ -579,6 +579,65 @@ console.log('Running Visualg declaration and comparison tests...');
 	);
 }
 
+console.log('Running Visualg essential function tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "FuncoesEssenciais"
+		var
+			texto : cadeia
+		inicio
+			texto <- "Crocode"
+			escreva(abs(-5), "|")
+			escreva(raizq(9), "|")
+			escreva(pot(2, 3), "|")
+			escreva(quad(4), "|")
+			escreva(int(8.9), "|")
+			escreva(10 mod 3, "|")
+			escreva(mod(10, 4), "|")
+			escreva(compr(texto), "|")
+			escreva(maiusc("abc"), "|")
+			escreva(minusc("ABC"), "|")
+			escreva(copia(texto, 2, 3), "|")
+			escreva(pos("code", texto), "|")
+			escreva(pos("x", texto), "|")
+			se pi > 3 entao
+				escreva("pi")
+			fimse
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '5|3|8|16|8|1|2|7|ABC|abc|roc|4|0|pi');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "LimpaTela"
+		var
+		inicio
+			escreva("antes")
+			limpatela()
+			escreva("depois")
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'depois');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroFuncoes"
+				var
+				inicio
+					escreva(abs("texto"))
+				fimalgoritmo
+			`),
+		"Função 'abs' espera argumento 1 numérico.",
+		'Should reject invalid numeric function argument'
+	);
+}
+
 console.log('Running SemanticValidator tests...');
 {
 	const lexer = new Lexer(`

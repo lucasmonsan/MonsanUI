@@ -234,7 +234,20 @@
 					'escreva',
 					'escreval',
 					'leia',
-					'limpa'
+					'limpa',
+					'limpatela',
+					'mod',
+					'pi',
+					'abs',
+					'raizq',
+					'pot',
+					'quad',
+					'int',
+					'compr',
+					'maiusc',
+					'minusc',
+					'copia',
+					'pos'
 				]);
 				if (keywords.has(word)) {
 					return 'keyword';

@@ -357,6 +357,13 @@ export class Lexer {
 						tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'nao' || lowerId === 'não') {
 						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'mod') {
+						const nextNonWhitespace = this.input.slice(this.pos).match(/^\s*(.)/)?.[1];
+						if (nextNonWhitespace === '(') {
+							this.pushIdentifierToken(tokens, id, startLine, startCol);
+						} else {
+							tokens.push({ type: 'PERCENT', value: '%', line: startLine, column: startCol });
+						}
 					} else if (
 						['inteiro', 'real', 'caractere', 'caracter', 'logico', 'cadeia'].includes(lowerId)
 					) {
@@ -1361,6 +1368,53 @@ export class Interpreter {
 		}
 	}
 
+	private expectArgCount(
+		callee: string,
+		actual: number,
+		expected: number | number[],
+		line: number
+	) {
+		const validCounts = Array.isArray(expected) ? expected : [expected];
+		if (!validCounts.includes(actual)) {
+			const expectedText =
+				validCounts.length === 1 ? String(validCounts[0]) : validCounts.join(' ou ');
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera ${expectedText} argumento(s), recebeu ${actual}.`
+			);
+		}
+	}
+
+	private requireNumberArg(
+		callee: string,
+		value: unknown,
+		argNumber: number,
+		line: number
+	): number {
+		if (typeof value !== 'number') {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera argumento ${argNumber} numérico.`
+			);
+		}
+		return value;
+	}
+
+	private requireTextArg(callee: string, value: unknown, argNumber: number, line: number): string {
+		if (typeof value !== 'string') {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera argumento ${argNumber} textual.`
+			);
+		}
+		return value;
+	}
+
+	private *evaluateArgs(node: CallNode, env: Environment): Generator<unknown, unknown[], unknown> {
+		const values: unknown[] = [];
+		for (const arg of node.args) {
+			values.push(yield* this.evaluate(arg, env));
+		}
+		return values;
+	}
+
 	// Generator execution entry point
 	public *run(program: ProgramNode) {
 		this.globalEnv = new Environment();
@@ -1487,6 +1541,9 @@ export class Interpreter {
 			case 'Literal':
 				return node.value;
 			case 'Identifier':
+				if (node.name.toLowerCase() === 'pi') {
+					return Math.PI;
+				}
 				return env.get(node.name, node.line);
 			case 'Binary': {
 				const left = yield* this.evaluate(node.left, env);
@@ -1496,6 +1553,7 @@ export class Interpreter {
 						if (typeof left === 'string' || typeof right === 'string') {
 							return String(left) + String(right);
 						}
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) + (right as number);
 					case '-':
 						this.assertNumberOperands(node.operator, left, right, node.line);
@@ -1546,8 +1604,18 @@ export class Interpreter {
 				const right = yield* this.evaluate(node.right, env);
 				switch (node.operator) {
 					case '-':
+						if (typeof right !== 'number') {
+							throw new Error(
+								`Erro em Tempo de Execução na linha ${node.line}: O operador '-' espera valor numérico.`
+							);
+						}
 						return -(right as number);
 					case 'nao':
+						if (typeof right !== 'boolean') {
+							throw new Error(
+								`Erro em Tempo de Execução na linha ${node.line}: O operador 'nao' espera valor lógico.`
+							);
+						}
 						return !(right as boolean);
 					default:
 						throw new Error(`Operador unário inválido '${node.operator}' na linha ${node.line}`);
@@ -1595,10 +1663,65 @@ export class Interpreter {
 			return;
 		}
 
-		if (lowerCallee === 'limpa') {
+		if (lowerCallee === 'limpa' || lowerCallee === 'limpatela') {
 			this.outputs = [];
 			yield { type: 'clear' };
 			return;
+		}
+
+		if (lowerCallee === 'mod') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			return (
+				this.requireNumberArg(node.callee, args[0], 1, node.line) %
+				this.requireNumberArg(node.callee, args[1], 2, node.line)
+			);
+		}
+
+		if (['abs', 'raizq', 'quad', 'int'].includes(lowerCallee)) {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const numberValue = this.requireNumberArg(node.callee, value, 1, node.line);
+			if (lowerCallee === 'abs') return Math.abs(numberValue);
+			if (lowerCallee === 'raizq') return Math.sqrt(numberValue);
+			if (lowerCallee === 'quad') return numberValue * numberValue;
+			return Math.trunc(numberValue);
+		}
+
+		if (lowerCallee === 'pot') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			return Math.pow(
+				this.requireNumberArg(node.callee, args[0], 1, node.line),
+				this.requireNumberArg(node.callee, args[1], 2, node.line)
+			);
+		}
+
+		if (['compr', 'maiusc', 'minusc'].includes(lowerCallee)) {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const text = this.requireTextArg(node.callee, value, 1, node.line);
+			if (lowerCallee === 'compr') return text.length;
+			if (lowerCallee === 'maiusc') return text.toUpperCase();
+			return text.toLowerCase();
+		}
+
+		if (lowerCallee === 'copia') {
+			this.expectArgCount(node.callee, node.args.length, 3, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			const text = this.requireTextArg(node.callee, args[0], 1, node.line);
+			const start = Math.trunc(this.requireNumberArg(node.callee, args[1], 2, node.line));
+			const count = Math.trunc(this.requireNumberArg(node.callee, args[2], 3, node.line));
+			return text.slice(Math.max(0, start - 1), Math.max(0, start - 1) + Math.max(0, count));
+		}
+
+		if (lowerCallee === 'pos') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			const needle = this.requireTextArg(node.callee, args[0], 1, node.line);
+			const text = this.requireTextArg(node.callee, args[1], 2, node.line);
+			const index = text.indexOf(needle);
+			return index === -1 ? 0 : index + 1;
 		}
 
 		// Função do usuário
