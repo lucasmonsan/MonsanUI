@@ -349,9 +349,9 @@
 								</div>
 								<div class="terminal-box">
 									<div class="terminal-content">
-										{#each outputs as output, index (index)}
-											<div class="terminal-line">{output}</div>
-										{/each}
+										{#if outputs.length > 0}
+											<div class="terminal-line">{outputs.join('')}</div>
+										{/if}
 
 										{#if pendingInputVar}
 											<div class="terminal-input-prompt">
