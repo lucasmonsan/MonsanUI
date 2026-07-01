@@ -279,10 +279,10 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		name: 'escolha',
 		aliases: ['caso', 'outrocaso', 'fimescolha'],
 		category: 'control-flow',
-		status: 'planned',
+		status: 'supported',
 		syntax: 'escolha valor\n  caso x\n    comandos\nfimescolha',
-		description: 'Estrutura de seleção por caso.',
-		compatibility: 'Planned'
+		description: 'Estrutura de seleção por caso, sem fallthrough entre casos.',
+		compatibility: 'Visualg'
 	},
 	{
 		name: 'randi',

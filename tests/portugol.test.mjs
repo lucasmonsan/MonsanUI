@@ -750,6 +750,90 @@ console.log('Running Visualg break statement tests...');
 	);
 }
 
+console.log('Running Visualg switch statement tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "Escolha"
+		var
+			opcao : inteiro
+		inicio
+			opcao <- 2
+			escolha opcao
+				caso 1
+					escreva("um")
+				caso 2
+					escreva("dois")
+				caso 3
+					escreva("tres")
+				outrocaso
+					escreva("outro")
+			fimescolha
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'dois');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "EscolhaOutro"
+		var
+			opcao : caractere
+		inicio
+			opcao <- "C"
+			escolha opcao
+				caso "A"
+					escreva("a")
+				caso "B"
+					escreva("b")
+				outrocaso
+					escreva("outro")
+			fimescolha
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'outro');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "EscolhaInline"
+				var
+					opcao : inteiro
+				inicio
+					opcao <- 1
+					escolha opcao caso 1
+						escreva("invalido")
+					fimescolha
+				fimalgoritmo
+			`),
+		"Depois de 'escolha', comece o bloco na próxima linha.",
+		'Should reject inline case after escolha'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "EscolhaTipoInvalido"
+				var
+					opcao : inteiro
+				inicio
+					opcao <- 1
+					escolha opcao
+						caso "A"
+							escreva("invalido")
+					fimescolha
+				fimalgoritmo
+			`),
+		"Não é possível comparar numero com texto usando 'caso'.",
+		'Should reject case comparisons with incompatible types'
+	);
+}
+
 console.log('Running Visualg essential function tests...');
 {
 	const outputs = runProgram(`
@@ -902,6 +986,10 @@ console.log('Running Visualg reference catalog tests...');
 		'fimenquanto',
 		'repita',
 		'interrompa',
+		'escolha',
+		'caso',
+		'outrocaso',
+		'fimescolha',
 		'para',
 		'de',
 		'ate',

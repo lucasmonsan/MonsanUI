@@ -46,6 +46,10 @@ export type TokenType =
 	| 'ENTAO'
 	| 'FACA'
 	| 'REPITA'
+	| 'ESCOLHA'
+	| 'CASO'
+	| 'OUTROCASO'
+	| 'FIMESCOLHA'
 	| 'DE'
 	| 'ATE'
 	| 'PASSO'
@@ -336,6 +340,14 @@ export class Lexer {
 						tokens.push({ type: 'FACA', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'repita') {
 						tokens.push({ type: 'REPITA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'escolha') {
+						tokens.push({ type: 'ESCOLHA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'caso') {
+						tokens.push({ type: 'CASO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'outrocaso') {
+						tokens.push({ type: 'OUTROCASO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'fimescolha') {
+						tokens.push({ type: 'FIMESCOLHA', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'de') {
 						tokens.push({ type: 'DE', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'ate' || lowerId === 'até') {
@@ -438,6 +450,7 @@ export type ASTNode =
 	| IfNode
 	| WhileNode
 	| RepeatNode
+	| SwitchNode
 	| ForNode
 	| ReturnNode
 	| BreakNode
@@ -502,6 +515,14 @@ export interface RepeatNode {
 	type: 'Repeat';
 	body: ASTNode;
 	condition: ASTNode;
+	line: number;
+}
+
+export interface SwitchNode {
+	type: 'Switch';
+	discriminant: ASTNode;
+	cases: { test: ASTNode; body: BlockNode; line: number }[];
+	defaultBody?: BlockNode;
 	line: number;
 }
 
@@ -1093,6 +1114,9 @@ export class Parser {
 		if (t.type === 'REPITA') {
 			return this.parseVisualgRepeat();
 		}
+		if (t.type === 'ESCOLHA') {
+			return this.parseVisualgSwitch();
+		}
 		if (t.type === 'FOR') {
 			return this.parseVisualgFor();
 		}
@@ -1193,6 +1217,60 @@ export class Parser {
 			body,
 			condition,
 			line: repeatToken.line
+		};
+	}
+
+	private parseVisualgSwitch(): SwitchNode {
+		const switchToken = this.consume('ESCOLHA', "Esperado 'escolha'");
+		const discriminant = this.parseExpression();
+		this.assertVisualgBlockStartsOnNextLine(switchToken, switchToken.value);
+
+		const cases: SwitchNode['cases'] = [];
+		let defaultBody: BlockNode | undefined;
+
+		while (!this.check('FIMESCOLHA') && !this.isAtEnd()) {
+			if (this.check('CASO')) {
+				const caseToken = this.advance();
+				const test = this.parseExpression();
+				this.assertVisualgBlockStartsOnNextLine(caseToken, caseToken.value);
+				const bodyStatements = this.parseVisualgStatementListUntil(
+					'CASO',
+					'OUTROCASO',
+					'FIMESCOLHA'
+				);
+				cases.push({
+					test,
+					body: { type: 'Block', statements: bodyStatements, line: caseToken.line },
+					line: caseToken.line
+				});
+				continue;
+			}
+
+			if (this.check('OUTROCASO')) {
+				const defaultToken = this.advance();
+				this.assertVisualgBlockStartsOnNextLine(defaultToken, defaultToken.value);
+				const bodyStatements = this.parseVisualgStatementListUntil('FIMESCOLHA');
+				defaultBody = { type: 'Block', statements: bodyStatements, line: defaultToken.line };
+				continue;
+			}
+
+			const token = this.peek();
+			throw new Error(
+				`Erro de Sintaxe na linha ${token.line}: Esperado 'caso', 'outrocaso' ou 'fimescolha' no bloco 'escolha'.`
+			);
+		}
+
+		this.consume(
+			'FIMESCOLHA',
+			`Esperado 'fimescolha' para fechar o bloco 'escolha' iniciado na linha ${switchToken.line}`
+		);
+
+		return {
+			type: 'Switch',
+			discriminant,
+			cases,
+			defaultBody,
+			line: switchToken.line
 		};
 	}
 
@@ -1615,6 +1693,23 @@ export class Interpreter {
 					}
 				} while (!(yield* this.evaluate(node.condition, env)));
 				break;
+			case 'Switch': {
+				const discriminant = yield* this.evaluate(node.discriminant, env);
+				let matched = false;
+				for (const caseNode of node.cases) {
+					const test = yield* this.evaluate(caseNode.test, env);
+					this.assertEqualityOperands('caso', discriminant, test, caseNode.line);
+					if (discriminant === test) {
+						yield* this.execute(caseNode.body, env);
+						matched = true;
+						break;
+					}
+				}
+				if (!matched && node.defaultBody) {
+					yield* this.execute(node.defaultBody, env);
+				}
+				break;
+			}
 			case 'For': {
 				const forEnv = new Environment(env);
 				if (node.initializer) {
