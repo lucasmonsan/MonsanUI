@@ -1093,10 +1093,62 @@ console.log('Running Visualg reference catalog tests...');
 	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
 	assertEquals(getVisualgReferenceItem('randi')?.status, 'supported');
 	assertEquals(getVisualgReferenceItem('numpcarac')?.status, 'planned');
+	assertEquals(getVisualgReferenceItem('log')?.status, 'planned');
+	assertEquals(getVisualgReferenceItem('cos')?.status, 'planned');
 	assertEquals(getVisualgReferenceItem('arquivo')?.status, 'out-of-scope');
+	assertEquals(getVisualgReferenceItem('pausa')?.status, 'out-of-scope');
+	assertEquals(getVisualgReferenceItem('timer')?.status, 'out-of-scope');
 	assert(
 		visualgReferenceItems.every((item) => item.syntax && item.description),
 		'Every reference item should include syntax and description'
+	);
+}
+
+console.log('Running Visualg unsupported command message tests...');
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "planned"
+				inicio
+					escreva(numpcarac("A"))
+				fimalgoritmo
+			`),
+		'Comando Visualg ainda não suportado: numpcarac.',
+		'Should explain planned Visualg functions'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "planned_math"
+				inicio
+					escreva(log(10))
+				fimalgoritmo
+			`),
+		'Comando Visualg ainda não suportado: log.',
+		'Should explain planned math functions'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "out_scope"
+				inicio
+					arquivo("a.alg")
+				fimalgoritmo
+			`),
+		'Comando Visualg fora do escopo do Crocode: arquivo.',
+		'Should explain out-of-scope Visualg commands'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "out_scope_alias"
+				inicio
+					timer()
+				fimalgoritmo
+			`),
+		'Comando Visualg fora do escopo do Crocode: cronometro.',
+		'Should explain out-of-scope aliases'
 	);
 }
 

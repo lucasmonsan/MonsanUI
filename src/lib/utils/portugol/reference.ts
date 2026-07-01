@@ -338,6 +338,31 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		compatibility: 'Crocode'
 	},
 	{
+		name: 'log',
+		category: 'math',
+		status: 'planned',
+		syntax: 'log(x)',
+		description: 'Função matemática planejada; semântica exata pendente de confirmação.',
+		compatibility: 'Planned'
+	},
+	{
+		name: 'exp',
+		category: 'math',
+		status: 'planned',
+		syntax: 'exp(x)',
+		description: 'Função exponencial planejada.',
+		compatibility: 'Planned'
+	},
+	{
+		name: 'sen',
+		aliases: ['cos', 'tan', 'cotan', 'arcsen', 'arccos'],
+		category: 'math',
+		status: 'planned',
+		syntax: 'sen(x), cos(x), tan(x), cotan(x), arcsen(x), arccos(x)',
+		description: 'Funções trigonométricas planejadas; unidade angular pendente de confirmação.',
+		compatibility: 'Planned'
+	},
+	{
 		name: 'mudacor',
 		category: 'environment',
 		status: 'out-of-scope',
@@ -359,6 +384,63 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'out-of-scope',
 		syntax: 'espera(ms)',
 		description: 'Extensão discutida e deixada fora do plano inicial.',
+		compatibility: 'Unsupported'
+	},
+	{
+		name: 'pausa',
+		category: 'environment',
+		status: 'out-of-scope',
+		syntax: 'pausa',
+		description: 'Fora do escopo inicial porque o console do navegador permanece visível.',
+		compatibility: 'Unsupported'
+	},
+	{
+		name: 'cronometro',
+		aliases: ['timer'],
+		category: 'environment',
+		status: 'out-of-scope',
+		syntax: 'cronometro, timer',
+		description: 'Fora do escopo inicial por pertencer ao ambiente Visualg desktop.',
+		compatibility: 'Unsupported'
+	},
+	{
+		name: 'eco',
+		category: 'environment',
+		status: 'out-of-scope',
+		syntax: 'eco',
+		description: 'Fora do escopo inicial por pertencer ao ambiente Visualg desktop.',
+		compatibility: 'Unsupported'
+	},
+	{
+		name: 'perfil',
+		category: 'environment',
+		status: 'out-of-scope',
+		syntax: 'perfil',
+		description: 'Fora do escopo inicial por pertencer ao ambiente Visualg desktop.',
+		compatibility: 'Unsupported'
+	},
+	{
+		name: 'dos',
+		category: 'environment',
+		status: 'out-of-scope',
+		syntax: 'dos',
+		description: 'Fora do escopo inicial por depender de comandos do sistema operacional.',
+		compatibility: 'Unsupported'
+	},
+	{
+		name: 'debug',
+		category: 'environment',
+		status: 'out-of-scope',
+		syntax: 'debug',
+		description: 'Fora do escopo inicial porque o Crocode já possui depuração própria.',
+		compatibility: 'Unsupported'
+	},
+	{
+		name: 'aleatorio',
+		category: 'environment',
+		status: 'out-of-scope',
+		syntax: 'aleatorio on/off',
+		description: 'Fora do escopo inicial porque rand e randi cobrem o sorteio didático.',
 		compatibility: 'Unsupported'
 	}
 ];
