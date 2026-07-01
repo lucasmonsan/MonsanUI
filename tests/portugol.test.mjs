@@ -34,6 +34,51 @@ console.log('Running Portugol Lexer tests...');
 	assertEquals(tokens[1].type, 'LBRACE');
 }
 
+console.log('Running Portugol identifier validation tests...');
+{
+	const lexer = new Lexer(`
+		programa {
+			funcao inicio() {
+				inteiro ação = 10
+			}
+		}
+	`);
+
+	let threw = false;
+	try {
+		lexer.tokenize();
+	} catch (e) {
+		threw = true;
+		assert(e.message.includes('Identificador inválido'), 'Should reject accented identifiers');
+		assert(e.message.includes('ação'), 'Should include the invalid identifier in the error');
+	}
+	assert(threw, 'Should reject identifiers with accents');
+}
+
+{
+	const lexer = new Lexer(`
+		algoritmo "ErroIdentificador"
+		var
+			maçã : inteiro
+		inicio
+			escreva("erro")
+		fimalgoritmo
+	`);
+
+	let threw = false;
+	try {
+		lexer.tokenize();
+	} catch (e) {
+		threw = true;
+		assert(
+			e.message.includes('Identificador inválido'),
+			'Should reject Visualg identifiers with cedilla'
+		);
+		assert(e.message.includes('maçã'), 'Should include the invalid identifier in the error');
+	}
+	assert(threw, 'Should reject Visualg identifiers with cedilla');
+}
+
 console.log('Running Portugol Parser tests...');
 {
 	const lexer = new Lexer(`
@@ -84,6 +129,32 @@ console.log('Running Portugol Interpreter Execution tests...');
 	const outputs = interpreter.getOutputs();
 	assertEquals(outputs.length, 1);
 	assertEquals(outputs[0], 'Soma: 7');
+}
+
+{
+	const lexer = new Lexer(`
+		programa {
+			funcao inicio() {
+				escreva("A")
+				escreva("B")
+				escreval("C")
+				escreva("D")
+			}
+		}
+	`);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	const ast = parser.parse();
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+
+	let result = gen.next();
+	while (!result.done) {
+		result = gen.next();
+	}
+
+	const outputs = interpreter.getOutputs();
+	assertEquals(outputs.join(''), 'ABC\nD');
 }
 
 console.log('Running Portugol Interpreter Step/Debug tests...');

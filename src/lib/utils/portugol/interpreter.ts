@@ -82,6 +82,19 @@ export class Lexer {
 		return char;
 	}
 
+	private isValidIdentifier(id: string): boolean {
+		return /^[A-Za-z_][A-Za-z0-9_]*$/.test(id);
+	}
+
+	private pushIdentifierToken(tokens: Token[], value: string, line: number, column: number) {
+		if (!this.isValidIdentifier(value)) {
+			throw new Error(
+				`Erro Léxico: Identificador inválido '${value}' na linha ${line}, coluna ${column}. Use apenas letras sem acento, números e _.`
+			);
+		}
+		tokens.push({ type: 'IDENTIFIER', value, line, column });
+	}
+
 	public tokenize(): Token[] {
 		const isVisualg = /algoritmo|fimalgoritmo/i.test(this.input);
 		const tokens: Token[] = [];
@@ -350,7 +363,7 @@ export class Lexer {
 						const normalizedType = lowerId === 'caractere' ? 'caracter' : lowerId;
 						tokens.push({ type: 'TYPE', value: normalizedType, line: startLine, column: startCol });
 					} else {
-						tokens.push({ type: 'IDENTIFIER', value: id, line: startLine, column: startCol });
+						this.pushIdentifierToken(tokens, id, startLine, startCol);
 					}
 				} else {
 					// Portugol Studio
@@ -381,7 +394,7 @@ export class Lexer {
 					} else if (lowerId === 'nao' || lowerId === 'não') {
 						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
 					} else {
-						tokens.push({ type: 'IDENTIFIER', value: id, line: startLine, column: startCol });
+						this.pushIdentifierToken(tokens, id, startLine, startCol);
 					}
 				}
 				continue;
