@@ -18,6 +18,37 @@ function assertEquals(actual, expected, message) {
 	}
 }
 
+function parseProgram(code) {
+	const lexer = new Lexer(code);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	return parser.parse();
+}
+
+function runProgram(code, inputs = []) {
+	const ast = parseProgram(code);
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+	const pendingInputs = [...inputs];
+	let result = gen.next();
+	while (!result.done) {
+		const val = result.value;
+		result = val && val.type === 'read' ? gen.next(pendingInputs.shift()) : gen.next();
+	}
+	return interpreter.getOutputs();
+}
+
+function assertThrowsMessage(fn, expectedMessage, message) {
+	let threw = false;
+	try {
+		fn();
+	} catch (e) {
+		threw = true;
+		assert(e.message.includes(expectedMessage), message || `Should include ${expectedMessage}`);
+	}
+	assert(threw, message || 'Should throw');
+}
+
 console.log('Running Portugol Lexer tests...');
 {
 	const lexer = new Lexer(`
@@ -421,6 +452,131 @@ console.log('Running Visualg typed assignment coercion tests...');
 	assertEquals(outputs.length, 2);
 	assertEquals(outputs[0], '15|15|141|L|');
 	assertEquals(outputs[1], 'sim');
+}
+
+console.log('Running Visualg strict block syntax tests...');
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "InlineSe"
+				var
+					nota : inteiro
+				inicio
+					nota <- 70
+					se nota >= 60 entao escreval("Aprovado")
+					fimse
+				fimalgoritmo
+			`),
+		"Depois de 'entao', comece o bloco na próxima linha.",
+		'Should reject inline command after entao'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "ComandosMesmaLinha"
+				var
+				inicio
+					escreva("A") escreva("B")
+				fimalgoritmo
+			`),
+		'Cada comando deve ficar em sua própria linha.',
+		'Should reject multiple commands in the same Visualg line'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "FechamentoMesmaLinha"
+				var
+				inicio
+					escreva("A") fimalgoritmo
+			`),
+		'Cada comando deve ficar em sua própria linha.',
+		'Should reject closing block in the same line as a command'
+	);
+}
+
+console.log('Running Visualg declaration and comparison tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "DeclaracaoMultipla"
+		var
+			idade, faltas : inteiro
+			nota, media : real
+			nome, turma : caractere
+			ativo, aprovado : logico
+		inicio
+			idade <- 14
+			faltas <- 2
+			nota <- 8.5
+			media <- 7
+			nome <- "Lucas"
+			turma <- "A"
+			ativo <- verdadeiro
+			aprovado <- falso
+			se idade > faltas entao
+				escreva("numeros|")
+			fimse
+			se nota >= media entao
+				escreva("misto|")
+			fimse
+			se nome = "L" entao
+				escreva("texto|")
+			fimse
+			se ativo <> aprovado entao
+				escreva("logico")
+			fimse
+		fimalgoritmo
+	`);
+	assertEquals(outputs.join(''), 'numeros|misto|texto|logico');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ComparacaoInvalidaTextoNumero"
+				var
+					nome : caractere
+					idade : inteiro
+				inicio
+					nome <- "Lucas"
+					idade <- 14
+					se nome = idade entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		'Não é possível comparar texto com numero',
+		'Should reject equality between text and number'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ComparacaoInvalidaRelacional"
+				var
+					nome : caractere
+					idade : inteiro
+				inicio
+					nome <- "Lucas"
+					idade <- 14
+					se nome > idade entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		"O operador '>' espera valores numéricos.",
+		'Should reject relational comparison between text and number'
+	);
 }
 
 console.log('Running SemanticValidator tests...');

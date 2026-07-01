@@ -572,6 +572,42 @@ export class Parser {
 		);
 	}
 
+	private assertVisualgBlockStartsOnNextLine(openingToken: Token, keyword: string) {
+		const next = this.peek();
+		if (!this.isAtEnd() && next.line === openingToken.line) {
+			throw new Error(
+				`Erro de Sintaxe na linha ${openingToken.line}: Depois de '${keyword}', comece o bloco na próxima linha.`
+			);
+		}
+	}
+
+	private assertVisualgStatementLine(previousLine: number | undefined, nextToken: Token) {
+		if (previousLine !== undefined && nextToken.line === previousLine) {
+			throw new Error(
+				`Erro de Sintaxe na linha ${nextToken.line}: Cada comando deve ficar em sua própria linha.`
+			);
+		}
+	}
+
+	private parseVisualgStatementListUntil(...terminators: TokenType[]): ASTNode[] {
+		const statements: ASTNode[] = [];
+		let previousLine: number | undefined;
+
+		while (!terminators.some((type) => this.check(type)) && !this.isAtEnd()) {
+			if (this.match('SEMICOLON')) continue;
+			this.assertVisualgStatementLine(previousLine, this.peek());
+			const statement = this.parseVisualgStatement();
+			statements.push(statement);
+			previousLine = statement.line;
+		}
+
+		if (!this.isAtEnd()) {
+			this.assertVisualgStatementLine(previousLine, this.peek());
+		}
+
+		return statements;
+	}
+
 	public parse(): ProgramNode {
 		if (this.check('ALGORITMO')) {
 			return this.parseVisualg();
@@ -965,11 +1001,7 @@ export class Parser {
 
 		this.consume('INICIO', "Esperado palavra-chave 'inicio'");
 
-		const statements: ASTNode[] = [];
-		while (!this.check('FIMALGORITMO') && !this.isAtEnd()) {
-			if (this.match('SEMICOLON')) continue;
-			statements.push(this.parseVisualgStatement());
-		}
+		const statements = this.parseVisualgStatementListUntil('FIMALGORITMO');
 
 		this.consume(
 			'FIMALGORITMO',
@@ -1037,12 +1069,10 @@ export class Parser {
 	private parseVisualgIf(): IfNode {
 		const ifToken = this.consume('IF', "Esperado 'se'");
 		const condition = this.parseExpression();
-		this.consume('ENTAO', "Esperado 'entao' após a condição do 'se'");
+		const thenToken = this.consume('ENTAO', "Esperado 'entao' após a condição do 'se'");
+		this.assertVisualgBlockStartsOnNextLine(thenToken, thenToken.value);
 
-		const thenStatements: ASTNode[] = [];
-		while (!this.check('ELSE') && !this.check('FIMSE') && !this.isAtEnd()) {
-			thenStatements.push(this.parseVisualgStatement());
-		}
+		const thenStatements = this.parseVisualgStatementListUntil('ELSE', 'FIMSE');
 
 		const thenBranch: BlockNode = {
 			type: 'Block',
@@ -1051,11 +1081,10 @@ export class Parser {
 		};
 
 		let elseBranch: ASTNode | undefined;
-		if (this.match('ELSE')) {
-			const elseStatements: ASTNode[] = [];
-			while (!this.check('FIMSE') && !this.isAtEnd()) {
-				elseStatements.push(this.parseVisualgStatement());
-			}
+		if (this.check('ELSE')) {
+			const elseToken = this.advance();
+			this.assertVisualgBlockStartsOnNextLine(elseToken, elseToken.value);
+			const elseStatements = this.parseVisualgStatementListUntil('FIMSE');
 			elseBranch = {
 				type: 'Block',
 				statements: elseStatements,
@@ -1080,12 +1109,10 @@ export class Parser {
 	private parseVisualgWhile(): WhileNode {
 		const whileToken = this.consume('WHILE', "Esperado 'enquanto'");
 		const condition = this.parseExpression();
-		this.consume('FACA', "Esperado 'faca' após a condição do 'enquanto'");
+		const doToken = this.consume('FACA', "Esperado 'faca' após a condição do 'enquanto'");
+		this.assertVisualgBlockStartsOnNextLine(doToken, doToken.value);
 
-		const bodyStatements: ASTNode[] = [];
-		while (!this.check('FIMENQUANTO') && !this.isAtEnd()) {
-			bodyStatements.push(this.parseVisualgStatement());
-		}
+		const bodyStatements = this.parseVisualgStatementListUntil('FIMENQUANTO');
 		this.consume(
 			'FIMENQUANTO',
 			`Esperado 'fimenquanto' para fechar o loop 'enquanto' iniciado na linha ${whileToken.line}`
@@ -1124,12 +1151,10 @@ export class Parser {
 			stepExpr = this.parseExpression();
 		}
 
-		this.consume('FACA', "Esperado 'faca' antes do bloco de comandos do 'para'");
+		const doToken = this.consume('FACA', "Esperado 'faca' antes do bloco de comandos do 'para'");
+		this.assertVisualgBlockStartsOnNextLine(doToken, doToken.value);
 
-		const bodyStatements: ASTNode[] = [];
-		while (!this.check('FIMPARA') && !this.isAtEnd()) {
-			bodyStatements.push(this.parseVisualgStatement());
-		}
+		const bodyStatements = this.parseVisualgStatementListUntil('FIMPARA');
 		this.consume(
 			'FIMPARA',
 			`Esperado 'fimpara' para fechar o loop 'para' iniciado na linha ${forToken.line}`
@@ -1302,6 +1327,40 @@ export class Interpreter {
 		this.outputs = [];
 	}
 
+	private runtimeType(value: unknown): string {
+		if (value === undefined || value === null) return 'vazio';
+		if (typeof value === 'number') return 'numero';
+		if (typeof value === 'string') return 'texto';
+		if (typeof value === 'boolean') return 'logico';
+		return typeof value;
+	}
+
+	private assertNumberOperands(operator: string, left: unknown, right: unknown, line: number) {
+		if (typeof left !== 'number' || typeof right !== 'number') {
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores numéricos.`
+			);
+		}
+	}
+
+	private assertBooleanOperands(operator: string, left: unknown, right: unknown, line: number) {
+		if (typeof left !== 'boolean' || typeof right !== 'boolean') {
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores lógicos.`
+			);
+		}
+	}
+
+	private assertEqualityOperands(operator: string, left: unknown, right: unknown, line: number) {
+		const leftType = this.runtimeType(left);
+		const rightType = this.runtimeType(right);
+		if (leftType !== rightType) {
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: Não é possível comparar ${leftType} com ${rightType} usando '${operator}'.`
+			);
+		}
+	}
+
 	// Generator execution entry point
 	public *run(program: ProgramNode) {
 		this.globalEnv = new Environment();
@@ -1439,33 +1498,45 @@ export class Interpreter {
 						}
 						return (left as number) + (right as number);
 					case '-':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) - (right as number);
 					case '*':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) * (right as number);
 					case '/':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						if (right === 0) {
 							throw new Error(`Erro em Tempo de Execução na linha ${node.line}: Divisão por zero.`);
 						}
 						return (left as number) / (right as number);
 					case '%':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) % (right as number);
 					case '==':
 					case '=':
+						this.assertEqualityOperands(node.operator, left, right, node.line);
 						return left === right;
 					case '!=':
 					case '<>':
+						this.assertEqualityOperands(node.operator, left, right, node.line);
 						return left !== right;
 					case '<':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) < (right as number);
 					case '>':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) > (right as number);
 					case '<=':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) <= (right as number);
 					case '>=':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) >= (right as number);
 					case 'e':
+						this.assertBooleanOperands(node.operator, left, right, node.line);
 						return !!((left as boolean) && (right as boolean));
 					case 'ou':
+						this.assertBooleanOperands(node.operator, left, right, node.line);
 						return !!((left as boolean) || (right as boolean));
 					default:
 						throw new Error(`Operador binário inválido '${node.operator}' na linha ${node.line}`);

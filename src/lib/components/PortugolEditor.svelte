@@ -18,7 +18,8 @@
 		RangeSet,
 		RangeSetBuilder,
 		Compartment,
-		Transaction
+		Transaction,
+		EditorSelection
 	} from '@codemirror/state';
 	import { history, historyKeymap, indentWithTab, defaultKeymap } from '@codemirror/commands';
 	import {
@@ -296,6 +297,33 @@
 		{ tag: t.variableName, color: 'var(--text-primary)' }
 	]);
 
+	function getIndent(text: string) {
+		return text.match(/^[\t ]*/)?.[0] ?? '';
+	}
+
+	function getNextLineIndent(textBeforeCursor: string) {
+		const currentIndent = getIndent(textBeforeCursor);
+		const trimmed = textBeforeCursor.trim().toLowerCase();
+		const opensBlock = /\b(var|inicio|entao|então|faca|faça)\s*$/i.test(trimmed);
+		return opensBlock ? `${currentIndent}\t` : currentIndent;
+	}
+
+	function insertIndentedNewline(editorView: EditorView) {
+		const range = editorView.state.selection.main;
+		const line = editorView.state.doc.lineAt(range.from);
+		const textBeforeCursor = editorView.state.sliceDoc(line.from, range.from);
+		const insert = `\n${getNextLineIndent(textBeforeCursor)}`;
+		const cursor = range.from + insert.length;
+
+		editorView.dispatch({
+			changes: { from: range.from, to: range.to, insert },
+			selection: EditorSelection.cursor(cursor),
+			scrollIntoView: true,
+			userEvent: 'input'
+		});
+		return true;
+	}
+
 	// Theme for CodeMirror container layout and design styles
 	const portugolTheme = EditorView.theme(
 		{
@@ -312,7 +340,8 @@
 			},
 			'.cm-content': {
 				fontFamily: 'inherit',
-				padding: '12px 0'
+				padding: '12px 0',
+				caretColor: 'var(--text-primary)'
 			},
 			'.cm-gutters': {
 				backgroundColor: 'var(--bg-secondary)',
@@ -338,7 +367,7 @@
 			'.cm-error-line': {
 				backgroundColor: 'rgba(155, 34, 38, 0.08) !important'
 			},
-			'.cm-cursor': {
+			'.cm-cursor, .cm-dropCursor': {
 				borderLeftColor: 'var(--text-primary) !important'
 			}
 		},
@@ -369,6 +398,10 @@
 								}
 								return false;
 							}
+						},
+						{
+							key: 'Enter',
+							run: insertIndentedNewline
 						},
 						{
 							key: 'Mod-d',
