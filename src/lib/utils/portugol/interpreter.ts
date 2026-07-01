@@ -1,3 +1,5 @@
+import { getVisualgReferenceItem } from './reference.js';
+
 export type TokenType =
 	| 'PROGRAM'
 	| 'FUNCTION'
@@ -2025,6 +2027,18 @@ export class Interpreter {
 			});
 			const value = lower + Math.random() * (upper - lower);
 			return lowerCallee === 'randi' ? Math.floor(value) : value;
+		}
+
+		const referenceItem = getVisualgReferenceItem(lowerCallee);
+		if (referenceItem?.status === 'planned') {
+			throw new Error(
+				`Erro na linha ${node.line}: Comando Visualg ainda não suportado: ${referenceItem.name}.`
+			);
+		}
+		if (referenceItem?.status === 'out-of-scope') {
+			throw new Error(
+				`Erro na linha ${node.line}: Comando Visualg fora do escopo do Crocode: ${referenceItem.name}.`
+			);
 		}
 
 		// Função do usuário
