@@ -1465,15 +1465,24 @@ class BreakException {
 	}
 }
 
+export interface InterpreterOptions {
+	maxExecutionSteps?: number;
+}
+
+export const DEFAULT_MAX_EXECUTION_STEPS = 100000;
+
 // AST Tree-Walking Interpreter using JavaScript Generator
 export class Interpreter {
 	private globalEnv = new Environment();
 	private functions = new Map<string, FunctionDeclNode>();
 	private outputs: string[] = [];
 	private debugMode = false;
+	private executionSteps = 0;
+	private maxExecutionSteps = DEFAULT_MAX_EXECUTION_STEPS;
 
-	constructor(debugMode = false) {
+	constructor(debugMode = false, options: InterpreterOptions = {}) {
 		this.debugMode = debugMode;
+		this.maxExecutionSteps = options.maxExecutionSteps ?? DEFAULT_MAX_EXECUTION_STEPS;
 	}
 
 	public getOutputs(): string[] {
@@ -1605,11 +1614,21 @@ export class Interpreter {
 		return values;
 	}
 
+	private tickExecution(line: number) {
+		this.executionSteps += 1;
+		if (this.executionSteps > this.maxExecutionSteps) {
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: Limite de execução atingido. Verifique se existe um loop infinito.`
+			);
+		}
+	}
+
 	// Generator execution entry point
 	public *run(program: ProgramNode) {
 		this.globalEnv = new Environment();
 		this.functions.clear();
 		this.outputs = [];
+		this.executionSteps = 0;
 
 		// Primeiro, registra funções e variáveis globais
 		for (const decl of program.declarations) {
@@ -1664,6 +1683,8 @@ export class Interpreter {
 	}
 
 	private *execute(node: ASTNode, env: Environment): Generator<unknown, void, unknown> {
+		this.tickExecution(node.line);
+
 		if (this.debugMode && node.line) {
 			// Yielda o estado atual para o debugger visual pausar e destacar a linha
 			yield {

@@ -47,6 +47,19 @@ function runProgram(code, inputs = []) {
 	return interpreter.getOutputs();
 }
 
+function runProgramWithOptions(code, options, inputs = []) {
+	const ast = parseProgram(code);
+	const interpreter = new Interpreter(false, options);
+	const gen = interpreter.run(ast);
+	const pendingInputs = [...inputs];
+	let result = gen.next();
+	while (!result.done) {
+		const val = result.value;
+		result = val && val.type === 'read' ? gen.next(pendingInputs.shift()) : gen.next();
+	}
+	return interpreter.getOutputs();
+}
+
 function assertThrowsMessage(fn, expectedMessage, message) {
 	let threw = false;
 	try {
@@ -1117,6 +1130,61 @@ console.log('Running Visualg official examples tests...');
 			);
 		}
 	}
+}
+
+console.log('Running Visualg execution safety tests...');
+{
+	assertThrowsMessage(
+		() =>
+			runProgramWithOptions(
+				`
+					algoritmo "EnquantoInfinito"
+					var
+					inicio
+						enquanto verdadeiro faca
+						fimenquanto
+					fimalgoritmo
+				`,
+				{ maxExecutionSteps: 20 }
+			),
+		'Limite de execução atingido',
+		'Should stop an infinite enquanto loop'
+	);
+
+	assertThrowsMessage(
+		() =>
+			runProgramWithOptions(
+				`
+					algoritmo "RepitaInfinito"
+					var
+					inicio
+						repita
+						ate falso
+					fimalgoritmo
+				`,
+				{ maxExecutionSteps: 20 }
+			),
+		'Verifique se existe um loop infinito',
+		'Should stop an infinite repita loop'
+	);
+
+	assertThrowsMessage(
+		() =>
+			runProgramWithOptions(
+				`
+					algoritmo "ParaInfinito"
+					var
+						i : inteiro
+					inicio
+						para i de 1 ate 10 passo 0 faca
+						fimpara
+					fimalgoritmo
+				`,
+				{ maxExecutionSteps: 40 }
+			),
+		'Limite de execução atingido',
+		'Should stop an infinite para loop'
+	);
 }
 
 console.log('Running SemanticValidator tests...');
