@@ -5,6 +5,11 @@ import {
 	SemanticValidator,
 	checkIndentation
 } from '../dist/utils/portugol/interpreter.js';
+import {
+	getSupportedVisualgReferenceNames,
+	getVisualgReferenceItem,
+	visualgReferenceItems
+} from '../dist/utils/portugol/reference.js';
 
 function assert(condition, message) {
 	if (!condition) throw new Error(message);
@@ -16,6 +21,37 @@ function assertEquals(actual, expected, message) {
 			`${message || 'Assertion failed'}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`
 		);
 	}
+}
+
+function parseProgram(code) {
+	const lexer = new Lexer(code);
+	const tokens = lexer.tokenize();
+	const parser = new Parser(tokens);
+	return parser.parse();
+}
+
+function runProgram(code, inputs = []) {
+	const ast = parseProgram(code);
+	const interpreter = new Interpreter(false);
+	const gen = interpreter.run(ast);
+	const pendingInputs = [...inputs];
+	let result = gen.next();
+	while (!result.done) {
+		const val = result.value;
+		result = val && val.type === 'read' ? gen.next(pendingInputs.shift()) : gen.next();
+	}
+	return interpreter.getOutputs();
+}
+
+function assertThrowsMessage(fn, expectedMessage, message) {
+	let threw = false;
+	try {
+		fn();
+	} catch (e) {
+		threw = true;
+		assert(e.message.includes(expectedMessage), message || `Should include ${expectedMessage}`);
+	}
+	assert(threw, message || 'Should throw');
 }
 
 console.log('Running Portugol Lexer tests...');
@@ -421,6 +457,625 @@ console.log('Running Visualg typed assignment coercion tests...');
 	assertEquals(outputs.length, 2);
 	assertEquals(outputs[0], '15|15|141|L|');
 	assertEquals(outputs[1], 'sim');
+}
+
+console.log('Running Visualg strict block syntax tests...');
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "InlineSe"
+				var
+					nota : inteiro
+				inicio
+					nota <- 70
+					se nota >= 60 entao escreval("Aprovado")
+					fimse
+				fimalgoritmo
+			`),
+		"Depois de 'entao', comece o bloco na próxima linha.",
+		'Should reject inline command after entao'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "ComandosMesmaLinha"
+				var
+				inicio
+					escreva("A") escreva("B")
+				fimalgoritmo
+			`),
+		'Cada comando deve ficar em sua própria linha.',
+		'Should reject multiple commands in the same Visualg line'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "FechamentoMesmaLinha"
+				var
+				inicio
+					escreva("A") fimalgoritmo
+			`),
+		'Cada comando deve ficar em sua própria linha.',
+		'Should reject closing block in the same line as a command'
+	);
+}
+
+console.log('Running Visualg declaration and comparison tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "DeclaracaoMultipla"
+		var
+			idade, faltas : inteiro
+			nota, media : real
+			nome, turma : caractere
+			ativo, aprovado : logico
+		inicio
+			idade <- 14
+			faltas <- 2
+			nota <- 8.5
+			media <- 7
+			nome <- "Lucas"
+			turma <- "A"
+			ativo <- verdadeiro
+			aprovado <- falso
+			se idade > faltas entao
+				escreva("numeros|")
+			fimse
+			se nota >= media entao
+				escreva("misto|")
+			fimse
+			se nome = "L" entao
+				escreva("texto|")
+			fimse
+			se ativo <> aprovado entao
+				escreva("logico")
+			fimse
+		fimalgoritmo
+	`);
+	assertEquals(outputs.join(''), 'numeros|misto|texto|logico');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ComparacaoInvalidaTextoNumero"
+				var
+					nome : caractere
+					idade : inteiro
+				inicio
+					nome <- "Lucas"
+					idade <- 14
+					se nome = idade entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		'Não é possível comparar texto com numero',
+		'Should reject equality between text and number'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ComparacaoInvalidaRelacional"
+				var
+					nome : caractere
+					idade : inteiro
+				inicio
+					nome <- "Lucas"
+					idade <- 14
+					se nome > idade entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		"O operador '>' espera valores numéricos.",
+		'Should reject relational comparison between text and number'
+	);
+}
+
+console.log('Running Visualg xor operator tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "Xou"
+		var
+		inicio
+			se verdadeiro xou falso entao
+				escreva("vf|")
+			fimse
+			se verdadeiro xou verdadeiro entao
+				escreva("erro|")
+			senao
+				escreva("vv|")
+			fimse
+			se falso xou falso entao
+				escreva("erro")
+			senao
+				escreva("ff")
+			fimse
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'vf|vv|ff');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroXou"
+				var
+				inicio
+					se verdadeiro xou 1 entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		"O operador 'xou' espera valores lógicos.",
+		'Should reject non-boolean xor operands'
+	);
+}
+
+console.log('Running Visualg repeat loop tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "Repita"
+		var
+			contador : inteiro
+		inicio
+			contador <- 0
+			repita
+				contador <- contador + 1
+				escreva(contador)
+			ate contador = 3
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '123');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "RepitaUmaVez"
+		var
+			contador : inteiro
+		inicio
+			contador <- 5
+			repita
+				escreva("uma")
+			ate contador > 0
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'uma');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "RepitaInline"
+				var
+				inicio
+					repita escreva("invalido")
+					ate verdadeiro
+				fimalgoritmo
+			`),
+		"Depois de 'repita', comece o bloco na próxima linha.",
+		'Should reject inline command after repita'
+	);
+}
+
+console.log('Running Visualg break statement tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "InterrompaEnquanto"
+		var
+			contador : inteiro
+		inicio
+			contador <- 0
+			enquanto contador < 5 faca
+				contador <- contador + 1
+				se contador = 3 entao
+					interrompa
+				fimse
+				escreva(contador)
+			fimenquanto
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '12');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "InterrompaRepita"
+		var
+			contador : inteiro
+		inicio
+			contador <- 0
+			repita
+				contador <- contador + 1
+				se contador = 2 entao
+					interrompa
+				fimse
+				escreva(contador)
+			ate contador = 5
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '1');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "InterrompaPara"
+		var
+			contador : inteiro
+		inicio
+			para contador de 1 ate 5 faca
+				se contador = 4 entao
+					interrompa
+				fimse
+				escreva(contador)
+			fimpara
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '123');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "InterrompaFora"
+				var
+				inicio
+					interrompa
+				fimalgoritmo
+			`),
+		"'interrompa' só pode ser usado dentro de um laço.",
+		'Should reject break outside loops'
+	);
+}
+
+console.log('Running Visualg switch statement tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "Escolha"
+		var
+			opcao : inteiro
+		inicio
+			opcao <- 2
+			escolha opcao
+				caso 1
+					escreva("um")
+				caso 2
+					escreva("dois")
+				caso 3
+					escreva("tres")
+				outrocaso
+					escreva("outro")
+			fimescolha
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'dois');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "EscolhaOutro"
+		var
+			opcao : caractere
+		inicio
+			opcao <- "C"
+			escolha opcao
+				caso "A"
+					escreva("a")
+				caso "B"
+					escreva("b")
+				outrocaso
+					escreva("outro")
+			fimescolha
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'outro');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "EscolhaInline"
+				var
+					opcao : inteiro
+				inicio
+					opcao <- 1
+					escolha opcao caso 1
+						escreva("invalido")
+					fimescolha
+				fimalgoritmo
+			`),
+		"Depois de 'escolha', comece o bloco na próxima linha.",
+		'Should reject inline case after escolha'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "EscolhaTipoInvalido"
+				var
+					opcao : inteiro
+				inicio
+					opcao <- 1
+					escolha opcao
+						caso "A"
+							escreva("invalido")
+					fimescolha
+				fimalgoritmo
+			`),
+		"Não é possível comparar numero com texto usando 'caso'.",
+		'Should reject case comparisons with incompatible types'
+	);
+}
+
+console.log('Running Visualg essential function tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "FuncoesEssenciais"
+		var
+			texto : cadeia
+		inicio
+			texto <- "Crocode"
+			escreva(abs(-5), "|")
+			escreva(raizq(9), "|")
+			escreva(pot(2, 3), "|")
+			escreva(quad(4), "|")
+			escreva(int(8.9), "|")
+			escreva(10 mod 3, "|")
+			escreva(mod(10, 4), "|")
+			escreva(10 div 3, "|")
+			escreva(div(11, 4), "|")
+			escreva(compr(texto), "|")
+			escreva(maiusc("abc"), "|")
+			escreva(minusc("ABC"), "|")
+			escreva(copia(texto, 2, 3), "|")
+			escreva(pos("code", texto), "|")
+			escreva(pos("x", texto), "|")
+			se pi > 3 entao
+				escreva("pi")
+			fimse
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '5|3|8|16|8|1|2|3|2|7|ABC|abc|roc|4|0|pi');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "LimpaTela"
+		var
+		inicio
+			escreva("antes")
+			limpatela()
+			escreva("depois")
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'depois');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroFuncoes"
+				var
+				inicio
+					escreva(abs("texto"))
+				fimalgoritmo
+			`),
+		"Função 'abs' espera argumento 1 numérico.",
+		'Should reject invalid numeric function argument'
+	);
+}
+
+console.log('Running Visualg random function tests...');
+{
+	for (let attempt = 0; attempt < 100; attempt += 1) {
+		const outputs = runProgram(`
+			algoritmo "Sorteio"
+			var
+			inicio
+				escreva(rand(), "|")
+				escreva(rand(10), "|")
+				escreva(rand(5, 10), "|")
+				escreva(randi(10), "|")
+				escreva(randi(1, 7))
+			fimalgoritmo
+		`);
+		const [randDefault, randMax, randRange, randiMax, randiRange] = outputs
+			.join('')
+			.split('|')
+			.map(Number);
+
+		assert(randDefault >= 0 && randDefault < 1, 'rand() should be >= 0 and < 1');
+		assert(randMax >= 0 && randMax < 10, 'rand(10) should be >= 0 and < 10');
+		assert(randRange >= 5 && randRange < 10, 'rand(5, 10) should be >= 5 and < 10');
+		assert(Number.isInteger(randiMax), 'randi(10) should return an integer');
+		assert(randiMax >= 0 && randiMax < 10, 'randi(10) should be >= 0 and < 10');
+		assert(Number.isInteger(randiRange), 'randi(1, 7) should return an integer');
+		assert(randiRange >= 1 && randiRange < 7, 'randi(1, 7) should be >= 1 and < 7');
+	}
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroRandiVazio"
+				var
+				inicio
+					escreva(randi())
+				fimalgoritmo
+			`),
+		"Função 'randi' espera 1 ou 2 argumento(s)",
+		'Should reject randi without arguments'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroRandTipo"
+				var
+				inicio
+					escreva(rand("dez"))
+				fimalgoritmo
+			`),
+		"Função 'rand' espera argumento 1 numérico.",
+		'Should reject invalid rand argument type'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroRandIntervalo"
+				var
+				inicio
+					escreva(rand(10, 10))
+				fimalgoritmo
+			`),
+		"Função 'rand' espera limite superior maior que o inferior.",
+		'Should reject empty random range'
+	);
+}
+
+console.log('Running Visualg character conversion tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "ConversoesCaracter"
+		var
+		inicio
+			escreva(asc("A"), "|")
+			escreva(carac(65), "|")
+			escreva(carac(randi(65, 66)))
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '65|A|A');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroAscTexto"
+				var
+				inicio
+					escreva(asc("AB"))
+				fimalgoritmo
+			`),
+		"Função 'asc' espera argumento 1 com exatamente um caractere.",
+		'Should reject asc with more than one character'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroCaracTipo"
+				var
+				inicio
+					escreva(carac("A"))
+				fimalgoritmo
+			`),
+		"Função 'carac' espera argumento 1 numérico.",
+		'Should reject carac with non-number argument'
+	);
+}
+
+console.log('Running Visualg reference catalog tests...');
+{
+	const supportedNames = new Set(
+		getSupportedVisualgReferenceNames().map((name) => name.toLowerCase())
+	);
+	const requiredSupportedNames = [
+		'algoritmo',
+		'var',
+		'inicio',
+		'fimalgoritmo',
+		'inteiro',
+		'real',
+		'caractere',
+		'caracter',
+		'cadeia',
+		'logico',
+		'se',
+		'entao',
+		'senao',
+		'fimse',
+		'enquanto',
+		'faca',
+		'fimenquanto',
+		'repita',
+		'interrompa',
+		'escolha',
+		'caso',
+		'outrocaso',
+		'fimescolha',
+		'para',
+		'de',
+		'ate',
+		'passo',
+		'fimpara',
+		'leia',
+		'escreva',
+		'escreval',
+		'limpa',
+		'limpatela',
+		'mod',
+		'div',
+		'xou',
+		'pi',
+		'abs',
+		'raizq',
+		'pot',
+		'quad',
+		'int',
+		'compr',
+		'maiusc',
+		'minusc',
+		'copia',
+		'pos',
+		'asc',
+		'carac',
+		'rand',
+		'randi'
+	];
+
+	for (const name of requiredSupportedNames) {
+		assert(supportedNames.has(name), `Reference catalog should include supported name '${name}'`);
+	}
+
+	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
+	assertEquals(getVisualgReferenceItem('randi')?.status, 'supported');
+	assertEquals(getVisualgReferenceItem('numpcarac')?.status, 'planned');
+	assertEquals(getVisualgReferenceItem('arquivo')?.status, 'out-of-scope');
+	assert(
+		visualgReferenceItems.every((item) => item.syntax && item.description),
+		'Every reference item should include syntax and description'
+	);
 }
 
 console.log('Running SemanticValidator tests...');

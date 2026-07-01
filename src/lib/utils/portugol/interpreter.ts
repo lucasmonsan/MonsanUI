@@ -7,6 +7,7 @@ export type TokenType =
 	| 'WHILE'
 	| 'FOR'
 	| 'RETURN'
+	| 'BREAK'
 	| 'TRUE'
 	| 'FALSE'
 	| 'IDENTIFIER'
@@ -19,6 +20,7 @@ export type TokenType =
 	| 'STAR'
 	| 'SLASH'
 	| 'PERCENT'
+	| 'INTDIV'
 	| 'EQ'
 	| 'NEQ'
 	| 'LT'
@@ -27,6 +29,7 @@ export type TokenType =
 	| 'GTE'
 	| 'AND'
 	| 'OR'
+	| 'XOR'
 	| 'NOT'
 	| 'LBRACE'
 	| 'RBRACE'
@@ -43,6 +46,11 @@ export type TokenType =
 	| 'FIMPARA'
 	| 'ENTAO'
 	| 'FACA'
+	| 'REPITA'
+	| 'ESCOLHA'
+	| 'CASO'
+	| 'OUTROCASO'
+	| 'FIMESCOLHA'
 	| 'DE'
 	| 'ATE'
 	| 'PASSO'
@@ -331,6 +339,16 @@ export class Lexer {
 						tokens.push({ type: 'ENTAO', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'faca' || lowerId === 'faça') {
 						tokens.push({ type: 'FACA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'repita') {
+						tokens.push({ type: 'REPITA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'escolha') {
+						tokens.push({ type: 'ESCOLHA', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'caso') {
+						tokens.push({ type: 'CASO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'outrocaso') {
+						tokens.push({ type: 'OUTROCASO', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'fimescolha') {
+						tokens.push({ type: 'FIMESCOLHA', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'de') {
 						tokens.push({ type: 'DE', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'ate' || lowerId === 'até') {
@@ -347,6 +365,8 @@ export class Lexer {
 						tokens.push({ type: 'FOR', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'retorne') {
 						tokens.push({ type: 'RETURN', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'interrompa') {
+						tokens.push({ type: 'BREAK', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'verdadeiro') {
 						tokens.push({ type: 'TRUE', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'falso') {
@@ -355,8 +375,24 @@ export class Lexer {
 						tokens.push({ type: 'AND', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'ou') {
 						tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'xou') {
+						tokens.push({ type: 'XOR', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'nao' || lowerId === 'não') {
 						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'mod') {
+						const nextNonWhitespace = this.input.slice(this.pos).match(/^\s*(.)/)?.[1];
+						if (nextNonWhitespace === '(') {
+							this.pushIdentifierToken(tokens, id, startLine, startCol);
+						} else {
+							tokens.push({ type: 'PERCENT', value: '%', line: startLine, column: startCol });
+						}
+					} else if (lowerId === 'div') {
+						const nextNonWhitespace = this.input.slice(this.pos).match(/^\s*(.)/)?.[1];
+						if (nextNonWhitespace === '(') {
+							this.pushIdentifierToken(tokens, id, startLine, startCol);
+						} else {
+							tokens.push({ type: 'INTDIV', value: 'div', line: startLine, column: startCol });
+						}
 					} else if (
 						['inteiro', 'real', 'caractere', 'caracter', 'logico', 'cadeia'].includes(lowerId)
 					) {
@@ -391,6 +427,8 @@ export class Lexer {
 						tokens.push({ type: 'AND', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'ou') {
 						tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'xou') {
+						tokens.push({ type: 'XOR', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'nao' || lowerId === 'não') {
 						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
 					} else {
@@ -419,8 +457,11 @@ export type ASTNode =
 	| AssignNode
 	| IfNode
 	| WhileNode
+	| RepeatNode
+	| SwitchNode
 	| ForNode
 	| ReturnNode
+	| BreakNode
 	| CallNode
 	| BinaryNode
 	| UnaryNode
@@ -478,6 +519,21 @@ export interface WhileNode {
 	line: number;
 }
 
+export interface RepeatNode {
+	type: 'Repeat';
+	body: ASTNode;
+	condition: ASTNode;
+	line: number;
+}
+
+export interface SwitchNode {
+	type: 'Switch';
+	discriminant: ASTNode;
+	cases: { test: ASTNode; body: BlockNode; line: number }[];
+	defaultBody?: BlockNode;
+	line: number;
+}
+
 export interface ForNode {
 	type: 'For';
 	initializer?: ASTNode;
@@ -490,6 +546,11 @@ export interface ForNode {
 export interface ReturnNode {
 	type: 'Return';
 	value?: ASTNode;
+	line: number;
+}
+
+export interface BreakNode {
+	type: 'Break';
 	line: number;
 }
 
@@ -570,6 +631,42 @@ export class Parser {
 		throw new Error(
 			`Erro de Sintaxe na linha ${t.line}, coluna ${t.column}: ${message} (encontrado '${t.value}')`
 		);
+	}
+
+	private assertVisualgBlockStartsOnNextLine(openingToken: Token, keyword: string) {
+		const next = this.peek();
+		if (!this.isAtEnd() && next.line === openingToken.line) {
+			throw new Error(
+				`Erro de Sintaxe na linha ${openingToken.line}: Depois de '${keyword}', comece o bloco na próxima linha.`
+			);
+		}
+	}
+
+	private assertVisualgStatementLine(previousLine: number | undefined, nextToken: Token) {
+		if (previousLine !== undefined && nextToken.line === previousLine) {
+			throw new Error(
+				`Erro de Sintaxe na linha ${nextToken.line}: Cada comando deve ficar em sua própria linha.`
+			);
+		}
+	}
+
+	private parseVisualgStatementListUntil(...terminators: TokenType[]): ASTNode[] {
+		const statements: ASTNode[] = [];
+		let previousLine: number | undefined;
+
+		while (!terminators.some((type) => this.check(type)) && !this.isAtEnd()) {
+			if (this.match('SEMICOLON')) continue;
+			this.assertVisualgStatementLine(previousLine, this.peek());
+			const statement = this.parseVisualgStatement();
+			statements.push(statement);
+			previousLine = statement.line;
+		}
+
+		if (!this.isAtEnd()) {
+			this.assertVisualgStatementLine(previousLine, this.peek());
+		}
+
+		return statements;
 	}
 
 	public parse(): ProgramNode {
@@ -819,7 +916,7 @@ export class Parser {
 
 	private parseOr(): ASTNode {
 		let expr = this.parseAnd();
-		while (this.match('OR')) {
+		while (this.match('OR', 'XOR')) {
 			const op = this.tokens[this.current - 1];
 			const right = this.parseAnd();
 			expr = { type: 'Binary', left: expr, operator: op.value, right, line: op.line };
@@ -869,7 +966,7 @@ export class Parser {
 
 	private parseFactor(): ASTNode {
 		let expr = this.parseUnary();
-		while (this.match('STAR', 'SLASH', 'PERCENT')) {
+		while (this.match('STAR', 'SLASH', 'PERCENT', 'INTDIV')) {
 			const op = this.tokens[this.current - 1];
 			const right = this.parseUnary();
 			expr = { type: 'Binary', left: expr, operator: op.value, right, line: op.line };
@@ -965,11 +1062,7 @@ export class Parser {
 
 		this.consume('INICIO', "Esperado palavra-chave 'inicio'");
 
-		const statements: ASTNode[] = [];
-		while (!this.check('FIMALGORITMO') && !this.isAtEnd()) {
-			if (this.match('SEMICOLON')) continue;
-			statements.push(this.parseVisualgStatement());
-		}
+		const statements = this.parseVisualgStatementListUntil('FIMALGORITMO');
 
 		this.consume(
 			'FIMALGORITMO',
@@ -1026,8 +1119,18 @@ export class Parser {
 		if (t.type === 'WHILE') {
 			return this.parseVisualgWhile();
 		}
+		if (t.type === 'REPITA') {
+			return this.parseVisualgRepeat();
+		}
+		if (t.type === 'ESCOLHA') {
+			return this.parseVisualgSwitch();
+		}
 		if (t.type === 'FOR') {
 			return this.parseVisualgFor();
+		}
+		if (t.type === 'BREAK') {
+			const breakToken = this.advance();
+			return { type: 'Break', line: breakToken.line };
 		}
 
 		const expr = this.parseExpression();
@@ -1037,12 +1140,10 @@ export class Parser {
 	private parseVisualgIf(): IfNode {
 		const ifToken = this.consume('IF', "Esperado 'se'");
 		const condition = this.parseExpression();
-		this.consume('ENTAO', "Esperado 'entao' após a condição do 'se'");
+		const thenToken = this.consume('ENTAO', "Esperado 'entao' após a condição do 'se'");
+		this.assertVisualgBlockStartsOnNextLine(thenToken, thenToken.value);
 
-		const thenStatements: ASTNode[] = [];
-		while (!this.check('ELSE') && !this.check('FIMSE') && !this.isAtEnd()) {
-			thenStatements.push(this.parseVisualgStatement());
-		}
+		const thenStatements = this.parseVisualgStatementListUntil('ELSE', 'FIMSE');
 
 		const thenBranch: BlockNode = {
 			type: 'Block',
@@ -1051,11 +1152,10 @@ export class Parser {
 		};
 
 		let elseBranch: ASTNode | undefined;
-		if (this.match('ELSE')) {
-			const elseStatements: ASTNode[] = [];
-			while (!this.check('FIMSE') && !this.isAtEnd()) {
-				elseStatements.push(this.parseVisualgStatement());
-			}
+		if (this.check('ELSE')) {
+			const elseToken = this.advance();
+			this.assertVisualgBlockStartsOnNextLine(elseToken, elseToken.value);
+			const elseStatements = this.parseVisualgStatementListUntil('FIMSE');
 			elseBranch = {
 				type: 'Block',
 				statements: elseStatements,
@@ -1080,12 +1180,10 @@ export class Parser {
 	private parseVisualgWhile(): WhileNode {
 		const whileToken = this.consume('WHILE', "Esperado 'enquanto'");
 		const condition = this.parseExpression();
-		this.consume('FACA', "Esperado 'faca' após a condição do 'enquanto'");
+		const doToken = this.consume('FACA', "Esperado 'faca' após a condição do 'enquanto'");
+		this.assertVisualgBlockStartsOnNextLine(doToken, doToken.value);
 
-		const bodyStatements: ASTNode[] = [];
-		while (!this.check('FIMENQUANTO') && !this.isAtEnd()) {
-			bodyStatements.push(this.parseVisualgStatement());
-		}
+		const bodyStatements = this.parseVisualgStatementListUntil('FIMENQUANTO');
 		this.consume(
 			'FIMENQUANTO',
 			`Esperado 'fimenquanto' para fechar o loop 'enquanto' iniciado na linha ${whileToken.line}`
@@ -1102,6 +1200,85 @@ export class Parser {
 			condition,
 			body,
 			line: whileToken.line
+		};
+	}
+
+	private parseVisualgRepeat(): RepeatNode {
+		const repeatToken = this.consume('REPITA', "Esperado 'repita'");
+		this.assertVisualgBlockStartsOnNextLine(repeatToken, repeatToken.value);
+
+		const bodyStatements = this.parseVisualgStatementListUntil('ATE');
+		this.consume(
+			'ATE',
+			`Esperado 'ate' para fechar o loop 'repita' iniciado na linha ${repeatToken.line}`
+		);
+		const condition = this.parseExpression();
+
+		const body: BlockNode = {
+			type: 'Block',
+			statements: bodyStatements,
+			line: repeatToken.line
+		};
+
+		return {
+			type: 'Repeat',
+			body,
+			condition,
+			line: repeatToken.line
+		};
+	}
+
+	private parseVisualgSwitch(): SwitchNode {
+		const switchToken = this.consume('ESCOLHA', "Esperado 'escolha'");
+		const discriminant = this.parseExpression();
+		this.assertVisualgBlockStartsOnNextLine(switchToken, switchToken.value);
+
+		const cases: SwitchNode['cases'] = [];
+		let defaultBody: BlockNode | undefined;
+
+		while (!this.check('FIMESCOLHA') && !this.isAtEnd()) {
+			if (this.check('CASO')) {
+				const caseToken = this.advance();
+				const test = this.parseExpression();
+				this.assertVisualgBlockStartsOnNextLine(caseToken, caseToken.value);
+				const bodyStatements = this.parseVisualgStatementListUntil(
+					'CASO',
+					'OUTROCASO',
+					'FIMESCOLHA'
+				);
+				cases.push({
+					test,
+					body: { type: 'Block', statements: bodyStatements, line: caseToken.line },
+					line: caseToken.line
+				});
+				continue;
+			}
+
+			if (this.check('OUTROCASO')) {
+				const defaultToken = this.advance();
+				this.assertVisualgBlockStartsOnNextLine(defaultToken, defaultToken.value);
+				const bodyStatements = this.parseVisualgStatementListUntil('FIMESCOLHA');
+				defaultBody = { type: 'Block', statements: bodyStatements, line: defaultToken.line };
+				continue;
+			}
+
+			const token = this.peek();
+			throw new Error(
+				`Erro de Sintaxe na linha ${token.line}: Esperado 'caso', 'outrocaso' ou 'fimescolha' no bloco 'escolha'.`
+			);
+		}
+
+		this.consume(
+			'FIMESCOLHA',
+			`Esperado 'fimescolha' para fechar o bloco 'escolha' iniciado na linha ${switchToken.line}`
+		);
+
+		return {
+			type: 'Switch',
+			discriminant,
+			cases,
+			defaultBody,
+			line: switchToken.line
 		};
 	}
 
@@ -1124,12 +1301,10 @@ export class Parser {
 			stepExpr = this.parseExpression();
 		}
 
-		this.consume('FACA', "Esperado 'faca' antes do bloco de comandos do 'para'");
+		const doToken = this.consume('FACA', "Esperado 'faca' antes do bloco de comandos do 'para'");
+		this.assertVisualgBlockStartsOnNextLine(doToken, doToken.value);
 
-		const bodyStatements: ASTNode[] = [];
-		while (!this.check('FIMPARA') && !this.isAtEnd()) {
-			bodyStatements.push(this.parseVisualgStatement());
-		}
+		const bodyStatements = this.parseVisualgStatementListUntil('FIMPARA');
 		this.consume(
 			'FIMPARA',
 			`Esperado 'fimpara' para fechar o loop 'para' iniciado na linha ${forToken.line}`
@@ -1283,6 +1458,13 @@ class ReturnException {
 	}
 }
 
+class BreakException {
+	public line: number;
+	constructor(line: number) {
+		this.line = line;
+	}
+}
+
 // AST Tree-Walking Interpreter using JavaScript Generator
 export class Interpreter {
 	private globalEnv = new Environment();
@@ -1300,6 +1482,127 @@ export class Interpreter {
 
 	public clearOutputs() {
 		this.outputs = [];
+	}
+
+	private runtimeType(value: unknown): string {
+		if (value === undefined || value === null) return 'vazio';
+		if (typeof value === 'number') return 'numero';
+		if (typeof value === 'string') return 'texto';
+		if (typeof value === 'boolean') return 'logico';
+		return typeof value;
+	}
+
+	private assertNumberOperands(operator: string, left: unknown, right: unknown, line: number) {
+		if (typeof left !== 'number' || typeof right !== 'number') {
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores numéricos.`
+			);
+		}
+	}
+
+	private assertBooleanOperands(operator: string, left: unknown, right: unknown, line: number) {
+		if (typeof left !== 'boolean' || typeof right !== 'boolean') {
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores lógicos.`
+			);
+		}
+	}
+
+	private assertEqualityOperands(operator: string, left: unknown, right: unknown, line: number) {
+		const leftType = this.runtimeType(left);
+		const rightType = this.runtimeType(right);
+		if (leftType !== rightType) {
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: Não é possível comparar ${leftType} com ${rightType} usando '${operator}'.`
+			);
+		}
+	}
+
+	private expectArgCount(
+		callee: string,
+		actual: number,
+		expected: number | number[],
+		line: number
+	) {
+		const validCounts = Array.isArray(expected) ? expected : [expected];
+		if (!validCounts.includes(actual)) {
+			const expectedText =
+				validCounts.length === 1 ? String(validCounts[0]) : validCounts.join(' ou ');
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera ${expectedText} argumento(s), recebeu ${actual}.`
+			);
+		}
+	}
+
+	private requireNumberArg(
+		callee: string,
+		value: unknown,
+		argNumber: number,
+		line: number
+	): number {
+		if (typeof value !== 'number') {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera argumento ${argNumber} numérico.`
+			);
+		}
+		return value;
+	}
+
+	private requireTextArg(callee: string, value: unknown, argNumber: number, line: number): string {
+		if (typeof value !== 'string') {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera argumento ${argNumber} textual.`
+			);
+		}
+		return value;
+	}
+
+	private requireCharacterArg(
+		callee: string,
+		value: unknown,
+		argNumber: number,
+		line: number
+	): string {
+		const text = this.requireTextArg(callee, value, argNumber, line);
+		if ([...text].length !== 1) {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera argumento ${argNumber} com exatamente um caractere.`
+			);
+		}
+		return text;
+	}
+
+	private getRandomBounds(
+		callee: string,
+		args: unknown[],
+		line: number,
+		options: { allowZeroArgs: boolean; integer: boolean }
+	) {
+		this.expectArgCount(callee, args.length, options.allowZeroArgs ? [0, 1, 2] : [1, 2], line);
+
+		const min = args.length === 2 ? this.requireNumberArg(callee, args[0], 1, line) : 0;
+		const max =
+			args.length === 0
+				? 1
+				: this.requireNumberArg(callee, args.length === 2 ? args[1] : args[0], args.length, line);
+		const lower = options.integer ? Math.trunc(min) : min;
+		const upper = options.integer ? Math.trunc(max) : max;
+
+		if (upper <= lower) {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera limite superior maior que o inferior.`
+			);
+		}
+
+		return { lower, upper };
+	}
+
+	private *evaluateArgs(node: CallNode, env: Environment): Generator<unknown, unknown[], unknown> {
+		const values: unknown[] = [];
+		for (const arg of node.args) {
+			values.push(yield* this.evaluate(arg, env));
+		}
+		return values;
 	}
 
 	// Generator execution entry point
@@ -1332,6 +1635,12 @@ export class Interpreter {
 		} catch (err) {
 			if (err instanceof ReturnException) {
 				return err.value;
+			}
+			if (err instanceof BreakException) {
+				throw new Error(
+					`Erro em Tempo de Execução na linha ${err.line}: 'interrompa' só pode ser usado dentro de um laço.`,
+					{ cause: err }
+				);
 			}
 			throw err;
 		}
@@ -1389,9 +1698,41 @@ export class Interpreter {
 			}
 			case 'While':
 				while (yield* this.evaluate(node.condition, env)) {
-					yield* this.execute(node.body, env);
+					try {
+						yield* this.execute(node.body, env);
+					} catch (err) {
+						if (err instanceof BreakException) break;
+						throw err;
+					}
 				}
 				break;
+			case 'Repeat':
+				do {
+					try {
+						yield* this.execute(node.body, env);
+					} catch (err) {
+						if (err instanceof BreakException) break;
+						throw err;
+					}
+				} while (!(yield* this.evaluate(node.condition, env)));
+				break;
+			case 'Switch': {
+				const discriminant = yield* this.evaluate(node.discriminant, env);
+				let matched = false;
+				for (const caseNode of node.cases) {
+					const test = yield* this.evaluate(caseNode.test, env);
+					this.assertEqualityOperands('caso', discriminant, test, caseNode.line);
+					if (discriminant === test) {
+						yield* this.execute(caseNode.body, env);
+						matched = true;
+						break;
+					}
+				}
+				if (!matched && node.defaultBody) {
+					yield* this.execute(node.defaultBody, env);
+				}
+				break;
+			}
 			case 'For': {
 				const forEnv = new Environment(env);
 				if (node.initializer) {
@@ -1402,7 +1743,12 @@ export class Interpreter {
 						const cond = yield* this.evaluate(node.condition, forEnv);
 						if (!cond) break;
 					}
-					yield* this.execute(node.body, forEnv);
+					try {
+						yield* this.execute(node.body, forEnv);
+					} catch (err) {
+						if (err instanceof BreakException) break;
+						throw err;
+					}
 					if (node.update) {
 						yield* this.execute(node.update, forEnv);
 					}
@@ -1413,6 +1759,8 @@ export class Interpreter {
 				const val = node.value ? yield* this.evaluate(node.value, env) : undefined;
 				throw new ReturnException(val);
 			}
+			case 'Break':
+				throw new BreakException(node.line);
 			case 'Call':
 				yield* this.evaluateCall(node, env);
 				break;
@@ -1428,6 +1776,9 @@ export class Interpreter {
 			case 'Literal':
 				return node.value;
 			case 'Identifier':
+				if (node.name.toLowerCase() === 'pi') {
+					return Math.PI;
+				}
 				return env.get(node.name, node.line);
 			case 'Binary': {
 				const left = yield* this.evaluate(node.left, env);
@@ -1437,36 +1788,58 @@ export class Interpreter {
 						if (typeof left === 'string' || typeof right === 'string') {
 							return String(left) + String(right);
 						}
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) + (right as number);
 					case '-':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) - (right as number);
 					case '*':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) * (right as number);
 					case '/':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						if (right === 0) {
 							throw new Error(`Erro em Tempo de Execução na linha ${node.line}: Divisão por zero.`);
 						}
 						return (left as number) / (right as number);
 					case '%':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) % (right as number);
+					case 'div':
+						this.assertNumberOperands(node.operator, left, right, node.line);
+						if (right === 0) {
+							throw new Error(`Erro em Tempo de Execução na linha ${node.line}: Divisão por zero.`);
+						}
+						return Math.trunc((left as number) / (right as number));
 					case '==':
 					case '=':
+						this.assertEqualityOperands(node.operator, left, right, node.line);
 						return left === right;
 					case '!=':
 					case '<>':
+						this.assertEqualityOperands(node.operator, left, right, node.line);
 						return left !== right;
 					case '<':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) < (right as number);
 					case '>':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) > (right as number);
 					case '<=':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) <= (right as number);
 					case '>=':
+						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) >= (right as number);
 					case 'e':
+						this.assertBooleanOperands(node.operator, left, right, node.line);
 						return !!((left as boolean) && (right as boolean));
 					case 'ou':
+						this.assertBooleanOperands(node.operator, left, right, node.line);
 						return !!((left as boolean) || (right as boolean));
+					case 'xou':
+						this.assertBooleanOperands(node.operator, left, right, node.line);
+						return (left as boolean) !== (right as boolean);
 					default:
 						throw new Error(`Operador binário inválido '${node.operator}' na linha ${node.line}`);
 				}
@@ -1475,8 +1848,18 @@ export class Interpreter {
 				const right = yield* this.evaluate(node.right, env);
 				switch (node.operator) {
 					case '-':
+						if (typeof right !== 'number') {
+							throw new Error(
+								`Erro em Tempo de Execução na linha ${node.line}: O operador '-' espera valor numérico.`
+							);
+						}
 						return -(right as number);
 					case 'nao':
+						if (typeof right !== 'boolean') {
+							throw new Error(
+								`Erro em Tempo de Execução na linha ${node.line}: O operador 'nao' espera valor lógico.`
+							);
+						}
 						return !(right as boolean);
 					default:
 						throw new Error(`Operador unário inválido '${node.operator}' na linha ${node.line}`);
@@ -1524,10 +1907,103 @@ export class Interpreter {
 			return;
 		}
 
-		if (lowerCallee === 'limpa') {
+		if (lowerCallee === 'limpa' || lowerCallee === 'limpatela') {
 			this.outputs = [];
 			yield { type: 'clear' };
 			return;
+		}
+
+		if (lowerCallee === 'mod') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			return (
+				this.requireNumberArg(node.callee, args[0], 1, node.line) %
+				this.requireNumberArg(node.callee, args[1], 2, node.line)
+			);
+		}
+
+		if (lowerCallee === 'div') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			const divisor = this.requireNumberArg(node.callee, args[1], 2, node.line);
+			if (divisor === 0) {
+				throw new Error(`Erro em Tempo de Execução na linha ${node.line}: Divisão por zero.`);
+			}
+			return Math.trunc(this.requireNumberArg(node.callee, args[0], 1, node.line) / divisor);
+		}
+
+		if (['abs', 'raizq', 'quad', 'int'].includes(lowerCallee)) {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const numberValue = this.requireNumberArg(node.callee, value, 1, node.line);
+			if (lowerCallee === 'abs') return Math.abs(numberValue);
+			if (lowerCallee === 'raizq') return Math.sqrt(numberValue);
+			if (lowerCallee === 'quad') return numberValue * numberValue;
+			return Math.trunc(numberValue);
+		}
+
+		if (lowerCallee === 'pot') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			return Math.pow(
+				this.requireNumberArg(node.callee, args[0], 1, node.line),
+				this.requireNumberArg(node.callee, args[1], 2, node.line)
+			);
+		}
+
+		if (['compr', 'maiusc', 'minusc'].includes(lowerCallee)) {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const text = this.requireTextArg(node.callee, value, 1, node.line);
+			if (lowerCallee === 'compr') return text.length;
+			if (lowerCallee === 'maiusc') return text.toUpperCase();
+			return text.toLowerCase();
+		}
+
+		if (lowerCallee === 'copia') {
+			this.expectArgCount(node.callee, node.args.length, 3, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			const text = this.requireTextArg(node.callee, args[0], 1, node.line);
+			const start = Math.trunc(this.requireNumberArg(node.callee, args[1], 2, node.line));
+			const count = Math.trunc(this.requireNumberArg(node.callee, args[2], 3, node.line));
+			return text.slice(Math.max(0, start - 1), Math.max(0, start - 1) + Math.max(0, count));
+		}
+
+		if (lowerCallee === 'pos') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			const needle = this.requireTextArg(node.callee, args[0], 1, node.line);
+			const text = this.requireTextArg(node.callee, args[1], 2, node.line);
+			const index = text.indexOf(needle);
+			return index === -1 ? 0 : index + 1;
+		}
+
+		if (lowerCallee === 'asc') {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			return this.requireCharacterArg(node.callee, value, 1, node.line).codePointAt(0) ?? 0;
+		}
+
+		if (lowerCallee === 'carac') {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const codePoint = Math.trunc(this.requireNumberArg(node.callee, value, 1, node.line));
+			if (codePoint < 0 || codePoint > 0x10ffff) {
+				throw new Error(
+					`Erro na linha ${node.line}: Função '${node.callee}' espera código numérico entre 0 e 1114111.`
+				);
+			}
+			return String.fromCodePoint(codePoint);
+		}
+
+		if (lowerCallee === 'rand' || lowerCallee === 'randi') {
+			const args = yield* this.evaluateArgs(node, env);
+			const { lower, upper } = this.getRandomBounds(node.callee, args, node.line, {
+				allowZeroArgs: lowerCallee === 'rand',
+				integer: lowerCallee === 'randi'
+			});
+			const value = lower + Math.random() * (upper - lower);
+			return lowerCallee === 'randi' ? Math.floor(value) : value;
 		}
 
 		// Função do usuário

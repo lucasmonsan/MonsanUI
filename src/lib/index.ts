@@ -160,3 +160,4 @@ export { i18n } from './utils/i18n.svelte.js';
 
 // Portugol Compiler & Interpreter
 export * from './utils/portugol/interpreter.js';
+export * from './utils/portugol/reference.js';
