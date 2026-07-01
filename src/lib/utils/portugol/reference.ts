@@ -258,6 +258,40 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		compatibility: 'Visualg'
 	},
 	{
+		name: 'asc',
+		category: 'string',
+		status: 'supported',
+		syntax: 'asc(caractere)',
+		description: 'Retorna o código numérico do caractere informado.',
+		example: 'escreva(asc("A"))',
+		compatibility: 'Visualg'
+	},
+	{
+		name: 'carac',
+		category: 'string',
+		status: 'supported',
+		syntax: 'carac(codigo)',
+		description: 'Retorna o caractere correspondente ao código numérico informado.',
+		example: 'escreva(carac(65))',
+		compatibility: 'Visualg'
+	},
+	{
+		name: 'numpcarac',
+		category: 'string',
+		status: 'planned',
+		syntax: 'numpcarac(...)',
+		description: 'Conversão relacionada a número/caractere; direção exata pendente de confirmação.',
+		compatibility: 'Planned'
+	},
+	{
+		name: 'caracpnum',
+		category: 'string',
+		status: 'planned',
+		syntax: 'caracpnum(...)',
+		description: 'Conversão relacionada a caractere/número; direção exata pendente de confirmação.',
+		compatibility: 'Planned'
+	},
+	{
 		name: 'repita',
 		aliases: ['ate'],
 		category: 'control-flow',

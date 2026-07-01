@@ -255,6 +255,8 @@
 					'minusc',
 					'copia',
 					'pos',
+					'asc',
+					'carac',
 					'rand',
 					'randi'
 				]);

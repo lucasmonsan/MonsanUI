@@ -1549,6 +1549,21 @@ export class Interpreter {
 		return value;
 	}
 
+	private requireCharacterArg(
+		callee: string,
+		value: unknown,
+		argNumber: number,
+		line: number
+	): string {
+		const text = this.requireTextArg(callee, value, argNumber, line);
+		if ([...text].length !== 1) {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera argumento ${argNumber} com exatamente um caractere.`
+			);
+		}
+		return text;
+	}
+
 	private getRandomBounds(
 		callee: string,
 		args: unknown[],
@@ -1937,6 +1952,24 @@ export class Interpreter {
 			const text = this.requireTextArg(node.callee, args[1], 2, node.line);
 			const index = text.indexOf(needle);
 			return index === -1 ? 0 : index + 1;
+		}
+
+		if (lowerCallee === 'asc') {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			return this.requireCharacterArg(node.callee, value, 1, node.line).codePointAt(0) ?? 0;
+		}
+
+		if (lowerCallee === 'carac') {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const codePoint = Math.trunc(this.requireNumberArg(node.callee, value, 1, node.line));
+			if (codePoint < 0 || codePoint > 0x10ffff) {
+				throw new Error(
+					`Erro na linha ${node.line}: Função '${node.callee}' espera código numérico entre 0 e 1114111.`
+				);
+			}
+			return String.fromCodePoint(codePoint);
 		}
 
 		if (lowerCallee === 'rand' || lowerCallee === 'randi') {

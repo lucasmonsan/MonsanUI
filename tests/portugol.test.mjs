@@ -961,6 +961,48 @@ console.log('Running Visualg random function tests...');
 	);
 }
 
+console.log('Running Visualg character conversion tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "ConversoesCaracter"
+		var
+		inicio
+			escreva(asc("A"), "|")
+			escreva(carac(65), "|")
+			escreva(carac(randi(65, 66)))
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '65|A|A');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroAscTexto"
+				var
+				inicio
+					escreva(asc("AB"))
+				fimalgoritmo
+			`),
+		"Função 'asc' espera argumento 1 com exatamente um caractere.",
+		'Should reject asc with more than one character'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroCaracTipo"
+				var
+				inicio
+					escreva(carac("A"))
+				fimalgoritmo
+			`),
+		"Função 'carac' espera argumento 1 numérico.",
+		'Should reject carac with non-number argument'
+	);
+}
+
 console.log('Running Visualg reference catalog tests...');
 {
 	const supportedNames = new Set(
@@ -1013,6 +1055,8 @@ console.log('Running Visualg reference catalog tests...');
 		'minusc',
 		'copia',
 		'pos',
+		'asc',
+		'carac',
 		'rand',
 		'randi'
 	];
@@ -1023,6 +1067,7 @@ console.log('Running Visualg reference catalog tests...');
 
 	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
 	assertEquals(getVisualgReferenceItem('randi')?.status, 'supported');
+	assertEquals(getVisualgReferenceItem('numpcarac')?.status, 'planned');
 	assertEquals(getVisualgReferenceItem('arquivo')?.status, 'out-of-scope');
 	assert(
 		visualgReferenceItems.every((item) => item.syntax && item.description),
