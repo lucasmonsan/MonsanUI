@@ -5,6 +5,11 @@ import {
 	SemanticValidator,
 	checkIndentation
 } from '../dist/utils/portugol/interpreter.js';
+import {
+	getSupportedVisualgReferenceNames,
+	getVisualgReferenceItem,
+	visualgReferenceItems
+} from '../dist/utils/portugol/reference.js';
 
 function assert(condition, message) {
 	if (!condition) throw new Error(message);
@@ -635,6 +640,66 @@ console.log('Running Visualg essential function tests...');
 			`),
 		"Função 'abs' espera argumento 1 numérico.",
 		'Should reject invalid numeric function argument'
+	);
+}
+
+console.log('Running Visualg reference catalog tests...');
+{
+	const supportedNames = new Set(
+		getSupportedVisualgReferenceNames().map((name) => name.toLowerCase())
+	);
+	const requiredSupportedNames = [
+		'algoritmo',
+		'var',
+		'inicio',
+		'fimalgoritmo',
+		'inteiro',
+		'real',
+		'caractere',
+		'caracter',
+		'cadeia',
+		'logico',
+		'se',
+		'entao',
+		'senao',
+		'fimse',
+		'enquanto',
+		'faca',
+		'fimenquanto',
+		'para',
+		'de',
+		'ate',
+		'passo',
+		'fimpara',
+		'leia',
+		'escreva',
+		'escreval',
+		'limpa',
+		'limpatela',
+		'mod',
+		'pi',
+		'abs',
+		'raizq',
+		'pot',
+		'quad',
+		'int',
+		'compr',
+		'maiusc',
+		'minusc',
+		'copia',
+		'pos'
+	];
+
+	for (const name of requiredSupportedNames) {
+		assert(supportedNames.has(name), `Reference catalog should include supported name '${name}'`);
+	}
+
+	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
+	assertEquals(getVisualgReferenceItem('randi')?.status, 'planned');
+	assertEquals(getVisualgReferenceItem('arquivo')?.status, 'out-of-scope');
+	assert(
+		visualgReferenceItems.every((item) => item.syntax && item.description),
+		'Every reference item should include syntax and description'
 	);
 }
 
