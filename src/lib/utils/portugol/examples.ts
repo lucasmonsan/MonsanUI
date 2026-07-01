@@ -48,7 +48,7 @@ inicio
 	escreva(nome, "|")
 	escreva(turma)
 fimalgoritmo`,
-		expectedOutput: '12|A|B'
+		expectedOutput: '12|Ana|B'
 	},
 	{
 		id: 'typed-read',

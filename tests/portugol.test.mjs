@@ -336,7 +336,7 @@ console.log('Running Portugol Interpreter I/O (leia) tests...');
 
 	const outputs = interpreter.getOutputs();
 	assertEquals(outputs.length, 2);
-	assertEquals(outputs[0], '15|15|141|L|');
+	assertEquals(outputs[0], '15|15|141|Lucas|');
 	assertEquals(outputs[1], 'sim');
 }
 
@@ -485,7 +485,7 @@ console.log('Running Visualg typed assignment coercion tests...');
 
 	const outputs = interpreter.getOutputs();
 	assertEquals(outputs.length, 2);
-	assertEquals(outputs[0], '15|15|141|L|');
+	assertEquals(outputs[0], '15|15|141|Lucas|');
 	assertEquals(outputs[1], 'sim');
 }
 
@@ -561,7 +561,7 @@ console.log('Running Visualg declaration and comparison tests...');
 			se nota >= media entao
 				escreva("misto|")
 			fimse
-			se nome = "L" entao
+			se nome = "Lucas" entao
 				escreva("texto|")
 			fimse
 			se ativo <> aprovado entao

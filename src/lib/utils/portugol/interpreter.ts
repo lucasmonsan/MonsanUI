@@ -1431,7 +1431,6 @@ export class Environment {
 			}
 			case 'caracter':
 			case 'caractere':
-				return String(value).charAt(0);
 			case 'cadeia':
 				return String(value);
 			default:
@@ -1493,6 +1492,10 @@ export class Interpreter {
 
 	public clearOutputs() {
 		this.outputs = [];
+	}
+
+	public getGlobalVariables(): Record<string, { value: unknown; type: string }> {
+		return this.globalEnv.getVariables();
 	}
 
 	private runtimeType(value: unknown): string {
