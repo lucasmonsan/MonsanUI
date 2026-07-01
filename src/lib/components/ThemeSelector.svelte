@@ -19,9 +19,20 @@
 		display?: 'icon' | 'label';
 	}
 
+	const SUITE_THEME_STORAGE_KEY = 'monsan-suite-theme';
+	const SUITE_THEME_COOKIE = 'monsan_theme';
+	const LEGACY_THEME_STORAGE_KEYS = [
+		'theme',
+		'manki_theme',
+		'crocode_theme',
+		'classhopper-theme',
+		'monsan-theme',
+		'koalify-theme'
+	];
+
 	let {
 		value = $bindable('light'),
-		storageKey = 'theme',
+		storageKey = SUITE_THEME_STORAGE_KEY,
 		themes = [
 			{ id: 'light', label: 'Light' },
 			{ id: 'dark', label: 'Dark' }
@@ -34,16 +45,73 @@
 	let isOpen = $state(false);
 	let activeTheme = $derived(themes.find((theme) => theme.id === value));
 
-	onMount(() => {
-		const documentTheme = document.documentElement.getAttribute('data-theme');
-		const saved = localStorage.getItem(storageKey);
-		let initialTheme: string = saved || '';
+	function isValidTheme(themeId: string | null | undefined) {
+		return Boolean(themeId && themes.some((theme: ThemeOption) => theme.id === themeId));
+	}
 
-		if (!initialTheme && documentTheme && themes.some((t: ThemeOption) => t.id === documentTheme)) {
-			initialTheme = documentTheme;
+	function readThemeCookie() {
+		const encodedTheme =
+			document.cookie
+				.split(';')
+				.map((item) => item.trim())
+				.find((item) => item.startsWith(`${SUITE_THEME_COOKIE}=`))
+				?.split('=')
+				.slice(1)
+				.join('=') || '';
+
+		try {
+			return decodeURIComponent(encodedTheme);
+		} catch {
+			return '';
+		}
+	}
+
+	function getSuiteCookieDomain() {
+		const hostname = window.location.hostname;
+		if (hostname === 'monsan.dev.br' || hostname.endsWith('.monsan.dev.br')) {
+			return '.monsan.dev.br';
+		}
+		return '';
+	}
+
+	function persistTheme(themeId: string) {
+		localStorage.setItem(SUITE_THEME_STORAGE_KEY, themeId);
+		if (storageKey !== SUITE_THEME_STORAGE_KEY) {
+			localStorage.setItem(storageKey, themeId);
 		}
 
-		if (!initialTheme || !themes.some((t: ThemeOption) => t.id === initialTheme)) {
+		const maxAge = 60 * 60 * 24 * 365;
+		const domain = getSuiteCookieDomain();
+		const domainPart = domain ? `; Domain=${domain}` : '';
+		const securePart = window.location.protocol === 'https:' ? '; Secure' : '';
+		document.cookie = `${SUITE_THEME_COOKIE}=${encodeURIComponent(themeId)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${domainPart}${securePart}`;
+	}
+
+	function readStoredTheme() {
+		const candidates = [
+			readThemeCookie(),
+			localStorage.getItem(SUITE_THEME_STORAGE_KEY),
+			localStorage.getItem(storageKey),
+			...LEGACY_THEME_STORAGE_KEYS.map((key) => localStorage.getItem(key)),
+			document.documentElement.getAttribute('data-theme')
+		];
+
+		return candidates.find((candidate) => isValidTheme(candidate)) || '';
+	}
+
+	function applyTheme(themeId: string, persist = true, notify = true) {
+		value = themeId;
+		document.documentElement.setAttribute('data-theme', themeId);
+		if (persist) persistTheme(themeId);
+		if (notify) {
+			window.dispatchEvent(new CustomEvent('monsan-theme-change', { detail: { theme: themeId } }));
+		}
+	}
+
+	onMount(() => {
+		let initialTheme = readStoredTheme();
+
+		if (!initialTheme) {
 			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 			if (prefersDark && themes.some((t: ThemeOption) => t.id === 'dark')) {
 				initialTheme = 'dark';
@@ -54,14 +122,32 @@
 			}
 		}
 
-		value = initialTheme;
-		document.documentElement.setAttribute('data-theme', value);
+		applyTheme(initialTheme, true, false);
+
+		const handleThemeChange = (event: Event) => {
+			const themeId = (event as CustomEvent<{ theme?: string }>).detail?.theme;
+			if (isValidTheme(themeId) && themeId !== value) {
+				applyTheme(themeId as string, false, false);
+			}
+		};
+
+		const handleStorage = (event: StorageEvent) => {
+			if (event.key === SUITE_THEME_STORAGE_KEY && isValidTheme(event.newValue)) {
+				applyTheme(event.newValue as string, false, false);
+			}
+		};
+
+		window.addEventListener('monsan-theme-change', handleThemeChange);
+		window.addEventListener('storage', handleStorage);
+
+		return () => {
+			window.removeEventListener('monsan-theme-change', handleThemeChange);
+			window.removeEventListener('storage', handleStorage);
+		};
 	});
 
 	function selectTheme(themeId: string) {
-		value = themeId;
-		document.documentElement.setAttribute('data-theme', themeId);
-		localStorage.setItem(storageKey, themeId);
+		applyTheme(themeId);
 		onChange?.(themeId);
 		isOpen = false;
 	}
