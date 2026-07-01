@@ -263,8 +263,18 @@
 					'pos',
 					'asc',
 					'carac',
+					'numpcarac',
+					'caracpnum',
 					'rand',
-					'randi'
+					'randi',
+					'log',
+					'exp',
+					'sen',
+					'cos',
+					'tan',
+					'cotan',
+					'arcsen',
+					'arccos'
 				]);
 				if (keywords.has(word)) {
 					return 'keyword';

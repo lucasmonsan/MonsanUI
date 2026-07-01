@@ -1559,6 +1559,21 @@ export class Interpreter {
 		return value;
 	}
 
+	private requireFiniteNumberArg(
+		callee: string,
+		value: unknown,
+		argNumber: number,
+		line: number
+	): number {
+		const numberValue = this.requireNumberArg(callee, value, argNumber, line);
+		if (!Number.isFinite(numberValue)) {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera argumento ${argNumber} numérico finito.`
+			);
+		}
+		return numberValue;
+	}
+
 	private requireTextArg(callee: string, value: unknown, argNumber: number, line: number): string {
 		if (typeof value !== 'string') {
 			throw new Error(
@@ -1581,6 +1596,16 @@ export class Interpreter {
 			);
 		}
 		return text;
+	}
+
+	private parseStrictNumberText(callee: string, value: unknown, line: number): number {
+		const text = this.requireTextArg(callee, value, 1, line);
+		if (!/^-?(?:\d+|\d+\.\d+)$/.test(text)) {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera texto contendo apenas um número válido com ponto decimal opcional.`
+			);
+		}
+		return Number(text);
 	}
 
 	private getRandomBounds(
@@ -1965,6 +1990,38 @@ export class Interpreter {
 			return Math.trunc(numberValue);
 		}
 
+		if (lowerCallee === 'log' || lowerCallee === 'exp') {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const numberValue = this.requireFiniteNumberArg(node.callee, value, 1, node.line);
+			if (lowerCallee === 'log') {
+				if (numberValue <= 0) {
+					throw new Error(
+						`Erro na linha ${node.line}: Função '${node.callee}' espera argumento maior que zero.`
+					);
+				}
+				return Math.log(numberValue);
+			}
+			return Math.exp(numberValue);
+		}
+
+		if (['sen', 'cos', 'tan', 'cotan', 'arcsen', 'arccos'].includes(lowerCallee)) {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			const numberValue = this.requireFiniteNumberArg(node.callee, value, 1, node.line);
+			if ((lowerCallee === 'arcsen' || lowerCallee === 'arccos') && Math.abs(numberValue) > 1) {
+				throw new Error(
+					`Erro na linha ${node.line}: Função '${node.callee}' espera argumento entre -1 e 1.`
+				);
+			}
+			if (lowerCallee === 'sen') return Math.sin(numberValue);
+			if (lowerCallee === 'cos') return Math.cos(numberValue);
+			if (lowerCallee === 'tan') return Math.tan(numberValue);
+			if (lowerCallee === 'cotan') return 1 / Math.tan(numberValue);
+			if (lowerCallee === 'arcsen') return Math.asin(numberValue);
+			return Math.acos(numberValue);
+		}
+
 		if (lowerCallee === 'pot') {
 			this.expectArgCount(node.callee, node.args.length, 2, node.line);
 			const args = yield* this.evaluateArgs(node, env);
@@ -2017,6 +2074,18 @@ export class Interpreter {
 				);
 			}
 			return String.fromCodePoint(codePoint);
+		}
+
+		if (lowerCallee === 'numpcarac') {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			return String(this.requireFiniteNumberArg(node.callee, value, 1, node.line));
+		}
+
+		if (lowerCallee === 'caracpnum') {
+			this.expectArgCount(node.callee, node.args.length, 1, node.line);
+			const [value] = yield* this.evaluateArgs(node, env);
+			return this.parseStrictNumberText(node.callee, value, node.line);
 		}
 
 		if (lowerCallee === 'rand' || lowerCallee === 'randi') {

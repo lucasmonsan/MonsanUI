@@ -32,6 +32,14 @@ function assertEquals(actual, expected, message) {
 	}
 }
 
+function assertApprox(actual, expected, tolerance = 1e-10, message) {
+	if (Math.abs(actual - expected) > tolerance) {
+		throw new Error(
+			`${message || 'Assertion failed'}: expected ${expected} within ${tolerance}, got ${actual}`
+		);
+	}
+}
+
 function parseProgram(code) {
 	const lexer = new Lexer(code);
 	const tokens = lexer.tokenize();
@@ -985,19 +993,82 @@ console.log('Running Visualg random function tests...');
 	);
 }
 
+console.log('Running Visualg math function tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "FuncoesMatematicas"
+		var
+		inicio
+			escreva(log(exp(1)), "|")
+			escreva(sen(pi / 2), "|")
+			escreva(cos(0), "|")
+			escreva(tan(0), "|")
+			escreva(cotan(pi / 4), "|")
+			escreva(arcsen(1), "|")
+			escreva(arccos(1))
+		fimalgoritmo
+	`);
+
+	const [logValue, sinValue, cosValue, tanValue, cotanValue, arcsenValue, arccosValue] = outputs
+		.join('')
+		.split('|')
+		.map(Number);
+
+	assertApprox(logValue, 1, 1e-10, 'log(exp(1)) should be 1');
+	assertApprox(sinValue, 1, 1e-10, 'sen(pi / 2) should be 1');
+	assertApprox(cosValue, 1, 1e-10, 'cos(0) should be 1');
+	assertApprox(tanValue, 0, 1e-10, 'tan(0) should be 0');
+	assertApprox(cotanValue, 1, 1e-10, 'cotan(pi / 4) should be 1');
+	assertApprox(arcsenValue, Math.PI / 2, 1e-10, 'arcsen(1) should be pi / 2');
+	assertApprox(arccosValue, 0, 1e-10, 'arccos(1) should be 0');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroLogZero"
+				var
+				inicio
+					escreva(log(0))
+				fimalgoritmo
+			`),
+		"Função 'log' espera argumento maior que zero.",
+		'Should reject log of zero'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroArcsenDominio"
+				var
+				inicio
+					escreva(arcsen(2))
+				fimalgoritmo
+			`),
+		"Função 'arcsen' espera argumento entre -1 e 1.",
+		'Should reject arcsen outside domain'
+	);
+}
+
 console.log('Running Visualg character conversion tests...');
 {
 	const outputs = runProgram(`
 		algoritmo "ConversoesCaracter"
 		var
+			inteiroConvertido : inteiro
 		inicio
 			escreva(asc("A"), "|")
 			escreva(carac(65), "|")
-			escreva(carac(randi(65, 66)))
+			escreva(carac(randi(65, 66)), "|")
+			escreva(numpcarac(28.165), "|")
+			escreva(caracpnum("15"), "|")
+			escreva(caracpnum("28.165"), "|")
+			inteiroConvertido <- caracpnum("16.24")
+			escreva(inteiroConvertido)
 		fimalgoritmo
 	`);
 
-	assertEquals(outputs.join(''), '65|A|A');
+	assertEquals(outputs.join(''), '65|A|A|28.165|15|28.165|16');
 }
 
 {
@@ -1024,6 +1095,42 @@ console.log('Running Visualg character conversion tests...');
 			`),
 		"Função 'carac' espera argumento 1 numérico.",
 		'Should reject carac with non-number argument'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroCaracPNumTexto"
+				var
+				inicio
+					escreva(caracpnum("18 dias"))
+				fimalgoritmo
+			`),
+		"Função 'caracpnum' espera texto contendo apenas um número válido com ponto decimal opcional.",
+		'Should reject mixed text in caracpnum'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroCaracPNumEspaco"
+				var
+				inicio
+					escreva(caracpnum(" 55"))
+				fimalgoritmo
+			`),
+		"Função 'caracpnum' espera texto contendo apenas um número válido com ponto decimal opcional.",
+		'Should reject whitespace in caracpnum'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroCaracPNumVirgula"
+				var
+				inicio
+					escreva(caracpnum("10,5"))
+				fimalgoritmo
+			`),
+		"Função 'caracpnum' espera texto contendo apenas um número válido com ponto decimal opcional.",
+		'Should reject comma decimal in caracpnum'
 	);
 }
 
@@ -1082,8 +1189,18 @@ console.log('Running Visualg reference catalog tests...');
 		'pos',
 		'asc',
 		'carac',
+		'numpcarac',
+		'caracpnum',
 		'rand',
-		'randi'
+		'randi',
+		'log',
+		'exp',
+		'sen',
+		'cos',
+		'tan',
+		'cotan',
+		'arcsen',
+		'arccos'
 	];
 
 	for (const name of requiredSupportedNames) {
@@ -1092,9 +1209,9 @@ console.log('Running Visualg reference catalog tests...');
 
 	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
 	assertEquals(getVisualgReferenceItem('randi')?.status, 'supported');
-	assertEquals(getVisualgReferenceItem('numpcarac')?.status, 'planned');
-	assertEquals(getVisualgReferenceItem('log')?.status, 'planned');
-	assertEquals(getVisualgReferenceItem('cos')?.status, 'planned');
+	assertEquals(getVisualgReferenceItem('numpcarac')?.status, 'supported');
+	assertEquals(getVisualgReferenceItem('log')?.status, 'supported');
+	assertEquals(getVisualgReferenceItem('cos')?.status, 'supported');
 	assertEquals(getVisualgReferenceItem('arquivo')?.status, 'out-of-scope');
 	assertEquals(getVisualgReferenceItem('pausa')?.status, 'out-of-scope');
 	assertEquals(getVisualgReferenceItem('timer')?.status, 'out-of-scope');
@@ -1106,28 +1223,6 @@ console.log('Running Visualg reference catalog tests...');
 
 console.log('Running Visualg unsupported command message tests...');
 {
-	assertThrowsMessage(
-		() =>
-			runProgram(`
-				algoritmo "planned"
-				inicio
-					escreva(numpcarac("A"))
-				fimalgoritmo
-			`),
-		'Comando Visualg ainda não suportado: numpcarac.',
-		'Should explain planned Visualg functions'
-	);
-	assertThrowsMessage(
-		() =>
-			runProgram(`
-				algoritmo "planned_math"
-				inicio
-					escreva(log(10))
-				fimalgoritmo
-			`),
-		'Comando Visualg ainda não suportado: log.',
-		'Should explain planned math functions'
-	);
 	assertThrowsMessage(
 		() =>
 			runProgram(`
