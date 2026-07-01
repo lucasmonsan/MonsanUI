@@ -16,6 +16,7 @@
 	import TerminalIcon from './icons/Terminal.svelte';
 	import BracketsCurlyIcon from './icons/BracketsCurly.svelte';
 	import ListBulletsIcon from './icons/ListBullets.svelte';
+	import XIcon from './icons/X.svelte';
 	import {
 		Lexer,
 		Parser,
@@ -140,8 +141,40 @@
 
 	let interpreter: Interpreter | null = null;
 	let generator: Generator<unknown, unknown, unknown> | null = null;
+	let stopRequested = false;
+	let scheduledRun: ReturnType<typeof setTimeout> | null = null;
+	const executionChunkSize = 500;
+
+	function clearScheduledRun() {
+		if (scheduledRun) {
+			clearTimeout(scheduledRun);
+			scheduledRun = null;
+		}
+	}
+
+	function scheduleRunNext() {
+		clearScheduledRun();
+		scheduledRun = setTimeout(() => {
+			scheduledRun = null;
+			runNext();
+		}, 0);
+	}
+
+	function finishStoppedExecution() {
+		clearScheduledRun();
+		isRunning = false;
+		isStepMode = false;
+		isPaused = false;
+		pendingInputVar = null;
+		currentInputValue = '';
+		activeLine = 0;
+		stopRequested = false;
+		interpreter = null;
+		generator = null;
+	}
 
 	function startExecution(step = false) {
+		clearScheduledRun();
 		errorMsg = '';
 		errorLine = 0;
 		outputs = [];
@@ -149,6 +182,7 @@
 		activeLine = 0;
 		pendingInputVar = null;
 		isStepMode = step;
+		stopRequested = false;
 
 		if (strictIndent) {
 			const indentResult = checkIndentation(code);
@@ -190,11 +224,21 @@
 
 	function runNext(inputValue?: string) {
 		if (!generator) return;
+		if (stopRequested) {
+			finishStoppedExecution();
+			return;
+		}
 
 		try {
 			let result = generator.next(inputValue);
+			let chunkSteps = 0;
 
 			while (!result.done) {
+				if (stopRequested) {
+					finishStoppedExecution();
+					return;
+				}
+
 				const val = result.value as {
 					type: string;
 					value?: string;
@@ -224,16 +268,27 @@
 					onOutputsChange?.(outputs);
 				}
 
+				chunkSteps += 1;
+				if (!isStepMode && chunkSteps >= executionChunkSize) {
+					scheduleRunNext();
+					return;
+				}
+
 				result = generator.next();
 			}
 
 			// Fim da execução limpa estados
+			clearScheduledRun();
 			isRunning = false;
 			isStepMode = false;
 			isPaused = false;
 			activeLine = 0;
+			stopRequested = false;
+			interpreter = null;
+			generator = null;
 			onSuccess?.();
 		} catch (e: unknown) {
+			clearScheduledRun();
 			const err = e as Error;
 			errorMsg = err.message || String(e);
 			const lineMatch = errorMsg.match(/(?:linha|line)\s+(\d+)/i);
@@ -241,6 +296,9 @@
 			isRunning = false;
 			isStepMode = false;
 			isPaused = false;
+			stopRequested = false;
+			interpreter = null;
+			generator = null;
 			onFailure?.(errorMsg);
 		}
 	}
@@ -265,12 +323,19 @@
 		runNext(value);
 	}
 
+	function handleStop() {
+		stopRequested = true;
+		finishStoppedExecution();
+	}
+
 	function handleReset() {
+		clearScheduledRun();
 		activeLine = 0;
 		errorLine = 0;
 		isRunning = false;
 		isPaused = false;
 		isStepMode = false;
+		stopRequested = false;
 		variables = {};
 		outputs = [];
 		errorMsg = '';
@@ -474,6 +539,12 @@
 						<RotateCwIcon size="16" />
 						<span class="toolbar-label">Reiniciar</span>
 					</Button>
+					{#if isRunning}
+						<Button variant="error" size="sm" onclick={handleStop} {disabled}>
+							<XIcon size="16" />
+							<span class="toolbar-label">Parar</span>
+						</Button>
+					{/if}
 					{#if onsave}
 						<Button
 							variant="secondary"
