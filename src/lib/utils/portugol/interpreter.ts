@@ -20,6 +20,7 @@ export type TokenType =
 	| 'STAR'
 	| 'SLASH'
 	| 'PERCENT'
+	| 'INTDIV'
 	| 'EQ'
 	| 'NEQ'
 	| 'LT'
@@ -384,6 +385,13 @@ export class Lexer {
 							this.pushIdentifierToken(tokens, id, startLine, startCol);
 						} else {
 							tokens.push({ type: 'PERCENT', value: '%', line: startLine, column: startCol });
+						}
+					} else if (lowerId === 'div') {
+						const nextNonWhitespace = this.input.slice(this.pos).match(/^\s*(.)/)?.[1];
+						if (nextNonWhitespace === '(') {
+							this.pushIdentifierToken(tokens, id, startLine, startCol);
+						} else {
+							tokens.push({ type: 'INTDIV', value: 'div', line: startLine, column: startCol });
 						}
 					} else if (
 						['inteiro', 'real', 'caractere', 'caracter', 'logico', 'cadeia'].includes(lowerId)
@@ -958,7 +966,7 @@ export class Parser {
 
 	private parseFactor(): ASTNode {
 		let expr = this.parseUnary();
-		while (this.match('STAR', 'SLASH', 'PERCENT')) {
+		while (this.match('STAR', 'SLASH', 'PERCENT', 'INTDIV')) {
 			const op = this.tokens[this.current - 1];
 			const right = this.parseUnary();
 			expr = { type: 'Binary', left: expr, operator: op.value, right, line: op.line };
@@ -1797,6 +1805,12 @@ export class Interpreter {
 					case '%':
 						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) % (right as number);
+					case 'div':
+						this.assertNumberOperands(node.operator, left, right, node.line);
+						if (right === 0) {
+							throw new Error(`Erro em Tempo de Execução na linha ${node.line}: Divisão por zero.`);
+						}
+						return Math.trunc((left as number) / (right as number));
 					case '==':
 					case '=':
 						this.assertEqualityOperands(node.operator, left, right, node.line);
@@ -1906,6 +1920,16 @@ export class Interpreter {
 				this.requireNumberArg(node.callee, args[0], 1, node.line) %
 				this.requireNumberArg(node.callee, args[1], 2, node.line)
 			);
+		}
+
+		if (lowerCallee === 'div') {
+			this.expectArgCount(node.callee, node.args.length, 2, node.line);
+			const args = yield* this.evaluateArgs(node, env);
+			const divisor = this.requireNumberArg(node.callee, args[1], 2, node.line);
+			if (divisor === 0) {
+				throw new Error(`Erro em Tempo de Execução na linha ${node.line}: Divisão por zero.`);
+			}
+			return Math.trunc(this.requireNumberArg(node.callee, args[0], 1, node.line) / divisor);
 		}
 
 		if (['abs', 'raizq', 'quad', 'int'].includes(lowerCallee)) {

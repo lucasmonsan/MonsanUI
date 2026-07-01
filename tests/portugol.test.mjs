@@ -849,6 +849,8 @@ console.log('Running Visualg essential function tests...');
 			escreva(int(8.9), "|")
 			escreva(10 mod 3, "|")
 			escreva(mod(10, 4), "|")
+			escreva(10 div 3, "|")
+			escreva(div(11, 4), "|")
 			escreva(compr(texto), "|")
 			escreva(maiusc("abc"), "|")
 			escreva(minusc("ABC"), "|")
@@ -861,7 +863,7 @@ console.log('Running Visualg essential function tests...');
 		fimalgoritmo
 	`);
 
-	assertEquals(outputs.join(''), '5|3|8|16|8|1|2|7|ABC|abc|roc|4|0|pi');
+	assertEquals(outputs.join(''), '5|3|8|16|8|1|2|3|2|7|ABC|abc|roc|4|0|pi');
 }
 
 {
@@ -1043,6 +1045,7 @@ console.log('Running Visualg reference catalog tests...');
 		'limpa',
 		'limpatela',
 		'mod',
+		'div',
 		'xou',
 		'pi',
 		'abs',

@@ -244,6 +244,7 @@
 					'limpa',
 					'limpatela',
 					'mod',
+					'div',
 					'pi',
 					'abs',
 					'raizq',

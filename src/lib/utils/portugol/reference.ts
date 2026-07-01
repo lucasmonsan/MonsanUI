@@ -161,6 +161,15 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		compatibility: 'Visualg'
 	},
 	{
+		name: 'div',
+		category: 'operator',
+		status: 'supported',
+		syntax: 'a div b',
+		description: 'Retorna a parte inteira da divisão. Também pode ser usado como div(a, b).',
+		example: 'escreva(10 div 3)',
+		compatibility: 'Visualg'
+	},
+	{
 		name: 'xou',
 		category: 'operator',
 		status: 'supported',
