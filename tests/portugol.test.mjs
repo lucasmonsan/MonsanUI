@@ -10,6 +10,10 @@ import {
 	getVisualgReferenceItem,
 	visualgReferenceItems
 } from '../dist/utils/portugol/reference.js';
+import {
+	getVisualgOfficialExample,
+	visualgOfficialExamples
+} from '../dist/utils/portugol/examples.js';
 
 function assert(condition, message) {
 	if (!condition) throw new Error(message);
@@ -1076,6 +1080,43 @@ console.log('Running Visualg reference catalog tests...');
 		visualgReferenceItems.every((item) => item.syntax && item.description),
 		'Every reference item should include syntax and description'
 	);
+}
+
+console.log('Running Visualg official examples tests...');
+{
+	assert(visualgOfficialExamples.length >= 8, 'Should include official regression examples');
+	assertEquals(getVisualgOfficialExample('hello-world')?.status, 'supported');
+
+	const ids = new Set();
+	for (const example of visualgOfficialExamples) {
+		assert(!ids.has(example.id), `Official example id should be unique: ${example.id}`);
+		ids.add(example.id);
+		assert(example.title, `Official example ${example.id} should include a title`);
+		assert(example.description, `Official example ${example.id} should include a description`);
+		assert(example.code, `Official example ${example.id} should include code`);
+		assert(example.tags.length > 0, `Official example ${example.id} should include tags`);
+
+		if (example.status === 'supported') {
+			assert(
+				typeof example.expectedOutput === 'string',
+				`Supported example ${example.id} should include expected output`
+			);
+			const outputs = runProgram(example.code, example.inputs ?? []);
+			assertEquals(outputs.join(''), example.expectedOutput, `Example ${example.id} should run`);
+		}
+
+		if (example.status === 'error-case') {
+			assert(
+				example.expectedErrorIncludes,
+				`Error example ${example.id} should include expected error text`
+			);
+			assertThrowsMessage(
+				() => runProgram(example.code, example.inputs ?? []),
+				example.expectedErrorIncludes,
+				`Example ${example.id} should fail with expected error`
+			);
+		}
+	}
 }
 
 console.log('Running SemanticValidator tests...');
