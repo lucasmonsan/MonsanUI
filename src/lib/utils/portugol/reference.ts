@@ -161,6 +161,15 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		compatibility: 'Visualg'
 	},
 	{
+		name: 'xou',
+		category: 'operator',
+		status: 'supported',
+		syntax: 'valor_logico xou outro_valor_logico',
+		description: 'Operador lógico ou exclusivo; verdadeiro quando exatamente um lado é verdadeiro.',
+		example: 'escreva(verdadeiro xou falso)',
+		compatibility: 'Visualg'
+	},
+	{
 		name: 'pi',
 		category: 'math',
 		status: 'supported',

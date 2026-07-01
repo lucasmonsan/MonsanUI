@@ -214,6 +214,7 @@
 					'falso',
 					'e',
 					'ou',
+					'xou',
 					'nao',
 					'não',
 					'algoritmo',

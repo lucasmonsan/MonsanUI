@@ -584,6 +584,48 @@ console.log('Running Visualg declaration and comparison tests...');
 	);
 }
 
+console.log('Running Visualg xor operator tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "Xou"
+		var
+		inicio
+			se verdadeiro xou falso entao
+				escreva("vf|")
+			fimse
+			se verdadeiro xou verdadeiro entao
+				escreva("erro|")
+			senao
+				escreva("vv|")
+			fimse
+			se falso xou falso entao
+				escreva("erro")
+			senao
+				escreva("ff")
+			fimse
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'vf|vv|ff');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroXou"
+				var
+				inicio
+					se verdadeiro xou 1 entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		"O operador 'xou' espera valores lógicos.",
+		'Should reject non-boolean xor operands'
+	);
+}
+
 console.log('Running Visualg essential function tests...');
 {
 	const outputs = runProgram(`
@@ -745,6 +787,7 @@ console.log('Running Visualg reference catalog tests...');
 		'limpa',
 		'limpatela',
 		'mod',
+		'xou',
 		'pi',
 		'abs',
 		'raizq',

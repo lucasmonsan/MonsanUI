@@ -27,6 +27,7 @@ export type TokenType =
 	| 'GTE'
 	| 'AND'
 	| 'OR'
+	| 'XOR'
 	| 'NOT'
 	| 'LBRACE'
 	| 'RBRACE'
@@ -355,6 +356,8 @@ export class Lexer {
 						tokens.push({ type: 'AND', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'ou') {
 						tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'xou') {
+						tokens.push({ type: 'XOR', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'nao' || lowerId === 'não') {
 						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'mod') {
@@ -398,6 +401,8 @@ export class Lexer {
 						tokens.push({ type: 'AND', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'ou') {
 						tokens.push({ type: 'OR', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'xou') {
+						tokens.push({ type: 'XOR', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'nao' || lowerId === 'não') {
 						tokens.push({ type: 'NOT', value: id, line: startLine, column: startCol });
 					} else {
@@ -862,7 +867,7 @@ export class Parser {
 
 	private parseOr(): ASTNode {
 		let expr = this.parseAnd();
-		while (this.match('OR')) {
+		while (this.match('OR', 'XOR')) {
 			const op = this.tokens[this.current - 1];
 			const right = this.parseAnd();
 			expr = { type: 'Binary', left: expr, operator: op.value, right, line: op.line };
@@ -1621,6 +1626,9 @@ export class Interpreter {
 					case 'ou':
 						this.assertBooleanOperands(node.operator, left, right, node.line);
 						return !!((left as boolean) || (right as boolean));
+					case 'xou':
+						this.assertBooleanOperands(node.operator, left, right, node.line);
+						return (left as boolean) !== (right as boolean);
 					default:
 						throw new Error(`Operador binário inválido '${node.operator}' na linha ${node.line}`);
 				}
