@@ -270,10 +270,11 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		name: 'randi',
 		aliases: ['rand'],
 		category: 'math',
-		status: 'planned',
-		syntax: 'randi(max)',
-		description: 'Sorteio com limite superior exclusivo.',
-		compatibility: 'Planned'
+		status: 'supported',
+		syntax: 'rand(), rand(max), rand(min, max), randi(max), randi(min, max)',
+		description: 'Sorteia números usando intervalo semiaberto, com limite superior exclusivo.',
+		example: 'escreva(randi(1, 7))',
+		compatibility: 'Crocode'
 	},
 	{
 		name: 'mudacor',

@@ -643,6 +643,74 @@ console.log('Running Visualg essential function tests...');
 	);
 }
 
+console.log('Running Visualg random function tests...');
+{
+	for (let attempt = 0; attempt < 100; attempt += 1) {
+		const outputs = runProgram(`
+			algoritmo "Sorteio"
+			var
+			inicio
+				escreva(rand(), "|")
+				escreva(rand(10), "|")
+				escreva(rand(5, 10), "|")
+				escreva(randi(10), "|")
+				escreva(randi(1, 7))
+			fimalgoritmo
+		`);
+		const [randDefault, randMax, randRange, randiMax, randiRange] = outputs
+			.join('')
+			.split('|')
+			.map(Number);
+
+		assert(randDefault >= 0 && randDefault < 1, 'rand() should be >= 0 and < 1');
+		assert(randMax >= 0 && randMax < 10, 'rand(10) should be >= 0 and < 10');
+		assert(randRange >= 5 && randRange < 10, 'rand(5, 10) should be >= 5 and < 10');
+		assert(Number.isInteger(randiMax), 'randi(10) should return an integer');
+		assert(randiMax >= 0 && randiMax < 10, 'randi(10) should be >= 0 and < 10');
+		assert(Number.isInteger(randiRange), 'randi(1, 7) should return an integer');
+		assert(randiRange >= 1 && randiRange < 7, 'randi(1, 7) should be >= 1 and < 7');
+	}
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroRandiVazio"
+				var
+				inicio
+					escreva(randi())
+				fimalgoritmo
+			`),
+		"Função 'randi' espera 1 ou 2 argumento(s)",
+		'Should reject randi without arguments'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroRandTipo"
+				var
+				inicio
+					escreva(rand("dez"))
+				fimalgoritmo
+			`),
+		"Função 'rand' espera argumento 1 numérico.",
+		'Should reject invalid rand argument type'
+	);
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ErroRandIntervalo"
+				var
+				inicio
+					escreva(rand(10, 10))
+				fimalgoritmo
+			`),
+		"Função 'rand' espera limite superior maior que o inferior.",
+		'Should reject empty random range'
+	);
+}
+
 console.log('Running Visualg reference catalog tests...');
 {
 	const supportedNames = new Set(
@@ -687,7 +755,9 @@ console.log('Running Visualg reference catalog tests...');
 		'maiusc',
 		'minusc',
 		'copia',
-		'pos'
+		'pos',
+		'rand',
+		'randi'
 	];
 
 	for (const name of requiredSupportedNames) {
@@ -695,7 +765,7 @@ console.log('Running Visualg reference catalog tests...');
 	}
 
 	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
-	assertEquals(getVisualgReferenceItem('randi')?.status, 'planned');
+	assertEquals(getVisualgReferenceItem('randi')?.status, 'supported');
 	assertEquals(getVisualgReferenceItem('arquivo')?.status, 'out-of-scope');
 	assert(
 		visualgReferenceItems.every((item) => item.syntax && item.description),

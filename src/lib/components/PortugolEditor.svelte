@@ -247,7 +247,9 @@
 					'maiusc',
 					'minusc',
 					'copia',
-					'pos'
+					'pos',
+					'rand',
+					'randi'
 				]);
 				if (keywords.has(word)) {
 					return 'keyword';

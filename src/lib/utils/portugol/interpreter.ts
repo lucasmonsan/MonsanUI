@@ -1407,6 +1407,31 @@ export class Interpreter {
 		return value;
 	}
 
+	private getRandomBounds(
+		callee: string,
+		args: unknown[],
+		line: number,
+		options: { allowZeroArgs: boolean; integer: boolean }
+	) {
+		this.expectArgCount(callee, args.length, options.allowZeroArgs ? [0, 1, 2] : [1, 2], line);
+
+		const min = args.length === 2 ? this.requireNumberArg(callee, args[0], 1, line) : 0;
+		const max =
+			args.length === 0
+				? 1
+				: this.requireNumberArg(callee, args.length === 2 ? args[1] : args[0], args.length, line);
+		const lower = options.integer ? Math.trunc(min) : min;
+		const upper = options.integer ? Math.trunc(max) : max;
+
+		if (upper <= lower) {
+			throw new Error(
+				`Erro na linha ${line}: Função '${callee}' espera limite superior maior que o inferior.`
+			);
+		}
+
+		return { lower, upper };
+	}
+
 	private *evaluateArgs(node: CallNode, env: Environment): Generator<unknown, unknown[], unknown> {
 		const values: unknown[] = [];
 		for (const arg of node.args) {
@@ -1722,6 +1747,16 @@ export class Interpreter {
 			const text = this.requireTextArg(node.callee, args[1], 2, node.line);
 			const index = text.indexOf(needle);
 			return index === -1 ? 0 : index + 1;
+		}
+
+		if (lowerCallee === 'rand' || lowerCallee === 'randi') {
+			const args = yield* this.evaluateArgs(node, env);
+			const { lower, upper } = this.getRandomBounds(node.callee, args, node.line, {
+				allowZeroArgs: lowerCallee === 'rand',
+				integer: lowerCallee === 'randi'
+			});
+			const value = lower + Math.random() * (upper - lower);
+			return lowerCallee === 'randi' ? Math.floor(value) : value;
 		}
 
 		// Função do usuário
