@@ -43,7 +43,7 @@ export const ptShowcase = {
 		horizontal_scroll: 'Scroll Horizontal:',
 		show_nav_buttons: 'Mostrar Botões Nav:',
 		theme_desc:
-			'Aplica o tema ativo como o atributo data-theme do elemento html e salva a preferência no localStorage. Suporta ciclo automático (<= 2 temas) ou dropdown (>= 3 temas).',
+			'Aplica o tema ativo como atributo data-theme e salva a preferência compartilhada da suíte em cookie/localStorage. Suporta ciclo automático (<= 2 temas) ou dropdown (>= 3 temas).',
 		language_desc:
 			'Controla a alternância de idiomas ativos. Suporta ciclo dinâmico (2 idiomas) ou dropdown (>= 3 idiomas).',
 		quick_actions_desc:
@@ -307,7 +307,7 @@ export const enShowcase = {
 		horizontal_scroll: 'Horizontal Scroll:',
 		show_nav_buttons: 'Show Nav Buttons:',
 		theme_desc:
-			'Applies the active theme as the data-theme attribute on the html element and persists the choice in localStorage. Supports auto cycle (<= 2 themes) or dropdown (>= 3 themes).',
+			'Applies the active theme as the data-theme attribute and persists the suite-wide preference in cookie/localStorage. Supports auto cycle (<= 2 themes) or dropdown (>= 3 themes).',
 		language_desc:
 			'Controls the active language toggling. Supports dynamic cycle (2 languages) or dropdown (>= 3 languages).',
 		quick_actions_desc:
@@ -554,7 +554,7 @@ export const esShowcase = {
 		horizontal_scroll: 'Desplazamiento Horizontal:',
 		show_nav_buttons: 'Mostrar Botones de Nav:',
 		theme_desc:
-			'Aplica el tema activo como el atributo data-theme en el elemento html y persiste la elección en localStorage. Admite ciclo automático (<= 2 temas) o menú desplegable (>= 3 temas).',
+			'Aplica el tema activo como atributo data-theme y guarda la preferencia compartida de la suite en cookie/localStorage. Admite ciclo automático (<= 2 temas) o menú desplegable (>= 3 temas).',
 		language_desc:
 			'Controla el cambio de idiomas activos. Admite ciclo dinámico (2 idiomas) o menú desplegable (>= 3 idiomas).',
 		quick_actions_desc:

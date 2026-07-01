@@ -15,7 +15,20 @@
 		<meta name="text-scale" content="scale" />
 		<script>
 			try {
-				const t = localStorage.getItem('theme');
+				const cookieTheme = document.cookie
+					.split(';')
+					.map((item) => item.trim())
+					.find((item) => item.startsWith('monsan_theme='))
+					?.split('=')
+					.slice(1)
+					.join('=');
+				let decodedCookieTheme = '';
+				try {
+					decodedCookieTheme = cookieTheme ? decodeURIComponent(cookieTheme) : '';
+				} catch {}
+				const storedTheme =
+					localStorage.getItem('monsan-suite-theme') || localStorage.getItem('theme');
+				const t = decodedCookieTheme || storedTheme;
 				const dark =
 					t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
 				document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
