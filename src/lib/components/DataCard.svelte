@@ -17,6 +17,8 @@
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
 		padding?: 'sm' | 'md' | 'lg';
 		fullHeight?: boolean;
+		interactive?: boolean;
+		onclick?: (event: MouseEvent) => void;
 	}
 
 	let {
@@ -31,7 +33,9 @@
 		footer,
 		variant = 'secondary',
 		padding = 'md',
-		fullHeight = false
+		fullHeight = false,
+		interactive = false,
+		onclick
 	}: Props = $props();
 
 	let panelPadding = $derived<PaddingPreset>(
@@ -42,7 +46,15 @@
 	let hasBottom = $derived(Boolean(bottom || footer));
 </script>
 
-<Panel {variant} maxWidth="100%" padding={panelPadding} overflow="hidden" {fullHeight}>
+<Panel
+	{variant}
+	maxWidth="100%"
+	padding={panelPadding}
+	overflow="hidden"
+	{fullHeight}
+	interactive={interactive || Boolean(onclick)}
+	{onclick}
+>
 	<article class="monsan-data-card" class:full-height={fullHeight}>
 		{#if hasTop}
 			<header class="data-card-top">

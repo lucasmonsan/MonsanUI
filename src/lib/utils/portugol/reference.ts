@@ -46,6 +46,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'inicio',
 		description: 'Inicia o bloco principal de comandos.',
+		example: 'algoritmo "Exemplo"\ninicio\n  escreva("Olá")\nfimalgoritmo',
 		compatibility: 'Visualg'
 	},
 	{
@@ -54,6 +55,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'fimalgoritmo',
 		description: 'Fecha o algoritmo.',
+		example: 'algoritmo "Exemplo"\ninicio\n  escreva("Olá")\nfimalgoritmo',
 		compatibility: 'Visualg'
 	},
 	{
@@ -62,6 +64,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'idade : inteiro',
 		description: 'Tipo numérico inteiro.',
+		example: 'var\n  idade : inteiro\ninicio\n  idade <- 18\nfimalgoritmo',
 		compatibility: 'Visualg'
 	},
 	{
@@ -70,6 +73,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'media : real',
 		description: 'Tipo numérico real.',
+		example: 'var\n  nota : real\ninicio\n  nota <- 9.5\nfimalgoritmo',
 		compatibility: 'Visualg'
 	},
 	{
@@ -79,6 +83,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'nome : caractere',
 		description: 'Tipo textual para armazenar textos de qualquer tamanho.',
+		example: 'var\n  texto : caractere\ninicio\n  texto <- "Algoritmo"\nfimalgoritmo',
 		compatibility: 'Visualg'
 	},
 	{
@@ -88,6 +93,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'ativo : logico',
 		description: 'Tipo lógico verdadeiro/falso.',
+		example: 'var\n  fim : logico\ninicio\n  fim <- verdadeiro\nfimalgoritmo',
 		compatibility: 'Visualg'
 	},
 	{
@@ -107,6 +113,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'enquanto condicao faca\n  comandos\nfimenquanto',
 		description: 'Repete comandos enquanto a condição for verdadeira.',
+		example: 'enquanto i < 5 faca\n  i <- i + 1\nfimenquanto',
 		compatibility: 'Visualg'
 	},
 	{
@@ -116,6 +123,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'para i de inicio ate fim passo n faca\n  comandos\nfimpara',
 		description: 'Repete comandos com uma variável de controle.',
+		example: 'para i de 1 ate 5 passo 1 faca\n  escreval(i)\nfimpara',
 		compatibility: 'Visualg'
 	},
 	{
@@ -124,6 +132,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'leia(variavel)',
 		description: 'Lê uma entrada e converte conforme o tipo da variável.',
+		example: 'leia(idade)',
 		compatibility: 'Visualg'
 	},
 	{
@@ -132,6 +141,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'escreva(valor)',
 		description: 'Escreve no console sem quebrar linha automaticamente.',
+		example: 'escreva("Resultado: ", total)',
 		compatibility: 'Visualg'
 	},
 	{
@@ -140,6 +150,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'escreval(valor)',
 		description: 'Escreve no console e quebra linha ao final.',
+		example: 'escreval("Linha 1")',
 		compatibility: 'Visualg'
 	},
 	{
@@ -149,6 +160,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'limpatela()',
 		description: 'Limpa o console de saída.',
+		example: 'limpatela()',
 		compatibility: 'Visualg'
 	},
 	{
@@ -184,6 +196,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'pi',
 		description: 'Constante numérica de PI.',
+		example: 'escreva(pi)',
 		compatibility: 'Visualg'
 	},
 	{
@@ -192,6 +205,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'abs(x)',
 		description: 'Retorna o valor absoluto de um número.',
+		example: 'escreva(abs(-5))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -200,6 +214,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'raizq(x)',
 		description: 'Retorna a raiz quadrada de um número.',
+		example: 'escreva(raizq(9))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -208,6 +223,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'pot(base, expoente)',
 		description: 'Retorna a potência de base elevada ao expoente.',
+		example: 'escreva(pot(2, 3))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -216,6 +232,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'quad(x)',
 		description: 'Retorna o quadrado de um número.',
+		example: 'escreva(quad(4))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -224,6 +241,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'int(x)',
 		description: 'Retorna a parte inteira por truncamento.',
+		example: 'escreva(int(4.9))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -232,6 +250,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'compr(texto)',
 		description: 'Retorna o comprimento do texto.',
+		example: 'escreva(compr("Crocode"))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -240,6 +259,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'maiusc(texto)',
 		description: 'Converte texto para maiúsculas.',
+		example: 'escreva(maiusc("teste"))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -248,6 +268,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'minusc(texto)',
 		description: 'Converte texto para minúsculas.',
+		example: 'escreva(minusc("TESTE"))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -256,6 +277,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'copia(texto, inicio, quantidade)',
 		description: 'Copia parte do texto usando posição inicial 1-based.',
+		example: 'escreva(copia("Portugol", 1, 5))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -264,6 +286,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'pos(trecho, texto)',
 		description: 'Retorna a posição 1-based do trecho ou 0 quando não encontra.',
+		example: 'escreva(pos("gol", "Portugol"))',
 		compatibility: 'Visualg'
 	},
 	{
@@ -309,6 +332,7 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'repita\n  comandos\nate condicao',
 		description: 'Laço que executa pelo menos uma vez.',
+		example: 'repita\n  i <- i + 1\nate i = 5',
 		compatibility: 'Visualg'
 	},
 	{
@@ -327,6 +351,8 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		status: 'supported',
 		syntax: 'escolha valor\n  caso x\n    comandos\nfimescolha',
 		description: 'Estrutura de seleção por caso, sem fallthrough entre casos.',
+		example:
+			'escolha opcao\n  caso 1\n    escreva("Opção 1")\n  outrocaso\n    escreva("Opção Inválida")\nfimescolha',
 		compatibility: 'Visualg'
 	},
 	{

@@ -6,7 +6,7 @@
 		/** Tag HTML a ser renderizada. Padrão: 'p' */
 		tag?: 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div' | 'label' | 'small';
 		/** Família tipográfica do MonsanUI. Padrão: 'body' (Plus Jakarta Sans) */
-		family?: 'body' | 'display';
+		family?: 'body' | 'display' | 'mono';
 		/** Tamanho do texto mapeado na escala. Padrão: 'md' */
 		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 		/** Peso da fonte. Padrão: 'normal' */
@@ -66,6 +66,10 @@
 		font-family: var(--font-display);
 		letter-spacing: 0;
 		line-height: 1.2;
+	}
+	.mono {
+		font-family: var(--font-mono);
+		white-space: pre-wrap;
 	}
 
 	/* Escala de Tamanhos */
