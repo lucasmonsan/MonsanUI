@@ -210,6 +210,7 @@
 					'enquanto',
 					'para',
 					'retorne',
+					'interrompa',
 					'verdadeiro',
 					'falso',
 					'e',

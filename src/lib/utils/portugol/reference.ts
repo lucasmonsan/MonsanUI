@@ -267,6 +267,15 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		compatibility: 'Visualg'
 	},
 	{
+		name: 'interrompa',
+		category: 'control-flow',
+		status: 'supported',
+		syntax: 'interrompa',
+		description: 'Interrompe a execução do laço mais próximo.',
+		example: 'se valor = 0 entao\n  interrompa\nfimse',
+		compatibility: 'Visualg'
+	},
+	{
 		name: 'escolha',
 		aliases: ['caso', 'outrocaso', 'fimescolha'],
 		category: 'control-flow',

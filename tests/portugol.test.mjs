@@ -676,6 +676,80 @@ console.log('Running Visualg repeat loop tests...');
 	);
 }
 
+console.log('Running Visualg break statement tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "InterrompaEnquanto"
+		var
+			contador : inteiro
+		inicio
+			contador <- 0
+			enquanto contador < 5 faca
+				contador <- contador + 1
+				se contador = 3 entao
+					interrompa
+				fimse
+				escreva(contador)
+			fimenquanto
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '12');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "InterrompaRepita"
+		var
+			contador : inteiro
+		inicio
+			contador <- 0
+			repita
+				contador <- contador + 1
+				se contador = 2 entao
+					interrompa
+				fimse
+				escreva(contador)
+			ate contador = 5
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '1');
+}
+
+{
+	const outputs = runProgram(`
+		algoritmo "InterrompaPara"
+		var
+			contador : inteiro
+		inicio
+			para contador de 1 ate 5 faca
+				se contador = 4 entao
+					interrompa
+				fimse
+				escreva(contador)
+			fimpara
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), '123');
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "InterrompaFora"
+				var
+				inicio
+					interrompa
+				fimalgoritmo
+			`),
+		"'interrompa' só pode ser usado dentro de um laço.",
+		'Should reject break outside loops'
+	);
+}
+
 console.log('Running Visualg essential function tests...');
 {
 	const outputs = runProgram(`
@@ -827,6 +901,7 @@ console.log('Running Visualg reference catalog tests...');
 		'faca',
 		'fimenquanto',
 		'repita',
+		'interrompa',
 		'para',
 		'de',
 		'ate',

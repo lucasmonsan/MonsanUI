@@ -7,6 +7,7 @@ export type TokenType =
 	| 'WHILE'
 	| 'FOR'
 	| 'RETURN'
+	| 'BREAK'
 	| 'TRUE'
 	| 'FALSE'
 	| 'IDENTIFIER'
@@ -351,6 +352,8 @@ export class Lexer {
 						tokens.push({ type: 'FOR', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'retorne') {
 						tokens.push({ type: 'RETURN', value: id, line: startLine, column: startCol });
+					} else if (lowerId === 'interrompa') {
+						tokens.push({ type: 'BREAK', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'verdadeiro') {
 						tokens.push({ type: 'TRUE', value: id, line: startLine, column: startCol });
 					} else if (lowerId === 'falso') {
@@ -437,6 +440,7 @@ export type ASTNode =
 	| RepeatNode
 	| ForNode
 	| ReturnNode
+	| BreakNode
 	| CallNode
 	| BinaryNode
 	| UnaryNode
@@ -513,6 +517,11 @@ export interface ForNode {
 export interface ReturnNode {
 	type: 'Return';
 	value?: ASTNode;
+	line: number;
+}
+
+export interface BreakNode {
+	type: 'Break';
 	line: number;
 }
 
@@ -1087,6 +1096,10 @@ export class Parser {
 		if (t.type === 'FOR') {
 			return this.parseVisualgFor();
 		}
+		if (t.type === 'BREAK') {
+			const breakToken = this.advance();
+			return { type: 'Break', line: breakToken.line };
+		}
 
 		const expr = this.parseExpression();
 		return expr;
@@ -1359,6 +1372,13 @@ class ReturnException {
 	}
 }
 
+class BreakException {
+	public line: number;
+	constructor(line: number) {
+		this.line = line;
+	}
+}
+
 // AST Tree-Walking Interpreter using JavaScript Generator
 export class Interpreter {
 	private globalEnv = new Environment();
@@ -1515,6 +1535,12 @@ export class Interpreter {
 			if (err instanceof ReturnException) {
 				return err.value;
 			}
+			if (err instanceof BreakException) {
+				throw new Error(
+					`Erro em Tempo de Execução na linha ${err.line}: 'interrompa' só pode ser usado dentro de um laço.`,
+					{ cause: err }
+				);
+			}
 			throw err;
 		}
 	}
@@ -1571,12 +1597,22 @@ export class Interpreter {
 			}
 			case 'While':
 				while (yield* this.evaluate(node.condition, env)) {
-					yield* this.execute(node.body, env);
+					try {
+						yield* this.execute(node.body, env);
+					} catch (err) {
+						if (err instanceof BreakException) break;
+						throw err;
+					}
 				}
 				break;
 			case 'Repeat':
 				do {
-					yield* this.execute(node.body, env);
+					try {
+						yield* this.execute(node.body, env);
+					} catch (err) {
+						if (err instanceof BreakException) break;
+						throw err;
+					}
 				} while (!(yield* this.evaluate(node.condition, env)));
 				break;
 			case 'For': {
@@ -1589,7 +1625,12 @@ export class Interpreter {
 						const cond = yield* this.evaluate(node.condition, forEnv);
 						if (!cond) break;
 					}
-					yield* this.execute(node.body, forEnv);
+					try {
+						yield* this.execute(node.body, forEnv);
+					} catch (err) {
+						if (err instanceof BreakException) break;
+						throw err;
+					}
 					if (node.update) {
 						yield* this.execute(node.update, forEnv);
 					}
@@ -1600,6 +1641,8 @@ export class Interpreter {
 				const val = node.value ? yield* this.evaluate(node.value, env) : undefined;
 				throw new ReturnException(val);
 			}
+			case 'Break':
+				throw new BreakException(node.line);
 			case 'Call':
 				yield* this.evaluateCall(node, env);
 				break;
