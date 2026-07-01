@@ -30,6 +30,11 @@
 		StringStream
 	} from '@codemirror/language';
 	import { tags as t } from '@lezer/highlight';
+	import {
+		getPortugolEditorIndentColumns,
+		getPortugolNextLineIndent,
+		PORTUGOL_EDITOR_CARET_COLOR
+	} from '../utils/portugol/editor.js';
 
 	let {
 		code = $bindable(''),
@@ -277,39 +282,7 @@
 			if (line.number <= 1) return 0;
 
 			const prevLine = doc.line(line.number - 1);
-			const prevText = prevLine.text.trim();
-
-			const prevIndentMatch = prevLine.text.match(/^[\t ]*/);
-			const prevIndent = prevIndentMatch ? prevIndentMatch[0] : '';
-
-			let indentLevel = 0;
-			for (let i = 0; i < prevIndent.length; i++) {
-				if (prevIndent[i] === '\t') {
-					indentLevel += 4;
-				} else {
-					indentLevel += 1;
-				}
-			}
-
-			// Se a linha anterior abriu um bloco, aumenta indentação
-			const opensBlock =
-				/[{(]$|\b(inicio|var|entao|então|faca|faça|se|enquanto|para|algoritmo|funcao|função)\b/i.test(
-					prevText
-				);
-			if (opensBlock) {
-				indentLevel += 4;
-			}
-
-			// Se a linha atual (que está sendo inserida) fecha um bloco, reduz indentação
-			const closesBlock =
-				/^\s*([})]|\b(fimse|fimenquanto|fimpara|fimalgoritmo|senao|senão)\b)/i.test(
-					textAfter.trim().toLowerCase()
-				);
-			if (closesBlock) {
-				indentLevel = Math.max(0, indentLevel - 4);
-			}
-
-			return indentLevel;
+			return getPortugolEditorIndentColumns(prevLine.text, textAfter);
 		}
 	});
 
@@ -322,22 +295,11 @@
 		{ tag: t.variableName, color: 'var(--text-primary)' }
 	]);
 
-	function getIndent(text: string) {
-		return text.match(/^[\t ]*/)?.[0] ?? '';
-	}
-
-	function getNextLineIndent(textBeforeCursor: string) {
-		const currentIndent = getIndent(textBeforeCursor);
-		const trimmed = textBeforeCursor.trim().toLowerCase();
-		const opensBlock = /\b(var|inicio|entao|então|faca|faça)\s*$/i.test(trimmed);
-		return opensBlock ? `${currentIndent}\t` : currentIndent;
-	}
-
 	function insertIndentedNewline(editorView: EditorView) {
 		const range = editorView.state.selection.main;
 		const line = editorView.state.doc.lineAt(range.from);
 		const textBeforeCursor = editorView.state.sliceDoc(line.from, range.from);
-		const insert = `\n${getNextLineIndent(textBeforeCursor)}`;
+		const insert = `\n${getPortugolNextLineIndent(textBeforeCursor)}`;
 		const cursor = range.from + insert.length;
 
 		editorView.dispatch({
@@ -357,7 +319,8 @@
 				fontFamily: 'var(--font-mono)',
 				fontSize: '14px',
 				backgroundColor: 'var(--bg-primary)',
-				color: 'var(--text-primary)'
+				color: 'var(--text-primary)',
+				caretColor: PORTUGOL_EDITOR_CARET_COLOR
 			},
 			'.cm-scroller': {
 				fontFamily: 'inherit',
@@ -366,7 +329,7 @@
 			'.cm-content': {
 				fontFamily: 'inherit',
 				padding: '12px 0',
-				caretColor: 'var(--text-primary)'
+				caretColor: PORTUGOL_EDITOR_CARET_COLOR
 			},
 			'.cm-gutters': {
 				backgroundColor: 'var(--bg-secondary)',
@@ -392,8 +355,8 @@
 			'.cm-error-line': {
 				backgroundColor: 'rgba(155, 34, 38, 0.08) !important'
 			},
-			'.cm-cursor, .cm-dropCursor': {
-				borderLeftColor: 'var(--text-primary) !important'
+			'.cm-cursor, .cm-dropCursor, .cm-content .cm-cursor, &.cm-focused .cm-cursor': {
+				borderLeftColor: `${PORTUGOL_EDITOR_CARET_COLOR} !important`
 			}
 		},
 		{ dark: false }

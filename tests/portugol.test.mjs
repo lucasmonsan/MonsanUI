@@ -14,6 +14,11 @@ import {
 	getVisualgOfficialExample,
 	visualgOfficialExamples
 } from '../dist/utils/portugol/examples.js';
+import {
+	getPortugolEditorIndentColumns,
+	getPortugolNextLineIndent,
+	PORTUGOL_EDITOR_CARET_COLOR
+} from '../dist/utils/portugol/editor.js';
 
 function assert(condition, message) {
 	if (!condition) throw new Error(message);
@@ -1184,6 +1189,55 @@ console.log('Running Visualg execution safety tests...');
 			),
 		'Limite de execução atingido',
 		'Should stop an infinite para loop'
+	);
+}
+
+console.log('Running Portugol editor behavior tests...');
+{
+	assertEquals(
+		PORTUGOL_EDITOR_CARET_COLOR,
+		'var(--text-primary)',
+		'Editor caret should use the MonsanUI text color token'
+	);
+	assertEquals(
+		getPortugolNextLineIndent('\tescreva()'),
+		'\t',
+		'Enter after a command should preserve tab indentation'
+	);
+	assertEquals(
+		getPortugolNextLineIndent('    escreva()'),
+		'    ',
+		'Enter after a command should preserve space indentation'
+	);
+	assertEquals(
+		getPortugolNextLineIndent('\t'),
+		'\t',
+		'Enter on an indented empty line should preserve indentation'
+	);
+	assertEquals(
+		getPortugolNextLineIndent('\tse nota >= 6 entao'),
+		'\t\t',
+		'Enter after entao should enter the inner block'
+	);
+	assertEquals(
+		getPortugolNextLineIndent('\trepita'),
+		'\t\t',
+		'Enter after repita should enter the inner block'
+	);
+	assertEquals(
+		getPortugolEditorIndentColumns('\tescreva()', ''),
+		4,
+		'CodeMirror indentation should keep command indentation'
+	);
+	assertEquals(
+		getPortugolEditorIndentColumns('\tse nota >= 6 entao', ''),
+		8,
+		'CodeMirror indentation should increase after block opener'
+	);
+	assertEquals(
+		getPortugolEditorIndentColumns('\t\tescreval("Aprovado")', 'fimse'),
+		4,
+		'CodeMirror indentation should reduce before block closer'
 	);
 }
 
