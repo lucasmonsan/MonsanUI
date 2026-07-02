@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount, tick } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import PortugolEditor from './PortugolEditor.svelte';
 	import Button from './Button.svelte';
@@ -17,6 +18,7 @@
 	import BracketsCurlyIcon from './icons/BracketsCurly.svelte';
 	import ListBulletsIcon from './icons/ListBullets.svelte';
 	import XIcon from './icons/X.svelte';
+	import { i18n } from '../utils/i18n.svelte.js';
 	import {
 		Lexer,
 		Parser,
@@ -67,10 +69,13 @@
 	// Input prompt state
 	let pendingInputVar = $state<string | null>(null);
 	let currentInputValue = $state('');
+	let terminalInputElement = $state<HTMLInputElement | null>(null);
 
 	// Collapsible state
 	let isConsoleCollapsed = $state(false);
 	let isVariablesCollapsed = $state(false);
+	let isConsoleFloating = $state(false);
+	let isFloatingConsoleOpen = $state(false);
 	let showLineNumbers = $state(true);
 
 	// Resizable state
@@ -144,6 +149,33 @@
 	let stopRequested = false;
 	let scheduledRun: ReturnType<typeof setTimeout> | null = null;
 	const executionChunkSize = 500;
+	const floatingConsolePreferenceKey = 'monsan-ui:portugol-runner:floating-console';
+	let floatingConsolePreferenceLoaded = false;
+
+	let embeddedConsoleVisible = $derived(!isConsoleCollapsed && !isConsoleFloating);
+	let sidebarHidden = $derived(!embeddedConsoleVisible && isVariablesCollapsed);
+	let sidebarRows = $derived(
+		embeddedConsoleVisible && !isVariablesCollapsed
+			? `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`
+			: '1fr'
+	);
+
+	onMount(() => {
+		isConsoleFloating = localStorage.getItem(floatingConsolePreferenceKey) === 'true';
+		floatingConsolePreferenceLoaded = true;
+	});
+
+	$effect(() => {
+		if (floatingConsolePreferenceLoaded) {
+			localStorage.setItem(floatingConsolePreferenceKey, String(isConsoleFloating));
+		}
+	});
+
+	$effect(() => {
+		if (pendingInputVar) {
+			void tick().then(() => terminalInputElement?.focus());
+		}
+	});
 
 	function clearScheduledRun() {
 		if (scheduledRun) {
@@ -173,8 +205,20 @@
 		generator = null;
 	}
 
+	function prepareConsoleForExecution() {
+		if (isConsoleFloating) {
+			isFloatingConsoleOpen = true;
+			return;
+		}
+
+		if (isConsoleCollapsed) {
+			isConsoleCollapsed = false;
+		}
+	}
+
 	function startExecution(step = false) {
 		clearScheduledRun();
+		prepareConsoleForExecution();
 		errorMsg = '';
 		errorLine = 0;
 		outputs = [];
@@ -187,7 +231,7 @@
 		if (strictIndent) {
 			const indentResult = checkIndentation(code);
 			if (!indentResult.ok) {
-				errorMsg = indentResult.errorMsg || 'Erro de Indentação.';
+				errorMsg = indentResult.errorMsg || i18n.t('portugolRunner.indentationError');
 				errorLine = indentResult.line || 0;
 				onFailure?.(errorMsg);
 				return;
@@ -350,7 +394,54 @@
 		interpreter = null;
 		generator = null;
 	}
+
+	function toggleConsoleFloating() {
+		isConsoleFloating = !isConsoleFloating;
+		if (isConsoleFloating) {
+			isFloatingConsoleOpen = true;
+			return;
+		}
+		isFloatingConsoleOpen = false;
+		if (isConsoleCollapsed) {
+			isConsoleCollapsed = false;
+		}
+	}
 </script>
+
+{#snippet consoleContent()}
+	<div class="terminal-box">
+		<div class="terminal-content">
+			{#if outputs.length > 0}
+				<div class="terminal-line">{outputs.join('')}</div>
+			{/if}
+
+			{#if pendingInputVar}
+				<div class="terminal-input-prompt">
+					<form onsubmit={submitInput} class="input-form">
+						<Text size="sm" variant="neutral">&gt;</Text>
+						<input
+							bind:this={terminalInputElement}
+							type="text"
+							bind:value={currentInputValue}
+							placeholder={i18n.t('portugolRunner.inputPlaceholder')}
+							aria-label={i18n.t('portugolRunner.inputLabel', { variable: pendingInputVar })}
+							class="terminal-text-input"
+						/>
+						<button
+							type="submit"
+							aria-label={i18n.t('portugolRunner.sendInput')}
+							style="display: none;"
+						></button>
+					</form>
+				</div>
+			{/if}
+
+			{#if outputs.length === 0 && !pendingInputVar}
+				<div class="terminal-empty">{i18n.t('portugolRunner.emptyConsole')}</div>
+			{/if}
+		</div>
+	</div>
+{/snippet}
 
 <div class="portugol-runner" class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}>
 	<Stack gap="md" fullHeight={true}>
@@ -360,7 +451,7 @@
 				class="workspace-grid"
 				class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}
 				class:all-panels-collapsed={isConsoleCollapsed && isVariablesCollapsed}
-				style={isConsoleCollapsed && isVariablesCollapsed
+				style={sidebarHidden
 					? 'grid-template-columns: 100% 0px 0px'
 					: 'grid-template-columns: ' +
 						editorWidthPercent +
@@ -390,7 +481,7 @@
 				<div
 					class="resize-bar"
 					class:dragging={isDragging}
-					class:hidden={isConsoleCollapsed && isVariablesCollapsed}
+					class:hidden={sidebarHidden}
 					onmousedown={startResize}
 					role="separator"
 					aria-valuenow={editorWidthPercent}
@@ -399,57 +490,35 @@
 				<!-- Terminal de I/O e inspetor de variáveis -->
 				<div
 					class="sidebar-col"
-					class:hidden={isConsoleCollapsed && isVariablesCollapsed}
-					style="grid-template-rows: {isConsoleCollapsed || isVariablesCollapsed
-						? '1fr'
-						: `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`}"
+					class:hidden={sidebarHidden}
+					style="grid-template-rows: {sidebarRows}"
 				>
 					<!-- Console/Terminal -->
-					{#if !isConsoleCollapsed}
+					{#if embeddedConsoleVisible}
 						<div class="terminal-card" style="grid-row: 1;">
 							<Panel padding="none" maxWidth="none" fullHeight={true}>
 								<div class="panel-header">
-									<span>Console</span>
-									<button
-										type="button"
-										class="collapse-btn"
-										onclick={() => (isConsoleCollapsed = true)}
-									>
-										Ocultar
-									</button>
-								</div>
-								<div class="terminal-box">
-									<div class="terminal-content">
-										{#if outputs.length > 0}
-											<div class="terminal-line">{outputs.join('')}</div>
-										{/if}
-
-										{#if pendingInputVar}
-											<div class="terminal-input-prompt">
-												<form onsubmit={submitInput} class="input-form">
-													<Text size="sm" variant="neutral">leia({pendingInputVar}):</Text>
-													<input
-														type="text"
-														bind:value={currentInputValue}
-														placeholder="Digite um valor e pressione Enter"
-														class="terminal-text-input"
-													/>
-													<button type="submit" aria-label="Enviar" style="display: none;"></button>
-												</form>
-											</div>
-										{/if}
-
-										{#if outputs.length === 0 && !pendingInputVar}
-											<div class="terminal-empty">Console vazio. Clique em Executar.</div>
-										{/if}
+									<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+									<div class="panel-header-actions">
+										<button type="button" class="collapse-btn" onclick={toggleConsoleFloating}>
+											{i18n.t('portugolRunner.floatConsole')}
+										</button>
+										<button
+											type="button"
+											class="collapse-btn"
+											onclick={() => (isConsoleCollapsed = true)}
+										>
+											{i18n.t('portugolRunner.hide')}
+										</button>
 									</div>
 								</div>
+								{@render consoleContent()}
 							</Panel>
 						</div>
 					{/if}
 
 					<!-- Barra de redimensionamento horizontal -->
-					{#if !isConsoleCollapsed && !isVariablesCollapsed}
+					{#if embeddedConsoleVisible && !isVariablesCollapsed}
 						<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 						<div
 							class="horizontal-resize-bar"
@@ -463,16 +532,19 @@
 
 					<!-- Inspetor de Variáveis -->
 					{#if !isVariablesCollapsed}
-						<div class="variables-panel-wrapper" style="grid-row: {isConsoleCollapsed ? 1 : 3};">
+						<div
+							class="variables-panel-wrapper"
+							style="grid-row: {embeddedConsoleVisible ? 3 : 1};"
+						>
 							<Panel padding="none" maxWidth="none" fullHeight={true}>
 								<div class="panel-header">
-									<span>Variáveis</span>
+									<span>{i18n.t('portugolRunner.variablesTitle')}</span>
 									<button
 										type="button"
 										class="collapse-btn"
 										onclick={() => (isVariablesCollapsed = true)}
 									>
-										Ocultar
+										{i18n.t('portugolRunner.hide')}
 									</button>
 								</div>
 								<div class="variables-box">
@@ -480,9 +552,9 @@
 										<table class="variables-table">
 											<thead>
 												<tr>
-													<th>Nome</th>
-													<th>Tipo</th>
-													<th>Valor</th>
+													<th>{i18n.t('portugolRunner.variableName')}</th>
+													<th>{i18n.t('portugolRunner.variableType')}</th>
+													<th>{i18n.t('portugolRunner.variableValue')}</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -492,7 +564,7 @@
 														<td class="var-type">{info.type}</td>
 														<td class="var-value">
 															{#if info.value === undefined}
-																vazio
+																{i18n.t('portugolRunner.emptyValue')}
 															{:else if ['caractere', 'caracter', 'cadeia'].includes(info.type)}
 																"{info.value}"
 															{:else}
@@ -504,7 +576,7 @@
 											</tbody>
 										</table>
 									{:else}
-										<div class="variables-empty">Nenhuma variável ativa.</div>
+										<div class="variables-empty">{i18n.t('portugolRunner.noVariables')}</div>
 									{/if}
 								</div>
 							</Panel>
@@ -516,7 +588,7 @@
 
 		<!-- Alerta de erro de compilação/execução -->
 		{#if errorMsg}
-			<Alert type="error" title="Erro de Execução">
+			<Alert type="error" title={i18n.t('portugolRunner.executionError')}>
 				<div class="error-msg-box">
 					<TriangleAlertIcon size="16" />
 					<span style="margin-left: 8px;">{errorMsg}</span>
@@ -530,13 +602,18 @@
 				<!-- Controles de Execução (Esquerda) -->
 				<Inline gap="sm" wrap>
 					<Button
-						variant="primary"
+						variant={isRunning ? 'error' : 'primary'}
 						size="sm"
-						onclick={() => startExecution(false)}
-						disabled={disabled || (isRunning && !isStepMode)}
+						onclick={() => (isRunning ? handleStop() : startExecution(false))}
+						{disabled}
 					>
-						<PlayIcon size="16" />
-						<span class="toolbar-label">Executar</span>
+						{#if isRunning}
+							<XIcon size="16" />
+							<span class="toolbar-label">{i18n.t('portugolRunner.stop')}</span>
+						{:else}
+							<PlayIcon size="16" />
+							<span class="toolbar-label">{i18n.t('portugolRunner.run')}</span>
+						{/if}
 					</Button>
 					<Button
 						variant="secondary"
@@ -545,18 +622,12 @@
 						disabled={disabled || (isRunning && !isStepMode && !isPaused)}
 					>
 						<SkipForwardIcon size="16" />
-						<span class="toolbar-label">Passo a Passo</span>
+						<span class="toolbar-label">{i18n.t('portugolRunner.step')}</span>
 					</Button>
 					<Button variant="secondary" size="sm" onclick={handleReset} {disabled}>
 						<RotateCwIcon size="16" />
-						<span class="toolbar-label">Reiniciar</span>
+						<span class="toolbar-label">{i18n.t('portugolRunner.reset')}</span>
 					</Button>
-					{#if isRunning}
-						<Button variant="error" size="sm" onclick={handleStop} {disabled}>
-							<XIcon size="16" />
-							<span class="toolbar-label">Parar</span>
-						</Button>
-					{/if}
 					{#if onsave}
 						<Button
 							variant="secondary"
@@ -565,7 +636,7 @@
 							disabled={disabled || isRunning}
 						>
 							<SaveIcon size="16" />
-							<span class="toolbar-label">Salvar</span>
+							<span class="toolbar-label">{i18n.t('portugolRunner.save')}</span>
 						</Button>
 					{/if}
 					<Button
@@ -575,7 +646,7 @@
 						disabled={disabled || isRunning}
 					>
 						<TextIndentIcon size="16" />
-						<span class="toolbar-label">Identação</span>
+						<span class="toolbar-label">{i18n.t('portugolRunner.indentation')}</span>
 					</Button>
 				</Inline>
 
@@ -589,15 +660,23 @@
 						ariaPressed={showLineNumbers}
 					>
 						<ListBulletsIcon size="16" />
-						<span class="toolbar-label">Linhas</span>
+						<span class="toolbar-label">{i18n.t('portugolRunner.lines')}</span>
 					</Button>
 					<Button
-						variant={!isConsoleCollapsed ? 'primary' : 'secondary'}
+						variant={(isConsoleFloating ? isFloatingConsoleOpen : !isConsoleCollapsed)
+							? 'primary'
+							: 'secondary'}
 						size="sm"
-						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
+						onclick={() => {
+							if (isConsoleFloating) {
+								isFloatingConsoleOpen = !isFloatingConsoleOpen;
+							} else {
+								isConsoleCollapsed = !isConsoleCollapsed;
+							}
+						}}
 					>
 						<TerminalIcon size="16" />
-						<span class="toolbar-label">Console</span>
+						<span class="toolbar-label">{i18n.t('portugolRunner.consoleTitle')}</span>
 					</Button>
 					<Button
 						variant={!isVariablesCollapsed ? 'primary' : 'secondary'}
@@ -605,16 +684,40 @@
 						onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
 					>
 						<BracketsCurlyIcon size="16" />
-						<span class="toolbar-label">Variáveis</span>
+						<span class="toolbar-label">{i18n.t('portugolRunner.variablesTitle')}</span>
 					</Button>
 				</Inline>
 			</Inline>
 		</div>
 	</Stack>
+
+	{#if isConsoleFloating && isFloatingConsoleOpen}
+		<div class="floating-console-panel">
+			<Panel padding="none" maxWidth="none" fullHeight={true}>
+				<div class="panel-header">
+					<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+					<div class="panel-header-actions">
+						<button type="button" class="collapse-btn" onclick={toggleConsoleFloating}>
+							{i18n.t('portugolRunner.dockConsole')}
+						</button>
+						<button
+							type="button"
+							class="collapse-btn"
+							onclick={() => (isFloatingConsoleOpen = false)}
+						>
+							{i18n.t('portugolRunner.hide')}
+						</button>
+					</div>
+				</div>
+				{@render consoleContent()}
+			</Panel>
+		</div>
+	{/if}
 </div>
 
 <style>
 	.portugol-runner {
+		position: relative;
 		width: 100%;
 		height: 100%;
 		min-height: 0;
@@ -867,6 +970,12 @@
 		min-height: 1.25em;
 	}
 
+	.panel-header-actions {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
+	}
+
 	.collapse-btn {
 		background: transparent;
 		border: none;
@@ -886,6 +995,18 @@
 	.collapse-btn:hover {
 		color: var(--text-primary);
 		background: rgba(0, 0, 0, 0.05);
+	}
+
+	.floating-console-panel {
+		position: absolute;
+		right: var(--space-md);
+		bottom: calc(var(--space-md) + 48px);
+		z-index: 35;
+		width: min(560px, calc(100% - var(--space-md) * 2));
+		height: min(360px, calc(100% - 96px));
+		min-height: 180px;
+		display: flex;
+		box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow-color);
 	}
 
 	.horizontal-resize-bar {
