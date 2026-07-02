@@ -1539,18 +1539,32 @@ export class Interpreter {
 
 	private assertNumberOperands(operator: string, left: unknown, right: unknown, line: number) {
 		if (typeof left !== 'number' || typeof right !== 'number') {
+			const leftType = this.runtimeType(left);
+			const rightType = this.runtimeType(right);
 			throw new Error(
-				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores numéricos.`
+				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores numéricos, mas recebeu ${leftType} e ${rightType}.`
 			);
 		}
 	}
 
 	private assertBooleanOperands(operator: string, left: unknown, right: unknown, line: number) {
 		if (typeof left !== 'boolean' || typeof right !== 'boolean') {
+			const leftType = this.runtimeType(left);
+			const rightType = this.runtimeType(right);
 			throw new Error(
-				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores lógicos.`
+				`Erro em Tempo de Execução na linha ${line}: O operador '${operator}' espera valores lógicos, mas recebeu ${leftType} e ${rightType}.`
 			);
 		}
+	}
+
+	private assertBooleanCondition(context: string, value: unknown, line: number): boolean {
+		if (typeof value !== 'boolean') {
+			const receivedType = this.runtimeType(value);
+			throw new Error(
+				`Erro em Tempo de Execução na linha ${line}: A condição de '${context}' precisa ser lógica, mas recebeu ${receivedType}.`
+			);
+		}
+		return value;
 	}
 
 	private assertEqualityOperands(operator: string, left: unknown, right: unknown, line: number) {
@@ -1770,7 +1784,11 @@ export class Interpreter {
 				break;
 			}
 			case 'If': {
-				const cond = yield* this.evaluate(node.condition, env);
+				const cond = this.assertBooleanCondition(
+					'se',
+					yield* this.evaluate(node.condition, env),
+					node.line
+				);
 				if (cond) {
 					yield* this.execute(node.thenBranch, env);
 				} else if (node.elseBranch) {
@@ -1779,7 +1797,13 @@ export class Interpreter {
 				break;
 			}
 			case 'While':
-				while (yield* this.evaluate(node.condition, env)) {
+				while (
+					this.assertBooleanCondition(
+						'enquanto',
+						yield* this.evaluate(node.condition, env),
+						node.line
+					)
+				) {
 					try {
 						yield* this.execute(node.body, env);
 					} catch (err) {
@@ -1796,7 +1820,13 @@ export class Interpreter {
 						if (err instanceof BreakException) break;
 						throw err;
 					}
-				} while (!(yield* this.evaluate(node.condition, env)));
+				} while (
+					!this.assertBooleanCondition(
+						'repita',
+						yield* this.evaluate(node.condition, env),
+						node.line
+					)
+				);
 				break;
 			case 'Switch': {
 				const discriminant = yield* this.evaluate(node.discriminant, env);
@@ -1822,7 +1852,11 @@ export class Interpreter {
 				}
 				while (true) {
 					if (node.condition) {
-						const cond = yield* this.evaluate(node.condition, forEnv);
+						const cond = this.assertBooleanCondition(
+							'para',
+							yield* this.evaluate(node.condition, forEnv),
+							node.line
+						);
 						if (!cond) break;
 					}
 					try {
