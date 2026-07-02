@@ -21,6 +21,7 @@ import {
 	getPortugolPairEdit,
 	PORTUGOL_EDITOR_CARET_COLOR
 } from '../dist/utils/portugol/editor.js';
+import { readFileSync } from 'node:fs';
 
 function assert(condition, message) {
 	if (!condition) throw new Error(message);
@@ -1428,6 +1429,18 @@ console.log('Running Visualg reference catalog tests...');
 	const supportedNames = new Set(
 		getSupportedVisualgReferenceNames().map((name) => name.toLowerCase())
 	);
+	const interpreterSource = readFileSync(
+		new URL('../src/lib/utils/portugol/interpreter.ts', import.meta.url),
+		'utf8'
+	);
+	const runtimeCallees = new Set(
+		[...interpreterSource.matchAll(/lowerCallee\s*===\s*'([^']+)'/g)].map((match) => match[1])
+	);
+	for (const match of interpreterSource.matchAll(/\[([^\]]+)\]\.includes\(lowerCallee\)/g)) {
+		for (const callee of match[1].matchAll(/'([^']+)'/g)) {
+			runtimeCallees.add(callee[1]);
+		}
+	}
 	const requiredSupportedNames = [
 		'algoritmo',
 		'var',
@@ -1496,6 +1509,14 @@ console.log('Running Visualg reference catalog tests...');
 		assert(supportedNames.has(name), `Reference catalog should include supported name '${name}'`);
 	}
 
+	for (const name of runtimeCallees) {
+		assertEquals(
+			getVisualgReferenceItem(name)?.status,
+			'supported',
+			`Runtime callee '${name}' should have a supported reference item`
+		);
+	}
+
 	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
 	assertEquals(getVisualgReferenceItem('randi')?.status, 'supported');
 	assertEquals(getVisualgReferenceItem('numpcarac')?.status, 'supported');
@@ -1507,6 +1528,12 @@ console.log('Running Visualg reference catalog tests...');
 	assert(
 		visualgReferenceItems.every((item) => item.syntax && item.description),
 		'Every reference item should include syntax and description'
+	);
+	assert(
+		visualgReferenceItems
+			.filter((item) => item.status === 'supported')
+			.every((item) => item.example),
+		'Every supported reference item should include an example from the catalog'
 	);
 }
 
