@@ -18,6 +18,7 @@ import { tokenizePortugolCode } from '../dist/utils/portugol/highlight.js';
 import {
 	getPortugolEditorIndentColumns,
 	getPortugolNextLineIndent,
+	getPortugolPairEdit,
 	PORTUGOL_EDITOR_CARET_COLOR
 } from '../dist/utils/portugol/editor.js';
 
@@ -1373,6 +1374,11 @@ console.log('Running Portugol editor behavior tests...');
 		'Enter after repita should enter the inner block'
 	);
 	assertEquals(
+		getPortugolNextLineIndent('\tfimse'),
+		'\t',
+		'Enter around a closing block should keep the closer indentation'
+	);
+	assertEquals(
 		getPortugolEditorIndentColumns('\tescreva()', ''),
 		4,
 		'CodeMirror indentation should keep command indentation'
@@ -1387,6 +1393,30 @@ console.log('Running Portugol editor behavior tests...');
 		4,
 		'CodeMirror indentation should reduce before block closer'
 	);
+	assertEquals(getPortugolPairEdit('', '', '"').insert, '""', 'Double quote should create a pair');
+	assertEquals(
+		getPortugolPairEdit('', '"', '"').insert,
+		'',
+		'Double quote before a closing quote should only move the cursor'
+	);
+	assertEquals(
+		getPortugolPairEdit('', '', '(', ')').insert,
+		'()',
+		'Opening parenthesis should create a pair'
+	);
+	assertEquals(
+		getPortugolPairEdit('', ')', '(', ')', false).insert,
+		'()',
+		'Opening parenthesis before a closing parenthesis should still create a pair'
+	);
+	const wrappedText = getPortugolPairEdit('nota', '', '"');
+	assertEquals(wrappedText.insert, '"nota"', 'Pair edit should wrap selected text');
+	assertEquals(
+		wrappedText.selectionStartOffset,
+		1,
+		'Wrapped text selection should start inside pair'
+	);
+	assertEquals(wrappedText.selectionEndOffset, 5, 'Wrapped text selection should end inside pair');
 }
 
 console.log('Running Portugol code highlight tests...');

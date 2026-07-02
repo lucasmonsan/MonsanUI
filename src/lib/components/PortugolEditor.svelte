@@ -33,6 +33,7 @@
 	import {
 		getPortugolEditorIndentColumns,
 		getPortugolNextLineIndent,
+		getPortugolPairEdit,
 		PORTUGOL_EDITOR_CARET_COLOR
 	} from '../utils/portugol/editor.js';
 
@@ -309,12 +310,48 @@
 		const range = editorView.state.selection.main;
 		const line = editorView.state.doc.lineAt(range.from);
 		const textBeforeCursor = editorView.state.sliceDoc(line.from, range.from);
-		const insert = `\n${getPortugolNextLineIndent(textBeforeCursor)}`;
+		const indentSource = textBeforeCursor.trim() ? textBeforeCursor : line.text;
+		const insert = `\n${getPortugolNextLineIndent(indentSource)}`;
 		const cursor = range.from + insert.length;
 
 		editorView.dispatch({
 			changes: { from: range.from, to: range.to, insert },
 			selection: EditorSelection.cursor(cursor),
+			scrollIntoView: true,
+			userEvent: 'input'
+		});
+		return true;
+	}
+
+	function insertEditorPair(
+		editorView: EditorView,
+		opening: string,
+		closing = opening,
+		skipClosing = opening === closing
+	) {
+		const range = editorView.state.selection.main;
+		const selectedText = editorView.state.sliceDoc(range.from, range.to);
+		const nextChar = editorView.state.sliceDoc(range.to, range.to + 1);
+		const edit = getPortugolPairEdit(selectedText, nextChar, opening, closing, skipClosing);
+
+		if (!edit.insert) {
+			editorView.dispatch({
+				selection: EditorSelection.cursor(range.to + edit.selectionStartOffset),
+				scrollIntoView: true,
+				userEvent: 'select'
+			});
+			return true;
+		}
+
+		const selectionStart = range.from + edit.selectionStartOffset;
+		const selectionEnd = range.from + edit.selectionEndOffset;
+
+		editorView.dispatch({
+			changes: { from: range.from, to: range.to, insert: edit.insert },
+			selection:
+				selectionStart === selectionEnd
+					? EditorSelection.cursor(selectionStart)
+					: EditorSelection.range(selectionStart, selectionEnd),
 			scrollIntoView: true,
 			userEvent: 'input'
 		});
@@ -334,11 +371,15 @@
 			},
 			'.cm-scroller': {
 				fontFamily: 'inherit',
-				overflow: 'auto'
+				overflow: 'auto',
+				caretColor: PORTUGOL_EDITOR_CARET_COLOR
 			},
 			'.cm-content': {
 				fontFamily: 'inherit',
 				padding: '12px 0',
+				caretColor: PORTUGOL_EDITOR_CARET_COLOR
+			},
+			'.cm-line': {
 				caretColor: PORTUGOL_EDITOR_CARET_COLOR
 			},
 			'.cm-gutters': {
@@ -400,6 +441,30 @@
 						{
 							key: 'Enter',
 							run: insertIndentedNewline
+						},
+						{
+							key: '"',
+							run: (editorView) => insertEditorPair(editorView, '"')
+						},
+						{
+							key: '(',
+							run: (editorView) => insertEditorPair(editorView, '(', ')', false)
+						},
+						{
+							key: ')',
+							run(editorView) {
+								const range = editorView.state.selection.main;
+								const nextChar = editorView.state.sliceDoc(range.to, range.to + 1);
+								if (range.empty && nextChar === ')') {
+									editorView.dispatch({
+										selection: EditorSelection.cursor(range.to + 1),
+										scrollIntoView: true,
+										userEvent: 'select'
+									});
+									return true;
+								}
+								return false;
+							}
 						},
 						{
 							key: 'Mod-d',

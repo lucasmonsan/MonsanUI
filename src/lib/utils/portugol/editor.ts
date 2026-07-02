@@ -5,6 +5,12 @@ const BLOCK_CLOSERS =
 
 export const PORTUGOL_EDITOR_CARET_COLOR = 'var(--text-primary)';
 
+export interface PortugolPairEdit {
+	insert: string;
+	selectionStartOffset: number;
+	selectionEndOffset: number;
+}
+
 export function getPortugolLineIndent(text: string) {
 	return text.match(/^[\t ]*/)?.[0] ?? '';
 }
@@ -29,6 +35,36 @@ export function closesPortugolBlock(text: string) {
 export function getPortugolNextLineIndent(textBeforeCursor: string) {
 	const currentIndent = getPortugolLineIndent(textBeforeCursor);
 	return opensPortugolBlock(textBeforeCursor) ? `${currentIndent}\t` : currentIndent;
+}
+
+export function getPortugolPairEdit(
+	selectedText: string,
+	nextChar: string,
+	opening: string,
+	closing = opening,
+	skipClosing = opening === closing
+): PortugolPairEdit {
+	if (skipClosing && !selectedText && nextChar === closing) {
+		return {
+			insert: '',
+			selectionStartOffset: 1,
+			selectionEndOffset: 1
+		};
+	}
+
+	if (selectedText) {
+		return {
+			insert: `${opening}${selectedText}${closing}`,
+			selectionStartOffset: 1,
+			selectionEndOffset: selectedText.length + 1
+		};
+	}
+
+	return {
+		insert: `${opening}${closing}`,
+		selectionStartOffset: 1,
+		selectionEndOffset: 1
+	};
 }
 
 export function getPortugolEditorIndentColumns(previousLineText: string, textAfter: string) {
