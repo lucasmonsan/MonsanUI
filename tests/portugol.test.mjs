@@ -14,6 +14,7 @@ import {
 	getVisualgOfficialExample,
 	visualgOfficialExamples
 } from '../dist/utils/portugol/examples.js';
+import { tokenizePortugolCode } from '../dist/utils/portugol/highlight.js';
 import {
 	getPortugolEditorIndentColumns,
 	getPortugolNextLineIndent,
@@ -1385,6 +1386,33 @@ console.log('Running Portugol editor behavior tests...');
 		getPortugolEditorIndentColumns('\t\tescreval("Aprovado")', 'fimse'),
 		4,
 		'CodeMirror indentation should reduce before block closer'
+	);
+}
+
+console.log('Running Portugol code highlight tests...');
+{
+	const source = 'se nota >= 6 entao escreva("ok") // fim';
+	const tokens = tokenizePortugolCode(source);
+	assert(
+		tokens.some((token) => token.kind === 'keyword' && token.text === 'se'),
+		'Should classify Visualg keywords'
+	);
+	assert(
+		tokens.some((token) => token.kind === 'number' && token.text === '6'),
+		'Should classify numbers'
+	);
+	assert(
+		tokens.some((token) => token.kind === 'string' && token.text === '"ok"'),
+		'Should classify strings'
+	);
+	assert(
+		tokens.some((token) => token.kind === 'comment' && token.text === '// fim'),
+		'Should classify comments'
+	);
+	assertEquals(
+		tokens.map((token) => token.text).join(''),
+		source,
+		'Tokenization should preserve source text'
 	);
 }
 
