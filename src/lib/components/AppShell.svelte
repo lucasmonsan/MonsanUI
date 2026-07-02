@@ -251,14 +251,14 @@
 
 	.app-shell-content::before {
 		top: 0;
-		margin-bottom: calc((var(--space-xl) + var(--space-md)) * -1);
+		margin-bottom: calc(var(--space-xl) * -1);
 		border-top: var(--border-width) solid var(--border-color);
 		background: linear-gradient(to bottom, var(--bg-primary), transparent);
 	}
 
 	.app-shell-content::after {
 		bottom: 0;
-		margin-top: calc((var(--space-xl) + var(--space-md)) * -1);
+		margin-top: calc(var(--space-xl) * -1);
 		border-bottom: var(--border-width) solid var(--border-color);
 		background: linear-gradient(to top, var(--bg-primary), transparent);
 	}
