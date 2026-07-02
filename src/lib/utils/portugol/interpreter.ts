@@ -142,11 +142,13 @@ export class Lexer {
 				const startCol = this.column;
 				this.advance(); // "
 				let str = '';
-				while (this.peek() !== '"' && this.peek() !== '') {
+				while (this.peek() !== '"' && this.peek() !== '' && this.peek() !== '\n') {
 					str += this.advance();
 				}
-				if (this.peek() === '') {
-					throw new Error(`Erro Léxico: Cadeia de caracteres não fechada na linha ${startLine}`);
+				if (this.peek() === '' || this.peek() === '\n') {
+					throw new Error(
+						`Erro Léxico na linha ${startLine}, coluna ${startCol}: Texto entre aspas não foi fechado. Adicione a aspa final ".`
+					);
 				}
 				this.advance(); // "
 				tokens.push({ type: 'STRING', value: str, line: startLine, column: startCol });
@@ -657,6 +659,9 @@ export class Parser {
 		let previousLine: number | undefined;
 
 		while (!terminators.some((type) => this.check(type)) && !this.isAtEnd()) {
+			if (this.check('FIMALGORITMO') && !terminators.includes('FIMALGORITMO')) {
+				break;
+			}
 			if (this.match('SEMICOLON')) continue;
 			this.assertVisualgStatementLine(previousLine, this.peek());
 			const statement = this.parseVisualgStatement();
@@ -1048,10 +1053,13 @@ export class Parser {
 		const algoToken = this.consume('ALGORITMO', "Esperado palavra-chave 'algoritmo'");
 		const line = algoToken.line;
 
-		// Nome do algoritmo opcional
-		if (this.check('STRING') || this.check('IDENTIFIER')) {
-			this.advance();
+		if (!this.check('STRING')) {
+			const token = this.peek();
+			throw new Error(
+				`Erro de Sintaxe na linha ${token.line}: Informe o nome do algoritmo entre aspas, por exemplo: algoritmo "MeuPrograma".`
+			);
 		}
+		this.advance();
 
 		// Seção de declaração de variáveis
 		if (this.match('VAR')) {
@@ -1110,6 +1118,29 @@ export class Parser {
 	private parseVisualgStatement(): ASTNode {
 		const t = this.peek();
 
+		if (t.type === 'FIMSE') {
+			throw new Error(`Erro de Sintaxe na linha ${t.line}: 'fimse' sem um 'se' correspondente.`);
+		}
+		if (t.type === 'FIMENQUANTO') {
+			throw new Error(
+				`Erro de Sintaxe na linha ${t.line}: 'fimenquanto' sem um 'enquanto' correspondente.`
+			);
+		}
+		if (t.type === 'FIMPARA') {
+			throw new Error(
+				`Erro de Sintaxe na linha ${t.line}: 'fimpara' sem um 'para' correspondente.`
+			);
+		}
+		if (t.type === 'FIMESCOLHA') {
+			throw new Error(
+				`Erro de Sintaxe na linha ${t.line}: 'fimescolha' sem um 'escolha' correspondente.`
+			);
+		}
+		if (t.type === 'FIMALGORITMO') {
+			throw new Error(
+				`Erro de Sintaxe na linha ${t.line}: 'fimalgoritmo' apareceu antes do fim do bloco atual.`
+			);
+		}
 		if (t.type === 'VAR') {
 			throw new Error(
 				`Erro na linha ${t.line}: Declarações de variáveis devem estar no bloco 'var'.`

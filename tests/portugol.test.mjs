@@ -49,6 +49,13 @@ function parseProgram(code) {
 	return parser.parse();
 }
 
+function validateProgram(code) {
+	const ast = parseProgram(code);
+	const validator = new SemanticValidator();
+	validator.validate(ast);
+	return ast;
+}
+
 function runProgram(code, inputs = []) {
 	const ast = parseProgram(code);
 	const interpreter = new Interpreter(false);
@@ -145,6 +152,183 @@ console.log('Running Portugol identifier validation tests...');
 		assert(e.message.includes('maçã'), 'Should include the invalid identifier in the error');
 	}
 	assert(threw, 'Should reject Visualg identifiers with cedilla');
+}
+
+console.log('Running Visualg diagnostic message tests...');
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "Aspas
+				var
+					idade : inteiro
+				inicio
+					escreva("erro")
+				fimalgoritmo
+			`),
+		'Texto entre aspas não foi fechado',
+		'Should report unclosed quote directly'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo
+				var
+					idade : inteiro
+				inicio
+					escreva(idade)
+				fimalgoritmo
+			`),
+		'Informe o nome do algoritmo entre aspas',
+		'Should require an algorithm name'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "Nome
+				var
+					idade : inteiro
+				inicio
+					escreva(idade)
+				fimalgoritmo
+			`),
+		'Texto entre aspas não foi fechado',
+		'Should report incomplete algorithm name quote'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "VarMalformada"
+				var
+					idade inteiro
+				inicio
+					escreva(idade)
+				fimalgoritmo
+			`),
+		"Esperado ':' após identificadores de variáveis",
+		'Should report missing colon in var declaration'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "TipoFaltando"
+				var
+					idade :
+				inicio
+					escreva(idade)
+				fimalgoritmo
+			`),
+		'Esperado tipo da variável',
+		'Should report missing variable type'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "SeSemFim"
+				var
+					idade : inteiro
+				inicio
+					se idade > 10 entao
+						escreva("ok")
+				fimalgoritmo
+			`),
+		"Esperado 'fimse' para fechar o bloco 'se'",
+		'Should report missing fimse'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "FimseSobrando"
+				var
+					idade : inteiro
+				inicio
+					fimse
+				fimalgoritmo
+			`),
+		"'fimse' sem um 'se' correspondente",
+		'Should report extra fimse'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "ParenAberto"
+				var
+					idade : inteiro
+				inicio
+					escreva((idade)
+				fimalgoritmo
+			`),
+		"Esperado ')'",
+		'Should report open parenthesis'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "EscrevaParen"
+				var
+				inicio
+					escreva("x"
+				fimalgoritmo
+			`),
+		"Esperado ')' após argumentos",
+		'Should report missing closing parenthesis in escreva'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			parseProgram(`
+				algoritmo "OperadorInvalido"
+				var
+					idade : inteiro
+				inicio
+					idade <- 1 @ 2
+				fimalgoritmo
+			`),
+		"Caracter inválido '@'",
+		'Should report invalid operator character'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			validateProgram(`
+				algoritmo "LeiaVazio"
+				var
+					idade : inteiro
+				inicio
+					leia()
+				fimalgoritmo
+			`),
+		"O comando 'leia' deve receber exatamente um identificador",
+		'Should report invalid leia call'
+	);
 }
 
 console.log('Running Portugol Parser tests...');
