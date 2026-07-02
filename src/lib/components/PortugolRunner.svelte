@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { tick } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import PortugolEditor from './PortugolEditor.svelte';
 	import Button from './Button.svelte';
@@ -74,8 +74,6 @@
 	// Collapsible state
 	let isConsoleCollapsed = $state(false);
 	let isVariablesCollapsed = $state(false);
-	let isConsoleFloating = $state(false);
-	let isFloatingConsoleOpen = $state(false);
 	let showLineNumbers = $state(true);
 
 	// Resizable state
@@ -149,27 +147,13 @@
 	let stopRequested = false;
 	let scheduledRun: ReturnType<typeof setTimeout> | null = null;
 	const executionChunkSize = 500;
-	const floatingConsolePreferenceKey = 'monsan-ui:portugol-runner:floating-console';
-	let floatingConsolePreferenceLoaded = false;
-
-	let embeddedConsoleVisible = $derived(!isConsoleCollapsed && !isConsoleFloating);
+	let embeddedConsoleVisible = $derived(!isConsoleCollapsed);
 	let sidebarHidden = $derived(!embeddedConsoleVisible && isVariablesCollapsed);
 	let sidebarRows = $derived(
 		embeddedConsoleVisible && !isVariablesCollapsed
 			? `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`
 			: '1fr'
 	);
-
-	onMount(() => {
-		isConsoleFloating = localStorage.getItem(floatingConsolePreferenceKey) === 'true';
-		floatingConsolePreferenceLoaded = true;
-	});
-
-	$effect(() => {
-		if (floatingConsolePreferenceLoaded) {
-			localStorage.setItem(floatingConsolePreferenceKey, String(isConsoleFloating));
-		}
-	});
 
 	$effect(() => {
 		if (pendingInputVar) {
@@ -206,11 +190,6 @@
 	}
 
 	function prepareConsoleForExecution() {
-		if (isConsoleFloating) {
-			isFloatingConsoleOpen = true;
-			return;
-		}
-
 		if (isConsoleCollapsed) {
 			isConsoleCollapsed = false;
 		}
@@ -394,18 +373,6 @@
 		interpreter = null;
 		generator = null;
 	}
-
-	function toggleConsoleFloating() {
-		isConsoleFloating = !isConsoleFloating;
-		if (isConsoleFloating) {
-			isFloatingConsoleOpen = true;
-			return;
-		}
-		isFloatingConsoleOpen = false;
-		if (isConsoleCollapsed) {
-			isConsoleCollapsed = false;
-		}
-	}
 </script>
 
 {#snippet consoleContent()}
@@ -500,9 +467,6 @@
 								<div class="panel-header">
 									<span>{i18n.t('portugolRunner.consoleTitle')}</span>
 									<div class="panel-header-actions">
-										<button type="button" class="collapse-btn" onclick={toggleConsoleFloating}>
-											{i18n.t('portugolRunner.floatConsole')}
-										</button>
 										<button
 											type="button"
 											class="collapse-btn"
@@ -663,17 +627,9 @@
 						<span class="toolbar-label">{i18n.t('portugolRunner.lines')}</span>
 					</Button>
 					<Button
-						variant={(isConsoleFloating ? isFloatingConsoleOpen : !isConsoleCollapsed)
-							? 'primary'
-							: 'secondary'}
+						variant={!isConsoleCollapsed ? 'primary' : 'secondary'}
 						size="sm"
-						onclick={() => {
-							if (isConsoleFloating) {
-								isFloatingConsoleOpen = !isFloatingConsoleOpen;
-							} else {
-								isConsoleCollapsed = !isConsoleCollapsed;
-							}
-						}}
+						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
 					>
 						<TerminalIcon size="16" />
 						<span class="toolbar-label">{i18n.t('portugolRunner.consoleTitle')}</span>
@@ -690,29 +646,6 @@
 			</Inline>
 		</div>
 	</Stack>
-
-	{#if isConsoleFloating && isFloatingConsoleOpen}
-		<div class="floating-console-panel">
-			<Panel padding="none" maxWidth="none" fullHeight={true}>
-				<div class="panel-header">
-					<span>{i18n.t('portugolRunner.consoleTitle')}</span>
-					<div class="panel-header-actions">
-						<button type="button" class="collapse-btn" onclick={toggleConsoleFloating}>
-							{i18n.t('portugolRunner.dockConsole')}
-						</button>
-						<button
-							type="button"
-							class="collapse-btn"
-							onclick={() => (isFloatingConsoleOpen = false)}
-						>
-							{i18n.t('portugolRunner.hide')}
-						</button>
-					</div>
-				</div>
-				{@render consoleContent()}
-			</Panel>
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -995,18 +928,6 @@
 	.collapse-btn:hover {
 		color: var(--text-primary);
 		background: rgba(0, 0, 0, 0.05);
-	}
-
-	.floating-console-panel {
-		position: absolute;
-		right: var(--space-md);
-		bottom: calc(var(--space-md) + 48px);
-		z-index: 35;
-		width: min(560px, calc(100% - var(--space-md) * 2));
-		height: min(360px, calc(100% - 96px));
-		min-height: 180px;
-		display: flex;
-		box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow-color);
 	}
 
 	.horizontal-resize-bar {
