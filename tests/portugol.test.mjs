@@ -780,6 +780,48 @@ console.log('Running Visualg declaration and comparison tests...');
 }
 
 {
+	const outputs = runProgram(`
+		algoritmo "ComparacoesTipos"
+		var
+			idade, minimo : inteiro
+			nota, media : real
+			nome : cadeia
+			ativo : logico
+		inicio
+			idade <- 14
+			minimo <- 10
+			nota <- 8.5
+			media <- 7
+			nome <- "Lucas"
+			ativo <- verdadeiro
+			se idade >= minimo entao
+				escreva("inteiro|")
+			fimse
+			se nota > media entao
+				escreva("real|")
+			fimse
+			se idade > media entao
+				escreva("misto|")
+			fimse
+			se idade = 14 entao
+				escreva("var-inteiro|")
+			fimse
+			se nota = 8.5 entao
+				escreva("var-real|")
+			fimse
+			se nome = "Lucas" entao
+				escreva("texto|")
+			fimse
+			se ativo = verdadeiro entao
+				escreva("logico")
+			fimse
+		fimalgoritmo
+	`);
+
+	assertEquals(outputs.join(''), 'inteiro|real|misto|var-inteiro|var-real|texto|logico');
+}
+
+{
 	assertThrowsMessage(
 		() =>
 			runProgram(`
@@ -795,8 +837,69 @@ console.log('Running Visualg declaration and comparison tests...');
 					fimse
 				fimalgoritmo
 			`),
-		"O operador '>' espera valores numéricos.",
+		"O operador '>' espera valores numéricos, mas recebeu texto e numero.",
 		'Should reject relational comparison between text and number'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ComparacaoInvalidaTextoLogico"
+				var
+					nome : cadeia
+					ativo : logico
+				inicio
+					nome <- "Lucas"
+					ativo <- verdadeiro
+					se nome = ativo entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		'Não é possível comparar texto com logico',
+		'Should reject equality between text and boolean'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "ComparacaoInvalidaNumeroLogico"
+				var
+					idade : inteiro
+					ativo : logico
+				inicio
+					idade <- 14
+					ativo <- verdadeiro
+					se idade = ativo entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		'Não é possível comparar numero com logico',
+		'Should reject equality between number and boolean'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "CondicaoNaoLogica"
+				var
+					idade : inteiro
+				inicio
+					idade <- 14
+					se idade entao
+						escreva("invalido")
+					fimse
+				fimalgoritmo
+			`),
+		"A condição de 'se' precisa ser lógica, mas recebeu numero.",
+		'Should reject non-boolean if condition'
 	);
 }
 
@@ -837,7 +940,7 @@ console.log('Running Visualg xor operator tests...');
 					fimse
 				fimalgoritmo
 			`),
-		"O operador 'xou' espera valores lógicos.",
+		"O operador 'xou' espera valores lógicos, mas recebeu logico e numero.",
 		'Should reject non-boolean xor operands'
 	);
 }
