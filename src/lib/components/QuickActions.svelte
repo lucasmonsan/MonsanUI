@@ -161,6 +161,8 @@
 			<div
 				class="quick-actions-trigger"
 				onclick={toggle}
+				onmousedown={(e) => e.stopPropagation()}
+				onpointerdown={(e) => e.stopPropagation()}
 				onkeydown={(event) => {
 					if (event.key === 'Enter' || event.key === ' ') {
 						event.preventDefault();
@@ -177,7 +179,12 @@
 				{@render trigger(toggle)}
 			</div>
 		{:else}
-			<div class="quick-actions-trigger">
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div
+				class="quick-actions-trigger"
+				onmousedown={(e) => e.stopPropagation()}
+				onpointerdown={(e) => e.stopPropagation()}
+			>
 				{@render trigger(toggle)}
 			</div>
 		{/if}

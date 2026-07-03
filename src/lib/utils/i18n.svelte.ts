@@ -140,7 +140,8 @@ class I18n {
 				reset: 'Reiniciar',
 				save: 'Salvar',
 				indentation: 'Identação',
-				lines: 'Linhas'
+				lines: 'Linhas',
+				view: 'Exibição'
 			},
 			timePicker: {
 				selectTime: 'Selecionar Horário',
@@ -353,7 +354,8 @@ class I18n {
 				reset: 'Reset',
 				save: 'Save',
 				indentation: 'Indentation',
-				lines: 'Lines'
+				lines: 'Lines',
+				view: 'View'
 			},
 			timePicker: {
 				selectTime: 'Select Time',
@@ -567,7 +569,8 @@ class I18n {
 				reset: 'Reiniciar',
 				save: 'Guardar',
 				indentation: 'Sangría',
-				lines: 'Líneas'
+				lines: 'Líneas',
+				view: 'Vista'
 			},
 			timePicker: {
 				selectTime: 'Seleccionar Hora',

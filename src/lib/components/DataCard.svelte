@@ -20,6 +20,8 @@
 		interactive?: boolean;
 		onclick?: (event: MouseEvent) => void;
 		wrapHeader?: boolean;
+		alignHeader?: 'start' | 'center';
+		flatInteractive?: boolean;
 	}
 
 	let {
@@ -37,7 +39,9 @@
 		fullHeight = false,
 		interactive = false,
 		onclick,
-		wrapHeader = true
+		wrapHeader = true,
+		alignHeader = 'start',
+		flatInteractive = false
 	}: Props = $props();
 
 	let panelPadding = $derived<PaddingPreset>(
@@ -55,11 +59,12 @@
 	overflow="hidden"
 	{fullHeight}
 	interactive={interactive || Boolean(onclick)}
+	{flatInteractive}
 	{onclick}
 >
 	<article class="monsan-data-card" class:full-height={fullHeight} class:wrap-header={wrapHeader}>
 		{#if hasTop}
-			<header class="data-card-top">
+			<header class="data-card-top align-header-{alignHeader}">
 				<div class="data-card-copy">
 					{#if top}
 						{@render top()}
@@ -140,6 +145,10 @@
 		justify-content: space-between;
 		gap: var(--space-md);
 		min-width: 0;
+	}
+
+	.data-card-top.align-header-center {
+		align-items: center;
 	}
 
 	.data-card-copy,

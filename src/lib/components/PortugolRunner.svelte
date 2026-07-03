@@ -14,10 +14,10 @@
 	import SaveIcon from './icons/Save.svelte';
 	import SkipForwardIcon from './icons/SkipForward.svelte';
 	import TextIndentIcon from './icons/TextIndent.svelte';
-	import TerminalIcon from './icons/Terminal.svelte';
-	import BracketsCurlyIcon from './icons/BracketsCurly.svelte';
-	import ListBulletsIcon from './icons/ListBullets.svelte';
 	import XIcon from './icons/X.svelte';
+	import SlidersHorizontalIcon from './icons/SlidersHorizontal.svelte';
+	import QuickActions from './QuickActions.svelte';
+	import MenuItem from './MenuItem.svelte';
 	import { i18n } from '../utils/i18n.svelte.js';
 	import {
 		Lexer,
@@ -673,36 +673,37 @@
 						<span class="toolbar-label">{i18n.t('portugolRunner.indentation')}</span>
 					</Button>
 				</Inline>
+				<!-- Alternador de Visibilidade Unificado (Direita) -->
+				<QuickActions align="right">
+					{#snippet trigger(toggle)}
+						<Button variant="secondary" size="sm" onclick={toggle} disabled={disabled || isRunning}>
+							<SlidersHorizontalIcon size={16} />
+							<span class="toolbar-label">{i18n.t('portugolRunner.view')}</span>
+						</Button>
+					{/snippet}
 
-				<!-- Alternadores de Visibilidade de Painéis (Direita) -->
-				<Inline gap="sm" wrap>
-					<Button
-						variant={showLineNumbers ? 'primary' : 'secondary'}
-						size="sm"
+					<MenuItem
+						checked={showLineNumbers}
 						onclick={() => (showLineNumbers = !showLineNumbers)}
-						disabled={disabled || isRunning}
-						ariaPressed={showLineNumbers}
+						data-menu-persistent
 					>
-						<ListBulletsIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.lines')}</span>
-					</Button>
-					<Button
-						variant={!isConsoleCollapsed ? 'primary' : 'secondary'}
-						size="sm"
+						{i18n.t('portugolRunner.lines')}
+					</MenuItem>
+					<MenuItem
+						checked={!isConsoleCollapsed}
 						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
+						data-menu-persistent
 					>
-						<TerminalIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.consoleTitle')}</span>
-					</Button>
-					<Button
-						variant={!isVariablesCollapsed ? 'primary' : 'secondary'}
-						size="sm"
+						{i18n.t('portugolRunner.consoleTitle')}
+					</MenuItem>
+					<MenuItem
+						checked={!isVariablesCollapsed}
 						onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
+						data-menu-persistent
 					>
-						<BracketsCurlyIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.variablesTitle')}</span>
-					</Button>
-				</Inline>
+						{i18n.t('portugolRunner.variablesTitle')}
+					</MenuItem>
+				</QuickActions>
 			</Inline>
 		</div>
 	</Stack>

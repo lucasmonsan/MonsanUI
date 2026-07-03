@@ -41,6 +41,9 @@
 		display: flex;
 		box-sizing: border-box;
 	}
+	.monsan-inline > :global(svg) {
+		flex-shrink: 0;
+	}
 
 	.wrap {
 		flex-wrap: wrap;
