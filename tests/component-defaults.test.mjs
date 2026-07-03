@@ -53,6 +53,11 @@ assert(
 );
 
 assert(
+	!/\.app-shell-content\s*\{[\s\S]*?\n\s*height:\s*100%;/.test(appShell),
+	'AppShell content must not force height: 100%; it clips card shadows and vertical content flow.'
+);
+
+assert(
 	ssoLoginButton.includes('class="account-main"') &&
 		ssoLoginButton.includes('aria-haspopup="menu"') &&
 		ssoLoginButton.includes('<DotsThreeVerticalIcon size={18} />'),
