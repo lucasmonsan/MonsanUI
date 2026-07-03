@@ -754,7 +754,7 @@
 	}
 
 	.toolbar {
-		padding: 0;
+		padding: 0 4px 4px 0;
 		background: transparent;
 		border: 0;
 		border-radius: 0;
