@@ -715,6 +715,7 @@
 		width: 100%;
 		height: 100%;
 		min-height: 0;
+		overflow: visible !important;
 	}
 
 	.runner-workspace {
@@ -753,10 +754,11 @@
 	}
 
 	.toolbar {
-		padding: 6px 4px;
+		padding: 0;
 		background: transparent;
 		border: 0;
 		border-radius: 0;
+		overflow: visible !important;
 	}
 
 	.workspace-grid {
