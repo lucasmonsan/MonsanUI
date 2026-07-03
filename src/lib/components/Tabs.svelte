@@ -260,27 +260,30 @@
 		width: 100%;
 		display: flex;
 		align-items: center;
+		overflow: visible;
 	}
 
 	.monsan-tabs-wrapper.is-scrollable {
-		overflow: hidden;
+		overflow: visible;
 	}
 
 	.monsan-tabs-container {
 		display: flex;
 		gap: var(--space-sm);
 		border-bottom: 0;
-		padding: 0;
-		margin: 0;
+		padding: 2px 4px 4px 2px;
+		margin: -2px -4px -4px -2px;
 		width: 100%;
-		overflow-x: auto;
-		scrollbar-width: thin;
-		scrollbar-color: var(--border-color) var(--bg-secondary);
+		flex-wrap: wrap;
+		overflow: visible;
+		scrollbar-width: auto;
 		box-sizing: border-box;
 	}
 
 	.monsan-tabs-container.scrollable {
+		flex-wrap: nowrap;
 		overflow-x: auto;
+		overflow-y: visible;
 		scroll-behavior: smooth;
 		scrollbar-width: none;
 		-webkit-mask-image: linear-gradient(
@@ -305,7 +308,7 @@
 
 	.monsan-tabs-container.wrap-tabs {
 		flex-wrap: wrap;
-		overflow-x: visible;
+		overflow: visible;
 		scrollbar-width: auto;
 		width: 100%;
 	}
@@ -318,18 +321,6 @@
 	.monsan-tabs-container.has-nav-buttons {
 		padding-left: 44px;
 		padding-right: 44px;
-	}
-
-	.monsan-tabs-container:not(.wrap-tabs):not(.scrollable)::-webkit-scrollbar {
-		height: 6px;
-		display: block;
-	}
-	.monsan-tabs-container:not(.wrap-tabs):not(.scrollable)::-webkit-scrollbar-track {
-		background: var(--bg-secondary);
-		border: 1px solid var(--border-color);
-	}
-	.monsan-tabs-container:not(.wrap-tabs):not(.scrollable)::-webkit-scrollbar-thumb {
-		background: var(--border-color);
 	}
 
 	/* TabItem styles */

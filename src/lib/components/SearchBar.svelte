@@ -20,6 +20,7 @@
 		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
 		clearLabel?: string;
 		readonly?: boolean;
+		width?: 'full' | 'auto' | 'flex';
 		oninput?: (event: Event) => void;
 		onfocus?: (event: FocusEvent) => void;
 		onblur?: (event: FocusEvent) => void;
@@ -38,6 +39,7 @@
 		ariaInvalid,
 		clearLabel,
 		readonly = false,
+		width = 'full',
 		oninput,
 		onfocus,
 		onblur
@@ -166,7 +168,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="monsan-searchbar-container">
+<div bind:this={containerEl} class="monsan-searchbar-container width-{width}">
 	<div class="searchbar-wrapper" class:focused={isFocused} class:disabled class:invalid={isInvalid}>
 		<span class="search-icon">
 			<Search size={20} />
@@ -248,6 +250,17 @@
 		position: relative;
 		width: 100%;
 		font-family: var(--font-body);
+	}
+
+	.width-auto {
+		width: auto;
+		min-width: min(100%, 240px);
+	}
+
+	.width-flex {
+		width: auto;
+		min-width: min(100%, 240px);
+		flex: 1 1 260px;
 	}
 
 	.searchbar-wrapper {
@@ -379,6 +392,14 @@
 		.clear-btn,
 		.suggestion-item {
 			transition: none;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.width-auto,
+		.width-flex {
+			width: 100%;
+			flex-basis: 100%;
 		}
 	}
 </style>
