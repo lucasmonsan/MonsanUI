@@ -242,7 +242,6 @@
 		width: 100%;
 		min-width: 0;
 		min-height: 100%;
-		height: 100%;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-md);
