@@ -42,6 +42,12 @@
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.monsan-filter-toolbar::-webkit-scrollbar {
+		display: none;
 	}
 
 	.filter-toolbar-filters,
@@ -54,12 +60,13 @@
 	}
 
 	.filter-toolbar-filters {
-		flex: 0 1 auto;
-		flex-wrap: wrap;
+		flex: 0 0 auto;
+		flex-wrap: nowrap;
 	}
 
 	.filter-toolbar-search-row {
-		flex: 1 1 260px;
+		flex: 1 0 260px;
+		flex-wrap: nowrap;
 	}
 
 	.filter-toolbar-search {
@@ -72,12 +79,14 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
+		white-space: nowrap;
 	}
 
 	@media (max-width: 640px) {
 		.monsan-filter-toolbar {
 			flex-direction: column;
 			align-items: stretch;
+			overflow-x: visible;
 		}
 
 		.filter-toolbar-filters {
