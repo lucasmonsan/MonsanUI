@@ -753,7 +753,7 @@
 	}
 
 	.toolbar {
-		padding: 0;
+		padding: 6px 4px;
 		background: transparent;
 		border: 0;
 		border-radius: 0;
