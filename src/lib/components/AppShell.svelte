@@ -10,6 +10,7 @@
 		footer?: Snippet;
 		contentId?: string;
 		resetKey?: string | number | boolean | null;
+		fullHeight?: boolean;
 	}
 
 	let {
@@ -19,7 +20,8 @@
 		bottom,
 		footer,
 		contentId = 'main-content',
-		resetKey = null
+		resetKey = null,
+		fullHeight = false
 	}: Props = $props();
 
 	let scrollEl = $state<HTMLElement>();
@@ -149,7 +151,7 @@
 		tabindex="-1"
 		onscroll={updateOverflowFade}
 	>
-		<div bind:this={contentEl} class="app-shell-content">
+		<div bind:this={contentEl} class="app-shell-content" class:full-height={fullHeight}>
 			{@render children()}
 		</div>
 	</div>
@@ -236,6 +238,10 @@
 
 	.app-shell-scroll::-webkit-scrollbar {
 		display: none;
+	}
+
+	.full-height {
+		height: 100%;
 	}
 
 	.app-shell-content {
