@@ -36,6 +36,7 @@
 		onsave?: (isShortcut?: boolean) => void;
 		floatingActions?: Snippet;
 		userId?: string;
+		fileName?: string;
 	}
 
 	let {
@@ -55,7 +56,8 @@
 		onFailure,
 		onsave,
 		floatingActions,
-		userId
+		userId,
+		fileName
 	}: Props = $props();
 
 	let activeLine = $state(0);
@@ -494,6 +496,11 @@
 						disabled={disabled || (isRunning && !isPaused)}
 						{onsave}
 					/>
+					{#if fileName}
+						<div class="runner-editor-watermark" aria-hidden="true">
+							{fileName}
+						</div>
+					{/if}
 				</div>
 
 				<!-- Barra de redimensionamento -->
@@ -724,6 +731,24 @@
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-xs);
+	}
+
+	.runner-editor-watermark {
+		position: absolute;
+		bottom: var(--space-sm);
+		right: var(--space-sm);
+		z-index: 10;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text-secondary);
+		opacity: 0.35;
+		pointer-events: none;
+		user-select: none;
+		background-color: var(--bg-primary);
+		padding: 2px 6px;
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-sm);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.toolbar {
