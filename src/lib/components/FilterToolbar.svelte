@@ -58,6 +58,20 @@
 		flex-wrap: nowrap;
 	}
 
+	.filter-toolbar-filters :global(.monsan-select-container),
+	.filter-toolbar-filters :global(.monsan-multiselect-container) {
+		flex: 0 0 var(--filter-toolbar-control-width, 180px);
+		width: var(--filter-toolbar-control-width, 180px);
+		min-width: 0;
+	}
+
+	.filter-toolbar-filters :global(.monsan-select-dropdown),
+	.filter-toolbar-filters :global(.monsan-multiselect-dropdown) {
+		width: 100%;
+		min-width: 100%;
+		max-width: 100%;
+	}
+
 	.filter-toolbar-search-row {
 		flex: 1 0 260px;
 		flex-wrap: nowrap;
