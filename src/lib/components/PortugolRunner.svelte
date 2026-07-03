@@ -523,7 +523,7 @@
 					<!-- Console/Terminal -->
 					{#if embeddedConsoleVisible}
 						<div class="terminal-card" style="grid-row: 1;">
-							<Panel padding="none" maxWidth="none" fullHeight={true}>
+							<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
 								<div class="panel-header">
 									<span>{i18n.t('portugolRunner.consoleTitle')}</span>
 									<div class="panel-header-actions">
@@ -560,7 +560,7 @@
 							class="variables-panel-wrapper"
 							style="grid-row: {embeddedConsoleVisible ? 3 : 1};"
 						>
-							<Panel padding="none" maxWidth="none" fullHeight={true}>
+							<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
 								<div class="panel-header">
 									<span>{i18n.t('portugolRunner.variablesTitle')}</span>
 									<button

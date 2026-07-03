@@ -25,6 +25,8 @@
 		onkeydown?: (event: KeyboardEvent) => void;
 		/** Disable hover/active physical translation animations while keeping clickability. Defaults to false */
 		flatInteractive?: boolean;
+		/** Render shadow. Defaults to true */
+		shadow?: boolean;
 	}
 
 	let {
@@ -38,7 +40,8 @@
 		overflow = 'visible',
 		onclick,
 		onkeydown,
-		flatInteractive = false
+		flatInteractive = false,
+		shadow = true
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -60,6 +63,7 @@
 	class:is-interactive={interactive}
 	class:flat-interactive={flatInteractive}
 	class:full-height={fullHeight}
+	class:no-shadow={!shadow}
 	style:padding={resolvedPadding}
 	style:max-width={resolvedMaxWidth}
 	style:height={fullHeight ? '100%' : undefined}
@@ -160,5 +164,8 @@
 	.is-interactive:not(.flat-interactive):active {
 		transform: translate(1px, 1px);
 		box-shadow: var(--shadow-xs);
+	}
+	.monsan-panel.no-shadow {
+		box-shadow: none !important;
 	}
 </style>
