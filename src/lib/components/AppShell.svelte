@@ -183,6 +183,7 @@
 		flex-direction: column;
 		gap: var(--space-sm);
 		box-sizing: border-box;
+		overflow: hidden;
 		min-width: 0;
 		position: relative;
 		z-index: 0;
@@ -226,6 +227,7 @@
 		min-width: 0;
 		width: 100%;
 		overflow-y: auto;
+		overflow-x: hidden;
 		scrollbar-width: none;
 		box-sizing: border-box;
 		position: relative;
