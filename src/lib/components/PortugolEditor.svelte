@@ -489,6 +489,20 @@
 						indentWithTab
 					]),
 					indentUnit.of('\t'),
+					EditorView.editorAttributes.of({
+						class: 'notranslate',
+						translate: 'no',
+						spellcheck: 'false',
+						autocorrect: 'off',
+						autocapitalize: 'off'
+					}),
+					EditorView.contentAttributes.of({
+						class: 'notranslate',
+						translate: 'no',
+						spellcheck: 'false',
+						autocorrect: 'off',
+						autocapitalize: 'off'
+					}),
 					EditorView.lineWrapping,
 					EditorView.updateListener.of((update: ViewUpdate) => {
 						if (update.docChanged) {
@@ -554,8 +568,8 @@
 	});
 </script>
 
-<div class="portugol-editor-container" class:disabled>
-	<div class="editor-wrapper" bind:this={editorContainer}></div>
+<div class="portugol-editor-container notranslate" class:disabled translate="no">
+	<div class="editor-wrapper notranslate" bind:this={editorContainer} translate="no"></div>
 </div>
 
 <style>
