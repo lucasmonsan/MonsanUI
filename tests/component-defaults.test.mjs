@@ -13,6 +13,7 @@ const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
+const stack = await readComponent('Stack.svelte');
 const suiteHeaderActions = await readComponent('SuiteHeaderActions.svelte');
 const suiteUserMenu = await readComponent('SuiteUserMenu.svelte');
 const themeSelector = await readComponent('ThemeSelector.svelte');
@@ -55,6 +56,13 @@ assert(
 assert(
 	!/\.app-shell-content\s*\{[\s\S]*?\n\s*height:\s*100%;/.test(appShell),
 	'AppShell content must not force height: 100%; it clips card shadows and vertical content flow.'
+);
+
+assert(
+	/\.full-height\s*\{[\s\S]*?flex:\s*1 1 auto;[\s\S]*?height:\s*100%;[\s\S]*?min-height:\s*0;/.test(
+		stack
+	),
+	'Stack fullHeight must grow inside flex parents so tool surfaces can fill AppShell content height.'
 );
 
 assert(
