@@ -411,7 +411,7 @@
 {/snippet}
 
 <div class="portugol-runner" class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}>
-	<Stack gap="md" fullHeight={true}>
+	<Stack gap="sm" fullHeight={true}>
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
 		<div class="runner-workspace">
 			<div
