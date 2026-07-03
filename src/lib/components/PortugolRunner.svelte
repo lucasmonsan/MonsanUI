@@ -427,8 +427,8 @@
 </script>
 
 {#snippet consoleContent()}
-	<div class="terminal-box">
-		<div class="terminal-content">
+	<div class="terminal-box notranslate" translate="no">
+		<div class="terminal-content notranslate" translate="no" spellcheck="false">
 			{#if outputs.length > 0}
 				<div class="terminal-line">{outputs.join('')}</div>
 			{/if}
@@ -444,6 +444,11 @@
 							placeholder={i18n.t('portugolRunner.inputPlaceholder')}
 							aria-label={i18n.t('portugolRunner.inputLabel', { variable: pendingInputVar })}
 							class="terminal-text-input"
+							translate="no"
+							spellcheck="false"
+							autocomplete="off"
+							autocorrect="off"
+							autocapitalize="off"
 						/>
 						<button
 							type="submit"
@@ -497,7 +502,7 @@
 						{onsave}
 					/>
 					{#if fileName}
-						<div class="runner-editor-watermark" aria-hidden="true">
+						<div class="runner-editor-watermark notranslate" aria-hidden="true" translate="no">
 							{fileName}
 						</div>
 					{/if}
@@ -571,7 +576,7 @@
 										{i18n.t('portugolRunner.hide')}
 									</button>
 								</div>
-								<div class="variables-box">
+								<div class="variables-box notranslate" translate="no" spellcheck="false">
 									{#if Object.keys(variables).length > 0}
 										<table class="variables-table">
 											<thead>

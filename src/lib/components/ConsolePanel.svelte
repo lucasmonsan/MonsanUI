@@ -69,7 +69,7 @@
 			</header>
 		{/if}
 
-		<div class="console-body" class:is-lined={lined}>
+		<div class="console-body notranslate" class:is-lined={lined} translate="no" spellcheck="false">
 			{@render children()}
 		</div>
 	</section>
