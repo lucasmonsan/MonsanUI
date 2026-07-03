@@ -38,7 +38,7 @@
 	.monsan-filter-toolbar {
 		display: flex;
 		align-items: center;
-		gap: var(--space-md);
+		gap: var(--filter-toolbar-gap, var(--space-sm));
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
@@ -48,7 +48,7 @@
 	.filter-toolbar-search-row {
 		display: flex;
 		align-items: center;
-		gap: var(--space-md);
+		gap: var(--filter-toolbar-gap, var(--space-sm));
 		min-width: 0;
 		box-sizing: border-box;
 	}
@@ -86,7 +86,7 @@
 		flex: 0 0 auto;
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm);
+		gap: var(--filter-toolbar-action-gap, var(--space-xs));
 		white-space: nowrap;
 	}
 
