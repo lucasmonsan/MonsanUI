@@ -6,7 +6,7 @@
 		label: string;
 		title?: string;
 		type?: 'button' | 'submit' | 'reset';
-		variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error';
+		variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost';
 		size?: 'sm' | 'md';
 		selected?: boolean;
 		disabled?: boolean;
@@ -84,6 +84,31 @@
 	.error {
 		background: var(--error);
 		color: var(--bg-primary);
+	}
+
+	.ghost {
+		background: transparent !important;
+		border-color: transparent !important;
+		box-shadow: none !important;
+		transform: none !important;
+	}
+
+	.monsan-icon-button.ghost,
+	.monsan-icon-button.ghost:hover:not(:disabled),
+	.monsan-icon-button.ghost:active:not(:disabled) {
+		box-shadow: none !important;
+		transform: none !important;
+	}
+
+	.monsan-icon-button.ghost:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--text-primary) 8%, transparent) !important;
+		border-color: transparent !important;
+	}
+
+	.monsan-icon-button.ghost:active:not(:disabled) {
+		background: color-mix(in srgb, var(--text-primary) 12%, transparent) !important;
+		border-color: transparent !important;
+		opacity: 0.8;
 	}
 
 	:global([data-theme='dark']) .primary,

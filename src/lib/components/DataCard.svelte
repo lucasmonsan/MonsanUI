@@ -19,6 +19,9 @@
 		fullHeight?: boolean;
 		interactive?: boolean;
 		onclick?: (event: MouseEvent) => void;
+		wrapHeader?: boolean;
+		alignHeader?: 'start' | 'center';
+		flatInteractive?: boolean;
 	}
 
 	let {
@@ -35,7 +38,10 @@
 		padding = 'md',
 		fullHeight = false,
 		interactive = false,
-		onclick
+		onclick,
+		wrapHeader = true,
+		alignHeader = 'start',
+		flatInteractive = false
 	}: Props = $props();
 
 	let panelPadding = $derived<PaddingPreset>(
@@ -53,11 +59,12 @@
 	overflow="hidden"
 	{fullHeight}
 	interactive={interactive || Boolean(onclick)}
+	{flatInteractive}
 	{onclick}
 >
-	<article class="monsan-data-card" class:full-height={fullHeight}>
+	<article class="monsan-data-card" class:full-height={fullHeight} class:wrap-header={wrapHeader}>
 		{#if hasTop}
-			<header class="data-card-top">
+			<header class="data-card-top align-header-{alignHeader}">
 				<div class="data-card-copy">
 					{#if top}
 						{@render top()}
@@ -95,13 +102,15 @@
 			</header>
 		{/if}
 
-		<div class="data-card-body">
-			{#if body}
-				{@render body()}
-			{:else}
-				{@render children?.()}
-			{/if}
-		</div>
+		{#if body || children}
+			<div class="data-card-body">
+				{#if body}
+					{@render body()}
+				{:else}
+					{@render children?.()}
+				{/if}
+			</div>
+		{/if}
 
 		{#if hasBottom}
 			<footer class="data-card-bottom">
@@ -138,6 +147,10 @@
 		min-width: 0;
 	}
 
+	.data-card-top.align-header-center {
+		align-items: center;
+	}
+
 	.data-card-copy,
 	.data-card-body {
 		display: flex;
@@ -166,11 +179,11 @@
 	}
 
 	@media (max-width: 520px) {
-		.data-card-top {
+		.wrap-header .data-card-top {
 			flex-direction: column;
 		}
 
-		.data-card-actions {
+		.wrap-header .data-card-actions {
 			justify-content: flex-start;
 		}
 	}

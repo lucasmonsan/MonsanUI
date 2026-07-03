@@ -23,6 +23,8 @@
 		onclick?: (event: MouseEvent) => void;
 		/** Keydown event handler */
 		onkeydown?: (event: KeyboardEvent) => void;
+		/** Disable hover/active physical translation animations while keeping clickability. Defaults to false */
+		flatInteractive?: boolean;
 	}
 
 	let {
@@ -35,7 +37,8 @@
 		variant = 'primary',
 		overflow = 'visible',
 		onclick,
-		onkeydown
+		onkeydown,
+		flatInteractive = false
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -55,6 +58,7 @@
 	this={tag}
 	class="monsan-panel {variant} overflow-{overflow}"
 	class:is-interactive={interactive}
+	class:flat-interactive={flatInteractive}
 	class:full-height={fullHeight}
 	style:padding={resolvedPadding}
 	style:max-width={resolvedMaxWidth}
@@ -149,11 +153,11 @@
 	.is-interactive {
 		cursor: pointer;
 	}
-	.is-interactive:hover {
+	.is-interactive:not(.flat-interactive):hover {
 		transform: translate(-3px, -3px);
 		box-shadow: var(--shadow-md);
 	}
-	.is-interactive:active {
+	.is-interactive:not(.flat-interactive):active {
 		transform: translate(1px, 1px);
 		box-shadow: var(--shadow-xs);
 	}

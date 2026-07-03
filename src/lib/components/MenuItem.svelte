@@ -12,6 +12,7 @@
 		selected?: boolean;
 		checked?: boolean;
 		current?: boolean | 'page' | 'step' | 'location' | 'date' | 'time';
+		'data-menu-persistent'?: boolean;
 	}
 
 	let {
@@ -24,7 +25,8 @@
 		disabled = false,
 		selected = false,
 		checked,
-		current
+		current,
+		'data-menu-persistent': dataMenuPersistent
 	}: Props = $props();
 
 	let itemRole = $derived(checked === undefined ? 'menuitem' : 'menuitemradio');
@@ -40,6 +42,7 @@
 				aria-checked={checked}
 				aria-current={current}
 				data-menu-item="true"
+				data-menu-persistent={dataMenuPersistent ? '' : undefined}
 				{href}
 				{onclick}
 			>
@@ -53,6 +56,7 @@
 				aria-checked={checked}
 				aria-current={current}
 				data-menu-item="true"
+				data-menu-persistent={dataMenuPersistent ? '' : undefined}
 				{disabled}
 				{onclick}
 			>
@@ -72,6 +76,7 @@
 		aria-checked={checked}
 		aria-current={current}
 		data-menu-item="true"
+		data-menu-persistent={dataMenuPersistent ? '' : undefined}
 		{href}
 		{onclick}
 	>
@@ -86,6 +91,7 @@
 		aria-checked={checked}
 		aria-current={current}
 		data-menu-item="true"
+		data-menu-persistent={dataMenuPersistent ? '' : undefined}
 		{disabled}
 		{onclick}
 	>

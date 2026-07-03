@@ -149,6 +149,8 @@ export { default as TerminalIcon } from './components/icons/Terminal.svelte';
 export { default as BracketsCurlyIcon } from './components/icons/BracketsCurly.svelte';
 export { default as FolderIcon } from './components/icons/Folder.svelte';
 export { default as UploadIcon } from './components/icons/Upload.svelte';
+export { default as FileArrowUpIcon } from './components/icons/FileArrowUp.svelte';
+export { default as FileArrowDownIcon } from './components/icons/FileArrowDown.svelte';
 export { default as GridFourIcon } from './components/icons/GridFour.svelte';
 export { default as ListBulletsIcon } from './components/icons/ListBullets.svelte';
 

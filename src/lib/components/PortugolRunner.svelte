@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import PortugolEditor from './PortugolEditor.svelte';
 	import Button from './Button.svelte';
@@ -14,10 +14,10 @@
 	import SaveIcon from './icons/Save.svelte';
 	import SkipForwardIcon from './icons/SkipForward.svelte';
 	import TextIndentIcon from './icons/TextIndent.svelte';
-	import TerminalIcon from './icons/Terminal.svelte';
-	import BracketsCurlyIcon from './icons/BracketsCurly.svelte';
-	import ListBulletsIcon from './icons/ListBullets.svelte';
 	import XIcon from './icons/X.svelte';
+	import SlidersHorizontalIcon from './icons/SlidersHorizontal.svelte';
+	import QuickActions from './QuickActions.svelte';
+	import MenuItem from './MenuItem.svelte';
 	import { i18n } from '../utils/i18n.svelte.js';
 	import {
 		Lexer,
@@ -35,6 +35,8 @@
 		onFailure?: (error: string) => void;
 		onsave?: (isShortcut?: boolean) => void;
 		floatingActions?: Snippet;
+		userId?: string;
+		fileName?: string;
 	}
 
 	let {
@@ -53,7 +55,9 @@
 		onSuccess,
 		onFailure,
 		onsave,
-		floatingActions
+		floatingActions,
+		userId,
+		fileName
 	}: Props = $props();
 
 	let activeLine = $state(0);
@@ -65,6 +69,53 @@
 	let variables = $state<Record<string, { value: unknown; type: string }>>({});
 	let outputs = $state<string[]>([]);
 	let errorMsg = $state('');
+
+	// Zoom and Font Size State
+	let fontSize = $state(14);
+	const storageKey = $derived(
+		userId ? 'monsan-portugol-font-size:' + userId : 'monsan-portugol-font-size:anonymous'
+	);
+
+	// Load font size preference when user ID changes
+	$effect(() => {
+		const key = storageKey;
+		const saved = localStorage.getItem(key);
+		if (saved) {
+			const parsed = parseInt(saved, 10);
+			if (!isNaN(parsed) && parsed >= 10 && parsed <= 32) {
+				fontSize = parsed;
+				return;
+			}
+		}
+		fontSize = 14;
+	});
+
+	// Global shortcut listeners for Ctrl + +, Ctrl + -, Ctrl + 0
+	onMount(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+			if (!isCtrlOrCmd) return;
+
+			if (e.key === '=' || e.key === '+') {
+				e.preventDefault();
+				fontSize = Math.min(32, fontSize + 2);
+				localStorage.setItem(storageKey, fontSize.toString());
+			} else if (e.key === '-') {
+				e.preventDefault();
+				fontSize = Math.max(10, fontSize - 2);
+				localStorage.setItem(storageKey, fontSize.toString());
+			} else if (e.key === '0') {
+				e.preventDefault();
+				fontSize = 14;
+				localStorage.setItem(storageKey, '14');
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	});
 
 	// Input prompt state
 	let pendingInputVar = $state<string | null>(null);
@@ -410,8 +461,12 @@
 	</div>
 {/snippet}
 
-<div class="portugol-runner" class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}>
-	<Stack gap="md" fullHeight={true}>
+<div
+	class="portugol-runner"
+	class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}
+	style="--runner-font-size: {fontSize}px;"
+>
+	<Stack gap="sm" fullHeight={true}>
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
 		<div class="runner-workspace">
 			<div
@@ -441,6 +496,11 @@
 						disabled={disabled || (isRunning && !isPaused)}
 						{onsave}
 					/>
+					{#if fileName}
+						<div class="runner-editor-watermark" aria-hidden="true">
+							{fileName}
+						</div>
+					{/if}
 				</div>
 
 				<!-- Barra de redimensionamento -->
@@ -613,36 +673,37 @@
 						<span class="toolbar-label">{i18n.t('portugolRunner.indentation')}</span>
 					</Button>
 				</Inline>
+				<!-- Alternador de Visibilidade Unificado (Direita) -->
+				<QuickActions align="right">
+					{#snippet trigger(toggle)}
+						<Button variant="secondary" size="sm" onclick={toggle} disabled={disabled || isRunning}>
+							<SlidersHorizontalIcon size={16} />
+							<span class="toolbar-label">{i18n.t('portugolRunner.view')}</span>
+						</Button>
+					{/snippet}
 
-				<!-- Alternadores de Visibilidade de Painéis (Direita) -->
-				<Inline gap="sm" wrap>
-					<Button
-						variant={showLineNumbers ? 'primary' : 'secondary'}
-						size="sm"
+					<MenuItem
+						checked={showLineNumbers}
 						onclick={() => (showLineNumbers = !showLineNumbers)}
-						disabled={disabled || isRunning}
-						ariaPressed={showLineNumbers}
+						data-menu-persistent
 					>
-						<ListBulletsIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.lines')}</span>
-					</Button>
-					<Button
-						variant={!isConsoleCollapsed ? 'primary' : 'secondary'}
-						size="sm"
+						{i18n.t('portugolRunner.lines')}
+					</MenuItem>
+					<MenuItem
+						checked={!isConsoleCollapsed}
 						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
+						data-menu-persistent
 					>
-						<TerminalIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.consoleTitle')}</span>
-					</Button>
-					<Button
-						variant={!isVariablesCollapsed ? 'primary' : 'secondary'}
-						size="sm"
+						{i18n.t('portugolRunner.consoleTitle')}
+					</MenuItem>
+					<MenuItem
+						checked={!isVariablesCollapsed}
 						onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
+						data-menu-persistent
 					>
-						<BracketsCurlyIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.variablesTitle')}</span>
-					</Button>
-				</Inline>
+						{i18n.t('portugolRunner.variablesTitle')}
+					</MenuItem>
+				</QuickActions>
 			</Inline>
 		</div>
 	</Stack>
@@ -671,6 +732,24 @@
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-xs);
+	}
+
+	.runner-editor-watermark {
+		position: absolute;
+		bottom: var(--space-sm);
+		right: var(--space-sm);
+		z-index: 10;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text-secondary);
+		opacity: 0.35;
+		pointer-events: none;
+		user-select: none;
+		background-color: var(--bg-primary);
+		padding: 2px 6px;
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-sm);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.toolbar {
@@ -766,8 +845,8 @@
 	.terminal-box {
 		color: var(--text-primary);
 		font-family: var(--font-mono);
-		font-size: 13px;
-		line-height: 18px;
+		font-size: calc(var(--runner-font-size, 14px) - 1px);
+		line-height: 1.45;
 		overflow-y: auto;
 		flex: 1;
 		min-height: 0;
@@ -833,6 +912,7 @@
 		min-height: 0;
 		overflow-y: auto;
 		padding: 16px;
+		font-size: calc(var(--runner-font-size, 14px) - 1px);
 	}
 
 	.variables-empty {
@@ -845,7 +925,7 @@
 	.variables-table {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 13px;
+		font-size: inherit;
 	}
 
 	.variables-table th,

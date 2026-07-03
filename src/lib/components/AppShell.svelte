@@ -234,11 +234,6 @@
 		z-index: 0;
 	}
 
-	.app-shell-header + .app-shell-scroll,
-	.app-shell-top + .app-shell-scroll {
-		margin-top: var(--space-sm);
-	}
-
 	.app-shell-scroll::-webkit-scrollbar {
 		display: none;
 	}
