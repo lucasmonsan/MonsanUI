@@ -9,9 +9,18 @@
 		bottom?: Snippet;
 		footer?: Snippet;
 		contentId?: string;
+		resetKey?: string | number | boolean | null;
 	}
 
-	let { children, header, top, bottom, footer, contentId = 'main-content' }: Props = $props();
+	let {
+		children,
+		header,
+		top,
+		bottom,
+		footer,
+		contentId = 'main-content',
+		resetKey = null
+	}: Props = $props();
 
 	let scrollEl = $state<HTMLElement>();
 	let contentEl = $state<HTMLElement>();
@@ -103,6 +112,18 @@
 
 	$effect(() => {
 		void tick().then(updateOverflowFade);
+	});
+
+	$effect(() => {
+		const key = resetKey;
+		if (key === null) {
+			return;
+		}
+
+		void tick().then(() => {
+			scrollEl?.scrollTo({ top: 0, left: 0 });
+			updateOverflowFade();
+		});
 	});
 </script>
 
