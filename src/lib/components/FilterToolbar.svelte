@@ -42,12 +42,6 @@
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
-		overflow-x: auto;
-		scrollbar-width: none;
-	}
-
-	.monsan-filter-toolbar::-webkit-scrollbar {
-		display: none;
 	}
 
 	.filter-toolbar-filters,
@@ -86,7 +80,6 @@
 		.monsan-filter-toolbar {
 			flex-direction: column;
 			align-items: stretch;
-			overflow-x: visible;
 		}
 
 		.filter-toolbar-filters {
