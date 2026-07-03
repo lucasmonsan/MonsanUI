@@ -364,7 +364,7 @@
 			'&': {
 				height: '100%',
 				fontFamily: 'var(--font-mono)',
-				fontSize: '14px',
+				fontSize: 'var(--runner-font-size, 14px)',
 				backgroundColor: 'var(--bg-primary)',
 				color: 'var(--text-primary)',
 				caretColor: PORTUGOL_EDITOR_CARET_COLOR
@@ -563,8 +563,8 @@
 		display: flex;
 		flex-direction: row;
 		font-family: var(--font-mono);
-		font-size: 14px;
-		line-height: 20px;
+		font-size: var(--runner-font-size, 14px);
+		line-height: 1.45;
 		background: var(--bg-primary);
 		color: var(--text-primary);
 		border: var(--border-width) solid var(--border-color);
