@@ -14,7 +14,8 @@
 		id = '',
 		disabled = false,
 		width = 'full',
-		formatSelected
+		formatSelected,
+		dropdownAlign = 'left'
 	} = $props<{
 		value: (string | number)[];
 		options: Option[];
@@ -23,6 +24,7 @@
 		disabled?: boolean;
 		width?: 'full' | 'auto';
 		formatSelected?: (count: number) => string;
+		dropdownAlign?: 'left' | 'right';
 	}>();
 
 	const fallbackId = `multiselect-${Math.random().toString(36).slice(2, 11)}`;
@@ -195,7 +197,7 @@
 	{#if isOpen}
 		<div
 			id={listboxId}
-			class="monsan-multiselect-dropdown"
+			class="monsan-multiselect-dropdown align-{dropdownAlign}"
 			role="listbox"
 			aria-multiselectable="true"
 			aria-label={activePlaceholder}
@@ -295,8 +297,6 @@
 	.monsan-multiselect-dropdown {
 		position: absolute;
 		top: calc(100% + var(--space-xs));
-		left: 0;
-		width: 100%;
 		min-width: 200px;
 		max-height: 250px;
 		overflow-y: auto;
@@ -310,6 +310,18 @@
 		gap: var(--space-xs);
 		padding: var(--space-xs);
 		box-sizing: border-box;
+	}
+
+	.monsan-multiselect-dropdown.align-left {
+		left: 0;
+		right: auto;
+		width: 100%;
+	}
+
+	.monsan-multiselect-dropdown.align-right {
+		right: 0;
+		left: auto;
+		width: auto;
 	}
 
 	.multiselect-option {

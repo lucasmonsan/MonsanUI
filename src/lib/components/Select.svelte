@@ -15,7 +15,8 @@
 		showChevron = true,
 		textAlign = 'left',
 		disabled = false,
-		width = 'full'
+		width = 'full',
+		dropdownAlign = 'left'
 	} = $props<{
 		value: string | number;
 		options: Option[];
@@ -25,6 +26,7 @@
 		textAlign?: 'left' | 'center' | 'right';
 		disabled?: boolean;
 		width?: 'full' | 'auto';
+		dropdownAlign?: 'left' | 'right';
 	}>();
 
 	const fallbackId = `select-${Math.random().toString(36).slice(2, 11)}`;
@@ -167,7 +169,7 @@
 	{#if isOpen}
 		<div
 			id={listboxId}
-			class="monsan-select-dropdown"
+			class="monsan-select-dropdown align-{dropdownAlign}"
 			role="listbox"
 			aria-label={activePlaceholder}
 		>
@@ -278,8 +280,6 @@
 	.monsan-select-dropdown {
 		position: absolute;
 		top: calc(100% + var(--space-xs));
-		left: 0;
-		width: 100%;
 		min-width: 200px;
 		max-height: 250px;
 		overflow-y: auto;
@@ -293,6 +293,18 @@
 		gap: var(--space-xs);
 		padding: var(--space-xs);
 		box-sizing: border-box;
+	}
+
+	.monsan-select-dropdown.align-left {
+		left: 0;
+		right: auto;
+		width: 100%;
+	}
+
+	.monsan-select-dropdown.align-right {
+		right: 0;
+		left: auto;
+		width: auto;
 	}
 
 	.select-option {
