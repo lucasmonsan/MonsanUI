@@ -7,6 +7,15 @@
 	"engines": {
 		"node": ">=22.13.0"
 	},
+	"monsanSuite": {
+		"type": "ui",
+		"publicProduct": false,
+		"usesMonsanUI": false,
+		"requiresSSO": false,
+		"requiresSEO": false,
+		"hasDirectus": false,
+		"hasLanding": false
+	},
 	"scripts": {
 		"dev": "pnpm run dev:fresh",
 		"dev:fast": "vite dev --host --force",
