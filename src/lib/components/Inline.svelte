@@ -62,6 +62,7 @@
 	}
 	.grow-first-child > :global(:not(:first-child)) {
 		flex: 0 0 auto;
+		width: auto;
 	}
 	.gap-xs {
 		gap: var(--space-xs);
