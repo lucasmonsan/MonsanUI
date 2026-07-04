@@ -71,7 +71,7 @@
 			variant="dropdown"
 			align="right"
 			triggerBehavior="child"
-			panelShadow="none"
+			panelShadow="default"
 			panelPadding="sm"
 			panelGap="sm"
 		>

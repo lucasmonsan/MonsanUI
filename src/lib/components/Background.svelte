@@ -249,4 +249,8 @@
 			animation: none !important;
 		}
 	}
+
+	:global(.monsan-no-bg-animation) .background-grid {
+		animation: none !important;
+	}
 </style>

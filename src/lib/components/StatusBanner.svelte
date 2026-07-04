@@ -40,12 +40,14 @@
 
 	:global(.monsan-status-banner a),
 	:global(.monsan-status-banner a:visited) {
-		color: var(--text-primary);
+		color: var(--accent-primary);
 		text-decoration: none;
+		font-weight: 800;
 	}
 
 	:global(.monsan-status-banner a:hover) {
 		color: var(--accent-primary);
+		text-decoration: underline;
 	}
 
 	:global(.monsan-status-banner a:focus-visible) {

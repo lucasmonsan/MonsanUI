@@ -241,6 +241,10 @@
 		animation: dialogBackdropIn 0.18s ease-out forwards;
 	}
 
+	:global(.monsan-no-blur) .dialog-wrapper {
+		backdrop-filter: none;
+	}
+
 	.dialog-wrapper.closing {
 		pointer-events: none;
 		animation: dialogBackdropOut 0.18s ease-in forwards;

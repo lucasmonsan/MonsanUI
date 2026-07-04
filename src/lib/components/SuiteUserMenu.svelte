@@ -70,7 +70,7 @@
 		layout = 'vertical',
 		placement = 'below',
 		variant = 'dropdown',
-		panelShadow = 'none',
+		panelShadow = 'default',
 		panelPadding = 'sm',
 		panelGap = 'sm',
 		profileDisabled = false,

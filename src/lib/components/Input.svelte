@@ -33,6 +33,7 @@
 		ariaControls?: string;
 		ariaExpanded?: boolean | 'false' | 'true';
 		ariaActivedescendant?: string;
+		autofocus?: boolean;
 		oninput?: (event: Event) => void;
 		onchange?: (event: Event) => void;
 		onkeydown?: (event: KeyboardEvent) => void;
@@ -71,6 +72,7 @@
 		ariaControls,
 		ariaExpanded,
 		ariaActivedescendant,
+		autofocus = false,
 		oninput,
 		onchange,
 		onkeydown,
@@ -114,6 +116,7 @@
 		{pattern}
 		{title}
 		{role}
+		{autofocus}
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
 		aria-invalid={ariaInvalid}

@@ -82,8 +82,8 @@ for (const [name, source] of [
 	['SuiteUserMenu', suiteUserMenu]
 ]) {
 	assert(
-		source.includes("PanelShadow = 'none'") || source.includes("panelShadow = 'none'"),
-		`${name} menu panel shadow must default to none.`
+		source.includes("PanelShadow = 'default'") || source.includes("panelShadow = 'default'"),
+		`${name} menu panel shadow must default to default.`
 	);
 	assert(
 		source.includes("PanelPadding = 'sm'") || source.includes("panelPadding = 'sm'"),
