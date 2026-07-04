@@ -148,7 +148,9 @@ class I18n {
 				autoCloseQuotesLabel: 'Auto-fechar Aspas',
 				lineWrappingLabel: 'Quebra Automática de Linha',
 				fontSizeLabel: 'Tamanho da Fonte',
-				zoomHint: 'Dica de zoom geral: CTRL + [ + / - / 0 ]'
+				zoomHint: 'Dica de zoom geral: CTRL + [ + / - / 0 ]',
+				settingsBlurLabel: 'Desfoque nas modais (Blur)',
+				settingsBgAnimLabel: 'Animar plano de fundo'
 			},
 			timePicker: {
 				selectTime: 'Selecionar Horário',
@@ -369,7 +371,9 @@ class I18n {
 				autoCloseQuotesLabel: 'Auto-close Quotes',
 				lineWrappingLabel: 'Line Wrapping',
 				fontSizeLabel: 'Font Size',
-				zoomHint: 'General zoom hint: CTRL + [ + / - / 0 ]'
+				zoomHint: 'General zoom hint: CTRL + [ + / - / 0 ]',
+				settingsBlurLabel: 'Modal Background Blur',
+				settingsBgAnimLabel: 'Animate Background'
 			},
 			timePicker: {
 				selectTime: 'Select Time',
@@ -591,7 +595,9 @@ class I18n {
 				autoCloseQuotesLabel: 'Cerrar Comillas Automáticamente',
 				lineWrappingLabel: 'Ajuste de Línea',
 				fontSizeLabel: 'Tamaño de Fuente',
-				zoomHint: 'Atajo de zoom general: CTRL + [ + / - / 0 ]'
+				zoomHint: 'Atajo de zoom general: CTRL + [ + / - / 0 ]',
+				settingsBlurLabel: 'Desfoque de fondo (Blur)',
+				settingsBgAnimLabel: 'Animar fondo'
 			},
 			timePicker: {
 				selectTime: 'Seleccionar Hora',

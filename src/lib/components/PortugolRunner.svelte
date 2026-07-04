@@ -77,6 +77,9 @@
 
 	// Zoom and Font Size State
 	let fontSize = $state(14);
+	let showBlur = $state(true);
+	let animateBackground = $state(true);
+
 	const storageKey = $derived(
 		userId ? 'monsan-portugol-font-size:' + userId : 'monsan-portugol-font-size:anonymous'
 	);
@@ -156,6 +159,56 @@
 			}
 		}
 		fontSize = 14;
+	});
+
+	// Load showBlur and animateBackground preferences
+	$effect(() => {
+		const saved = localStorage.getItem('monsan-suite-no-blur');
+		if (saved === 'true') {
+			showBlur = false;
+		} else if (saved === 'false') {
+			showBlur = true;
+		} else {
+			if (typeof document !== 'undefined') {
+				showBlur = !document.documentElement.classList.contains('monsan-no-blur');
+			}
+		}
+	});
+
+	$effect(() => {
+		const saved = localStorage.getItem('monsan-suite-no-bg-animation');
+		if (saved === 'true') {
+			animateBackground = false;
+		} else if (saved === 'false') {
+			animateBackground = true;
+		} else {
+			if (typeof document !== 'undefined') {
+				animateBackground = !document.documentElement.classList.contains('monsan-no-bg-animation');
+			}
+		}
+	});
+
+	// Save preferences reactively and toggle classes on root element
+	$effect(() => {
+		localStorage.setItem('monsan-suite-no-blur', (!showBlur).toString());
+		if (typeof document !== 'undefined') {
+			if (!showBlur) {
+				document.documentElement.classList.add('monsan-no-blur');
+			} else {
+				document.documentElement.classList.remove('monsan-no-blur');
+			}
+		}
+	});
+
+	$effect(() => {
+		localStorage.setItem('monsan-suite-no-bg-animation', (!animateBackground).toString());
+		if (typeof document !== 'undefined') {
+			if (!animateBackground) {
+				document.documentElement.classList.add('monsan-no-bg-animation');
+			} else {
+				document.documentElement.classList.remove('monsan-no-bg-animation');
+			}
+		}
 	});
 
 	// Global shortcut listeners for Ctrl + +, Ctrl + -, Ctrl + 0
@@ -815,13 +868,45 @@
 							</Inline>
 						</MenuItem>
 
+						<MenuItem
+							checked={showBlur}
+							onclick={() => (showBlur = !showBlur)}
+							align="left"
+							data-menu-persistent
+						>
+							<Inline gap="sm" align="center">
+								{#if showBlur}
+									<CheckIcon size={14} />
+								{:else}
+									<span style="width: 14px"></span>
+								{/if}
+								<span>{i18n.t('portugolRunner.settingsBlurLabel')}</span>
+							</Inline>
+						</MenuItem>
+
+						<MenuItem
+							checked={animateBackground}
+							onclick={() => (animateBackground = !animateBackground)}
+							align="left"
+							data-menu-persistent
+						>
+							<Inline gap="sm" align="center">
+								{#if animateBackground}
+									<CheckIcon size={14} />
+								{:else}
+									<span style="width: 14px"></span>
+								{/if}
+								<span>{i18n.t('portugolRunner.settingsBgAnimLabel')}</span>
+							</Inline>
+						</MenuItem>
+
 						<MenuItem align="left" data-menu-persistent>
 							<Stack gap="xs" fullWidth>
 								<Inline justify="between" fullWidth>
 									<Text size="sm" weight="bold">{i18n.t('portugolRunner.fontSizeLabel')}</Text>
 									<Text size="sm" weight="bold" variant="secondary">{fontSize}px</Text>
 								</Inline>
-								<div onclick={(e) => e.stopPropagation()}>
+								<div role="presentation" onclick={(e) => e.stopPropagation()}>
 									<Range min={12} max={24} bind:value={fontSize} />
 								</div>
 							</Stack>

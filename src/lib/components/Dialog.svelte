@@ -241,7 +241,7 @@
 		animation: dialogBackdropIn 0.18s ease-out forwards;
 	}
 
-	:global(.monsan-low-end) .dialog-wrapper {
+	:global(.monsan-no-blur) .dialog-wrapper {
 		backdrop-filter: none;
 	}
 
