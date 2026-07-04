@@ -1,4 +1,6 @@
 <script lang="ts">
+	import UserIcon from './icons/User.svelte';
+
 	interface Props {
 		src?: string;
 		name?: string;
@@ -59,7 +61,11 @@
 		<img {src} alt={alt || name} class="avatar-img" onerror={handleImageError} />
 	{:else}
 		<div class="avatar-fallback" role="img" aria-label={resolvedLabel}>
-			{initials || '?'}
+			{#if initials}
+				{initials}
+			{:else}
+				<UserIcon size="56%" />
+			{/if}
 		</div>
 	{/if}
 {/snippet}

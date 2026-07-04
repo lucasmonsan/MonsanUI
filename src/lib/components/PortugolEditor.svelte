@@ -44,6 +44,9 @@
 		disabled = false,
 		showLineNumbers = true,
 		placeholder = 'Escreva seu código Portugol aqui...',
+		autoCloseBrackets = true,
+		autoCloseQuotes = true,
+		lineWrapping = true,
 		onsave
 	} = $props<{
 		code: string;
@@ -52,6 +55,9 @@
 		disabled?: boolean;
 		showLineNumbers?: boolean;
 		placeholder?: string;
+		autoCloseBrackets?: boolean;
+		autoCloseQuotes?: boolean;
+		lineWrapping?: boolean;
 		onsave?: (isShortcut?: boolean) => void;
 	}>();
 
@@ -61,6 +67,7 @@
 	// Compartment to allow dynamic read-only toggling
 	const readOnlyCompartment = new Compartment();
 	const lineNumbersCompartment = new Compartment();
+	const lineWrappingCompartment = new Compartment();
 
 	// Effect to dispatch active line / error line highlights
 	const highlightEffect = StateEffect.define<{ activeLine: number; errorLine: number }>();
@@ -444,15 +451,22 @@
 						},
 						{
 							key: '"',
-							run: (editorView) => insertEditorPair(editorView, '"')
+							run: (editorView) => {
+								if (!autoCloseQuotes) return false;
+								return insertEditorPair(editorView, '"');
+							}
 						},
 						{
 							key: '(',
-							run: (editorView) => insertEditorPair(editorView, '(', ')', false)
+							run: (editorView) => {
+								if (!autoCloseBrackets) return false;
+								return insertEditorPair(editorView, '(', ')', false);
+							}
 						},
 						{
 							key: ')',
 							run(editorView) {
+								if (!autoCloseBrackets) return false;
 								const range = editorView.state.selection.main;
 								const nextChar = editorView.state.sliceDoc(range.to, range.to + 1);
 								if (range.empty && nextChar === ')') {
@@ -489,7 +503,7 @@
 						indentWithTab
 					]),
 					indentUnit.of('\t'),
-					EditorView.lineWrapping,
+					lineWrappingCompartment.of(lineWrapping ? EditorView.lineWrapping : []),
 					EditorView.updateListener.of((update: ViewUpdate) => {
 						if (update.docChanged) {
 							code = update.state.doc.toString();
@@ -540,6 +554,15 @@
 		if (view) {
 			view.dispatch({
 				effects: lineNumbersCompartment.reconfigure(getGutterExtensions())
+			});
+		}
+	});
+
+	// Reactive update for line wrapping
+	$effect(() => {
+		if (view) {
+			view.dispatch({
+				effects: lineWrappingCompartment.reconfigure(lineWrapping ? EditorView.lineWrapping : [])
 			});
 		}
 	});

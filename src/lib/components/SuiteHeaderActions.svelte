@@ -68,7 +68,7 @@
 		themeAriaLabel,
 		profileDisabled = false,
 		logoutDisabled = false,
-		userMenuPanelShadow = 'none',
+		userMenuPanelShadow = 'default',
 		userMenuPanelPadding = 'sm',
 		userMenuPanelGap = 'sm',
 		onThemeChange,

@@ -4,7 +4,7 @@
 	type MinItemWidth = 'xs' | 'sm' | 'md' | 'lg';
 	type Gap = 'sm' | 'md' | 'lg';
 	type Align = 'stretch' | 'start';
-	type Columns = 'auto' | '2' | '3' | '4';
+	type Columns = 'auto' | '1' | '2' | '3' | '4';
 	type ColumnsBreakpoint = 'md' | 'lg';
 
 	interface Props {
@@ -35,6 +35,7 @@
 	};
 
 	const FIXED_COLUMN_VALUES: Record<Exclude<Columns, 'auto'>, string> = {
+		'1': 'minmax(0, 1fr)',
 		'2': 'repeat(2, minmax(0, 1fr))',
 		'3': 'repeat(3, minmax(0, 1fr))',
 		'4': 'repeat(4, minmax(0, 1fr))'

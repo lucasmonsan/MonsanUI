@@ -13,9 +13,11 @@
 	import PlayIcon from './icons/Play.svelte';
 	import SaveIcon from './icons/Save.svelte';
 	import SkipForwardIcon from './icons/SkipForward.svelte';
-	import TextIndentIcon from './icons/TextIndent.svelte';
 	import XIcon from './icons/X.svelte';
 	import SlidersHorizontalIcon from './icons/SlidersHorizontal.svelte';
+	import SettingsIcon from './icons/Settings.svelte';
+	import CheckIcon from './icons/Check.svelte';
+	import Range from './Range.svelte';
 	import QuickActions from './QuickActions.svelte';
 	import MenuItem from './MenuItem.svelte';
 	import { i18n } from '../utils/i18n.svelte.js';
@@ -63,6 +65,9 @@
 	let activeLine = $state(0);
 	let errorLine = $state(0);
 	let strictIndent = $state(false);
+	let autoCloseBrackets = $state(true);
+	let autoCloseQuotes = $state(true);
+	let lineWrapping = $state(true);
 	let isRunning = $state(false);
 	let isPaused = $state(false);
 	let isStepMode = $state(false);
@@ -75,6 +80,69 @@
 	const storageKey = $derived(
 		userId ? 'monsan-portugol-font-size:' + userId : 'monsan-portugol-font-size:anonymous'
 	);
+
+	const strictIndentKey = $derived(
+		userId ? 'monsan-portugol-strict-indent:' + userId : 'monsan-portugol-strict-indent:anonymous'
+	);
+	const autoCloseBracketsKey = $derived(
+		userId
+			? 'monsan-portugol-auto-close-brackets:' + userId
+			: 'monsan-portugol-auto-close-brackets:anonymous'
+	);
+	const autoCloseQuotesKey = $derived(
+		userId
+			? 'monsan-portugol-auto-close-quotes:' + userId
+			: 'monsan-portugol-auto-close-quotes:anonymous'
+	);
+	const lineWrappingKey = $derived(
+		userId ? 'monsan-portugol-line-wrapping:' + userId : 'monsan-portugol-line-wrapping:anonymous'
+	);
+
+	// Load settings preference when user ID changes
+	$effect(() => {
+		const key = strictIndentKey;
+		const saved = localStorage.getItem(key);
+		strictIndent = saved === 'true';
+	});
+
+	$effect(() => {
+		const key = autoCloseBracketsKey;
+		const saved = localStorage.getItem(key);
+		autoCloseBrackets = saved !== 'false'; // default true
+	});
+
+	$effect(() => {
+		const key = autoCloseQuotesKey;
+		const saved = localStorage.getItem(key);
+		autoCloseQuotes = saved !== 'false'; // default true
+	});
+
+	$effect(() => {
+		const key = lineWrappingKey;
+		const saved = localStorage.getItem(key);
+		lineWrapping = saved !== 'false'; // default true
+	});
+
+	// Save settings on changes
+	$effect(() => {
+		localStorage.setItem(strictIndentKey, strictIndent.toString());
+	});
+
+	$effect(() => {
+		localStorage.setItem(autoCloseBracketsKey, autoCloseBrackets.toString());
+	});
+
+	$effect(() => {
+		localStorage.setItem(autoCloseQuotesKey, autoCloseQuotes.toString());
+	});
+
+	$effect(() => {
+		localStorage.setItem(lineWrappingKey, lineWrapping.toString());
+	});
+
+	$effect(() => {
+		localStorage.setItem(storageKey, fontSize.toString());
+	});
 
 	// Load font size preference when user ID changes
 	$effect(() => {
@@ -493,6 +561,9 @@
 						{activeLine}
 						{errorLine}
 						{showLineNumbers}
+						{autoCloseBrackets}
+						{autoCloseQuotes}
+						{lineWrapping}
 						disabled={disabled || (isRunning && !isPaused)}
 						{onsave}
 					/>
@@ -663,47 +734,143 @@
 							<span class="toolbar-label">{i18n.t('portugolRunner.save')}</span>
 						</Button>
 					{/if}
-					<Button
-						variant={strictIndent ? 'primary' : 'secondary'}
-						size="sm"
-						onclick={() => (strictIndent = !strictIndent)}
-						disabled={disabled || isRunning}
-					>
-						<TextIndentIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.indentation')}</span>
-					</Button>
 				</Inline>
-				<!-- Alternador de Visibilidade Unificado (Direita) -->
-				<QuickActions align="right">
-					{#snippet trigger(toggle)}
-						<Button variant="secondary" size="sm" onclick={toggle} disabled={disabled || isRunning}>
-							<SlidersHorizontalIcon size={16} />
-							<span class="toolbar-label">{i18n.t('portugolRunner.view')}</span>
-						</Button>
-					{/snippet}
+				<!-- Configurações e Alternador de Visibilidade (Direita) -->
+				<Inline gap="sm" align="center">
+					<!-- Menu de Configurações do Editor -->
+					<QuickActions align="right">
+						{#snippet trigger(toggle)}
+							<Button
+								variant="secondary"
+								size="sm"
+								onclick={toggle}
+								disabled={disabled || isRunning}
+							>
+								<SettingsIcon size={16} />
+								<span class="toolbar-label">{i18n.t('portugolRunner.settingsTitle')}</span>
+							</Button>
+						{/snippet}
 
-					<MenuItem
-						checked={showLineNumbers}
-						onclick={() => (showLineNumbers = !showLineNumbers)}
-						data-menu-persistent
-					>
-						{i18n.t('portugolRunner.lines')}
-					</MenuItem>
-					<MenuItem
-						checked={!isConsoleCollapsed}
-						onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
-						data-menu-persistent
-					>
-						{i18n.t('portugolRunner.consoleTitle')}
-					</MenuItem>
-					<MenuItem
-						checked={!isVariablesCollapsed}
-						onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
-						data-menu-persistent
-					>
-						{i18n.t('portugolRunner.variablesTitle')}
-					</MenuItem>
-				</QuickActions>
+						<MenuItem
+							checked={strictIndent}
+							onclick={() => (strictIndent = !strictIndent)}
+							align="left"
+							data-menu-persistent
+						>
+							<Inline gap="sm" align="center">
+								{#if strictIndent}
+									<CheckIcon size={14} />
+								{:else}
+									<span style="width: 14px"></span>
+								{/if}
+								<span>{i18n.t('portugolRunner.strictIndentLabel')}</span>
+							</Inline>
+						</MenuItem>
+
+						<MenuItem
+							checked={autoCloseBrackets}
+							onclick={() => (autoCloseBrackets = !autoCloseBrackets)}
+							align="left"
+							data-menu-persistent
+						>
+							<Inline gap="sm" align="center">
+								{#if autoCloseBrackets}
+									<CheckIcon size={14} />
+								{:else}
+									<span style="width: 14px"></span>
+								{/if}
+								<span>{i18n.t('portugolRunner.autoCloseBracketsLabel')}</span>
+							</Inline>
+						</MenuItem>
+
+						<MenuItem
+							checked={autoCloseQuotes}
+							onclick={() => (autoCloseQuotes = !autoCloseQuotes)}
+							align="left"
+							data-menu-persistent
+						>
+							<Inline gap="sm" align="center">
+								{#if autoCloseQuotes}
+									<CheckIcon size={14} />
+								{:else}
+									<span style="width: 14px"></span>
+								{/if}
+								<span>{i18n.t('portugolRunner.autoCloseQuotesLabel')}</span>
+							</Inline>
+						</MenuItem>
+
+						<MenuItem
+							checked={lineWrapping}
+							onclick={() => (lineWrapping = !lineWrapping)}
+							align="left"
+							data-menu-persistent
+						>
+							<Inline gap="sm" align="center">
+								{#if lineWrapping}
+									<CheckIcon size={14} />
+								{:else}
+									<span style="width: 14px"></span>
+								{/if}
+								<span>{i18n.t('portugolRunner.lineWrappingLabel')}</span>
+							</Inline>
+						</MenuItem>
+
+						<MenuItem align="left" data-menu-persistent>
+							<Stack gap="xs" fullWidth>
+								<Inline justify="between" fullWidth>
+									<Text size="sm" weight="bold">{i18n.t('portugolRunner.fontSizeLabel')}</Text>
+									<Text size="sm" weight="bold" variant="secondary">{fontSize}px</Text>
+								</Inline>
+								<div onclick={(e) => e.stopPropagation()}>
+									<Range min={12} max={24} bind:value={fontSize} />
+								</div>
+							</Stack>
+						</MenuItem>
+
+						<div class="zoom-hint-box" data-menu-persistent>
+							<Text size="xs" variant="secondary" align="center">
+								{i18n.t('portugolRunner.zoomHint')}
+							</Text>
+						</div>
+					</QuickActions>
+
+					<!-- Alternador de Visibilidade Unificado -->
+					<QuickActions align="right">
+						{#snippet trigger(toggle)}
+							<Button
+								variant="secondary"
+								size="sm"
+								onclick={toggle}
+								disabled={disabled || isRunning}
+							>
+								<SlidersHorizontalIcon size={16} />
+								<span class="toolbar-label">{i18n.t('portugolRunner.view')}</span>
+							</Button>
+						{/snippet}
+
+						<MenuItem
+							checked={showLineNumbers}
+							onclick={() => (showLineNumbers = !showLineNumbers)}
+							data-menu-persistent
+						>
+							{i18n.t('portugolRunner.lines')}
+						</MenuItem>
+						<MenuItem
+							checked={!isConsoleCollapsed}
+							onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
+							data-menu-persistent
+						>
+							{i18n.t('portugolRunner.consoleTitle')}
+						</MenuItem>
+						<MenuItem
+							checked={!isVariablesCollapsed}
+							onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
+							data-menu-persistent
+						>
+							{i18n.t('portugolRunner.variablesTitle')}
+						</MenuItem>
+					</QuickActions>
+				</Inline>
 			</Inline>
 		</div>
 	</Stack>
@@ -1151,5 +1318,15 @@
 		.horizontal-resize-bar {
 			display: none;
 		}
+	}
+
+	.zoom-hint-box {
+		padding: var(--space-xs) var(--space-md);
+		border-top: var(--border-width) solid var(--border-color);
+		margin-top: var(--space-xs);
+		background-color: var(--bg-secondary);
+		text-align: center;
+		white-space: normal;
+		word-break: break-word;
 	}
 </style>

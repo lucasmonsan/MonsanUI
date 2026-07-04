@@ -141,7 +141,14 @@ class I18n {
 				save: 'Salvar',
 				indentation: 'Identação',
 				lines: 'Linhas',
-				view: 'Exibição'
+				view: 'Exibição',
+				settingsTitle: 'Configurações',
+				strictIndentLabel: 'Validar Indentação Rígida',
+				autoCloseBracketsLabel: 'Auto-fechar Parênteses',
+				autoCloseQuotesLabel: 'Auto-fechar Aspas',
+				lineWrappingLabel: 'Quebra Automática de Linha',
+				fontSizeLabel: 'Tamanho da Fonte',
+				zoomHint: 'Dica de zoom geral: CTRL + [ + / - / 0 ]'
 			},
 			timePicker: {
 				selectTime: 'Selecionar Horário',
@@ -355,7 +362,14 @@ class I18n {
 				save: 'Save',
 				indentation: 'Indentation',
 				lines: 'Lines',
-				view: 'View'
+				view: 'View',
+				settingsTitle: 'Settings',
+				strictIndentLabel: 'Enforce Strict Indentation',
+				autoCloseBracketsLabel: 'Auto-close Parentheses',
+				autoCloseQuotesLabel: 'Auto-close Quotes',
+				lineWrappingLabel: 'Line Wrapping',
+				fontSizeLabel: 'Font Size',
+				zoomHint: 'General zoom hint: CTRL + [ + / - / 0 ]'
 			},
 			timePicker: {
 				selectTime: 'Select Time',
@@ -570,7 +584,14 @@ class I18n {
 				save: 'Guardar',
 				indentation: 'Sangría',
 				lines: 'Líneas',
-				view: 'Vista'
+				view: 'Vista',
+				settingsTitle: 'Configuraciones',
+				strictIndentLabel: 'Validar Sangría Estricta',
+				autoCloseBracketsLabel: 'Cerrar Paréntesis Automáticamente',
+				autoCloseQuotesLabel: 'Cerrar Comillas Automáticamente',
+				lineWrappingLabel: 'Ajuste de Línea',
+				fontSizeLabel: 'Tamaño de Fuente',
+				zoomHint: 'Atajo de zoom general: CTRL + [ + / - / 0 ]'
 			},
 			timePicker: {
 				selectTime: 'Seleccionar Hora',
