@@ -23,6 +23,7 @@
 		align-items: center;
 		gap: var(--space-md);
 		width: 100%;
+		align-self: stretch;
 	}
 
 	.divider-line {
