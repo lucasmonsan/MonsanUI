@@ -490,9 +490,16 @@
 		bind:this={terminalWrapperEl}
 		class="terminal-wrapper"
 		class:hidden-mobile={activeTab === 'explorer'}
+		translate="no"
 	>
-		<div class="terminal-content" bind:this={terminalElement}>
-			<div class="terminal-history" role="log" aria-live="polite" aria-relevant="additions text">
+		<div class="terminal-content notranslate" bind:this={terminalElement} translate="no">
+			<div
+				class="terminal-history notranslate"
+				role="log"
+				aria-live="polite"
+				aria-relevant="additions text"
+				translate="no"
+			>
 				{#each history as line (line.id)}
 					<div class="line {line.type}">{line.text}</div>
 				{/each}
@@ -506,6 +513,9 @@
 					onkeydown={handleCommand}
 					autocomplete="off"
 					spellcheck="false"
+					translate="no"
+					autocorrect="off"
+					autocapitalize="off"
 					aria-label={mergedMessages.inputLabel}
 					{disabled}
 				/>

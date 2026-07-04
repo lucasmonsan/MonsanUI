@@ -12,7 +12,11 @@
 	let tokens = $derived(tokenizePortugolCode(code));
 </script>
 
-<code class="portugol-code size-{size} weight-{weight}">
+<code
+	class="portugol-code notranslate size-{size} weight-{weight}"
+	translate="no"
+	spellcheck="false"
+>
 	{#each tokens as token, index (index)}
 		{#if token.kind === 'plain'}
 			{token.text}

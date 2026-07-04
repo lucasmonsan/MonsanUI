@@ -44,6 +44,7 @@
 		width: 100%;
 	}
 	.full-height {
+		flex: 1 1 auto;
 		height: 100%;
 		min-height: 0;
 	}
