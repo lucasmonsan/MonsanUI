@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { spring } from 'svelte/motion';
-	import type { HeightPreset } from '$lib/utils/layout.js';
-	import { resolveHeight } from '$lib/utils/layout.js';
+	import type { HeightPreset, MaxWidthPreset } from '$lib/utils/layout.js';
+	import { resolveHeight, resolveMaxWidth } from '$lib/utils/layout.js';
 
 	let {
 		flipped = $bindable(false),
@@ -12,7 +12,8 @@
 		front,
 		back,
 		draggable = true,
-		height = '256px'
+		height = '256px',
+		maxWidth = 'none'
 	} = $props<{
 		flipped?: boolean;
 		onFlip?: () => void;
@@ -33,9 +34,11 @@
 		back: import('svelte').Snippet;
 		draggable?: boolean;
 		height?: HeightPreset;
+		maxWidth?: MaxWidthPreset;
 	}>();
 
 	let resolvedHeight = $derived(resolveHeight(height));
+	let resolvedMaxWidth = $derived(resolveMaxWidth(maxWidth));
 
 	let isDragging = $state(false);
 	let startX = $state(0);
@@ -158,6 +161,7 @@
 <div
 	class="monsan-flipcard-container"
 	style:--flipcard-height={resolvedHeight}
+	style:max-width={resolvedMaxWidth}
 	class:flipped
 	onpointerdown={onPointerDown}
 	onpointermove={onPointerMoveLocal}
@@ -205,6 +209,7 @@
 		user-select: none;
 		-webkit-user-select: none;
 		outline: none;
+		margin: 0 auto;
 	}
 
 	.card-wrapper {
