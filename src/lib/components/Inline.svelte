@@ -64,6 +64,12 @@
 		flex: 0 0 auto;
 		width: auto;
 	}
+
+	.grow-first-child > :global(.monsan-button.square),
+	.grow-first-child > :global(.monsan-icon-button) {
+		width: var(--control-height);
+		height: var(--control-height);
+	}
 	.gap-xs {
 		gap: var(--space-xs);
 	}
