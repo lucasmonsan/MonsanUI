@@ -72,6 +72,7 @@ export { default as SearchBar } from './components/SearchBar.svelte';
 export { default as SSOLoginButton } from './components/SSOLoginButton.svelte';
 export { default as TimePicker } from './components/TimePicker.svelte';
 export { default as Text } from './components/Text.svelte';
+export { default as Markdown } from './components/Markdown.svelte';
 export { default as Loading } from './components/Loading.svelte';
 export { default as Alert } from './components/Alert.svelte';
 export { default as ProgressBar } from './components/ProgressBar.svelte';

@@ -248,3 +248,112 @@ button:disabled {
 	text-decoration: none;
 	outline: none;
 }
+
+.markdown-content {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+	width: 100%;
+}
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+	font-family: var(--font-display);
+	color: var(--text-primary);
+	margin-top: var(--space-sm);
+	margin-bottom: var(--space-xs);
+	line-height: 1.2;
+}
+.markdown-content h1 {
+	font-size: var(--text-xl);
+}
+.markdown-content h2 {
+	font-size: var(--text-lg);
+}
+.markdown-content h3 {
+	font-size: var(--text-md);
+}
+.markdown-content h4 {
+	font-size: var(--text-sm);
+}
+.markdown-content p {
+	font-family: var(--font-body);
+	color: var(--text-secondary);
+	margin-bottom: var(--space-xs);
+	line-height: 1.5;
+	font-size: var(--text-sm);
+}
+.markdown-content strong {
+	color: var(--text-primary);
+	font-weight: bold;
+}
+.markdown-content em {
+	font-style: italic;
+}
+.markdown-content ul,
+.markdown-content ol {
+	margin-left: var(--space-lg);
+	margin-bottom: var(--space-xs);
+	color: var(--text-secondary);
+	display: flex;
+	flex-direction: column;
+	gap: calc(var(--space-xs) / 2);
+}
+.markdown-content ul {
+	list-style-type: disc;
+}
+.markdown-content ol {
+	list-style-type: decimal;
+}
+.markdown-content li {
+	font-size: var(--text-sm);
+	line-height: 1.4;
+}
+.markdown-content pre {
+	background-color: var(--bg-secondary);
+	border: var(--border-width) solid var(--border-color);
+	border-radius: var(--radius-md);
+	padding: var(--space-sm);
+	overflow-x: auto;
+	font-family: var(--font-mono);
+	font-size: var(--text-xs);
+	margin-top: var(--space-xs);
+	margin-bottom: var(--space-sm);
+}
+.markdown-content code {
+	font-family: var(--font-mono);
+	background-color: var(--bg-secondary);
+	padding: 2px var(--space-xs);
+	border-radius: var(--radius-sm);
+	font-size: 0.875em;
+	color: var(--accent-primary);
+	border: 1px solid var(--border-color);
+}
+.markdown-content pre code {
+	padding: 0;
+	border: none;
+	background-color: transparent;
+	color: var(--text-primary);
+}
+.markdown-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: var(--space-xs);
+	margin-bottom: var(--space-sm);
+}
+.markdown-content th,
+.markdown-content td {
+	border: var(--border-width) solid var(--border-color);
+	padding: var(--space-xs) var(--space-sm);
+	text-align: left;
+	font-size: var(--text-sm);
+}
+.markdown-content th {
+	background-color: var(--bg-secondary);
+	font-weight: bold;
+	color: var(--text-primary);
+}
+.markdown-content td {
+	color: var(--text-secondary);
+}
