@@ -4,6 +4,8 @@
 	import Button from './Button.svelte';
 	import MenuItem from './MenuItem.svelte';
 	import QuickActions from './QuickActions.svelte';
+	import IconButton from './IconButton.svelte';
+	import Inline from './Inline.svelte';
 	import DotsThreeVerticalIcon from './icons/DotsThreeVertical.svelte';
 	import FileTextIcon from './icons/FileText.svelte';
 	import LockIcon from './icons/Lock.svelte';
@@ -33,6 +35,7 @@
 		disabled?: boolean;
 		block?: boolean;
 		ariaLabel?: string;
+		variant?: 'dropdown' | 'reveal';
 		onclick?: (event: MouseEvent) => void;
 		onProfile?: (event: MouseEvent) => void;
 		onTerms?: (event: MouseEvent) => void;
@@ -58,6 +61,7 @@
 		disabled = false,
 		block = false,
 		ariaLabel,
+		variant = 'dropdown',
 		onclick,
 		onProfile,
 		onTerms,
@@ -87,13 +91,17 @@
 	<div class="monsan-sso-account" class:block>
 		<QuickActions
 			bind:open={menuOpen}
-			variant="dropdown"
+			{variant}
 			align="right"
-			width="dropdown"
+			width={variant === 'reveal' ? 'max-content' : 'dropdown'}
 			triggerBehavior="child"
-			panelShadow="none"
+			panelShadow={variant === 'reveal' ? 'none' : 'default'}
 			panelPadding="sm"
 			panelGap="sm"
+			placement={variant === 'reveal' ? 'before' : 'below'}
+			panelLayout={variant === 'reveal' ? 'horizontal' : 'vertical'}
+			surface={variant === 'reveal' ? 'plain' : 'panel'}
+			containedReveal={variant === 'reveal'}
 			triggerLabel={accountMenuLabel}
 		>
 			{#snippet trigger(toggle)}
@@ -111,30 +119,46 @@
 				</button>
 			{/snippet}
 
-			{#if profileLabel}
-				<MenuItem href={profileHref} onclick={onProfile} align="right">
-					<UserIcon size={16} />
-					{profileLabel}
-				</MenuItem>
-			{/if}
-			{@render children?.()}
-			{#if termsLabel}
-				<MenuItem href={termsHref} onclick={onTerms} align="right">
-					<FileTextIcon size={16} />
-					{termsLabel}
-				</MenuItem>
-			{/if}
-			{#if privacyLabel}
-				<MenuItem href={privacyHref} onclick={onPrivacy} align="right">
-					<LockIcon size={16} />
-					{privacyLabel}
-				</MenuItem>
-			{/if}
-			{#if logoutLabel}
-				<MenuItem variant="error" onclick={onLogout} align="right">
-					<LogOutIcon size={16} />
-					{logoutLabel}
-				</MenuItem>
+			{#if variant === 'reveal'}
+				<Inline gap="xs" align="center">
+					{#if profileLabel}
+						<IconButton size="sm" label={profileLabel} onclick={onProfile}>
+							<UserIcon size={16} />
+						</IconButton>
+					{/if}
+					{@render children?.()}
+					{#if logoutLabel}
+						<IconButton size="sm" label={logoutLabel} variant="error" onclick={onLogout}>
+							<LogOutIcon size={16} />
+						</IconButton>
+					{/if}
+				</Inline>
+			{:else}
+				{#if profileLabel}
+					<MenuItem href={profileHref} onclick={onProfile} align="right">
+						<UserIcon size={16} />
+						{profileLabel}
+					</MenuItem>
+				{/if}
+				{@render children?.()}
+				{#if termsLabel}
+					<MenuItem href={termsHref} onclick={onTerms} align="right">
+						<FileTextIcon size={16} />
+						{termsLabel}
+					</MenuItem>
+				{/if}
+				{#if privacyLabel}
+					<MenuItem href={privacyHref} onclick={onPrivacy} align="right">
+						<LockIcon size={16} />
+						{privacyLabel}
+					</MenuItem>
+				{/if}
+				{#if logoutLabel}
+					<MenuItem variant="error" onclick={onLogout} align="right">
+						<LogOutIcon size={16} />
+						{logoutLabel}
+					</MenuItem>
+				{/if}
 			{/if}
 		</QuickActions>
 	</div>
