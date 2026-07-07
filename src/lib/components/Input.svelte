@@ -96,6 +96,7 @@
 </script>
 
 <div class="monsan-input-container" class:with-toggle={type === 'password' && showPasswordToggle}>
+	<!-- svelte-ignore a11y_autofocus -->
 	<input
 		bind:this={inputEl}
 		bind:value

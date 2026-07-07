@@ -122,7 +122,7 @@
 	}
 
 	.brand-logo-mask {
-		background-color: var(--text-primary);
+		background-color: var(--accent-primary);
 		mask: var(--brand-logo-mask);
 		-webkit-mask: var(--brand-logo-mask);
 	}

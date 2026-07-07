@@ -12,6 +12,7 @@
 	--space-2xl: calc(var(--base) * 3);
 
 	/* Typography Scale */
+	--text-xxs: calc(var(--base) * 0.65);
 	--text-xs: calc(var(--base) * 0.75);
 	--text-sm: calc(var(--base) * 0.875);
 	--text-md: var(--base);
