@@ -191,18 +191,31 @@
 		z-index: 0;
 	}
 
-	.app-shell-header,
-	.app-shell-top,
+	.app-shell-header {
+		flex: 0 0 auto;
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+		border-bottom: var(--border-width) solid var(--border-color);
+		position: relative;
+		z-index: 50;
+	}
+
+	.app-shell-top {
+		flex: 0 0 auto;
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+		position: relative;
+		z-index: 50;
+	}
+
 	.app-shell-bottom,
 	.app-shell-footer {
 		flex: 0 0 auto;
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
-	}
-
-	.app-shell-header {
-		border-bottom: var(--border-width) solid var(--border-color);
 	}
 
 	.app-shell-top > :global(* + *),
