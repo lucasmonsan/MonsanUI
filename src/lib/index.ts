@@ -61,6 +61,7 @@ export { default as Terminal } from './components/Terminal.svelte';
 export { default as PortugolEditor } from './components/PortugolEditor.svelte';
 export { default as PortugolRunner } from './components/PortugolRunner.svelte';
 export { default as PortugolCode } from './components/PortugolCode.svelte';
+export { default as SplitPane } from './components/SplitPane.svelte';
 export { default as Checkbox } from './components/Checkbox.svelte';
 export { default as Chips } from './components/Chips.svelte';
 export { default as ColorPicker } from './components/ColorPicker.svelte';
