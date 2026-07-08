@@ -14,7 +14,6 @@
 	import SaveIcon from './icons/Save.svelte';
 	import SkipForwardIcon from './icons/SkipForward.svelte';
 	import XIcon from './icons/X.svelte';
-	import SlidersHorizontalIcon from './icons/SlidersHorizontal.svelte';
 	import SettingsIcon from './icons/Settings.svelte';
 	import CheckIcon from './icons/Check.svelte';
 	import Range from './Range.svelte';
@@ -39,19 +38,17 @@
 		floatingActions?: Snippet;
 		userId?: string;
 		fileName?: string;
+		height?: string;
+		defaultFocusMode?: boolean;
 	}
 
 	let {
-		code = $bindable(`programa
-{
-	funcao inicio()
-	{
-		inteiro x = 5
-		inteiro y = 10
-		inteiro soma = x + y
-		escreva("A soma de x e y é: ", soma)
-	}
-}`),
+		code = $bindable(`algoritmo "sem nome"
+var
+
+inicio
+
+fimalgoritmo`),
 		disabled = false,
 		onOutputsChange,
 		onSuccess,
@@ -59,7 +56,9 @@
 		onsave,
 		floatingActions,
 		userId,
-		fileName
+		fileName,
+		height = '100%',
+		defaultFocusMode = true
 	}: Props = $props();
 
 	let activeLine = $state(0);
@@ -74,14 +73,50 @@
 	let variables = $state<Record<string, { value: unknown; type: string }>>({});
 	let outputs = $state<string[]>([]);
 	let errorMsg = $state('');
+	let hasRun = $state(false);
 
 	// Zoom and Font Size State
 	let fontSize = $state(14);
 	let showBlur = $state(true);
 	let animateBackground = $state(true);
+	let isFocusMode = $state(false);
+	let floatingWidth = $state(320);
+	let isFloatingDragging = $state(false);
+	let isLoaded = $state(false);
+
+	function startFloatingResize(e: MouseEvent) {
+		e.preventDefault();
+		isFloatingDragging = true;
+		document.addEventListener('mousemove', handleFloatingResize);
+		document.addEventListener('mouseup', stopFloatingResize);
+	}
+
+	function handleFloatingResize(e: MouseEvent) {
+		if (!isFloatingDragging) return;
+		const runnerEl = document.querySelector('.portugol-runner');
+		if (runnerEl) {
+			const rect = runnerEl.getBoundingClientRect();
+			const newWidth = rect.right - e.clientX - 8;
+			floatingWidth = Math.max(220, Math.min(newWidth, rect.width * 0.9));
+		}
+	}
+
+	function stopFloatingResize() {
+		isFloatingDragging = false;
+		document.removeEventListener('mousemove', handleFloatingResize);
+		document.removeEventListener('mouseup', stopFloatingResize);
+	}
+
+	const focusModeKey = $derived(
+		userId ? 'monsan-portugol-focus-mode:' + userId : 'monsan-portugol-focus-mode:anonymous'
+	);
 
 	const storageKey = $derived(
 		userId ? 'monsan-portugol-font-size:' + userId : 'monsan-portugol-font-size:anonymous'
+	);
+
+	const floatingWidthKey = $derived(
+		userId ? 'monsan-portugol-floating-width:' + userId : 'monsan-portugol-floating-width:anonymous'
 	);
 
 	const strictIndentKey = $derived(
@@ -101,64 +136,47 @@
 		userId ? 'monsan-portugol-line-wrapping:' + userId : 'monsan-portugol-line-wrapping:anonymous'
 	);
 
-	// Load settings preference when user ID changes
+	// Save settings on changes (only after isLoaded)
 	$effect(() => {
-		const key = strictIndentKey;
-		const saved = localStorage.getItem(key);
-		strictIndent = saved === 'true';
-	});
-
-	$effect(() => {
-		const key = autoCloseBracketsKey;
-		const saved = localStorage.getItem(key);
-		autoCloseBrackets = saved !== 'false'; // default true
-	});
-
-	$effect(() => {
-		const key = autoCloseQuotesKey;
-		const saved = localStorage.getItem(key);
-		autoCloseQuotes = saved !== 'false'; // default true
-	});
-
-	$effect(() => {
-		const key = lineWrappingKey;
-		const saved = localStorage.getItem(key);
-		lineWrapping = saved !== 'false'; // default true
-	});
-
-	// Save settings on changes
-	$effect(() => {
-		localStorage.setItem(strictIndentKey, strictIndent.toString());
-	});
-
-	$effect(() => {
-		localStorage.setItem(autoCloseBracketsKey, autoCloseBrackets.toString());
-	});
-
-	$effect(() => {
-		localStorage.setItem(autoCloseQuotesKey, autoCloseQuotes.toString());
-	});
-
-	$effect(() => {
-		localStorage.setItem(lineWrappingKey, lineWrapping.toString());
-	});
-
-	$effect(() => {
-		localStorage.setItem(storageKey, fontSize.toString());
-	});
-
-	// Load font size preference when user ID changes
-	$effect(() => {
-		const key = storageKey;
-		const saved = localStorage.getItem(key);
-		if (saved) {
-			const parsed = parseInt(saved, 10);
-			if (!isNaN(parsed) && parsed >= 10 && parsed <= 32) {
-				fontSize = parsed;
-				return;
-			}
+		if (isLoaded) {
+			localStorage.setItem(strictIndentKey, strictIndent.toString());
 		}
-		fontSize = 14;
+	});
+
+	$effect(() => {
+		if (isLoaded) {
+			localStorage.setItem(autoCloseBracketsKey, autoCloseBrackets.toString());
+		}
+	});
+
+	$effect(() => {
+		if (isLoaded) {
+			localStorage.setItem(autoCloseQuotesKey, autoCloseQuotes.toString());
+		}
+	});
+
+	$effect(() => {
+		if (isLoaded) {
+			localStorage.setItem(lineWrappingKey, lineWrapping.toString());
+		}
+	});
+
+	$effect(() => {
+		if (isLoaded) {
+			localStorage.setItem(storageKey, fontSize.toString());
+		}
+	});
+
+	$effect(() => {
+		if (isLoaded) {
+			localStorage.setItem(focusModeKey, isFocusMode.toString());
+		}
+	});
+
+	$effect(() => {
+		if (isLoaded) {
+			localStorage.setItem(floatingWidthKey, floatingWidth.toString());
+		}
 	});
 
 	// Load showBlur and animateBackground preferences
@@ -213,6 +231,55 @@
 
 	// Global shortcut listeners for Ctrl + +, Ctrl + -, Ctrl + 0
 	onMount(() => {
+		// Load all preferences from localStorage synchronously on client mount
+		if (window.innerWidth <= 560) {
+			isFocusMode = true;
+		} else {
+			const savedFocus = localStorage.getItem(focusModeKey);
+			if (savedFocus !== null) {
+				isFocusMode = savedFocus === 'true';
+			} else {
+				isFocusMode = defaultFocusMode;
+			}
+		}
+
+		const savedWidth = localStorage.getItem(floatingWidthKey);
+		if (savedWidth) {
+			const parsed = parseInt(savedWidth, 10);
+			if (!isNaN(parsed) && parsed >= 220) {
+				floatingWidth = parsed;
+			}
+		}
+
+		const savedFont = localStorage.getItem(storageKey);
+		if (savedFont) {
+			const parsed = parseInt(savedFont, 10);
+			if (!isNaN(parsed) && parsed >= 10 && parsed <= 32) {
+				fontSize = parsed;
+			}
+		}
+
+		const savedStrict = localStorage.getItem(strictIndentKey);
+		if (savedStrict !== null) {
+			strictIndent = savedStrict === 'true';
+		}
+
+		const savedBrackets = localStorage.getItem(autoCloseBracketsKey);
+		if (savedBrackets !== null) {
+			autoCloseBrackets = savedBrackets !== 'false';
+		}
+
+		const savedQuotes = localStorage.getItem(autoCloseQuotesKey);
+		if (savedQuotes !== null) {
+			autoCloseQuotes = savedQuotes !== 'false';
+		}
+
+		const savedWrapping = localStorage.getItem(lineWrappingKey);
+		if (savedWrapping !== null) {
+			lineWrapping = savedWrapping !== 'false';
+		}
+
+		isLoaded = true; // Signal that loading is complete
 		function handleKeyDown(e: KeyboardEvent) {
 			const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 			if (!isCtrlOrCmd) return;
@@ -320,7 +387,7 @@
 	let scheduledRun: ReturnType<typeof setTimeout> | null = null;
 	const executionChunkSize = 500;
 	let embeddedConsoleVisible = $derived(!isConsoleCollapsed);
-	let sidebarHidden = $derived(!embeddedConsoleVisible && isVariablesCollapsed);
+	let sidebarHidden = $derived(isFocusMode || (!embeddedConsoleVisible && isVariablesCollapsed));
 	let sidebarRows = $derived(
 		embeddedConsoleVisible && !isVariablesCollapsed
 			? `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`
@@ -368,6 +435,7 @@
 	}
 
 	function startExecution(step = false) {
+		hasRun = true;
 		clearScheduledRun();
 		prepareConsoleForExecution();
 		errorMsg = '';
@@ -525,11 +593,13 @@
 	}
 
 	function handleStop() {
+		hasRun = false;
 		stopRequested = true;
 		finishStoppedExecution();
 	}
 
 	function handleReset() {
+		hasRun = false;
 		clearScheduledRun();
 		activeLine = 0;
 		errorLine = 0;
@@ -587,10 +657,46 @@
 	</div>
 {/snippet}
 
+{#snippet variablesContent()}
+	<div class="variables-box notranslate" translate="no" spellcheck="false">
+		{#if Object.keys(variables).length > 0}
+			<table class="variables-table">
+				<thead>
+					<tr>
+						<th>{i18n.t('portugolRunner.variableName')}</th>
+						<th>{i18n.t('portugolRunner.variableType')}</th>
+						<th>{i18n.t('portugolRunner.variableValue')}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each Object.entries(variables) as [name, info] (name)}
+						<tr>
+							<td class="var-name">{name}</td>
+							<td class="var-type">{info.type}</td>
+							<td class="var-value">
+								{#if info.value === undefined}
+									{i18n.t('portugolRunner.emptyValue')}
+								{:else if ['caractere', 'caracter', 'cadeia'].includes(info.type)}
+									"{info.value}"
+								{:else}
+									{String(info.value)}
+								{/if}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{:else}
+			<div class="variables-empty">{i18n.t('portugolRunner.noVariables')}</div>
+		{/if}
+	</div>
+{/snippet}
+
 <div
 	class="portugol-runner"
 	class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}
 	style="--runner-font-size: {fontSize}px;"
+	style:height
 >
 	<Stack gap="sm" fullHeight={true}>
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
@@ -622,14 +728,209 @@
 						{autoCloseBrackets}
 						{autoCloseQuotes}
 						{lineWrapping}
-						disabled={disabled || (isRunning && !isPaused)}
+						disabled={disabled || (isFocusMode ? isRunning || hasRun : isRunning && !isPaused)}
 						{onsave}
 					/>
+					{#if isFocusMode && (isRunning || hasRun)}
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div class="editor-blocked-overlay" onclick={handleStop}></div>
+					{/if}
 					{#if fileName}
 						<div class="runner-editor-watermark notranslate" aria-hidden="true" translate="no">
 							{fileName}
 						</div>
 					{/if}
+
+					<!-- Controles de Ação Flutuantes (Apenas Ícones) -->
+					<div class="runner-floating-controls">
+						<Button
+							variant={isRunning ? 'error' : 'primary'}
+							size="sm"
+							onclick={() => (isRunning ? handleStop() : startExecution(false))}
+							{disabled}
+							title={isRunning ? i18n.t('portugolRunner.stop') : i18n.t('portugolRunner.run')}
+						>
+							{#if isRunning}
+								<XIcon size={16} />
+							{:else}
+								<PlayIcon size={16} />
+							{/if}
+						</Button>
+						<Button
+							variant="secondary"
+							size="sm"
+							onclick={handleStep}
+							disabled={disabled || (isRunning && !isStepMode && !isPaused)}
+							title={i18n.t('portugolRunner.step')}
+						>
+							<SkipForwardIcon size={16} />
+						</Button>
+						<Button
+							variant="secondary"
+							size="sm"
+							onclick={handleReset}
+							{disabled}
+							title={i18n.t('portugolRunner.reset')}
+						>
+							<RotateCwIcon size={16} />
+						</Button>
+						{#if onsave}
+							<Button
+								variant="secondary"
+								size="sm"
+								onclick={() => onsave?.(false)}
+								disabled={disabled || isRunning}
+								title={i18n.t('portugolRunner.save')}
+							>
+								<SaveIcon size={16} />
+							</Button>
+						{/if}
+
+						<QuickActions align="right">
+							{#snippet trigger(toggle)}
+								<Button
+									variant="secondary"
+									size="sm"
+									onclick={toggle}
+									disabled={disabled || isRunning}
+									title={i18n.t('portugolRunner.settingsTitle')}
+								>
+									<SettingsIcon size={16} />
+								</Button>
+							{/snippet}
+
+							<MenuItem
+								checked={strictIndent}
+								onclick={() => (strictIndent = !strictIndent)}
+								align="left"
+								data-menu-persistent
+							>
+								<Inline gap="sm" align="center">
+									{#if strictIndent}
+										<CheckIcon size={14} />
+									{:else}
+										<span style="width: 14px"></span>
+									{/if}
+									<span>{i18n.t('portugolRunner.strictIndentLabel')}</span>
+								</Inline>
+							</MenuItem>
+
+							<MenuItem
+								checked={autoCloseBrackets}
+								onclick={() => (autoCloseBrackets = !autoCloseBrackets)}
+								align="left"
+								data-menu-persistent
+							>
+								<Inline gap="sm" align="center">
+									{#if autoCloseBrackets}
+										<CheckIcon size={14} />
+									{:else}
+										<span style="width: 14px"></span>
+									{/if}
+									<span>{i18n.t('portugolRunner.autoCloseBracketsLabel')}</span>
+								</Inline>
+							</MenuItem>
+
+							<MenuItem
+								checked={autoCloseQuotes}
+								onclick={() => (autoCloseQuotes = !autoCloseQuotes)}
+								align="left"
+								data-menu-persistent
+							>
+								<Inline gap="sm" align="center">
+									{#if autoCloseQuotes}
+										<CheckIcon size={14} />
+									{:else}
+										<span style="width: 14px"></span>
+									{/if}
+									<span>{i18n.t('portugolRunner.autoCloseQuotesLabel')}</span>
+								</Inline>
+							</MenuItem>
+
+							<MenuItem
+								checked={lineWrapping}
+								onclick={() => (lineWrapping = !lineWrapping)}
+								align="left"
+								data-menu-persistent
+							>
+								<Inline gap="sm" align="center">
+									{#if lineWrapping}
+										<CheckIcon size={14} />
+									{:else}
+										<span style="width: 14px"></span>
+									{/if}
+									<span>{i18n.t('portugolRunner.lineWrappingLabel')}</span>
+								</Inline>
+							</MenuItem>
+
+							<MenuItem
+								checked={showBlur}
+								onclick={() => (showBlur = !showBlur)}
+								align="left"
+								data-menu-persistent
+							>
+								<Inline gap="sm" align="center">
+									{#if showBlur}
+										<CheckIcon size={14} />
+									{:else}
+										<span style="width: 14px"></span>
+									{/if}
+									<span>{i18n.t('portugolRunner.settingsBlurLabel')}</span>
+								</Inline>
+							</MenuItem>
+
+							<MenuItem
+								checked={animateBackground}
+								onclick={() => (animateBackground = !animateBackground)}
+								align="left"
+								data-menu-persistent
+							>
+								<Inline gap="sm" align="center">
+									{#if animateBackground}
+										<CheckIcon size={14} />
+									{:else}
+										<span style="width: 14px"></span>
+									{/if}
+									<span>{i18n.t('portugolRunner.settingsBgAnimLabel')}</span>
+								</Inline>
+							</MenuItem>
+
+							<MenuItem
+								checked={isFocusMode}
+								onclick={() => (isFocusMode = !isFocusMode)}
+								align="left"
+								data-menu-persistent
+							>
+								<Inline gap="sm" align="center">
+									{#if isFocusMode}
+										<CheckIcon size={14} />
+									{:else}
+										<span style="width: 14px"></span>
+									{/if}
+									<span>{i18n.t('portugolRunner.settingsFocusModeLabel')}</span>
+								</Inline>
+							</MenuItem>
+
+							<MenuItem align="left" data-menu-persistent>
+								<Stack gap="xs" fullWidth>
+									<Inline justify="between" fullWidth>
+										<Text size="sm" weight="bold">{i18n.t('portugolRunner.fontSizeLabel')}</Text>
+										<Text size="sm" weight="bold" variant="secondary">{fontSize}px</Text>
+									</Inline>
+									<div role="presentation" onclick={(e) => e.stopPropagation()}>
+										<Range min={12} max={24} bind:value={fontSize} />
+									</div>
+								</Stack>
+							</MenuItem>
+
+							<div class="zoom-hint-box" data-menu-persistent>
+								<Text size="xs" variant="secondary" align="center">
+									{i18n.t('portugolRunner.zoomHint')}
+								</Text>
+							</div>
+						</QuickActions>
+					</div>
 				</div>
 
 				<!-- Barra de redimensionamento -->
@@ -646,32 +947,52 @@
 				<!-- Terminal de I/O e inspetor de variáveis -->
 				<div
 					class="sidebar-col"
-					class:hidden={sidebarHidden}
+					class:hidden={isFocusMode ? !(isRunning || hasRun) : sidebarHidden}
+					class:focus-floating={isFocusMode}
 					style="grid-template-rows: {sidebarRows}"
+					style:--floating-width={isFocusMode ? `${floatingWidth}px` : undefined}
 				>
+					{#if isFocusMode}
+						<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+						<div
+							class="floating-resize-handle"
+							class:dragging={isFloatingDragging}
+							onmousedown={startFloatingResize}
+							role="separator"
+						></div>
+					{/if}
 					<!-- Console/Terminal -->
-					{#if embeddedConsoleVisible}
+					{#if isFocusMode || embeddedConsoleVisible}
 						<div class="terminal-card" style="grid-row: 1;">
-							<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
-								<div class="panel-header">
+							{#if isFocusMode}
+								<div class="focus-panel-header">
 									<span>{i18n.t('portugolRunner.consoleTitle')}</span>
-									<div class="panel-header-actions">
-										<button
-											type="button"
-											class="collapse-btn"
-											onclick={() => (isConsoleCollapsed = true)}
-										>
-											{i18n.t('portugolRunner.hide')}
-										</button>
-									</div>
 								</div>
 								{@render consoleContent()}
-							</Panel>
+							{:else}
+								<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
+									<div class="panel-header">
+										<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+										{#if !isFocusMode}
+											<div class="panel-header-actions">
+												<button
+													type="button"
+													class="collapse-btn"
+													onclick={() => (isConsoleCollapsed = true)}
+												>
+													{i18n.t('portugolRunner.hide')}
+												</button>
+											</div>
+										{/if}
+									</div>
+									{@render consoleContent()}
+								</Panel>
+							{/if}
 						</div>
 					{/if}
 
 					<!-- Barra de redimensionamento horizontal -->
-					{#if embeddedConsoleVisible && !isVariablesCollapsed}
+					{#if isFocusMode || (embeddedConsoleVisible && !isVariablesCollapsed)}
 						<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 						<div
 							class="horizontal-resize-bar"
@@ -684,55 +1005,33 @@
 					{/if}
 
 					<!-- Inspetor de Variáveis -->
-					{#if !isVariablesCollapsed}
+					{#if isFocusMode || !isVariablesCollapsed}
 						<div
 							class="variables-panel-wrapper"
-							style="grid-row: {embeddedConsoleVisible ? 3 : 1};"
+							style="grid-row: {isFocusMode ? 3 : embeddedConsoleVisible ? 3 : 1};"
 						>
-							<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
-								<div class="panel-header">
+							{#if isFocusMode}
+								<div class="focus-panel-header">
 									<span>{i18n.t('portugolRunner.variablesTitle')}</span>
-									<button
-										type="button"
-										class="collapse-btn"
-										onclick={() => (isVariablesCollapsed = true)}
-									>
-										{i18n.t('portugolRunner.hide')}
-									</button>
 								</div>
-								<div class="variables-box notranslate" translate="no" spellcheck="false">
-									{#if Object.keys(variables).length > 0}
-										<table class="variables-table">
-											<thead>
-												<tr>
-													<th>{i18n.t('portugolRunner.variableName')}</th>
-													<th>{i18n.t('portugolRunner.variableType')}</th>
-													<th>{i18n.t('portugolRunner.variableValue')}</th>
-												</tr>
-											</thead>
-											<tbody>
-												{#each Object.entries(variables) as [name, info] (name)}
-													<tr>
-														<td class="var-name">{name}</td>
-														<td class="var-type">{info.type}</td>
-														<td class="var-value">
-															{#if info.value === undefined}
-																{i18n.t('portugolRunner.emptyValue')}
-															{:else if ['caractere', 'caracter', 'cadeia'].includes(info.type)}
-																"{info.value}"
-															{:else}
-																{String(info.value)}
-															{/if}
-														</td>
-													</tr>
-												{/each}
-											</tbody>
-										</table>
-									{:else}
-										<div class="variables-empty">{i18n.t('portugolRunner.noVariables')}</div>
-									{/if}
-								</div>
-							</Panel>
+								{@render variablesContent()}
+							{:else}
+								<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
+									<div class="panel-header">
+										<span>{i18n.t('portugolRunner.variablesTitle')}</span>
+										{#if !isFocusMode}
+											<button
+												type="button"
+												class="collapse-btn"
+												onclick={() => (isVariablesCollapsed = true)}
+											>
+												{i18n.t('portugolRunner.hide')}
+											</button>
+										{/if}
+									</div>
+									{@render variablesContent()}
+								</Panel>
+							{/if}
 						</div>
 					{/if}
 				</div>
@@ -748,225 +1047,92 @@
 				</div>
 			</Alert>
 		{/if}
-
-		<!-- Toolbar de controle -->
-		<div class="toolbar">
-			<Inline justify="between" align="center" fullWidth={true} wrap>
-				<!-- Controles de Execução (Esquerda) -->
-				<Inline gap="sm" wrap>
-					<Button
-						variant={isRunning ? 'error' : 'primary'}
-						size="sm"
-						onclick={() => (isRunning ? handleStop() : startExecution(false))}
-						{disabled}
-					>
-						{#if isRunning}
-							<XIcon size="16" />
-							<span class="toolbar-label">{i18n.t('portugolRunner.stop')}</span>
-						{:else}
-							<PlayIcon size="16" />
-							<span class="toolbar-label">{i18n.t('portugolRunner.run')}</span>
-						{/if}
-					</Button>
-					<Button
-						variant="secondary"
-						size="sm"
-						onclick={handleStep}
-						disabled={disabled || (isRunning && !isStepMode && !isPaused)}
-					>
-						<SkipForwardIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.step')}</span>
-					</Button>
-					<Button variant="secondary" size="sm" onclick={handleReset} {disabled}>
-						<RotateCwIcon size="16" />
-						<span class="toolbar-label">{i18n.t('portugolRunner.reset')}</span>
-					</Button>
-					{#if onsave}
-						<Button
-							variant="secondary"
-							size="sm"
-							onclick={() => onsave?.(false)}
-							disabled={disabled || isRunning}
-						>
-							<SaveIcon size="16" />
-							<span class="toolbar-label">{i18n.t('portugolRunner.save')}</span>
-						</Button>
-					{/if}
-				</Inline>
-				<!-- Configurações e Alternador de Visibilidade (Direita) -->
-				<Inline gap="sm" align="center">
-					<!-- Menu de Configurações do Editor -->
-					<QuickActions align="right">
-						{#snippet trigger(toggle)}
-							<Button
-								variant="secondary"
-								size="sm"
-								onclick={toggle}
-								disabled={disabled || isRunning}
-							>
-								<SettingsIcon size={16} />
-								<span class="toolbar-label">{i18n.t('portugolRunner.settingsTitle')}</span>
-							</Button>
-						{/snippet}
-
-						<MenuItem
-							checked={strictIndent}
-							onclick={() => (strictIndent = !strictIndent)}
-							align="left"
-							data-menu-persistent
-						>
-							<Inline gap="sm" align="center">
-								{#if strictIndent}
-									<CheckIcon size={14} />
-								{:else}
-									<span style="width: 14px"></span>
-								{/if}
-								<span>{i18n.t('portugolRunner.strictIndentLabel')}</span>
-							</Inline>
-						</MenuItem>
-
-						<MenuItem
-							checked={autoCloseBrackets}
-							onclick={() => (autoCloseBrackets = !autoCloseBrackets)}
-							align="left"
-							data-menu-persistent
-						>
-							<Inline gap="sm" align="center">
-								{#if autoCloseBrackets}
-									<CheckIcon size={14} />
-								{:else}
-									<span style="width: 14px"></span>
-								{/if}
-								<span>{i18n.t('portugolRunner.autoCloseBracketsLabel')}</span>
-							</Inline>
-						</MenuItem>
-
-						<MenuItem
-							checked={autoCloseQuotes}
-							onclick={() => (autoCloseQuotes = !autoCloseQuotes)}
-							align="left"
-							data-menu-persistent
-						>
-							<Inline gap="sm" align="center">
-								{#if autoCloseQuotes}
-									<CheckIcon size={14} />
-								{:else}
-									<span style="width: 14px"></span>
-								{/if}
-								<span>{i18n.t('portugolRunner.autoCloseQuotesLabel')}</span>
-							</Inline>
-						</MenuItem>
-
-						<MenuItem
-							checked={lineWrapping}
-							onclick={() => (lineWrapping = !lineWrapping)}
-							align="left"
-							data-menu-persistent
-						>
-							<Inline gap="sm" align="center">
-								{#if lineWrapping}
-									<CheckIcon size={14} />
-								{:else}
-									<span style="width: 14px"></span>
-								{/if}
-								<span>{i18n.t('portugolRunner.lineWrappingLabel')}</span>
-							</Inline>
-						</MenuItem>
-
-						<MenuItem
-							checked={showBlur}
-							onclick={() => (showBlur = !showBlur)}
-							align="left"
-							data-menu-persistent
-						>
-							<Inline gap="sm" align="center">
-								{#if showBlur}
-									<CheckIcon size={14} />
-								{:else}
-									<span style="width: 14px"></span>
-								{/if}
-								<span>{i18n.t('portugolRunner.settingsBlurLabel')}</span>
-							</Inline>
-						</MenuItem>
-
-						<MenuItem
-							checked={animateBackground}
-							onclick={() => (animateBackground = !animateBackground)}
-							align="left"
-							data-menu-persistent
-						>
-							<Inline gap="sm" align="center">
-								{#if animateBackground}
-									<CheckIcon size={14} />
-								{:else}
-									<span style="width: 14px"></span>
-								{/if}
-								<span>{i18n.t('portugolRunner.settingsBgAnimLabel')}</span>
-							</Inline>
-						</MenuItem>
-
-						<MenuItem align="left" data-menu-persistent>
-							<Stack gap="xs" fullWidth>
-								<Inline justify="between" fullWidth>
-									<Text size="sm" weight="bold">{i18n.t('portugolRunner.fontSizeLabel')}</Text>
-									<Text size="sm" weight="bold" variant="secondary">{fontSize}px</Text>
-								</Inline>
-								<div role="presentation" onclick={(e) => e.stopPropagation()}>
-									<Range min={12} max={24} bind:value={fontSize} />
-								</div>
-							</Stack>
-						</MenuItem>
-
-						<div class="zoom-hint-box" data-menu-persistent>
-							<Text size="xs" variant="secondary" align="center">
-								{i18n.t('portugolRunner.zoomHint')}
-							</Text>
-						</div>
-					</QuickActions>
-
-					<!-- Alternador de Visibilidade Unificado -->
-					<QuickActions align="right">
-						{#snippet trigger(toggle)}
-							<Button
-								variant="secondary"
-								size="sm"
-								onclick={toggle}
-								disabled={disabled || isRunning}
-							>
-								<SlidersHorizontalIcon size={16} />
-								<span class="toolbar-label">{i18n.t('portugolRunner.view')}</span>
-							</Button>
-						{/snippet}
-
-						<MenuItem
-							checked={showLineNumbers}
-							onclick={() => (showLineNumbers = !showLineNumbers)}
-							data-menu-persistent
-						>
-							{i18n.t('portugolRunner.lines')}
-						</MenuItem>
-						<MenuItem
-							checked={!isConsoleCollapsed}
-							onclick={() => (isConsoleCollapsed = !isConsoleCollapsed)}
-							data-menu-persistent
-						>
-							{i18n.t('portugolRunner.consoleTitle')}
-						</MenuItem>
-						<MenuItem
-							checked={!isVariablesCollapsed}
-							onclick={() => (isVariablesCollapsed = !isVariablesCollapsed)}
-							data-menu-persistent
-						>
-							{i18n.t('portugolRunner.variablesTitle')}
-						</MenuItem>
-					</QuickActions>
-				</Inline>
-			</Inline>
-		</div>
 	</Stack>
 </div>
 
 <style>
+	.focus-panel-header {
+		padding: var(--space-xs) var(--space-sm);
+		font-size: var(--font-size-sm);
+		font-weight: bold;
+		border-bottom: var(--border-width) solid var(--border-color);
+		background: var(--bg-secondary);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		box-sizing: border-box;
+		flex: 0 0 auto;
+	}
+
+	.editor-blocked-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 40;
+		cursor: pointer;
+		background: rgba(0, 0, 0, 0.04);
+		backdrop-filter: blur(2px);
+		box-sizing: border-box;
+	}
+
+	.sidebar-col.focus-floating {
+		position: absolute;
+		right: 8px;
+		top: 8px;
+		width: var(--floating-width, 320px) !important;
+		max-width: 90%;
+		max-height: 90%;
+		z-index: 50;
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		overflow: visible;
+		display: grid;
+		gap: 0px;
+		transition:
+			opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+			visibility 0.2s;
+		opacity: 1;
+		transform: scale(1);
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.sidebar-col.focus-floating.hidden {
+		display: grid !important;
+		opacity: 0 !important;
+		transform: scale(0.95) !important;
+		pointer-events: none !important;
+		visibility: hidden !important;
+	}
+
+	.sidebar-col.focus-floating .terminal-card,
+	.sidebar-col.focus-floating .variables-panel-wrapper {
+		background: var(--bg-primary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-sm);
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		min-height: 80px;
+	}
+
+	.sidebar-col.focus-floating .horizontal-resize-bar {
+		height: 6px;
+	}
+
+	.floating-resize-handle {
+		position: absolute;
+		left: -4px;
+		top: 0;
+		bottom: 0;
+		width: 8px;
+		cursor: ew-resize;
+		z-index: 60;
+		background: transparent;
+	}
+
 	.portugol-runner {
 		position: relative;
 		width: 100%;
@@ -994,8 +1160,8 @@
 
 	.runner-editor-watermark {
 		position: absolute;
-		bottom: var(--space-sm);
-		right: var(--space-sm);
+		bottom: 64px;
+		right: 16px;
 		z-index: 10;
 		font-family: var(--font-mono);
 		font-size: var(--text-xs);
@@ -1010,12 +1176,18 @@
 		box-shadow: var(--shadow-sm);
 	}
 
-	.toolbar {
-		padding: 0 4px 4px 0;
+	.runner-floating-controls {
+		position: absolute;
+		bottom: 16px;
+		right: 16px;
+		z-index: 70;
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
 		background: transparent;
-		border: 0;
-		border-radius: 0;
-		overflow: visible !important;
+		border: none;
+		box-shadow: none;
+		padding: 0;
 	}
 
 	.workspace-grid {
@@ -1025,12 +1197,6 @@
 		height: 100%;
 		flex: 1;
 		min-height: 0;
-	}
-
-	@media (max-width: 600px) {
-		.toolbar-label {
-			display: none;
-		}
 	}
 
 	.editor-col {

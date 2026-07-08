@@ -6,12 +6,23 @@
 		columns?: 'one' | 'two' | 'three';
 		gap?: 'sm' | 'md' | 'lg';
 		responsive?: boolean;
+		fullHeight?: boolean;
 	}
 
-	let { children, columns = 'two', gap = 'md', responsive = true }: Props = $props();
+	let {
+		children,
+		columns = 'two',
+		gap = 'md',
+		responsive = true,
+		fullHeight = false
+	}: Props = $props();
 </script>
 
-<div class="monsan-grid columns-{columns} gap-{gap}" class:responsive>
+<div
+	class="monsan-grid columns-{columns} gap-{gap}"
+	class:responsive
+	class:full-height={fullHeight}
+>
 	{@render children()}
 </div>
 
@@ -19,6 +30,11 @@
 	.monsan-grid {
 		display: grid;
 		box-sizing: border-box;
+	}
+
+	.full-height {
+		height: 100%;
+		min-height: 0;
 	}
 
 	.columns-one {
@@ -43,6 +59,10 @@
 	@media (max-width: 560px) {
 		.responsive {
 			grid-template-columns: minmax(0, 1fr);
+		}
+		.responsive.full-height {
+			grid-template-columns: 100% !important;
+			grid-template-rows: 40% 60% !important;
 		}
 	}
 </style>
