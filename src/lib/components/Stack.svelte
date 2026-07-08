@@ -10,6 +10,7 @@
 		fullWidth?: boolean;
 		fullHeight?: boolean;
 		growLastChild?: boolean;
+		overflow?: 'visible' | 'auto' | 'hidden';
 	}
 
 	let {
@@ -20,7 +21,8 @@
 		textAlign = 'start',
 		fullWidth = false,
 		fullHeight = false,
-		growLastChild = false
+		growLastChild = false,
+		overflow = 'visible'
 	}: Props = $props();
 </script>
 
@@ -29,6 +31,7 @@
 	class:full-width={fullWidth}
 	class:full-height={fullHeight}
 	class:grow-last-child={growLastChild}
+	style:overflow
 >
 	{@render children()}
 </div>

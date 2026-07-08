@@ -47,7 +47,8 @@
 		autoCloseBrackets = true,
 		autoCloseQuotes = true,
 		lineWrapping = true,
-		onsave
+		onsave,
+		height = '100%'
 	} = $props<{
 		code: string;
 		activeLine?: number;
@@ -59,6 +60,7 @@
 		autoCloseQuotes?: boolean;
 		lineWrapping?: boolean;
 		onsave?: (isShortcut?: boolean) => void;
+		height?: string;
 	}>();
 
 	let editorContainer = $state<HTMLDivElement | null>(null);
@@ -591,7 +593,7 @@
 	});
 </script>
 
-<div class="portugol-editor-container notranslate" class:disabled translate="no">
+<div class="portugol-editor-container notranslate" class:disabled style:height translate="no">
 	<div class="editor-wrapper notranslate" bind:this={editorContainer} translate="no"></div>
 </div>
 

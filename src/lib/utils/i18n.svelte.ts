@@ -150,7 +150,8 @@ class I18n {
 				fontSizeLabel: 'Tamanho da Fonte',
 				zoomHint: 'Dica de zoom geral: CTRL + [ + / - / 0 ]',
 				settingsBlurLabel: 'Desfoque nas modais (Blur)',
-				settingsBgAnimLabel: 'Animar plano de fundo'
+				settingsBgAnimLabel: 'Animar plano de fundo',
+				settingsFocusModeLabel: 'Modo Foco (Painéis Flutuantes)'
 			},
 			timePicker: {
 				selectTime: 'Selecionar Horário',
@@ -373,7 +374,8 @@ class I18n {
 				fontSizeLabel: 'Font Size',
 				zoomHint: 'General zoom hint: CTRL + [ + / - / 0 ]',
 				settingsBlurLabel: 'Modal Background Blur',
-				settingsBgAnimLabel: 'Animate Background'
+				settingsBgAnimLabel: 'Animate Background',
+				settingsFocusModeLabel: 'Focus Mode (Floating Panels)'
 			},
 			timePicker: {
 				selectTime: 'Select Time',
@@ -597,7 +599,8 @@ class I18n {
 				fontSizeLabel: 'Tamaño de Fuente',
 				zoomHint: 'Atajo de zoom general: CTRL + [ + / - / 0 ]',
 				settingsBlurLabel: 'Desfoque de fondo (Blur)',
-				settingsBgAnimLabel: 'Animar fondo'
+				settingsBgAnimLabel: 'Animar fondo',
+				settingsFocusModeLabel: 'Modo Enfoque (Paneles Flotantes)'
 			},
 			timePicker: {
 				selectTime: 'Seleccionar Hora',
