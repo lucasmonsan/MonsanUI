@@ -20,6 +20,7 @@
 		tooltipPosition?: 'top' | 'bottom';
 		children?: Snippet;
 		control?: Snippet<[ControlContext]>;
+		labelAddon?: Snippet;
 	}
 
 	let {
@@ -34,7 +35,8 @@
 		info,
 		tooltipPosition = 'top',
 		children,
-		control
+		control,
+		labelAddon
 	}: Props = $props();
 
 	let resolvedHelperId = $derived(helper ? (helperId ?? `${forId}-helper`) : undefined);
@@ -54,6 +56,9 @@
 					?
 					<span class="info-tooltip position-{tooltipPosition}">{info}</span>
 				</span>
+			{/if}
+			{#if labelAddon}
+				{@render labelAddon()}
 			{/if}
 		</Text>
 	</label>
@@ -137,6 +142,7 @@
 		border-color: var(--text-primary);
 		box-shadow: 1.5px 1.5px 0 var(--text-primary);
 		transform: translate(-0.5px, -0.5px);
+		z-index: 50;
 	}
 
 	.info-tooltip {
@@ -178,5 +184,44 @@
 	.info-trigger:hover .info-tooltip {
 		visibility: visible;
 		opacity: 1;
+	}
+
+	label :global(span > span) {
+		color: var(--text-secondary);
+		font-size: 10px;
+		margin-right: 2px;
+		text-transform: none;
+		font-weight: 500;
+		vertical-align: middle;
+	}
+
+	label :global(span > button) {
+		background: var(--bg-secondary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-sm);
+		padding: 1px 5px;
+		font-size: 10px;
+		color: var(--text-secondary);
+		cursor: pointer;
+		font-family: var(--font-body);
+		font-weight: 500;
+		line-height: 1.2;
+		transition: all 0.1s var(--ease-out);
+		box-shadow: 1px 1px 0 var(--text-primary);
+		vertical-align: middle;
+		margin-left: var(--space-xs);
+		text-transform: none;
+	}
+
+	label :global(span > button:hover) {
+		color: var(--text-primary);
+		border-color: var(--text-primary);
+		box-shadow: 1.5px 1.5px 0 var(--text-primary);
+		transform: translate(-0.5px, -0.5px);
+	}
+
+	label :global(span > button:active) {
+		transform: translate(1px, 1px);
+		box-shadow: none;
 	}
 </style>

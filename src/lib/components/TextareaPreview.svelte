@@ -13,10 +13,17 @@
 	let { children, preview, showPreview = $bindable(false) }: Props = $props();
 
 	let editorHeight = $state(130);
+	let currentHeight = $state(0);
+
+	$effect(() => {
+		if (!showPreview && currentHeight > 0) {
+			editorHeight = currentHeight;
+		}
+	});
 </script>
 
 <div class="monsan-textarea-preview">
-	<div class="editor-wrapper" class:hidden={showPreview} bind:clientHeight={editorHeight}>
+	<div class="editor-wrapper" class:hidden={showPreview} bind:clientHeight={currentHeight}>
 		{@render children()}
 	</div>
 

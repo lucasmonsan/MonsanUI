@@ -42,6 +42,7 @@
 		padding: 0;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
+		margin-bottom: var(--space-xs);
 	}
 
 	.info-trigger {
@@ -70,6 +71,7 @@
 		border-color: var(--text-primary);
 		box-shadow: 1.5px 1.5px 0 var(--text-primary);
 		transform: translate(-0.5px, -0.5px);
+		z-index: 50;
 	}
 
 	.info-tooltip {
