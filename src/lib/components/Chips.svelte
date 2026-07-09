@@ -216,12 +216,12 @@
 	.chips-input-item {
 		display: flex;
 		flex: 1;
-		min-width: 80px;
+		min-width: 40px;
 	}
 
 	.chips-input {
 		flex: 1;
-		min-width: 80px;
+		min-width: 40px;
 		border: none;
 		outline: none;
 		background: transparent;

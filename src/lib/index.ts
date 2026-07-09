@@ -24,6 +24,7 @@ export { default as Textarea } from './components/Textarea.svelte';
 export { default as ThemeSelector } from './components/ThemeSelector.svelte';
 export { default as Toast } from './components/Toast.svelte';
 export { default as ToastViewport } from './components/ToastViewport.svelte';
+export { default as TextareaPreview } from './components/TextareaPreview.svelte';
 export { default as FlashOverlay } from './components/FlashOverlay.svelte';
 /** @deprecated Use AppShell directly and keep route transitions separate from page structure. */
 export { default as RouteViewport } from './components/RouteViewport.svelte';
@@ -118,6 +119,7 @@ export { default as ChevronLeftIcon } from './components/icons/ChevronLeft.svelt
 export { default as ChevronUpIcon } from './components/icons/ChevronUp.svelte';
 export { default as CircleAlertIcon } from './components/icons/CircleAlert.svelte';
 export { default as CopyIcon } from './components/icons/Copy.svelte';
+export { default as EyeIcon } from './components/icons/Eye.svelte';
 export { default as FileTextIcon } from './components/icons/FileText.svelte';
 export { default as DotsThreeVerticalIcon } from './components/icons/DotsThreeVertical.svelte';
 export { default as GripVerticalIcon } from './components/icons/GripVertical.svelte';
