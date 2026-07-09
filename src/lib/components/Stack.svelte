@@ -3,7 +3,7 @@
 
 	interface Props {
 		children: Snippet;
-		gap?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+		gap?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 		align?: 'stretch' | 'start' | 'center' | 'end';
 		justify?: 'start' | 'center' | 'between';
 		textAlign?: 'start' | 'center';
@@ -56,6 +56,9 @@
 		min-height: 0;
 	}
 
+	.gap-xxs {
+		gap: var(--space-xxs);
+	}
 	.gap-xs {
 		gap: var(--space-xs);
 	}

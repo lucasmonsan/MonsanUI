@@ -139,7 +139,7 @@
 	}
 
 	.card-header-inner {
-		padding: var(--space-md) var(--space-md);
+		padding: var(--space-sm) var(--space-md);
 	}
 
 	.header-toggle-btn {
@@ -147,7 +147,7 @@
 		text-align: left;
 		background: transparent;
 		border: none;
-		padding: var(--space-md) var(--space-md);
+		padding: var(--space-sm) var(--space-md);
 		margin: 0;
 		cursor: pointer;
 		display: block;
