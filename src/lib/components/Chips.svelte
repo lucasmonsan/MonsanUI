@@ -117,7 +117,7 @@
 		display: flex;
 		width: 100%;
 		min-height: var(--control-height);
-		padding: var(--space-xs) var(--space-sm);
+		padding: 4px var(--space-sm);
 		background-color: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
@@ -167,9 +167,9 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-xs);
-		padding: 4px var(--space-xs);
+		padding: 2px var(--space-xs);
 		background-color: var(--bg-secondary);
-		border: 2px solid var(--border-color);
+		border: 1.5px solid var(--border-color);
 		border-radius: var(--radius-sm);
 		font-size: var(--text-sm);
 		font-weight: bold;

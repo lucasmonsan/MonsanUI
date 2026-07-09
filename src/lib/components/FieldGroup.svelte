@@ -5,20 +5,21 @@
 	interface Props {
 		label: string;
 		info?: string;
+		tooltipPosition?: 'top' | 'bottom';
 		children: Snippet;
 	}
 
-	let { label, info, children }: Props = $props();
+	let { label, info, tooltipPosition = 'top', children }: Props = $props();
 </script>
 
 <fieldset class="monsan-field-group">
 	<legend>
-		<Text tag="span" size="sm" weight="bold" variant="secondary">
+		<Text tag="span" size="xs" weight="bold" variant="secondary">
 			{label}
 			{#if info}
 				<span class="info-trigger" role="img" aria-label={info}>
 					?
-					<span class="info-tooltip">{info}</span>
+					<span class="info-tooltip position-{tooltipPosition}">{info}</span>
 				</span>
 			{/if}
 		</Text>
@@ -40,20 +41,20 @@
 	legend {
 		padding: 0;
 		text-transform: uppercase;
-		letter-spacing: 0;
+		letter-spacing: 0.05em;
 	}
 
 	.info-trigger {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 14px;
-		height: 14px;
+		width: 18px;
+		height: 18px;
 		border: var(--border-width) solid var(--border-color);
 		box-shadow: 1px 1px 0 var(--text-primary);
 		background: var(--bg-secondary);
 		border-radius: var(--radius-sm);
-		font-size: 10px;
+		font-size: 11px;
 		font-family: var(--font-body);
 		font-weight: bold;
 		color: var(--text-secondary);
@@ -74,9 +75,6 @@
 	.info-tooltip {
 		visibility: hidden;
 		position: absolute;
-		bottom: 150%;
-		left: 50%;
-		transform: translateX(-50%);
 		background-color: var(--text-primary);
 		color: var(--bg-primary);
 		text-align: center;
@@ -96,6 +94,18 @@
 		transition: opacity 0.2s var(--ease-out);
 		pointer-events: none;
 		border: 1px solid var(--border-color);
+	}
+
+	.info-tooltip.position-top {
+		bottom: 150%;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.info-tooltip.position-bottom {
+		top: 150%;
+		left: 50%;
+		transform: translateX(-50%);
 	}
 
 	.info-trigger:hover .info-tooltip {

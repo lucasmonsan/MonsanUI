@@ -11,16 +11,18 @@
 	}
 
 	let { children, preview, showPreview = $bindable(false) }: Props = $props();
+
+	let editorHeight = $state(130);
 </script>
 
 <div class="monsan-textarea-preview">
-	{#if showPreview}
-		<div class="preview-panel-content">
-			{@render preview()}
-		</div>
-	{:else}
+	<div class="editor-wrapper" class:hidden={showPreview} bind:clientHeight={editorHeight}>
 		{@render children()}
-	{/if}
+	</div>
+
+	<div class="preview-panel-content" class:hidden={!showPreview} style="height: {editorHeight}px;">
+		{@render preview()}
+	</div>
 
 	<div class="floating-toggle-btn">
 		<Button
@@ -48,10 +50,28 @@
 		flex-direction: column;
 	}
 
+	.editor-wrapper {
+		width: 100%;
+	}
+
 	.preview-panel-content {
 		width: 100%;
+		overflow-y: auto;
+		background-color: var(--bg-primary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-md);
+		padding: var(--space-sm);
+		padding-right: 48px; /* space for the floating eye button */
 		box-sizing: border-box;
-		min-height: 120px;
+		box-shadow: var(--shadow-sm);
+		font-family: var(--font-body);
+		font-size: var(--text-md);
+		line-height: 1.5;
+		color: var(--text-primary);
+	}
+
+	.hidden {
+		display: none !important;
 	}
 
 	.floating-toggle-btn {
