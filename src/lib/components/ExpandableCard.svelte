@@ -139,7 +139,7 @@
 	}
 
 	.card-header-inner {
-		padding: var(--space-md) var(--space-lg);
+		padding: var(--space-sm) var(--space-md);
 	}
 
 	.header-toggle-btn {
@@ -147,7 +147,7 @@
 		text-align: left;
 		background: transparent;
 		border: none;
-		padding: var(--space-md) var(--space-lg);
+		padding: var(--space-sm) var(--space-md);
 		margin: 0;
 		cursor: pointer;
 		display: block;
@@ -199,7 +199,7 @@
 		border-top: var(--border-width) solid var(--border-color);
 		border-radius: 0;
 		width: 100%;
-		padding: var(--space-sm) var(--space-lg);
+		padding: var(--space-sm) var(--space-md);
 		display: flex;
 		justify-content: center;
 		align-items: center;

@@ -3,13 +3,14 @@
 
 	interface Props {
 		children: Snippet;
-		gap?: 'xs' | 'sm' | 'md' | 'lg';
+		gap?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg';
 		align?: 'start' | 'center' | 'end' | 'stretch';
 		justify?: 'start' | 'center' | 'between' | 'end';
 		wrap?: boolean;
 		fullWidth?: boolean;
 		growChildren?: boolean;
 		growFirstChild?: boolean;
+		growLastChild?: boolean;
 		collapseBelow?: 'never' | 'sm' | 'md';
 	}
 
@@ -22,6 +23,7 @@
 		fullWidth = false,
 		growChildren = false,
 		growFirstChild = false,
+		growLastChild = false,
 		collapseBelow = 'never'
 	}: Props = $props();
 </script>
@@ -32,6 +34,7 @@
 	class:full-width={fullWidth}
 	class:grow-children={growChildren}
 	class:grow-first-child={growFirstChild}
+	class:grow-last-child={growLastChild}
 >
 	{@render children()}
 </div>
@@ -69,6 +72,26 @@
 	.grow-first-child > :global(.monsan-icon-button) {
 		width: var(--control-height);
 		height: var(--control-height);
+	}
+
+	.grow-last-child > :global(:last-child) {
+		flex: 1 1 0;
+		width: auto;
+		min-width: 0;
+	}
+	.grow-last-child > :global(:not(:last-child)) {
+		flex: 0 0 auto;
+		width: auto;
+	}
+
+	.grow-last-child > :global(.monsan-button.square),
+	.grow-last-child > :global(.monsan-icon-button) {
+		width: var(--control-height);
+		height: var(--control-height);
+	}
+
+	.gap-xxs {
+		gap: var(--space-xxs);
 	}
 	.gap-xs {
 		gap: var(--space-xs);
