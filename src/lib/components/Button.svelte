@@ -21,6 +21,7 @@
 		'aria-label'?: string;
 		'aria-busy'?: boolean;
 		deckTheme?: string;
+		casing?: 'uppercase' | 'none';
 	}
 
 	let {
@@ -42,7 +43,8 @@
 		ariaControls,
 		'aria-label': ariaLabelAttr,
 		'aria-busy': ariaBusyAttr,
-		deckTheme
+		deckTheme,
+		casing = 'uppercase'
 	}: Props = $props();
 
 	const responsiveIconClass = $derived(iconOnlyBelow ? `icon-only-${iconOnlyBelow}` : '');
@@ -59,7 +61,7 @@
 	aria-pressed={ariaPressed}
 	aria-controls={ariaControls}
 	data-deck-theme={deckTheme}
-	class="monsan-button {variant} size-{size} shape-{shape} {responsiveIconClass}"
+	class="monsan-button {variant} size-{size} shape-{shape} casing-{casing} {responsiveIconClass}"
 	class:block
 	class:square
 >
@@ -72,6 +74,13 @@
 		font-weight: 800;
 		text-transform: uppercase;
 		letter-spacing: 0;
+	}
+
+	.monsan-button.casing-none {
+		text-transform: none;
+	}
+
+	.monsan-button {
 		min-height: var(--control-height);
 		height: auto;
 		padding: var(--space-sm) var(--space-md);

@@ -13,7 +13,8 @@
 		showText = true,
 		expandOn = 'card', // 'card' | 'header' | 'indicator'
 		compact = false,
-		variant = 'default'
+		variant = 'default',
+		disabled = false
 	} = $props<{
 		expanded?: boolean;
 		title?: string;
@@ -27,6 +28,7 @@
 		expandOn?: 'card' | 'header' | 'indicator';
 		compact?: boolean;
 		variant?: 'default' | 'success';
+		disabled?: boolean;
 	}>();
 
 	const contentId = $props.id();
@@ -105,6 +107,7 @@
 	class="monsan-expandable-card variant-{variant}"
 	class:compact
 	class:is-expanded={expanded}
+	class:disabled
 >
 	{@render content()}
 </article>
@@ -123,6 +126,10 @@
 		overflow: hidden;
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	.monsan-expandable-card.disabled {
+		opacity: 0.55;
 	}
 
 	/* Cabeçalho */
