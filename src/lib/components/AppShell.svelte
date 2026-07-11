@@ -198,7 +198,7 @@
 		box-sizing: border-box;
 		border-bottom: var(--border-width) solid var(--border-color);
 		position: relative;
-		z-index: 50;
+		z-index: 60;
 	}
 
 	.app-shell-top {
@@ -206,6 +206,7 @@
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
+		border-bottom: var(--border-width) solid var(--border-color);
 		position: relative;
 		z-index: 50;
 	}
