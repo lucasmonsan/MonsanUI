@@ -240,7 +240,7 @@
 	}
 
 	.quick-actions-panel {
-		z-index: 50;
+		z-index: 120;
 		box-sizing: border-box;
 		gap: var(--quick-actions-panel-gap);
 	}
@@ -317,7 +317,7 @@
 		max-width: calc(100vw - var(--space-md) * 2);
 		display: flex;
 		align-items: center;
-		z-index: 10;
+		z-index: 120;
 	}
 
 	.quick-actions-panel.variant-reveal.layout-vertical {
