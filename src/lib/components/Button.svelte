@@ -11,6 +11,7 @@
 		disabled?: boolean;
 		block?: boolean;
 		square?: boolean;
+		label?: string;
 		iconOnlyBelow?: 'sm' | 'md';
 		title?: string;
 		ariaLabel?: string;
@@ -34,6 +35,7 @@
 		disabled = false,
 		block = false,
 		square = false,
+		label,
 		iconOnlyBelow,
 		title,
 		ariaLabel,
@@ -66,6 +68,9 @@
 	class:square
 >
 	{@render children?.()}
+	{#if label}
+		<span class="monsan-button-label">{label}</span>
+	{/if}
 </button>
 
 <style>
