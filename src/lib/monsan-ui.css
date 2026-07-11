@@ -58,19 +58,12 @@ main {
 	-webkit-tap-highlight-color: transparent;
 }
 
-* {
-	user-select: none;
-	-webkit-user-select: none;
-}
-
 input,
 select,
 textarea,
 button,
 [contenteditable] {
 	font-family: inherit;
-	user-select: auto;
-	-webkit-user-select: auto;
 }
 
 .app-container {
