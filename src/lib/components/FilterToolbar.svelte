@@ -5,27 +5,37 @@
 		filters?: Snippet;
 		search?: Snippet;
 		actions?: Snippet;
+		hasFilters?: boolean;
+		hasSearch?: boolean;
+		hasActions?: boolean;
 	}
 
-	let { filters, search, actions }: Props = $props();
+	let {
+		filters,
+		search,
+		actions,
+		hasFilters = Boolean(filters),
+		hasSearch = Boolean(search),
+		hasActions = Boolean(actions)
+	}: Props = $props();
 </script>
 
 <div class="monsan-filter-toolbar">
-	{#if filters}
+	{#if filters && hasFilters}
 		<div class="filter-toolbar-filters">
 			{@render filters()}
 		</div>
 	{/if}
 
-	{#if search || actions}
+	{#if (search && hasSearch) || (actions && hasActions)}
 		<div class="filter-toolbar-search-row">
-			{#if search}
+			{#if search && hasSearch}
 				<div class="filter-toolbar-search">
 					{@render search()}
 				</div>
 			{/if}
 
-			{#if actions}
+			{#if actions && hasActions}
 				<div class="filter-toolbar-actions">
 					{@render actions()}
 				</div>
@@ -59,10 +69,15 @@
 	}
 
 	.filter-toolbar-filters :global(.monsan-select-container),
-	.filter-toolbar-filters :global(.monsan-multiselect-container) {
+	.filter-toolbar-filters :global(.monsan-multiselect-container),
+	.filter-toolbar-filters :global(.monsan-datepicker-container) {
 		flex: 0 0 var(--filter-toolbar-control-width, 180px);
 		width: var(--filter-toolbar-control-width, 180px);
 		min-width: 0;
+	}
+
+	.filter-toolbar-filters :global(.datepicker-trigger) {
+		width: 100%;
 	}
 
 	.filter-toolbar-filters :global(.monsan-select-dropdown),
@@ -107,7 +122,8 @@
 		}
 
 		.filter-toolbar-filters :global(.monsan-select-container),
-		.filter-toolbar-filters :global(.monsan-multiselect-container) {
+		.filter-toolbar-filters :global(.monsan-multiselect-container),
+		.filter-toolbar-filters :global(.monsan-datepicker-container) {
 			width: 100%;
 			min-width: 0;
 		}

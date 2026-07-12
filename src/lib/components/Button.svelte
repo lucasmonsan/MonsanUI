@@ -217,8 +217,9 @@
 
 	@media (max-width: 600px) {
 		.icon-only-sm {
-			width: calc(var(--control-height) * 0.8);
-			min-height: calc(var(--control-height) * 0.8);
+			width: var(--control-height);
+			height: var(--control-height);
+			min-height: var(--control-height);
 			padding: 0;
 		}
 
@@ -229,8 +230,9 @@
 
 	@media (max-width: 900px) {
 		.icon-only-md {
-			width: calc(var(--control-height) * 0.8);
-			min-height: calc(var(--control-height) * 0.8);
+			width: var(--control-height);
+			height: var(--control-height);
+			min-height: var(--control-height);
 			padding: 0;
 		}
 
