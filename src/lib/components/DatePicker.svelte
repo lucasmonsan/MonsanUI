@@ -162,7 +162,7 @@
 				start: prefersReducedMotion ? 1 : 0.95
 			}}
 		>
-			<Calendar bind:selectedDate={selectedDateString} />
+			<Calendar bind:selectedDate={selectedDateString} showDetails={false} />
 		</div>
 	{/if}
 </div>
@@ -236,6 +236,11 @@
 		top: calc(100% + var(--space-xs));
 		left: 0;
 		z-index: 1000;
+		width: var(--datepicker-dropdown-width, 320px);
+	}
+
+	.datepicker-dropdown :global(.calendar-card) {
+		max-width: none;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

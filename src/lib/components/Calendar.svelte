@@ -20,6 +20,7 @@
 		title?: string;
 		weekDayLabels?: string[];
 		selectedDate?: string | null;
+		showDetails?: boolean;
 		onSelectDate?: (dateStr: string) => void;
 	}
 
@@ -30,6 +31,7 @@
 		title,
 		weekDayLabels,
 		selectedDate = $bindable(null),
+		showDetails = true,
 		onSelectDate
 	}: Props = $props();
 
@@ -345,7 +347,7 @@
 									showMonthYearPicker = false;
 								}}
 							>
-								{month.substring(0, 3)}
+								{month}
 							</button>
 						{/each}
 					</div>
@@ -519,7 +521,7 @@
 		</div>
 	{/if}
 
-	{#if mode !== 'heatmap' && selectedDate}
+	{#if showDetails && mode !== 'heatmap' && selectedDate}
 		<div class="calendar-details-panel">
 			<div class="details-header">
 				<h4>{i18n.t('calendar.dayDetails')} — {formatDisplayDate(selectedDate)}</h4>
@@ -652,7 +654,7 @@
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-md);
 		padding: var(--space-sm);
-		width: 240px;
+		width: 320px;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm);
@@ -730,7 +732,7 @@
 
 	.months-grid {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(2, 1fr);
 		gap: var(--space-xs);
 	}
 
@@ -742,6 +744,7 @@
 		font-family: var(--font-body);
 		font-weight: 700;
 		font-size: var(--text-xs);
+		white-space: nowrap;
 		cursor: pointer;
 		color: var(--text-primary);
 		box-shadow: var(--shadow-sm);
