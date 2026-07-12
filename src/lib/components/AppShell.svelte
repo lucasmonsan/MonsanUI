@@ -205,6 +205,7 @@
 		flex: 0 0 auto;
 		width: 100%;
 		min-width: 0;
+		padding-bottom: var(--space-sm);
 		box-sizing: border-box;
 		border-bottom: var(--border-width) solid var(--border-color);
 		position: relative;

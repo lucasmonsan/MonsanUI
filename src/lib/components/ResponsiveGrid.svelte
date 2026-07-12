@@ -92,4 +92,10 @@
 			grid-template-columns: var(--monsan-responsive-grid-fixed-columns);
 		}
 	}
+
+	@media (max-width: 640px) {
+		.monsan-responsive-grid {
+			gap: var(--monsan-responsive-grid-mobile-gap, var(--space-sm));
+		}
+	}
 </style>
