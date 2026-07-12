@@ -13,9 +13,12 @@
 		color?: 'default' | 'blue' | 'green' | 'yellow' | 'purple' | 'orange' | 'red';
 	}
 
+	type CalendarDateState = 'saved' | 'pending' | 'blocked';
+
 	interface Props {
 		studyLogs?: Record<string, number>;
 		events?: Record<string, CalendarEvent[]>;
+		dateStates?: Record<string, CalendarDateState>;
 		mode?: 'heatmap' | 'calendar' | 'week' | 'list';
 		title?: string;
 		weekDayLabels?: string[];
@@ -27,6 +30,7 @@
 	let {
 		studyLogs = {},
 		events = {},
+		dateStates = {},
 		mode = 'calendar',
 		title,
 		weekDayLabels,
@@ -154,9 +158,13 @@
 	});
 
 	function handleDayClick(dateStr: string) {
-		if (!dateStr) return;
+		if (!dateStr || getDateState(dateStr) === 'blocked') return;
 		selectedDate = dateStr;
 		onSelectDate?.(dateStr);
+	}
+
+	function getDateState(dateStr: string): CalendarDateState | undefined {
+		return dateStates[dateStr];
 	}
 
 	let showMonthYearPicker = $state(false);
@@ -202,6 +210,11 @@
 
 		if (hasEvents) {
 			suffix += `, ${i18n.t('calendar.hasEvents')}`;
+		}
+
+		const dateState = getDateState(dateStr);
+		if (dateState) {
+			suffix += `, ${dateState}`;
 		}
 
 		return `${formattedDate}${suffix}`;
@@ -451,7 +464,10 @@
 					class:is-today={day.dateStr === todayDateStr}
 					class:selected={selectedDate === day.dateStr}
 					class:has-events={day.hasEvents || day.count > 0}
-					disabled={day.day === ''}
+					class:saved={getDateState(day.dateStr) === 'saved'}
+					class:pending={getDateState(day.dateStr) === 'pending'}
+					class:blocked={getDateState(day.dateStr) === 'blocked'}
+					disabled={day.day === '' || getDateState(day.dateStr) === 'blocked'}
 					onclick={() => handleDayClick(day.dateStr)}
 					aria-label={day.dateStr
 						? getAriaLabelForDay(day.dateStr, day.count, day.hasEvents)
@@ -475,6 +491,10 @@
 					class:is-today={day.dateStr === todayDateStr}
 					class:selected={selectedDate === day.dateStr}
 					class:has-events={day.hasEvents || day.count > 0}
+					class:saved={getDateState(day.dateStr) === 'saved'}
+					class:pending={getDateState(day.dateStr) === 'pending'}
+					class:blocked={getDateState(day.dateStr) === 'blocked'}
+					disabled={getDateState(day.dateStr) === 'blocked'}
 					onclick={() => handleDayClick(day.dateStr)}
 					aria-label={day.dateStr
 						? getAriaLabelForDay(day.dateStr, day.count, day.hasEvents)
@@ -891,6 +911,29 @@
 
 	.calendar-cell.is-today.selected {
 		border-color: var(--border-color);
+	}
+
+	.calendar-cell.saved {
+		background: color-mix(in srgb, var(--success) 18%, var(--bg-primary));
+		border-color: var(--success);
+	}
+
+	.calendar-cell.pending {
+		background: color-mix(in srgb, var(--warning) 18%, var(--bg-primary));
+		border-color: var(--warning);
+	}
+
+	.calendar-cell.blocked {
+		background: var(--bg-secondary);
+		color: var(--text-secondary);
+		border-style: dashed;
+		cursor: not-allowed;
+		opacity: 0.65;
+	}
+
+	.calendar-cell.blocked:hover {
+		transform: none;
+		box-shadow: none;
 	}
 
 	.day-number {
