@@ -6,10 +6,13 @@
 	import CalendarBlank from './icons/CalendarBlank.svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
+	type CalendarDateState = 'saved' | 'pending' | 'blocked';
+
 	interface Props {
 		value?: Date | null;
 		placeholder?: string;
 		disabled?: boolean;
+		dateStates?: Record<string, CalendarDateState>;
 		id?: string;
 		title?: string;
 		ariaLabel?: string;
@@ -21,6 +24,7 @@
 		value = $bindable(null),
 		placeholder,
 		disabled = false,
+		dateStates = {},
 		id,
 		title,
 		ariaLabel,
@@ -162,7 +166,7 @@
 				start: prefersReducedMotion ? 1 : 0.95
 			}}
 		>
-			<Calendar bind:selectedDate={selectedDateString} />
+			<Calendar bind:selectedDate={selectedDateString} showDetails={false} {dateStates} />
 		</div>
 	{/if}
 </div>
@@ -236,6 +240,11 @@
 		top: calc(100% + var(--space-xs));
 		left: 0;
 		z-index: 1000;
+		width: var(--datepicker-dropdown-width, 320px);
+	}
+
+	.datepicker-dropdown :global(.calendar-card) {
+		max-width: none;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

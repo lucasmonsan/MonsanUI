@@ -498,6 +498,17 @@
 		.monsan-tabs-container.hide-labels .monsan-tab-text {
 			display: none;
 		}
+
+		.monsan-tabs-container.hide-labels {
+			flex-wrap: nowrap;
+		}
+
+		.monsan-tabs-container.hide-labels .monsan-tab-item {
+			flex: 1 1 0;
+			min-width: 0;
+			padding-right: var(--space-sm);
+			padding-left: var(--space-sm);
+		}
 	}
 
 	.monsan-tabs-container.variant-underline {

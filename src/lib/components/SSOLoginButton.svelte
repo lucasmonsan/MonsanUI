@@ -98,7 +98,7 @@
 			panelShadow={variant === 'reveal' ? 'none' : 'default'}
 			panelPadding="sm"
 			panelGap="sm"
-			placement={variant === 'reveal' ? 'before' : 'below'}
+			placement="below"
 			panelLayout={variant === 'reveal' ? 'horizontal' : 'vertical'}
 			surface={variant === 'reveal' ? 'plain' : 'panel'}
 			containedReveal={variant === 'reveal'}

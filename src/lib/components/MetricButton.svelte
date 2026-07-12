@@ -38,6 +38,7 @@
 	>
 		{#if showLabel}
 			<span class="metric-label">{label}</span>
+			<span class="metric-separator" aria-hidden="true">:</span>
 		{/if}
 		<span class="metric-value">{value}</span>
 		{#if children}
@@ -52,6 +53,7 @@
 	>
 		{#if showLabel}
 			<span class="metric-label">{label}</span>
+			<span class="metric-separator" aria-hidden="true">:</span>
 		{/if}
 		<span class="metric-value">{value}</span>
 		{#if children}
@@ -144,6 +146,13 @@
 		font-weight: 800;
 		line-height: 1;
 		text-transform: uppercase;
+	}
+
+	.metric-separator {
+		font-family: var(--font-display);
+		font-size: var(--text-sm);
+		font-weight: 800;
+		line-height: 1;
 	}
 
 	.metric-value {
