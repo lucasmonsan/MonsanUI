@@ -5,6 +5,7 @@
 	import Calendar from './Calendar.svelte';
 	import CalendarBlank from './icons/CalendarBlank.svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import { floatingPortal } from '../utils/floatingPortal.js';
 
 	type CalendarDateState = 'saved' | 'pending' | 'blocked';
 
@@ -39,6 +40,7 @@
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
 	let triggerEl = $state<HTMLButtonElement>();
+	let dropdownEl = $state<HTMLDivElement>();
 	let selectedDateString = $state<string | null>(null);
 	let prefersReducedMotion = $state(false);
 
@@ -70,7 +72,12 @@
 	}
 
 	function handleOutsideClick(event: MouseEvent) {
-		if (isOpen && containerEl && !containerEl.contains(event.target as Node)) {
+		if (
+			isOpen &&
+			containerEl &&
+			!containerEl.contains(event.target as Node) &&
+			!dropdownEl?.contains(event.target as Node)
+		) {
 			closePopover();
 		}
 	}
@@ -158,6 +165,13 @@
 
 	{#if isOpen}
 		<div
+			bind:this={dropdownEl}
+			use:floatingPortal={{
+				anchor: triggerEl,
+				align: 'left',
+				matchWidth: false,
+				minWidth: 320
+			}}
 			id={panelId}
 			class="datepicker-dropdown"
 			transition:scale={{
@@ -236,9 +250,6 @@
 	}
 
 	.datepicker-dropdown {
-		position: absolute;
-		top: calc(100% + var(--space-xs));
-		left: 0;
 		z-index: 1000;
 		width: var(--datepicker-dropdown-width, 320px);
 	}

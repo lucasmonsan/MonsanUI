@@ -41,7 +41,7 @@
 <style>
 	.monsan-toast-viewport {
 		position: fixed;
-		z-index: 1000;
+		z-index: 1003;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm);

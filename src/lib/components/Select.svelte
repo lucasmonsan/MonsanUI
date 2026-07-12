@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ChevronDown from './icons/ChevronDown.svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import { floatingPortal } from '../utils/floatingPortal.js';
 
 	interface Option {
 		value: string | number;
@@ -34,6 +35,7 @@
 	let isOpen = $state(false);
 	let containerEl = $state<HTMLDivElement>();
 	let triggerEl = $state<HTMLButtonElement>();
+	let dropdownEl = $state<HTMLDivElement>();
 	let activeIndex = $state(-1);
 	let activePlaceholder = $derived(placeholder ?? i18n.t('select.placeholder'));
 	let triggerId = $derived(id || fallbackId);
@@ -84,7 +86,7 @@
 	function handleOutsideClick(e: MouseEvent) {
 		if (!isOpen) return;
 		const target = e.target as HTMLElement;
-		if (containerEl && !containerEl.contains(target)) {
+		if (containerEl && !containerEl.contains(target) && !dropdownEl?.contains(target)) {
 			closeDropdown();
 		}
 	}
@@ -168,6 +170,13 @@
 
 	{#if isOpen}
 		<div
+			bind:this={dropdownEl}
+			use:floatingPortal={{
+				anchor: triggerEl,
+				align: dropdownAlign,
+				matchWidth: dropdownAlign === 'left',
+				minWidth: 200
+			}}
 			id={listboxId}
 			class="monsan-select-dropdown align-{dropdownAlign}"
 			role="listbox"
@@ -278,8 +287,6 @@
 	}
 
 	.monsan-select-dropdown {
-		position: absolute;
-		top: calc(100% + var(--space-xs));
 		min-width: 200px;
 		max-height: 250px;
 		overflow-y: auto;
@@ -296,14 +303,10 @@
 	}
 
 	.monsan-select-dropdown.align-left {
-		left: 0;
-		right: auto;
 		width: 100%;
 	}
 
 	.monsan-select-dropdown.align-right {
-		right: 0;
-		left: auto;
 		width: auto;
 	}
 
