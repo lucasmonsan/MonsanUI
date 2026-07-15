@@ -120,14 +120,15 @@
 
 	.credits-author {
 		color: var(--accent-primary);
-		text-decoration: none;
+		text-decoration-line: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.16em;
 		font-weight: 700;
-		border-bottom: 2px solid transparent;
-		transition: border-color 0.2s ease;
+		transition: text-decoration-thickness 0.2s ease;
 	}
 
 	a.credits-author:hover {
-		border-bottom-color: var(--accent-primary);
+		text-decoration-thickness: 0.14em;
 	}
 
 	.credits-tech {
@@ -138,13 +139,21 @@
 	.credits-tech-link {
 		color: var(--text-primary);
 		font-weight: 700;
-		text-decoration: none;
-		border-bottom: 2px solid transparent;
-		transition: border-color 0.2s ease;
+		text-decoration-line: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.16em;
+		transition: text-decoration-thickness 0.2s ease;
 	}
 
 	a.credits-tech-link:hover {
-		border-bottom-color: var(--text-primary);
+		text-decoration-thickness: 0.14em;
+	}
+
+	a.credits-author:focus-visible,
+	a.credits-tech-link:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 3px;
+		border-radius: var(--radius-xs);
 	}
 
 	.variant-compact {
