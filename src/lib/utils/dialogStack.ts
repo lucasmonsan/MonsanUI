@@ -1,3 +1,5 @@
+import { pushState } from '$app/navigation';
+
 type DialogInstance = {
 	id: string;
 	close: () => void;
@@ -26,7 +28,7 @@ if (typeof window !== 'undefined') {
 export function pushDialog(id: string, closeFn: () => void) {
 	if (typeof window === 'undefined') return;
 	// Push a dummy state to history to enable the back button swipe/click gesture
-	history.pushState({ monsanDialogId: id }, '');
+	pushState('', { monsanDialogId: id });
 	stack.push({ id, close: closeFn });
 }
 

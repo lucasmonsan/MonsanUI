@@ -6,6 +6,7 @@
 		value?: string[];
 		placeholder?: string;
 		disabled?: boolean;
+		suggestions?: string[];
 		id?: string;
 		name?: string;
 		ariaLabel?: string;
@@ -19,6 +20,7 @@
 		value = $bindable([]),
 		placeholder,
 		disabled = false,
+		suggestions = [],
 		id,
 		name,
 		ariaLabel,
@@ -37,11 +39,34 @@
 		removeLabel ?? ((tag: string) => i18n.t('chips.remove', { tag }))
 	);
 	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
+	let fallbackId = `chips-${Math.random().toString(36).slice(2, 11)}`;
+	let activeId = $derived(id ?? fallbackId);
+	let suggestionsId = $derived(`${activeId}-suggestions`);
+	let availableSuggestions = $derived(
+		suggestions.filter(
+			(suggestion, index) =>
+				suggestion.trim() !== '' &&
+				suggestions.findIndex(
+					(candidate) =>
+						candidate.trim().toLocaleLowerCase() === suggestion.trim().toLocaleLowerCase()
+				) === index &&
+				!value.some((tag) => tag.toLocaleLowerCase() === suggestion.trim().toLocaleLowerCase())
+		)
+	);
 
 	function addTag() {
 		const cleanTag = inputValue.trim().replace(/,$/, '');
-		if (cleanTag !== '' && !value.includes(cleanTag)) {
-			value = [...value, cleanTag];
+		const canonicalTag =
+			suggestions
+				.find(
+					(suggestion) => suggestion.trim().toLocaleLowerCase() === cleanTag.toLocaleLowerCase()
+				)
+				?.trim() ?? cleanTag;
+		if (
+			canonicalTag !== '' &&
+			!value.some((tag) => tag.toLocaleLowerCase() === canonicalTag.toLocaleLowerCase())
+		) {
+			value = [...value, canonicalTag];
 			inputValue = '';
 		}
 	}
@@ -92,8 +117,9 @@
 				bind:this={inputEl}
 				type="text"
 				bind:value={inputValue}
-				{id}
+				id={activeId}
 				{name}
+				list={availableSuggestions.length > 0 ? suggestionsId : undefined}
 				placeholder={value.length === 0 ? activePlaceholder : ''}
 				{disabled}
 				aria-label={ariaLabel}
@@ -110,6 +136,13 @@
 			/>
 		</li>
 	</ul>
+	{#if availableSuggestions.length > 0}
+		<datalist id={suggestionsId}>
+			{#each availableSuggestions as suggestion (suggestion)}
+				<option value={suggestion}></option>
+			{/each}
+		</datalist>
+	{/if}
 </div>
 
 <style>

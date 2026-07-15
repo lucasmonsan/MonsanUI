@@ -74,7 +74,7 @@
 		font-family: var(--font-display);
 		font-weight: 700;
 		font-size: var(--text-sm);
-		color: var(--text-secondary);
+		color: var(--text-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		background-color: var(--bg-primary);
@@ -114,8 +114,7 @@
 	.credits-copyright {
 		font-size: calc(var(--base) * 0.7);
 		font-weight: 400;
-		color: var(--text-secondary);
-		opacity: 0.6;
+		color: var(--text-primary);
 	}
 
 	.credits-author {
@@ -179,7 +178,6 @@
 
 	.variant-compact .credits-copyright {
 		font-size: inherit;
-		opacity: 0.68;
 		white-space: nowrap;
 	}
 

@@ -16,7 +16,7 @@
 		disabled = false,
 		width = 'full',
 		formatSelected,
-		dropdownAlign = 'left'
+		dropdownAlign = 'auto'
 	} = $props<{
 		value: (string | number)[];
 		options: Option[];
@@ -25,7 +25,7 @@
 		disabled?: boolean;
 		width?: 'full' | 'auto';
 		formatSelected?: (count: number) => string;
-		dropdownAlign?: 'left' | 'right';
+		dropdownAlign?: 'left' | 'right' | 'auto';
 	}>();
 
 	const fallbackId = `multiselect-${Math.random().toString(36).slice(2, 11)}`;
@@ -202,7 +202,7 @@
 			use:floatingPortal={{
 				anchor: triggerEl,
 				align: dropdownAlign,
-				matchWidth: dropdownAlign === 'left',
+				matchWidth: true,
 				minWidth: 200
 			}}
 			id={listboxId}

@@ -26,6 +26,7 @@
 	class:full-width={fullWidth}
 	class:nowrap
 	{title}
+	role={ariaLabel ? 'img' : undefined}
 	aria-label={ariaLabel}
 >
 	{#if children}
