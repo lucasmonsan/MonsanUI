@@ -117,7 +117,7 @@
 
 	.monsan-badge.variant-warning {
 		background: var(--warning);
-		color: var(--bg-primary);
+		color: var(--warning-contrast);
 	}
 
 	:global([data-theme='dark']) .monsan-badge.variant-warning {

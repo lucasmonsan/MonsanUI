@@ -78,7 +78,7 @@
 
 	.warning {
 		background: var(--warning);
-		color: var(--bg-primary);
+		color: var(--warning-contrast);
 	}
 
 	.error {

@@ -119,7 +119,7 @@
 	}
 
 	.credits-author {
-		color: var(--accent-primary);
+		color: var(--text-primary);
 		text-decoration-line: underline;
 		text-decoration-thickness: 0.08em;
 		text-underline-offset: 0.16em;
