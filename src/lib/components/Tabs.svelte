@@ -225,6 +225,7 @@
 					data-tab-id={tab.id}
 					aria-selected={value === tab.id}
 					aria-controls={getPanelId(tab.id)}
+					aria-label={tab.label}
 					tabindex={value === tab.id ? 0 : -1}
 				>
 					{#if tab.icon}

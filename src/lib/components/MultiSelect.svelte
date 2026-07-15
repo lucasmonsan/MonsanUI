@@ -16,7 +16,8 @@
 		disabled = false,
 		width = 'full',
 		formatSelected,
-		dropdownAlign = 'auto'
+		dropdownAlign = 'auto',
+		ariaLabel
 	} = $props<{
 		value: (string | number)[];
 		options: Option[];
@@ -26,6 +27,7 @@
 		width?: 'full' | 'auto';
 		formatSelected?: (count: number) => string;
 		dropdownAlign?: 'left' | 'right' | 'auto';
+		ariaLabel?: string;
 	}>();
 
 	const fallbackId = `multiselect-${Math.random().toString(36).slice(2, 11)}`;
@@ -189,6 +191,7 @@
 		aria-expanded={isOpen}
 		aria-controls={listboxId}
 		aria-activedescendant={activeDescendant}
+		aria-label={ariaLabel ?? activePlaceholder}
 	>
 		<span class="label-text">{displayLabel}</span>
 		<span class="chevron-wrapper" class:open={isOpen}>
