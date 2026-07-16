@@ -48,6 +48,7 @@
 
 	// Container is always rendered from SSR (opacity 1, covers everything).
 	// After mount, content fades in. After 2s, container fades out then is removed.
+	// CSS independently releases the page after 10s if hydration never runs.
 	let contentVisible = $state(false);
 	let hiding = $state(false);
 	let hidden = $state(false);
@@ -138,6 +139,7 @@
 		align-items: center;
 		box-sizing: border-box;
 		padding: var(--space-xl);
+		animation: splashFailsafe 0s linear 10s forwards;
 	}
 
 	.monsan-splash-screen.hiding {
@@ -150,6 +152,15 @@
 		}
 		to {
 			opacity: 0;
+		}
+	}
+
+	/* Never let an SSR splash permanently cover usable content when JS fails. */
+	@keyframes splashFailsafe {
+		to {
+			opacity: 0;
+			visibility: hidden;
+			pointer-events: none;
 		}
 	}
 

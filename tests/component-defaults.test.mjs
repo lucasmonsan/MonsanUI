@@ -13,6 +13,7 @@ const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
+const splashScreen = await readComponent('SplashScreen.svelte');
 const stack = await readComponent('Stack.svelte');
 const suiteHeaderActions = await readComponent('SuiteHeaderActions.svelte');
 const suiteUserMenu = await readComponent('SuiteUserMenu.svelte');
@@ -56,6 +57,14 @@ assert(
 assert(
 	appShell.includes('showTop = true') && appShell.includes('{#if top && showTop}'),
 	'AppShell must allow consumers to hide the complete top region without removing its snippet.'
+);
+
+assert(
+	splashScreen.includes('animation: splashFailsafe 0s linear 10s forwards') &&
+		splashScreen.includes('@keyframes splashFailsafe') &&
+		splashScreen.includes('visibility: hidden') &&
+		splashScreen.includes('pointer-events: none'),
+	'SplashScreen must release SSR content even when client hydration never runs.'
 );
 
 assert(
