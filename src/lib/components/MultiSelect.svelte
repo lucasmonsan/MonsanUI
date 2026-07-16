@@ -7,6 +7,8 @@
 	interface Option {
 		value: string | number;
 		label: string;
+		description?: string;
+		disabled?: boolean;
 	}
 
 	let {
@@ -50,21 +52,46 @@
 	let filteredOptions = $derived.by(() => {
 		const query = searchQuery.trim().toLocaleLowerCase();
 		if (!searchable || !query) return options;
-		return options.filter((option: Option) => option.label.toLocaleLowerCase().includes(query));
+		return options.filter((option: Option) =>
+			`${option.label} ${option.description ?? ''}`.toLocaleLowerCase().includes(query)
+		);
 	});
 	let firstSelectedIndex = $derived(
 		filteredOptions.findIndex((option: Option) =>
-			option.value === '' ? value.length === 0 : value.includes(option.value)
+			option.disabled
+				? false
+				: option.value === ''
+					? value.length === 0
+					: value.includes(option.value)
 		)
 	);
 	let activeDescendant = $derived(
 		isOpen && activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
 	);
 
-	function getInitialIndex(direction: 'first' | 'last' = 'first') {
+	function getBoundaryIndex(direction: 'first' | 'last') {
 		if (filteredOptions.length === 0) return -1;
+		return direction === 'last'
+			? filteredOptions.findLastIndex((option: Option) => !option.disabled)
+			: filteredOptions.findIndex((option: Option) => !option.disabled);
+	}
+
+	function getInitialIndex(direction: 'first' | 'last' = 'first') {
 		if (firstSelectedIndex >= 0) return firstSelectedIndex;
-		return direction === 'last' ? filteredOptions.length - 1 : 0;
+		return getBoundaryIndex(direction);
+	}
+
+	function moveActiveIndex(direction: 1 | -1) {
+		if (filteredOptions.length === 0) return -1;
+
+		for (let offset = 1; offset <= filteredOptions.length; offset++) {
+			const baseIndex = activeIndex < 0 ? (direction === 1 ? -1 : 0) : activeIndex;
+			const candidate =
+				(baseIndex + direction * offset + filteredOptions.length) % filteredOptions.length;
+			if (!filteredOptions[candidate].disabled) return candidate;
+		}
+
+		return -1;
 	}
 
 	async function openDropdown(direction: 'first' | 'last' = 'first') {
@@ -95,8 +122,9 @@
 		}
 	}
 
-	function handleOptionClick(optValue: string | number) {
-		if (disabled) return;
+	function handleOptionClick(option: Option) {
+		if (disabled || option.disabled) return;
+		const optValue = option.value;
 
 		if (optValue === '') {
 			value = [];
@@ -135,24 +163,19 @@
 			void openDropdown('last');
 			e.preventDefault();
 		} else if (isOpen && e.key === 'ArrowDown') {
-			activeIndex = filteredOptions.length === 0 ? -1 : (activeIndex + 1) % filteredOptions.length;
+			activeIndex = moveActiveIndex(1);
 			e.preventDefault();
 		} else if (isOpen && e.key === 'ArrowUp') {
-			activeIndex =
-				filteredOptions.length === 0
-					? -1
-					: activeIndex <= 0
-						? filteredOptions.length - 1
-						: activeIndex - 1;
+			activeIndex = moveActiveIndex(-1);
 			e.preventDefault();
 		} else if (isOpen && e.key === 'Home') {
-			activeIndex = filteredOptions.length === 0 ? -1 : 0;
+			activeIndex = getBoundaryIndex('first');
 			e.preventDefault();
 		} else if (isOpen && e.key === 'End') {
-			activeIndex = filteredOptions.length - 1;
+			activeIndex = getBoundaryIndex('last');
 			e.preventDefault();
 		} else if (isOpen && (e.key === 'Enter' || e.key === ' ') && activeIndex >= 0) {
-			handleOptionClick(filteredOptions[activeIndex].value);
+			handleOptionClick(filteredOptions[activeIndex]);
 			e.preventDefault();
 		}
 	}
@@ -167,7 +190,10 @@
 	$effect(() => {
 		if (!isOpen && activeIndex !== -1) {
 			activeIndex = -1;
-		} else if (isOpen && activeIndex >= filteredOptions.length) {
+		} else if (
+			isOpen &&
+			(activeIndex >= filteredOptions.length || filteredOptions[activeIndex]?.disabled)
+		) {
 			activeIndex = getInitialIndex();
 		}
 	});
@@ -268,12 +294,21 @@
 						class="multiselect-option"
 						class:selected={isOptionChecked}
 						class:active={i === activeIndex}
-						onmouseenter={() => (activeIndex = i)}
-						onclick={() => handleOptionClick(option.value)}
+						onmouseenter={() => {
+							if (!option.disabled) activeIndex = i;
+						}}
+						onclick={() => handleOptionClick(option)}
+						disabled={option.disabled}
 						role="option"
 						aria-selected={isOptionChecked}
+						aria-disabled={option.disabled}
 					>
-						<span class="option-label">{option.label}</span>
+						<span class="option-copy">
+							<span class="option-label">{option.label}</span>
+							{#if option.description}
+								<span class="option-description">{option.description}</span>
+							{/if}
+						</span>
 					</button>
 				{/each}
 				{#if filteredOptions.length === 0}
@@ -458,7 +493,28 @@
 		color: var(--bg-primary);
 	}
 
+	.multiselect-option:disabled {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
+
+	.option-copy {
+		display: flex;
+		min-width: 0;
+		flex-direction: column;
+		gap: var(--space-xxs);
+	}
+
 	.option-label {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.option-description {
+		color: var(--text-secondary);
+		font-size: var(--text-xs);
+		font-weight: 600;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
