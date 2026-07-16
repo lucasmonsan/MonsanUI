@@ -168,7 +168,7 @@
 			bind:this={dropdownEl}
 			use:floatingPortal={{
 				anchor: triggerEl,
-				align: 'left',
+				align: 'auto',
 				matchWidth: false,
 				minWidth: 320
 			}}

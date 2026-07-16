@@ -26,6 +26,7 @@
 	class:full-width={fullWidth}
 	class:nowrap
 	{title}
+	role={ariaLabel ? 'img' : undefined}
 	aria-label={ariaLabel}
 >
 	{#if children}
@@ -117,7 +118,7 @@
 
 	.monsan-badge.variant-warning {
 		background: var(--warning);
-		color: var(--bg-primary);
+		color: var(--warning-contrast);
 	}
 
 	:global([data-theme='dark']) .monsan-badge.variant-warning {

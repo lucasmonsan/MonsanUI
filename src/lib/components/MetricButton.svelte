@@ -109,7 +109,7 @@
 
 	.variant-warning {
 		background-color: var(--warning);
-		color: var(--bg-primary);
+		color: var(--warning-contrast);
 	}
 
 	.variant-neutral {

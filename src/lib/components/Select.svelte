@@ -17,7 +17,8 @@
 		textAlign = 'left',
 		disabled = false,
 		width = 'full',
-		dropdownAlign = 'left'
+		dropdownAlign = 'auto',
+		ariaLabel
 	} = $props<{
 		value: string | number;
 		options: Option[];
@@ -27,7 +28,8 @@
 		textAlign?: 'left' | 'center' | 'right';
 		disabled?: boolean;
 		width?: 'full' | 'auto';
-		dropdownAlign?: 'left' | 'right';
+		dropdownAlign?: 'left' | 'right' | 'auto';
+		ariaLabel?: string;
 	}>();
 
 	const fallbackId = `select-${Math.random().toString(36).slice(2, 11)}`;
@@ -158,6 +160,7 @@
 		aria-expanded={isOpen}
 		aria-controls={listboxId}
 		aria-activedescendant={activeDescendant}
+		aria-label={ariaLabel ?? displayLabel ?? activePlaceholder}
 	>
 		<span class="label-text">{displayLabel}</span>
 
@@ -174,7 +177,7 @@
 			use:floatingPortal={{
 				anchor: triggerEl,
 				align: dropdownAlign,
-				matchWidth: dropdownAlign === 'left',
+				matchWidth: true,
 				minWidth: 200
 			}}
 			id={listboxId}

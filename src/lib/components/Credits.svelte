@@ -74,7 +74,7 @@
 		font-family: var(--font-display);
 		font-weight: 700;
 		font-size: var(--text-sm);
-		color: var(--text-secondary);
+		color: var(--text-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		background-color: var(--bg-primary);
@@ -114,20 +114,20 @@
 	.credits-copyright {
 		font-size: calc(var(--base) * 0.7);
 		font-weight: 400;
-		color: var(--text-secondary);
-		opacity: 0.6;
+		color: var(--text-primary);
 	}
 
 	.credits-author {
-		color: var(--accent-primary);
-		text-decoration: none;
+		color: var(--text-primary);
+		text-decoration-line: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.16em;
 		font-weight: 700;
-		border-bottom: 2px solid transparent;
-		transition: border-color 0.2s ease;
+		transition: text-decoration-thickness 0.2s ease;
 	}
 
 	a.credits-author:hover {
-		border-bottom-color: var(--accent-primary);
+		text-decoration-thickness: 0.14em;
 	}
 
 	.credits-tech {
@@ -138,13 +138,21 @@
 	.credits-tech-link {
 		color: var(--text-primary);
 		font-weight: 700;
-		text-decoration: none;
-		border-bottom: 2px solid transparent;
-		transition: border-color 0.2s ease;
+		text-decoration-line: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.16em;
+		transition: text-decoration-thickness 0.2s ease;
 	}
 
 	a.credits-tech-link:hover {
-		border-bottom-color: var(--text-primary);
+		text-decoration-thickness: 0.14em;
+	}
+
+	a.credits-author:focus-visible,
+	a.credits-tech-link:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 3px;
+		border-radius: var(--radius-xs);
 	}
 
 	.variant-compact {
@@ -170,7 +178,6 @@
 
 	.variant-compact .credits-copyright {
 		font-size: inherit;
-		opacity: 0.68;
 		white-space: nowrap;
 	}
 

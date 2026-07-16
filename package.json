@@ -64,6 +64,7 @@
 		"./variables.css": "./dist/variables.css"
 	},
 	"peerDependencies": {
+		"@sveltejs/kit": "^2.0.0",
 		"svelte": "^5.0.0"
 	},
 	"dependencies": {

@@ -23,13 +23,8 @@
 		showNumbers = true
 	}: Props = $props();
 
-	// If value is null, initialize it with the default options order
-	$effect(() => {
-		if (!value || !Array.isArray(value) || value.length === 0) {
-			value = [...options];
-		}
-	});
-
+	// Render the supplied initial order without turning it into a submitted value.
+	// The bound value changes only after the user actually reorders an item.
 	let items = $derived(Array.isArray(value) && value.length > 0 ? value : options);
 
 	let draggedIndex = $state<number | null>(null);

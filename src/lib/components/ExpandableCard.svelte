@@ -42,24 +42,45 @@
 		e.stopPropagation();
 		toggleExpanded();
 	}
+
+	function handleHeaderContentClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		if (target.closest('a, button, input, label, select, textarea, [role="button"]')) return;
+		handleTriggerClick(e);
+	}
 </script>
 
 {#snippet content()}
 	<header class="card-header">
 		{#if headerIsTrigger}
-			<button
-				type="button"
-				class="header-toggle-btn"
-				onclick={handleTriggerClick}
-				aria-expanded={expanded}
-				aria-controls={contentId}
-			>
-				{#if header}
-					{@render header()}
-				{:else}
+			{#if header}
+				<div class="interactive-header">
+					<button
+						type="button"
+						class="header-toggle-btn overlay-toggle"
+						onclick={handleTriggerClick}
+						aria-label={expanded ? indicatorTextExpanded : indicatorText}
+						aria-expanded={expanded}
+						aria-controls={contentId}
+					></button>
+					<!-- Mouse activation is paired with the adjacent keyboard-accessible toggle button. -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div class="interactive-header-content" onclick={handleHeaderContentClick}>
+						{@render header()}
+					</div>
+				</div>
+			{:else}
+				<button
+					type="button"
+					class="header-toggle-btn"
+					onclick={handleTriggerClick}
+					aria-expanded={expanded}
+					aria-controls={contentId}
+				>
 					<h3 class="card-title">{title}</h3>
-				{/if}
-			</button>
+				</button>
+			{/if}
 		{:else}
 			<div class="card-header-inner">
 				{#if header}
@@ -71,7 +92,13 @@
 		{/if}
 	</header>
 
-	<div id={contentId} class="expandable-content-wrapper" class:expanded aria-hidden={!expanded}>
+	<div
+		id={contentId}
+		class="expandable-content-wrapper"
+		class:expanded
+		aria-hidden={!expanded}
+		inert={!expanded}
+	>
 		<div class="expandable-content-inner">
 			<div class="card-body">
 				{@render children()}
@@ -129,7 +156,7 @@
 	}
 
 	.monsan-expandable-card.disabled {
-		opacity: 0.55;
+		border-style: dashed;
 	}
 
 	/* Cabeçalho */
@@ -154,6 +181,23 @@
 		font-family: inherit;
 		color: inherit;
 		transition: background-color 0.15s ease;
+	}
+
+	.interactive-header {
+		position: relative;
+	}
+
+	.overlay-toggle {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+	}
+
+	.interactive-header-content {
+		position: relative;
+		z-index: 2;
+		padding: var(--space-sm) var(--space-md);
+		cursor: pointer;
 	}
 
 	.header-toggle-btn:hover {

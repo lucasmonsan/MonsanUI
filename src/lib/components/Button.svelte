@@ -161,7 +161,7 @@
 	}
 	.warning {
 		background-color: var(--warning);
-		color: var(--bg-primary);
+		color: var(--warning-contrast);
 	}
 	.neutral {
 		background-color: var(--neutral);
