@@ -54,6 +54,11 @@ assert(
 );
 
 assert(
+	appShell.includes('showTop = true') && appShell.includes('{#if top && showTop}'),
+	'AppShell must allow consumers to hide the complete top region without removing its snippet.'
+);
+
+assert(
 	!/\.app-shell-content\s*\{[\s\S]*?\n\s*height:\s*100%;/.test(appShell),
 	'AppShell content must not force height: 100%; it clips card shadows and vertical content flow.'
 );

@@ -11,6 +11,7 @@
 		contentId?: string;
 		resetKey?: string | number | boolean | null;
 		fullHeight?: boolean;
+		showTop?: boolean;
 	}
 
 	let {
@@ -21,7 +22,8 @@
 		footer,
 		contentId = 'main-content',
 		resetKey = null,
-		fullHeight = false
+		fullHeight = false,
+		showTop = true
 	}: Props = $props();
 
 	let scrollEl = $state<HTMLElement>();
@@ -136,7 +138,7 @@
 		</header>
 	{/if}
 
-	{#if top}
+	{#if top && showTop}
 		<div class="app-shell-top">
 			{@render top()}
 		</div>
