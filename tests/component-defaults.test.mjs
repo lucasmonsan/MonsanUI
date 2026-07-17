@@ -12,6 +12,7 @@ const appHeader = await readComponent('AppHeader.svelte');
 const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
+const dndMatch = await readComponent('DndMatch.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
 const splashScreen = await readComponent('SplashScreen.svelte');
 const stack = await readComponent('Stack.svelte');
@@ -65,6 +66,13 @@ assert(
 		splashScreen.includes('visibility: hidden') &&
 		splashScreen.includes('pointer-events: none'),
 	'SplashScreen must release SSR content even when client hydration never runs.'
+);
+
+assert(
+	dndMatch.includes('value?: Record<string, string[]> | null') &&
+		dndMatch.includes('let safeValue = $derived(isMatchValue(value) ? value : {})') &&
+		dndMatch.includes('{#each safeValue[bucket] || [] as item (item)}'),
+	'DndMatch must render a null bound answer safely before its initialization effect runs.'
 );
 
 assert(

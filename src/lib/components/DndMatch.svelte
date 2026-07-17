@@ -13,7 +13,7 @@
 	interface Props {
 		options: string[];
 		buckets: string[];
-		value?: Record<string, string[]>;
+		value?: Record<string, string[]> | null;
 		disabled?: boolean;
 		labels?: DndMatchLabels;
 	}
@@ -26,6 +26,19 @@
 		labels = {}
 	}: Props = $props();
 
+	function isMatchValue(candidate: unknown): candidate is Record<string, string[]> {
+		return (
+			candidate !== null &&
+			typeof candidate === 'object' &&
+			!Array.isArray(candidate) &&
+			Object.values(candidate).every(
+				(items) => Array.isArray(items) && items.every((item) => typeof item === 'string')
+			)
+		);
+	}
+
+	let safeValue = $derived(isMatchValue(value) ? value : {});
+
 	const mergedLabels = $derived({
 		poolTitle: labels.poolTitle || i18n.t('dndMatch.poolTitle'),
 		allClassified: labels.allClassified || i18n.t('dndMatch.allClassified'),
@@ -34,7 +47,7 @@
 
 	// Initialize value if it's null or invalid
 	$effect(() => {
-		if (!value || typeof value !== 'object' || Array.isArray(value)) {
+		if (!isMatchValue(value)) {
 			const initialValue: Record<string, string[]> = {};
 			buckets.forEach((b) => {
 				initialValue[b] = [];
@@ -56,9 +69,8 @@
 
 	// Items still in the pool (not in any bucket)
 	let poolItems = $derived.by(() => {
-		if (!value || typeof value !== 'object') return options;
 		const usedItems = new SvelteSet<string>();
-		Object.values(value).forEach((arr) => {
+		Object.values(safeValue).forEach((arr) => {
 			if (Array.isArray(arr)) arr.forEach((i) => usedItems.add(i));
 		});
 		return options.filter((opt) => !usedItems.has(opt));
@@ -87,7 +99,7 @@
 	function moveItem(item: string, source: string | 'pool', target: string | 'pool') {
 		if (source === target) return;
 
-		const newValue = { ...value };
+		const newValue = { ...safeValue };
 
 		if (source !== 'pool') {
 			newValue[source] = (newValue[source] || []).filter((i: string) => i !== item);
@@ -244,7 +256,7 @@
 	function handleKeyDown(e: KeyboardEvent, item: string, source: string | 'pool') {
 		if (disabled) return;
 
-		const newValue = { ...value };
+		const newValue = { ...safeValue };
 
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
@@ -426,12 +438,12 @@
 			>
 				<h4 class="bucket-title">{bucket}</h4>
 				<div class="bucket-content">
-					{#if !value || !value[bucket] || value[bucket].length === 0}
+					{#if !safeValue[bucket] || safeValue[bucket].length === 0}
 						<div transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }} class="empty-msg">
 							{mergedLabels.dropHere}
 						</div>
 					{/if}
-					{#each value[bucket] || [] as item (item)}
+					{#each safeValue[bucket] || [] as item (item)}
 						<div
 							transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }}
 							class="dnd-chip bucket-chip"
