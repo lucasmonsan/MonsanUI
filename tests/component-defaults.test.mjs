@@ -13,6 +13,9 @@ const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
 const dndMatch = await readComponent('DndMatch.svelte');
+const dndOrder = await readComponent('DndOrder.svelte');
+const multipleChoice = await readComponent('questions/MultipleChoice.svelte');
+const singleChoice = await readComponent('questions/SingleChoice.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
 const splashScreen = await readComponent('SplashScreen.svelte');
 const stack = await readComponent('Stack.svelte');
@@ -71,9 +74,21 @@ assert(
 assert(
 	dndMatch.includes('value?: Record<string, string[]> | null') &&
 		dndMatch.includes('let safeValue = $derived(isMatchValue(value) ? value : {})') &&
-		dndMatch.includes('{#each safeValue[bucket] || [] as item (item)}'),
+		dndMatch.includes('getOccurrenceKey(safeValue[bucket] || [], itemIndex)'),
 	'DndMatch must render a null bound answer safely before its initialization effect runs.'
 );
+
+for (const [name, source] of [
+	['DndMatch', dndMatch],
+	['DndOrder', dndOrder],
+	['MultipleChoice', multipleChoice],
+	['SingleChoice', singleChoice]
+]) {
+	assert(
+		source.includes('getOccurrenceKey'),
+		`${name} must use occurrence-aware render keys so duplicate labels cannot crash the UI.`
+	);
+}
 
 assert(
 	!/\.app-shell-content\s*\{[\s\S]*?\n\s*height:\s*100%;/.test(appShell),
