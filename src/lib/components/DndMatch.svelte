@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { i18n } from '../utils/i18n.svelte';
+	import { getOccurrenceKey } from '../utils/listKeys.js';
 	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { scale } from 'svelte/transition';
@@ -382,7 +383,7 @@
 					{mergedLabels.allClassified}
 				</div>
 			{/if}
-			{#each poolItems as item (item)}
+			{#each poolItems as item, index (getOccurrenceKey(poolItems, index))}
 				<div
 					transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }}
 					class="dnd-chip glass-panel"
@@ -417,7 +418,7 @@
 
 	<!-- Buckets Area -->
 	<div class="buckets-grid">
-		{#each buckets as bucket (bucket)}
+		{#each buckets as bucket, bucketIndex (getOccurrenceKey(buckets, bucketIndex))}
 			<div
 				class="bucket-area glass-panel"
 				class:drop-target={dropTarget === bucket}
@@ -443,7 +444,7 @@
 							{mergedLabels.dropHere}
 						</div>
 					{/if}
-					{#each safeValue[bucket] || [] as item (item)}
+					{#each safeValue[bucket] || [] as item, itemIndex (getOccurrenceKey(safeValue[bucket] || [], itemIndex))}
 						<div
 							transition:scale={{ duration: prefersReducedMotion ? 0 : 150 }}
 							class="dnd-chip bucket-chip"

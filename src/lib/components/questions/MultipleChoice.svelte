@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Check from '../icons/Check.svelte';
+	import { getOccurrenceKey } from '../../utils/listKeys.js';
 
 	interface Props {
 		options: string[];
@@ -70,7 +71,7 @@
 	aria-labelledby={ariaLabelledby}
 	style:--cols={String(columns)}
 >
-	{#each options as option, index (option)}
+	{#each options as option, index (getOccurrenceKey(options, index))}
 		{@const selected = Array.isArray(value) && value.includes(option)}
 		<button
 			type="button"

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { getOccurrenceKey } from '../../utils/listKeys.js';
+
 	interface Props {
 		options: string[];
 		value?: string | null;
@@ -59,7 +61,7 @@
 	aria-labelledby={ariaLabelledby}
 	style:--cols={String(columns)}
 >
-	{#each options as option, index (option)}
+	{#each options as option, index (getOccurrenceKey(options, index))}
 		<button
 			type="button"
 			class="option-btn"

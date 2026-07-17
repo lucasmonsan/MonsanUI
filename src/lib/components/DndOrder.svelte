@@ -3,6 +3,7 @@
 	import { quintOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import { getOccurrenceKey } from '../utils/listKeys.js';
 	import GripVertical from './icons/GripVertical.svelte';
 
 	interface Props {
@@ -217,7 +218,7 @@
 	role="listbox"
 	style:grid-template-columns={`repeat(${columns}, minmax(0, 1fr))`}
 >
-	{#each items as item, index (item)}
+	{#each items as item, index (getOccurrenceKey(items, index))}
 		<div
 			animate:flip={{ duration: prefersReducedMotion ? 0 : 250, easing: quintOut }}
 			class="dnd-item glass-panel"
