@@ -22,11 +22,10 @@
 	}
 </script>
 
-<span
+<button
+	type="button"
 	bind:this={triggerEl}
 	class="info-trigger"
-	role="button"
-	tabindex="0"
 	aria-label={text}
 	aria-expanded={open}
 	onmouseenter={() => (open = true)}
@@ -37,7 +36,7 @@
 	onkeydown={handleKeydown}
 >
 	?
-</span>
+</button>
 
 {#if open}
 	<span
@@ -64,6 +63,8 @@
 		justify-content: center;
 		width: 18px;
 		height: 18px;
+		flex: 0 0 18px;
+		padding: 0;
 		border: var(--border-width) solid var(--border-color);
 		box-shadow: 1px 1px 0 var(--text-primary);
 		background: var(--bg-secondary);
@@ -76,6 +77,9 @@
 		margin-left: var(--space-xs);
 		vertical-align: middle;
 		user-select: none;
+		position: relative;
+		z-index: 1;
+		pointer-events: auto;
 	}
 
 	.info-trigger:hover,

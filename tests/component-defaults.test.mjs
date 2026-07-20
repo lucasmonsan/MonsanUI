@@ -125,6 +125,13 @@ assert(
 );
 
 assert(
+	/<button\s+type="button"[\s\S]*?class="info-trigger"/.test(
+		await readComponent('InfoTooltip.svelte')
+	),
+	'InfoTooltip must expose a native button target for reliable pointer and keyboard interaction.'
+);
+
+assert(
 	!/\.app-shell-content\s*\{[\s\S]*?\n\s*height:\s*100%;/.test(appShell),
 	'AppShell content must not force height: 100%; it clips card shadows and vertical content flow.'
 );

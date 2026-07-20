@@ -59,7 +59,9 @@
 			<InfoTooltip text={info} position={tooltipPosition} />
 		{/if}
 		{#if labelAddon}
-			{@render labelAddon()}
+			<span class="field-label-addon">
+				{@render labelAddon()}
+			</span>
 		{/if}
 	</div>
 
@@ -123,7 +125,7 @@
 		font-weight: 700;
 	}
 
-	.field-label-row > :global(span) {
+	.field-label-addon > :global(span) {
 		color: var(--text-secondary);
 		font-size: 10px;
 		text-transform: none;
@@ -131,7 +133,7 @@
 		vertical-align: middle;
 	}
 
-	.field-label-row > :global(button) {
+	.field-label-addon > :global(button) {
 		background: var(--bg-secondary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-sm);
@@ -149,14 +151,14 @@
 		text-transform: none;
 	}
 
-	.field-label-row > :global(button:hover) {
+	.field-label-addon > :global(button:hover) {
 		color: var(--text-primary);
 		border-color: var(--text-primary);
 		box-shadow: 1.5px 1.5px 0 var(--text-primary);
 		transform: translate(-0.5px, -0.5px);
 	}
 
-	.field-label-row > :global(button:active) {
+	.field-label-addon > :global(button:active) {
 		transform: translate(1px, 1px);
 		box-shadow: none;
 	}
