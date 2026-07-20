@@ -152,6 +152,7 @@ export function floatingPortal(node: HTMLElement, options: FloatingPortalOptions
 
 	function mount() {
 		node.style.visibility = 'hidden';
+		node.style.position = 'fixed';
 		node.dataset.floatingPositioned = 'false';
 		ensurePortalRoot();
 		schedulePositionUpdate();

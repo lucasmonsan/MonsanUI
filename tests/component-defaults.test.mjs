@@ -119,6 +119,13 @@ assert(
 );
 
 assert(
+	/function mount\(\) \{[\s\S]*?node\.style\.visibility = 'hidden';[\s\S]*?node\.style\.position = 'fixed';[\s\S]*?ensurePortalRoot\(\);/.test(
+		floatingPortal
+	),
+	'Floating overlays must leave document flow before entering the portal or measuring geometry.'
+);
+
+assert(
 	/<\/label>\s*\{#if info\}\s*<InfoTooltip/.test(formField) &&
 		!/<label[\s\S]*?<InfoTooltip[\s\S]*?<\/label>/.test(formField),
 	'FormField must keep interactive help outside its label so the label cannot intercept the trigger.'
