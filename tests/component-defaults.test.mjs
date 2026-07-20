@@ -14,7 +14,13 @@ const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
 const dndMatch = await readComponent('DndMatch.svelte');
 const dndOrder = await readComponent('DndOrder.svelte');
+const expandableCard = await readComponent('ExpandableCard.svelte');
 const filterToolbar = await readComponent('FilterToolbar.svelte');
+const formField = await readComponent('FormField.svelte');
+const floatingPortal = await readFile(
+	new URL('../src/lib/utils/floatingPortal.ts', import.meta.url),
+	'utf8'
+);
 const multipleChoice = await readComponent('questions/MultipleChoice.svelte');
 const singleChoice = await readComponent('questions/SingleChoice.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
@@ -96,6 +102,40 @@ assert(
 		filterToolbar.includes('.filter-toolbar-filters > :global(.monsan-multiselect-container)') &&
 		!filterToolbar.includes('.filter-toolbar-filters :global(.monsan-select-container),'),
 	'FilterToolbar sizing must only target direct controls so nested dialog fields remain content-sized.'
+);
+
+assert(
+	expandableCard.includes("variant?: 'default' | 'success' | 'archived'") &&
+		expandableCard.includes('.monsan-expandable-card.variant-archived'),
+	'ExpandableCard must expose an explicit, semantic archived visual variant.'
+);
+
+assert(
+	floatingPortal.includes('requiredStableFrames') &&
+		floatingPortal.includes("node.dataset.floatingPositioned = 'true';") &&
+		floatingPortal.indexOf("node.dataset.floatingPositioned = 'true';") <
+			floatingPortal.indexOf("node.style.visibility = 'visible';"),
+	'Floating overlays must wait for stable geometry and expose positioned state before becoming visible.'
+);
+
+assert(
+	/function mount\(\) \{[\s\S]*?node\.style\.visibility = 'hidden';[\s\S]*?node\.style\.position = 'fixed';[\s\S]*?ensurePortalRoot\(\);/.test(
+		floatingPortal
+	),
+	'Floating overlays must leave document flow before entering the portal or measuring geometry.'
+);
+
+assert(
+	/<\/label>\s*\{#if info\}\s*<InfoTooltip/.test(formField) &&
+		!/<label[\s\S]*?<InfoTooltip[\s\S]*?<\/label>/.test(formField),
+	'FormField must keep interactive help outside its label so the label cannot intercept the trigger.'
+);
+
+assert(
+	/<button\s+type="button"[\s\S]*?class="info-trigger"/.test(
+		await readComponent('InfoTooltip.svelte')
+	),
+	'InfoTooltip must expose a native button target for reliable pointer and keyboard interaction.'
 );
 
 assert(
