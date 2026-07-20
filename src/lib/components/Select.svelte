@@ -18,7 +18,8 @@
 		disabled = false,
 		width = 'full',
 		dropdownAlign = 'auto',
-		ariaLabel
+		ariaLabel,
+		onchange
 	} = $props<{
 		value: string | number;
 		options: Option[];
@@ -30,6 +31,7 @@
 		width?: 'full' | 'auto';
 		dropdownAlign?: 'left' | 'right' | 'auto';
 		ariaLabel?: string;
+		onchange?: (value: string | number) => void;
 	}>();
 
 	const fallbackId = `select-${Math.random().toString(36).slice(2, 11)}`;
@@ -82,6 +84,7 @@
 	function selectOption(optionValue: string | number) {
 		if (disabled) return;
 		value = optionValue;
+		onchange?.(optionValue);
 		closeDropdown(true);
 	}
 
