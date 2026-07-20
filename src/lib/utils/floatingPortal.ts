@@ -24,15 +24,26 @@ export function floatingPortal(node: HTMLElement, options: FloatingPortalOptions
 	let marker: Comment | undefined;
 	let resizeObserver: ResizeObserver | undefined;
 
-	function schedulePositionUpdate() {
-		if (frame !== undefined) cancelAnimationFrame(frame);
-		frame = requestAnimationFrame(updatePosition);
+	function ensurePortalRoot() {
+		const portalRoot = activeOptions.anchor?.closest('dialog') ?? document.body;
+		if (node.parentNode === portalRoot) return;
+		if (!marker) {
+			marker = document.createComment('monsan-floating-portal');
+			node.parentNode?.insertBefore(marker, node);
+		}
+		portalRoot.appendChild(node);
 	}
 
-	function updatePosition() {
+	function schedulePositionUpdate() {
+		if (frame !== undefined) cancelAnimationFrame(frame);
+		frame = requestAnimationFrame(positionAndReveal);
+	}
+
+	function positionAndReveal() {
 		frame = undefined;
 		const anchor = activeOptions.anchor;
 		if (!anchor) return;
+		ensurePortalRoot();
 
 		const anchorRect = anchor.getBoundingClientRect();
 		const visualViewport = window.visualViewport;
@@ -91,19 +102,13 @@ export function floatingPortal(node: HTMLElement, options: FloatingPortalOptions
 		node.style.top = `${top}px`;
 		node.style.width = `${width}px`;
 		node.style.zIndex = String(activeOptions.zIndex ?? 1002);
+		node.style.visibility = 'visible';
 	}
 
 	function mount() {
-		const portalRoot = activeOptions.anchor?.closest('dialog') ?? document.body;
-		if (node.parentNode !== portalRoot) {
-			marker = document.createComment('monsan-floating-portal');
-			node.parentNode?.insertBefore(marker, node);
-			portalRoot.appendChild(node);
-		}
-
 		node.style.visibility = 'hidden';
-		updatePosition();
-		node.style.visibility = '';
+		ensurePortalRoot();
+		positionAndReveal();
 
 		window.addEventListener('resize', schedulePositionUpdate);
 		window.addEventListener('scroll', schedulePositionUpdate, true);

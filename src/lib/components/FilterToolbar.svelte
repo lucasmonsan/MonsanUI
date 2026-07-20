@@ -68,20 +68,22 @@
 		flex-wrap: nowrap;
 	}
 
-	.filter-toolbar-filters :global(.monsan-select-container),
-	.filter-toolbar-filters :global(.monsan-multiselect-container),
-	.filter-toolbar-filters :global(.monsan-datepicker-container) {
+	.filter-toolbar-filters > :global(.monsan-select-container),
+	.filter-toolbar-filters > :global(.monsan-multiselect-container),
+	.filter-toolbar-filters > :global(.monsan-datepicker-container) {
 		flex: 0 0 var(--filter-toolbar-control-width, 180px);
 		width: var(--filter-toolbar-control-width, 180px);
 		min-width: 0;
 	}
 
-	.filter-toolbar-filters :global(.datepicker-trigger) {
+	.filter-toolbar-filters > :global(.monsan-datepicker-container) :global(.datepicker-trigger) {
 		width: 100%;
 	}
 
-	.filter-toolbar-filters :global(.monsan-select-dropdown),
-	.filter-toolbar-filters :global(.monsan-multiselect-dropdown) {
+	.filter-toolbar-filters > :global(.monsan-select-container) :global(.monsan-select-dropdown),
+	.filter-toolbar-filters
+		> :global(.monsan-multiselect-container)
+		:global(.monsan-multiselect-dropdown) {
 		width: 100%;
 		min-width: 100%;
 		max-width: 100%;
@@ -107,30 +109,23 @@
 
 	@media (max-width: 640px) {
 		.monsan-filter-toolbar {
-			flex-direction: column;
-			align-items: stretch;
+			align-items: center;
+			flex-direction: row;
 		}
 
 		.filter-toolbar-filters {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			width: 100%;
-		}
-
-		.filter-toolbar-filters :global(> :last-child:nth-child(odd)) {
-			grid-column: 1 / -1;
-		}
-
-		.filter-toolbar-filters :global(.monsan-select-container),
-		.filter-toolbar-filters :global(.monsan-multiselect-container),
-		.filter-toolbar-filters :global(.monsan-datepicker-container) {
-			width: 100%;
-			min-width: 0;
+			display: flex;
+			flex: 0 0 auto;
+			width: auto;
 		}
 
 		.filter-toolbar-search-row {
-			width: 100%;
-			flex: 0 0 auto;
+			flex: 1 1 auto;
+			width: auto;
+		}
+
+		.filter-toolbar-search {
+			min-width: 0;
 		}
 	}
 </style>

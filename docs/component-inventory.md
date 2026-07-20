@@ -81,6 +81,8 @@ Completed and validated locally:
   reduced-motion handling.
 - `MultiSelect`: moved default placeholder to MonsanUI i18n and added
   reduced-motion handling.
+- `FilterDialog`: groups composable filters behind one compact trigger, reports
+  the active-filter count and provides explicit apply, clear and cancel actions.
 - `Button`: replaced manual conditional class string assembly with Svelte class
   directives, replaced `transition: all`, and added reduced-motion handling.
 - `IconButton`: added explicit cursor/transition behavior and reduced-motion

@@ -24,6 +24,7 @@
 		compactHeader = false,
 		showSubheader = true,
 		showFooter = true,
+		contentGrow = true,
 		ariaDescribedby
 	} = $props<{
 		open: boolean;
@@ -43,6 +44,7 @@
 		compactHeader?: boolean;
 		showSubheader?: boolean;
 		showFooter?: boolean;
+		contentGrow?: boolean;
 		ariaDescribedby?: string;
 	}>();
 
@@ -206,7 +208,7 @@
 			{/if}
 
 			<!-- Content -->
-			<div class="modal-content" style:padding={resolvedPadding}>
+			<div class="modal-content" class:grow={contentGrow} style:padding={resolvedPadding}>
 				{@render children()}
 			</div>
 
@@ -315,9 +317,13 @@
 		padding: var(--space-md);
 		background: var(--bg-primary);
 		color: var(--text-primary);
-		flex: 1 1 auto;
+		flex: 0 1 auto;
 		min-height: 0;
 		overflow-y: auto;
+	}
+
+	.modal-content.grow {
+		flex: 1 1 auto;
 	}
 
 	.modal-subheader,

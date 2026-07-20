@@ -14,6 +14,7 @@ const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
 const dndMatch = await readComponent('DndMatch.svelte');
 const dndOrder = await readComponent('DndOrder.svelte');
+const filterToolbar = await readComponent('FilterToolbar.svelte');
 const multipleChoice = await readComponent('questions/MultipleChoice.svelte');
 const singleChoice = await readComponent('questions/SingleChoice.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
@@ -89,6 +90,13 @@ for (const [name, source] of [
 		`${name} must use occurrence-aware render keys so duplicate labels cannot crash the UI.`
 	);
 }
+
+assert(
+	filterToolbar.includes('.filter-toolbar-filters > :global(.monsan-select-container)') &&
+		filterToolbar.includes('.filter-toolbar-filters > :global(.monsan-multiselect-container)') &&
+		!filterToolbar.includes('.filter-toolbar-filters :global(.monsan-select-container),'),
+	'FilterToolbar sizing must only target direct controls so nested dialog fields remain content-sized.'
+);
 
 assert(
 	!/\.app-shell-content\s*\{[\s\S]*?\n\s*height:\s*100%;/.test(appShell),

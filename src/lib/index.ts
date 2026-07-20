@@ -54,6 +54,7 @@ export { default as SplashScreen } from './components/SplashScreen.svelte';
 /** Toolbar content only; parent layout such as AppShell owns structural spacing. */
 export { default as ActionBar } from './components/ActionBar.svelte';
 export { default as FilterToolbar } from './components/FilterToolbar.svelte';
+export { default as FilterDialog } from './components/FilterDialog.svelte';
 export { default as SingleChoice } from './components/questions/SingleChoice.svelte';
 export { default as MultipleChoice } from './components/questions/MultipleChoice.svelte';
 export { default as DndOrder } from './components/DndOrder.svelte';
