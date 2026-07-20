@@ -68,20 +68,22 @@
 		flex-wrap: nowrap;
 	}
 
-	.filter-toolbar-filters :global(.monsan-select-container),
-	.filter-toolbar-filters :global(.monsan-multiselect-container),
-	.filter-toolbar-filters :global(.monsan-datepicker-container) {
+	.filter-toolbar-filters > :global(.monsan-select-container),
+	.filter-toolbar-filters > :global(.monsan-multiselect-container),
+	.filter-toolbar-filters > :global(.monsan-datepicker-container) {
 		flex: 0 0 var(--filter-toolbar-control-width, 180px);
 		width: var(--filter-toolbar-control-width, 180px);
 		min-width: 0;
 	}
 
-	.filter-toolbar-filters :global(.datepicker-trigger) {
+	.filter-toolbar-filters > :global(.monsan-datepicker-container) :global(.datepicker-trigger) {
 		width: 100%;
 	}
 
-	.filter-toolbar-filters :global(.monsan-select-dropdown),
-	.filter-toolbar-filters :global(.monsan-multiselect-dropdown) {
+	.filter-toolbar-filters > :global(.monsan-select-container) :global(.monsan-select-dropdown),
+	.filter-toolbar-filters
+		> :global(.monsan-multiselect-container)
+		:global(.monsan-multiselect-dropdown) {
 		width: 100%;
 		min-width: 100%;
 		max-width: 100%;
