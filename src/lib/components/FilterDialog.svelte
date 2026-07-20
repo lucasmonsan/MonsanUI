@@ -12,7 +12,7 @@
 		applyLabel: string;
 		clearLabel: string;
 		cancelLabel: string;
-		closeLabel?: string;
+		closeLabel: string;
 		activeCount?: number;
 		activeCountLabel?: string;
 		disabled?: boolean;
@@ -31,7 +31,7 @@
 		applyLabel,
 		clearLabel,
 		cancelLabel,
-		closeLabel = cancelLabel,
+		closeLabel,
 		activeCount = 0,
 		activeCountLabel,
 		disabled = false,
