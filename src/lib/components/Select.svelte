@@ -177,6 +177,7 @@
 	{#if isOpen}
 		<div
 			bind:this={dropdownEl}
+			style="visibility: hidden"
 			use:floatingPortal={{
 				anchor: triggerEl,
 				align: dropdownAlign,

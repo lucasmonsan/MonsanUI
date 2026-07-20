@@ -43,6 +43,7 @@
 	<span
 		class="info-tooltip"
 		role="tooltip"
+		style="visibility: hidden"
 		use:floatingPortal={{
 			anchor: triggerEl,
 			align: 'auto',

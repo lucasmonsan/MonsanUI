@@ -66,16 +66,18 @@
 <div class="monsan-filter-dialog-trigger">
 	<Button
 		variant="secondary"
-		size="sm"
 		{disabled}
 		ariaLabel={triggerAriaLabel}
 		ariaExpanded={open}
+		iconOnlyBelow="sm"
 		onclick={showDialog}
 	>
 		<SlidersHorizontalIcon size={16} />
-		<span>{triggerLabel}</span>
+		<span class="monsan-button-label">{triggerLabel}</span>
 		{#if activeCount > 0}
-			<Badge size="sm" variant="primary" ariaLabel={activeCountLabel}>{activeCount}</Badge>
+			<span class="filter-dialog-count" aria-hidden="true">
+				<Badge size="sm" variant="primary">{activeCount}</Badge>
+			</span>
 		{/if}
 	</Button>
 	{#if summary}
@@ -137,6 +139,12 @@
 		.filter-dialog-primary-actions {
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 600px) {
+		.filter-dialog-count {
+			display: none;
 		}
 	}
 </style>
