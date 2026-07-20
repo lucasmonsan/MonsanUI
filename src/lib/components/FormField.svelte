@@ -49,17 +49,19 @@
 </script>
 
 <div class="monsan-form-field" class:is-disabled={disabled} class:is-invalid={invalid}>
-	<label for={forId}>
-		<Text tag="span" size="xs" weight="bold" variant="secondary">
-			{label}{#if required}<span class="required-mark" aria-hidden="true">*</span>{/if}
-			{#if info}
-				<InfoTooltip text={info} position={tooltipPosition} />
-			{/if}
-			{#if labelAddon}
-				{@render labelAddon()}
-			{/if}
-		</Text>
-	</label>
+	<div class="field-label-row">
+		<label for={forId}>
+			<Text tag="span" size="xs" weight="bold" variant="secondary">
+				{label}{#if required}<span class="required-mark" aria-hidden="true">*</span>{/if}
+			</Text>
+		</label>
+		{#if info}
+			<InfoTooltip text={info} position={tooltipPosition} />
+		{/if}
+		{#if labelAddon}
+			{@render labelAddon()}
+		{/if}
+	</div>
 
 	{#if control}
 		{@render control({ describedby, invalid })}
@@ -89,6 +91,13 @@
 		letter-spacing: 0.05em;
 	}
 
+	.field-label-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+		min-width: 0;
+	}
+
 	.is-disabled {
 		opacity: 0.7;
 	}
@@ -114,16 +123,15 @@
 		font-weight: 700;
 	}
 
-	label :global(span > span) {
+	.field-label-row > :global(span) {
 		color: var(--text-secondary);
 		font-size: 10px;
-		margin-right: 2px;
 		text-transform: none;
 		font-weight: 500;
 		vertical-align: middle;
 	}
 
-	label :global(span > button) {
+	.field-label-row > :global(button) {
 		background: var(--bg-secondary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-sm);
@@ -141,14 +149,14 @@
 		text-transform: none;
 	}
 
-	label :global(span > button:hover) {
+	.field-label-row > :global(button:hover) {
 		color: var(--text-primary);
 		border-color: var(--text-primary);
 		box-shadow: 1.5px 1.5px 0 var(--text-primary);
 		transform: translate(-0.5px, -0.5px);
 	}
 
-	label :global(span > button:active) {
+	.field-label-row > :global(button:active) {
 		transform: translate(1px, 1px);
 		box-shadow: none;
 	}

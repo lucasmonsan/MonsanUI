@@ -83,7 +83,6 @@
 		color: var(--text-primary);
 		border-color: var(--text-primary);
 		box-shadow: 1.5px 1.5px 0 var(--text-primary);
-		transform: translate(-0.5px, -0.5px);
 		outline: none;
 	}
 

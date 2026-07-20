@@ -16,6 +16,7 @@ const dndMatch = await readComponent('DndMatch.svelte');
 const dndOrder = await readComponent('DndOrder.svelte');
 const expandableCard = await readComponent('ExpandableCard.svelte');
 const filterToolbar = await readComponent('FilterToolbar.svelte');
+const formField = await readComponent('FormField.svelte');
 const floatingPortal = await readFile(
 	new URL('../src/lib/utils/floatingPortal.ts', import.meta.url),
 	'utf8'
@@ -115,6 +116,12 @@ assert(
 		floatingPortal.indexOf("node.dataset.floatingPositioned = 'true';") <
 			floatingPortal.indexOf("node.style.visibility = 'visible';"),
 	'Floating overlays must wait for stable geometry and expose positioned state before becoming visible.'
+);
+
+assert(
+	/<\/label>\s*\{#if info\}\s*<InfoTooltip/.test(formField) &&
+		!/<label[\s\S]*?<InfoTooltip[\s\S]*?<\/label>/.test(formField),
+	'FormField must keep interactive help outside its label so the label cannot intercept the trigger.'
 );
 
 assert(
