@@ -27,7 +27,7 @@
 		showText?: boolean;
 		expandOn?: 'card' | 'header' | 'indicator';
 		compact?: boolean;
-		variant?: 'default' | 'success';
+		variant?: 'default' | 'success' | 'archived';
 		disabled?: boolean;
 	}>();
 
@@ -289,6 +289,23 @@
 	/* Variante Success */
 	.monsan-expandable-card.variant-success .card-header {
 		background: color-mix(in srgb, var(--success) 16%, var(--bg-secondary));
+	}
+
+	.monsan-expandable-card.variant-archived {
+		border-color: color-mix(in srgb, var(--warning) 70%, var(--border-color));
+		border-style: solid;
+		box-shadow:
+			inset 5px 0 0 color-mix(in srgb, var(--warning) 80%, var(--text-primary)),
+			var(--shadow-sm);
+	}
+
+	.monsan-expandable-card.variant-archived .card-header {
+		background: color-mix(in srgb, var(--warning) 18%, var(--bg-secondary));
+	}
+
+	.monsan-expandable-card.variant-archived .expandable-content-wrapper,
+	.monsan-expandable-card.variant-archived .card-indicator-footer {
+		background: color-mix(in srgb, var(--warning) 5%, var(--bg-primary));
 	}
 
 	@media (prefers-reduced-motion: reduce) {

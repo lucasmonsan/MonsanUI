@@ -13,6 +13,9 @@ type FloatingPortalOptions = {
 };
 
 const viewportPadding = 8;
+const geometryTolerance = 0.5;
+const requiredStableFrames = 2;
+const maximumSettleFrames = 24;
 
 function clamp(value: number, min: number, max: number) {
 	return Math.min(Math.max(value, min), max);
@@ -23,6 +26,10 @@ export function floatingPortal(node: HTMLElement, options: FloatingPortalOptions
 	let frame: number | undefined;
 	let marker: Comment | undefined;
 	let resizeObserver: ResizeObserver | undefined;
+	let positioned = false;
+	let settleFrames = 0;
+	let stableFrames = 0;
+	let previousAnchorRect: DOMRect | undefined;
 
 	function ensurePortalRoot() {
 		const portalRoot = activeOptions.anchor?.closest('dialog') ?? document.body;
@@ -36,7 +43,44 @@ export function floatingPortal(node: HTMLElement, options: FloatingPortalOptions
 
 	function schedulePositionUpdate() {
 		if (frame !== undefined) cancelAnimationFrame(frame);
+		if (!positioned) {
+			settleFrames = 0;
+			stableFrames = 0;
+			previousAnchorRect = undefined;
+			frame = requestAnimationFrame(settleAndReveal);
+			return;
+		}
 		frame = requestAnimationFrame(positionAndReveal);
+	}
+
+	function rectIsStable(current: DOMRect, previous: DOMRect) {
+		return (
+			Math.abs(current.left - previous.left) <= geometryTolerance &&
+			Math.abs(current.top - previous.top) <= geometryTolerance &&
+			Math.abs(current.width - previous.width) <= geometryTolerance &&
+			Math.abs(current.height - previous.height) <= geometryTolerance
+		);
+	}
+
+	function settleAndReveal() {
+		frame = undefined;
+		const anchor = activeOptions.anchor;
+		if (!anchor) return;
+
+		ensurePortalRoot();
+		const anchorRect = anchor.getBoundingClientRect();
+		settleFrames += 1;
+		stableFrames =
+			previousAnchorRect && rectIsStable(anchorRect, previousAnchorRect) ? stableFrames + 1 : 0;
+		previousAnchorRect = anchorRect;
+
+		if (stableFrames >= requiredStableFrames || settleFrames >= maximumSettleFrames) {
+			positioned = true;
+			positionAndReveal();
+			return;
+		}
+
+		frame = requestAnimationFrame(settleAndReveal);
 	}
 
 	function positionAndReveal() {
@@ -102,13 +146,15 @@ export function floatingPortal(node: HTMLElement, options: FloatingPortalOptions
 		node.style.top = `${top}px`;
 		node.style.width = `${width}px`;
 		node.style.zIndex = String(activeOptions.zIndex ?? 1002);
+		node.dataset.floatingPositioned = 'true';
 		node.style.visibility = 'visible';
 	}
 
 	function mount() {
 		node.style.visibility = 'hidden';
+		node.dataset.floatingPositioned = 'false';
 		ensurePortalRoot();
-		positionAndReveal();
+		schedulePositionUpdate();
 
 		window.addEventListener('resize', schedulePositionUpdate);
 		window.addEventListener('scroll', schedulePositionUpdate, true);
