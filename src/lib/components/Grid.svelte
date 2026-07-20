@@ -29,10 +29,12 @@
 <style>
 	.monsan-grid {
 		display: grid;
+		align-content: start;
 		box-sizing: border-box;
 	}
 
 	.full-height {
+		align-content: stretch;
 		height: 100%;
 		min-height: 0;
 	}
