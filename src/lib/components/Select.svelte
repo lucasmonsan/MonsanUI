@@ -18,6 +18,8 @@
 		disabled = false,
 		width = 'full',
 		dropdownAlign = 'auto',
+		dropdownMatchWidth = false,
+		dropdownMinWidth = 240,
 		ariaLabel,
 		onchange
 	} = $props<{
@@ -30,6 +32,8 @@
 		disabled?: boolean;
 		width?: 'full' | 'auto';
 		dropdownAlign?: 'left' | 'right' | 'auto';
+		dropdownMatchWidth?: boolean;
+		dropdownMinWidth?: number;
 		ariaLabel?: string;
 		onchange?: (value: string | number) => void;
 	}>();
@@ -181,8 +185,8 @@
 			use:floatingPortal={{
 				anchor: triggerEl,
 				align: dropdownAlign,
-				matchWidth: true,
-				minWidth: 200
+				matchWidth: dropdownMatchWidth,
+				minWidth: dropdownMinWidth
 			}}
 			id={listboxId}
 			class="monsan-select-dropdown align-{dropdownAlign}"
@@ -199,6 +203,7 @@
 					class:active={i === activeIndex}
 					onmouseenter={() => (activeIndex = i)}
 					onclick={() => selectOption(option.value)}
+					title={option.label}
 					role="option"
 					aria-selected={isSelected}
 				>
@@ -366,9 +371,8 @@
 	}
 
 	.option-label {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		overflow-wrap: anywhere;
+		white-space: normal;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
