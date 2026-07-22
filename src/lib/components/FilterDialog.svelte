@@ -87,7 +87,16 @@
 	{/if}
 </div>
 
-<Dialog bind:open {title} {closeLabel} size="md" contentGrow={false} onClose={onCancel}>
+<Dialog
+	bind:open
+	{title}
+	{closeLabel}
+	size="md"
+	contentGrow={false}
+	compactHeader
+	closeOnBackNavigation={false}
+	onClose={onCancel}
+>
 	{@render children()}
 
 	{#snippet footer()}

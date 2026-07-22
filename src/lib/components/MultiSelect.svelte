@@ -20,6 +20,8 @@
 		width = 'full',
 		formatSelected,
 		dropdownAlign = 'auto',
+		dropdownMatchWidth = false,
+		dropdownMinWidth = 280,
 		ariaLabel,
 		searchable = false,
 		searchPlaceholder
@@ -32,6 +34,8 @@
 		width?: 'full' | 'auto';
 		formatSelected?: (count: number) => string;
 		dropdownAlign?: 'left' | 'right' | 'auto';
+		dropdownMatchWidth?: boolean;
+		dropdownMinWidth?: number;
 		ariaLabel?: string;
 		searchable?: boolean;
 		searchPlaceholder?: string;
@@ -264,8 +268,8 @@
 			use:floatingPortal={{
 				anchor: triggerEl,
 				align: dropdownAlign,
-				matchWidth: true,
-				minWidth: 200
+				matchWidth: dropdownMatchWidth,
+				minWidth: dropdownMinWidth
 			}}
 			class="monsan-multiselect-dropdown align-{dropdownAlign}"
 		>
@@ -299,6 +303,7 @@
 							if (!option.disabled) activeIndex = i;
 						}}
 						onclick={() => handleOptionClick(option)}
+						title={option.description ? `${option.label} - ${option.description}` : option.label}
 						disabled={option.disabled}
 						role="option"
 						aria-selected={isOptionChecked}
@@ -507,18 +512,16 @@
 	}
 
 	.option-label {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		overflow-wrap: anywhere;
+		white-space: normal;
 	}
 
 	.option-description {
 		color: var(--text-secondary);
 		font-size: var(--text-xs);
 		font-weight: 600;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		overflow-wrap: anywhere;
+		white-space: normal;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
