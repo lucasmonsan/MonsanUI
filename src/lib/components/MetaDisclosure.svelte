@@ -54,7 +54,12 @@
 		</span>
 	</button>
 
-	<div id={resolvedContentId} class="meta-disclosure-content">
+	<div
+		id={resolvedContentId}
+		class="meta-disclosure-content"
+		aria-hidden={!expanded}
+		inert={!expanded}
+	>
 		<div class="meta-disclosure-inner">
 			{@render children()}
 		</div>
