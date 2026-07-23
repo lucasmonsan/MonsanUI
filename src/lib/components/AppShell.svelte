@@ -12,6 +12,7 @@
 		resetKey?: string | number | boolean | null;
 		fullHeight?: boolean;
 		showTop?: boolean;
+		viewportScroll?: boolean;
 	}
 
 	let {
@@ -23,7 +24,8 @@
 		contentId = 'main-content',
 		resetKey = null,
 		fullHeight = false,
-		showTop = true
+		showTop = true,
+		viewportScroll = false
 	}: Props = $props();
 
 	let scrollEl = $state<HTMLElement>();
@@ -131,7 +133,7 @@
 	});
 </script>
 
-<main class="monsan-app-shell">
+<main class="monsan-app-shell {viewportScroll ? 'viewport-scroll' : ''}">
 	{#if header}
 		<header class="app-shell-header">
 			{@render header()}
@@ -270,6 +272,15 @@
 		gap: var(--space-md);
 		box-sizing: border-box;
 		position: relative;
+	}
+
+	.viewport-scroll {
+		max-width: none;
+	}
+
+	.viewport-scroll .app-shell-content {
+		width: min(100%, var(--container-max-width));
+		margin-inline: auto;
 	}
 
 	.app-shell-content::before,

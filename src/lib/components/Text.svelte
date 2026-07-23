@@ -55,7 +55,8 @@
 		box-sizing: border-box;
 		max-width: 100%;
 		min-width: 0;
-		overflow-wrap: anywhere;
+		overflow-wrap: break-word;
+		word-break: normal;
 	}
 
 	/* Família Tipográfica */
