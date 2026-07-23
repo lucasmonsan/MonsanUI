@@ -11,6 +11,7 @@
 		children: Snippet;
 		actions?: Snippet;
 		height?: 'xs' | 'sm' | 'md' | 'lg' | 'auto' | 'fill';
+		maxBodyHeight?: string;
 		statusLabel?: 'visible' | 'hidden';
 		statusShape?: 'pill' | 'square';
 		lined?: boolean;
@@ -23,6 +24,7 @@
 		children,
 		actions,
 		height = 'md',
+		maxBodyHeight,
 		statusLabel = 'visible',
 		statusShape = 'pill',
 		lined = false
@@ -36,7 +38,10 @@
 	overflow="hidden"
 	fullHeight={height === 'fill'}
 >
-	<section class="monsan-console-panel height-{height}">
+	<section
+		class="monsan-console-panel height-{height}"
+		style:--console-body-max-height={maxBodyHeight}
+	>
 		{#if title || status || actions}
 			<header class="console-header">
 				<div class="console-title">
@@ -150,6 +155,7 @@
 	.console-body {
 		min-height: 0;
 		height: var(--console-height);
+		max-height: var(--console-body-max-height, none);
 		overflow: auto;
 		padding: var(--space-md);
 		font-family:
