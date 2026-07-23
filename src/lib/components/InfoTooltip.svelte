@@ -106,7 +106,7 @@
 		line-height: 1.35;
 		text-transform: none;
 		letter-spacing: normal;
-		white-space: normal;
+		white-space: pre-line;
 		pointer-events: none;
 	}
 </style>
