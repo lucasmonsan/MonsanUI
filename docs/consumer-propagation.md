@@ -22,10 +22,9 @@ The automation token is removed from the environment before a consumer install
 or test command runs. A prior MonsanUI revision discovered during the lockfile
 rewrite is explicitly denied, never broadly trusted. The workspace file is
 formatted before the consumer test runs. A short-lived GitHub Actions read
-token fetches the private MonsanUI source while scripts are disabled; the
-subsequent frozen install still runs with scripts disabled. The temporary read
-token is then removed before pnpm rebuilds the pending approved dependencies
-and runs the consumer test.
+token fetches the private MonsanUI source. The frozen install then runs only
+the exact MonsanUI revision approved by the workspace allowlist, generating
+its package files and command-line checks before the consumer test.
 
 ## Required GitHub configuration
 
