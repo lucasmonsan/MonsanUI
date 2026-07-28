@@ -216,6 +216,19 @@ function refreshConsumerLockfile(directory, environment) {
 	runVisible('pnpm', installArguments, directory, environment);
 }
 
+function installConsumerDependencies(directory, environment) {
+	runVisible(
+		'pnpm',
+		['install', '--frozen-lockfile', '--prefer-offline', '--ignore-scripts'],
+		directory,
+		environment
+	);
+}
+
+function rebuildConsumerDependencies(directory, environment) {
+	runVisible('pnpm', ['rebuild', '--pending'], directory, environment);
+}
+
 function formatConsumerWorkspace(directory, environment) {
 	runVisible(
 		'pnpm',
@@ -255,17 +268,14 @@ function propagateToConsumer(repository, sha, rootDirectory) {
 		const fetchEnvironment = monsanUiFetchEnvironment();
 		try {
 			refreshConsumerLockfile(directory, fetchEnvironment.environment);
+			denyUnapprovedMonsanUiBuilds(directory);
+			assertOnlyDependencyFilesChanged(directory);
+			installConsumerDependencies(directory, fetchEnvironment.environment);
 		} finally {
 			fetchEnvironment.dispose();
 		}
-		denyUnapprovedMonsanUiBuilds(directory);
 		assertOnlyDependencyFilesChanged(directory);
-		runVisible(
-			'pnpm',
-			['install', '--frozen-lockfile', '--prefer-offline'],
-			directory,
-			consumerEnvironment
-		);
+		rebuildConsumerDependencies(directory, consumerEnvironment);
 		formatConsumerWorkspace(directory, consumerEnvironment);
 		assertOnlyDependencyFilesChanged(directory);
 		runVisible('git', ['diff', '--check'], directory);
