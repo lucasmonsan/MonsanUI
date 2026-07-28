@@ -3,7 +3,7 @@
 	"private": true,
 	"version": "0.0.2",
 	"license": "AGPL-3.0-only",
-	"packageManager": "pnpm@11.5.0",
+	"packageManager": "pnpm@11.17.0",
 	"engines": {
 		"node": ">=22.13.0"
 	},
@@ -34,8 +34,9 @@
 		"test:standards": "node tests/consumer-standards.test.mjs",
 		"test:defaults": "node tests/component-defaults.test.mjs",
 		"test:tooling": "node tests/tooling-standards.test.mjs",
+		"test:propagation": "node --check scripts/propagate-monsan-ui.mjs",
 		"format": "prettier --write .",
-		"test": "pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm run test:defaults && pnpm run test:tooling && pnpm build && pnpm run build:package && pnpm run lint:package && node tests/portugol.test.mjs",
+		"test": "pnpm lint && pnpm typecheck && pnpm run test:standards && pnpm run test:defaults && pnpm run test:tooling && pnpm run test:propagation && pnpm build && pnpm run build:package && pnpm run lint:package && node tests/portugol.test.mjs",
 		"test:latest": "pnpm update && pnpm test"
 	},
 	"files": [

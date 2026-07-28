@@ -107,8 +107,8 @@ export async function checkToolingStandards(options = {}) {
 	const packageJsonContent = await readOptionalFile(path.join(root, 'package.json'));
 	if (requireFile(violations, 'package.json', packageJsonContent)) {
 		const packageJson = JSON.parse(/** @type {string} */ (packageJsonContent));
-		if (packageJson.packageManager !== 'pnpm@11.5.0') {
-			violations.push('package.json must use packageManager "pnpm@11.5.0".');
+		if (packageJson.packageManager !== 'pnpm@11.17.0') {
+			violations.push('package.json must use packageManager "pnpm@11.17.0".');
 		}
 		if (packageJson.type !== 'module') {
 			violations.push('package.json must use type "module".');
