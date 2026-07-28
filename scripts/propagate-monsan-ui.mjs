@@ -217,16 +217,7 @@ function refreshConsumerLockfile(directory, environment) {
 }
 
 function installConsumerDependencies(directory, environment) {
-	runVisible(
-		'pnpm',
-		['install', '--frozen-lockfile', '--prefer-offline', '--ignore-scripts'],
-		directory,
-		environment
-	);
-}
-
-function rebuildConsumerDependencies(directory, environment) {
-	runVisible('pnpm', ['rebuild', '--pending'], directory, environment);
+	runVisible('pnpm', ['install', '--frozen-lockfile', '--prefer-offline'], directory, environment);
 }
 
 function formatConsumerWorkspace(directory, environment) {
@@ -275,7 +266,6 @@ function propagateToConsumer(repository, sha, rootDirectory) {
 			fetchEnvironment.dispose();
 		}
 		assertOnlyDependencyFilesChanged(directory);
-		rebuildConsumerDependencies(directory, consumerEnvironment);
 		formatConsumerWorkspace(directory, consumerEnvironment);
 		assertOnlyDependencyFilesChanged(directory);
 		runVisible('git', ['diff', '--check'], directory);
