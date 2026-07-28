@@ -20,7 +20,8 @@ the MonsanUI Git revision permitted to execute `prepare`. It pushes a
 open pull requests or remote branches with that name are never overwritten.
 The automation token is removed from the environment before a consumer install
 or test command runs. A prior MonsanUI revision discovered during the lockfile
-rewrite is explicitly denied, never broadly trusted.
+rewrite is explicitly denied, never broadly trusted. The workspace file is
+formatted before the consumer test runs.
 
 ## Required GitHub configuration
 

@@ -17,18 +17,18 @@ try {
 	updateMonsanUiBuildAllowance(directory, sha);
 	assert.match(
 		readFileSync(workspacePath, 'utf8'),
-		new RegExp(`monsan-ui@git\\+ssh://git@github\\.com/lucasmonsan/MonsanUI\\.git#${sha}`)
+		new RegExp(`'monsan-ui@git\\+ssh://git@github\\.com/lucasmonsan/MonsanUI\\.git#${sha}'`)
 	);
 	assert.doesNotMatch(readFileSync(workspacePath, 'utf8'), /"monsan-ui@git\+ssh/);
 
 	const previousSha = '7ed2ee30ad031997947207400ee0ad50262f25bd';
 	writeFileSync(
 		workspacePath,
-		`allowBuilds:\n  monsan-ui@git+ssh://git@github.com/lucasmonsan/MonsanUI.git#${previousSha}: true\n`
+		`allowBuilds:\n  'monsan-ui@git+ssh://git@github.com/lucasmonsan/MonsanUI.git#${previousSha}': true\n`
 	);
 	updateMonsanUiBuildAllowance(directory, sha);
-	assert.match(readFileSync(workspacePath, 'utf8'), new RegExp(`#${previousSha}: false`));
-	assert.match(readFileSync(workspacePath, 'utf8'), new RegExp(`#${sha}: true`));
+	assert.match(readFileSync(workspacePath, 'utf8'), new RegExp(`'[^']*#${previousSha}': false`));
+	assert.match(readFileSync(workspacePath, 'utf8'), new RegExp(`'[^']*#${sha}': true`));
 
 	writeFileSync(
 		workspacePath,
