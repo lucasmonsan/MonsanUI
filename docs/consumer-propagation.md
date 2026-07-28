@@ -28,4 +28,5 @@ Rooster. It needs only `Contents: Read and write` and `Pull requests: Read and
 write` for those consumers.
 
 The workflow does not merge pull requests, publish packages or deploy an app.
-It fails before cloning a consumer when the secret is unavailable.
+Until the secret is configured, it completes successfully without propagating
+changes. Configure the secret and use **Run workflow** to activate propagation.

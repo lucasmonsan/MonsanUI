@@ -39,10 +39,15 @@ jobs:
           corepack enable
           corepack prepare pnpm@11.17.0 --activate
 
+      - name: Report disabled propagation
+        if: env.GH_TOKEN == ''
+        run: echo "Consumer propagation is disabled until MONSAN_SUITE_AUTOMATION_TOKEN is configured."
+
       - name: Verify automation access
+        if: env.GH_TOKEN != ''
         run: |
-          test -n "$GH_TOKEN"
           gh auth status
 
       - name: Create consumer update pull requests
+        if: env.GH_TOKEN != ''
         run: node scripts/propagate-monsan-ui.mjs
