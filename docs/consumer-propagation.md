@@ -21,7 +21,9 @@ open pull requests or remote branches with that name are never overwritten.
 The automation token is removed from the environment before a consumer install
 or test command runs. A prior MonsanUI revision discovered during the lockfile
 rewrite is explicitly denied, never broadly trusted. The workspace file is
-formatted before the consumer test runs.
+formatted before the consumer test runs. A short-lived GitHub Actions read
+token fetches the private MonsanUI source while scripts are disabled; the
+subsequent frozen offline install and consumer test run without either token.
 
 ## Required GitHub configuration
 

@@ -59,7 +59,34 @@ function runVisibleResult(command, argumentsList, cwd, environment = process.env
 function unprivilegedEnvironment() {
 	const environment = { ...process.env };
 	delete environment.GH_TOKEN;
+	delete environment.MONSAN_UI_READ_TOKEN;
 	return environment;
+}
+
+export function createMonsanUiGitConfig(token) {
+	if (!token) {
+		throw new Error('MONSAN_UI_READ_TOKEN is required to fetch MonsanUI.');
+	}
+
+	const encodedToken = encodeURIComponent(token);
+	return `[url "https://x-access-token:${encodedToken}@github.com/"]\n\tinsteadOf = git@github.com:\n\tinsteadOf = ssh://git@github.com/\n`;
+}
+
+function monsanUiFetchEnvironment() {
+	const directory = mkdtempSync(join(tmpdir(), 'monsan-ui-git-config-'));
+	const configPath = join(directory, 'config');
+	writeFileSync(configPath, createMonsanUiGitConfig(process.env.MONSAN_UI_READ_TOKEN));
+
+	const environment = unprivilegedEnvironment();
+	environment.GIT_CONFIG_GLOBAL = configPath;
+	environment.GIT_CONFIG_NOSYSTEM = '1';
+
+	return {
+		environment,
+		dispose() {
+			rmSync(directory, { recursive: true, force: true });
+		}
+	};
 }
 
 function hasOpenPullRequest(repository, branch) {
@@ -177,7 +204,8 @@ function assertOnlyDependencyFilesChanged(directory) {
 }
 
 function refreshConsumerLockfile(directory, environment) {
-	const result = runVisibleResult('pnpm', ['install', '--lockfile-only'], directory, environment);
+	const installArguments = ['install', '--lockfile-only', '--ignore-scripts'];
+	const result = runVisibleResult('pnpm', installArguments, directory, environment);
 	if (result.status === 0) {
 		return;
 	}
@@ -185,7 +213,7 @@ function refreshConsumerLockfile(directory, environment) {
 		throw new Error(`pnpm install exited with code ${result.status ?? 'unknown'}.`);
 	}
 
-	runVisible('pnpm', ['install', '--lockfile-only'], directory, environment);
+	runVisible('pnpm', installArguments, directory, environment);
 }
 
 function formatConsumerWorkspace(directory, environment) {
@@ -224,10 +252,20 @@ function propagateToConsumer(repository, sha, rootDirectory) {
 		updateMonsanUiReference(directory, sha);
 		updateMonsanUiBuildAllowance(directory, sha);
 		const consumerEnvironment = unprivilegedEnvironment();
-		refreshConsumerLockfile(directory, consumerEnvironment);
+		const fetchEnvironment = monsanUiFetchEnvironment();
+		try {
+			refreshConsumerLockfile(directory, fetchEnvironment.environment);
+		} finally {
+			fetchEnvironment.dispose();
+		}
 		denyUnapprovedMonsanUiBuilds(directory);
 		assertOnlyDependencyFilesChanged(directory);
-		runVisible('pnpm', ['install', '--frozen-lockfile'], directory, consumerEnvironment);
+		runVisible(
+			'pnpm',
+			['install', '--frozen-lockfile', '--offline'],
+			directory,
+			consumerEnvironment
+		);
 		formatConsumerWorkspace(directory, consumerEnvironment);
 		assertOnlyDependencyFilesChanged(directory);
 		runVisible('git', ['diff', '--check'], directory);
