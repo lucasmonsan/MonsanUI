@@ -7,7 +7,7 @@ const validPackageJson = {
 	name: 'fixture',
 	private: true,
 	version: '0.0.0',
-	packageManager: 'pnpm@11.5.0',
+	packageManager: 'pnpm@11.17.0',
 	type: 'module',
 	scripts: {
 		lint: 'prettier --check . && eslint .'
@@ -145,7 +145,7 @@ await withFixture(
 		const violations = await checkToolingStandards({ root });
 		const report = violations.join('\n');
 
-		assert(report.includes('pnpm@11.5.0'), `Expected pnpm violation: ${report}`);
+		assert(report.includes('pnpm@11.17.0'), `Expected pnpm violation: ${report}`);
 		assert(report.includes('lint script'), `Expected lint script violation: ${report}`);
 		assert(report.includes('.prettierrc'), `Expected Prettier violation: ${report}`);
 		assert(report.includes('broad ignore src/**'), `Expected broad ignore violation: ${report}`);

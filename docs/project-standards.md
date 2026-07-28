@@ -39,7 +39,7 @@ monsan-ui-check-tooling
 
 The checker verifies:
 
-- `packageManager` is `pnpm@11.5.0`.
+- `packageManager` is `pnpm@11.17.0`.
 - `type` is `module`.
 - `lint` is `prettier --check . && eslint .`.
 - `.prettierrc` matches the suite Prettier config.
