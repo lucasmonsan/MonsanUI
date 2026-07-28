@@ -7,7 +7,7 @@ Koalify, Manki or Owlth.
 ## Runtime
 
 - Package manager: `pnpm@11.17.0`
-- Local dev origin: Vite dev server at `http://localhost:5180` when run
+- Local dev origin: Vite dev server at `http://localhost:5172` when run
   standalone
 - Production domain: none required for the package itself
 - Build command: `pnpm install --frozen-lockfile && pnpm build:package`
