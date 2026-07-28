@@ -23,7 +23,9 @@ or test command runs. A prior MonsanUI revision discovered during the lockfile
 rewrite is explicitly denied, never broadly trusted. The workspace file is
 formatted before the consumer test runs. A short-lived GitHub Actions read
 token fetches the private MonsanUI source while scripts are disabled; the
-subsequent frozen offline install and consumer test run without either token.
+subsequent frozen install prefers that cached source while downloading missing
+public packages without either token. The consumer test also runs without
+either token.
 
 ## Required GitHub configuration
 

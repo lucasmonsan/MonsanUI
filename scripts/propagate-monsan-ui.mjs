@@ -262,7 +262,7 @@ function propagateToConsumer(repository, sha, rootDirectory) {
 		assertOnlyDependencyFilesChanged(directory);
 		runVisible(
 			'pnpm',
-			['install', '--frozen-lockfile', '--offline'],
+			['install', '--frozen-lockfile', '--prefer-offline'],
 			directory,
 			consumerEnvironment
 		);
