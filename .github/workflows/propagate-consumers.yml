@@ -23,16 +23,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.MONSAN_SUITE_AUTOMATION_TOKEN }}
+      MONSAN_UI_READ_TOKEN: ${{ github.token }}
       MONSAN_UI_SHA: ${{ github.sha }}
 
     steps:
       - name: Checkout MonsanUI
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
+          package-manager-cache: false
 
       - name: Setup pnpm
         run: |
