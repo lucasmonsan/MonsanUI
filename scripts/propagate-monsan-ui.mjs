@@ -1,7 +1,8 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const MONSAN_UI_REPOSITORY = 'lucasmonsan/MonsanUI';
 const CONSUMERS = ['Crocode', 'Koalify', 'Manki', 'Monsan', 'Owlth', 'Rooster'];
@@ -35,6 +36,13 @@ function run(command, argumentsList, cwd) {
 }
 
 function runVisible(command, argumentsList, cwd, environment = process.env) {
+	const result = runVisibleResult(command, argumentsList, cwd, environment);
+	if (result.status !== 0) {
+		throw new Error(`${command} exited with code ${result.status ?? 'unknown'}.`);
+	}
+}
+
+function runVisibleResult(command, argumentsList, cwd, environment = process.env) {
 	const result = spawnSync(command, argumentsList, {
 		cwd,
 		env: environment,
@@ -44,9 +52,8 @@ function runVisible(command, argumentsList, cwd, environment = process.env) {
 	if (result.error) {
 		throw new Error(`Could not run ${command}: ${result.error.message}`);
 	}
-	if (result.status !== 0) {
-		throw new Error(`${command} exited with code ${result.status ?? 'unknown'}.`);
-	}
+
+	return result;
 }
 
 function unprivilegedEnvironment() {
@@ -104,6 +111,55 @@ function updateMonsanUiReference(directory, sha) {
 	writeFileSync(packagePath, `${JSON.stringify(packageJson, null, '\t')}\n`);
 }
 
+export function updateMonsanUiBuildAllowance(directory, sha) {
+	const workspacePath = join(directory, 'pnpm-workspace.yaml');
+	const workspace = readFileSync(workspacePath, 'utf8');
+	const allowanceReference = `monsan-ui@git+ssh://git@github.com/${MONSAN_UI_REPOSITORY}.git#${sha}`;
+	const allowance = `${allowanceReference}: true`;
+	const genericAllowance = /^(\s*)monsan-ui:\s+true\s*$/m;
+	const pinnedAllowance =
+		/^(\s*)(?:"?(monsan-ui@git\+ssh:\/\/git@github\.com\/lucasmonsan\/MonsanUI\.git#[0-9a-f]{40})"?):\s+true\s*$/im;
+
+	if (genericAllowance.test(workspace)) {
+		writeFileSync(workspacePath, workspace.replace(genericAllowance, `$1${allowance}`));
+		return;
+	}
+	const pinnedMatch = workspace.match(pinnedAllowance);
+	if (pinnedMatch) {
+		const indentation = pinnedMatch[1];
+		const previousAllowance = pinnedMatch[2];
+		const replacement =
+			previousAllowance === allowanceReference
+				? `${indentation}${allowance}`
+				: `${indentation}${previousAllowance}: false\n${indentation}${allowance}`;
+		writeFileSync(workspacePath, workspace.replace(pinnedAllowance, replacement));
+		return;
+	}
+
+	throw new Error(`${directory} does not allow MonsanUI build scripts.`);
+}
+
+export function denyUnapprovedMonsanUiBuilds(directory) {
+	const workspacePath = join(directory, 'pnpm-workspace.yaml');
+	const workspace = readFileSync(workspacePath, 'utf8');
+	const lines = workspace.split('\n');
+	let updated = false;
+	const resolvedLines = lines.map((line) => {
+		if (!line.includes('monsan-ui@git') || !line.endsWith('set this to true or false')) {
+			return line;
+		}
+
+		updated = true;
+		return line.replace('set this to true or false', 'false');
+	});
+
+	if (updated) {
+		writeFileSync(workspacePath, resolvedLines.join('\n'));
+	}
+
+	return updated;
+}
+
 function changedFiles(directory) {
 	return run('git', ['status', '--porcelain'], directory)
 		.split('\n')
@@ -112,11 +168,23 @@ function changedFiles(directory) {
 }
 
 function assertOnlyDependencyFilesChanged(directory) {
-	const allowedFiles = new Set(['package.json', 'pnpm-lock.yaml']);
+	const allowedFiles = new Set(['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml']);
 	const unexpectedFiles = changedFiles(directory).filter((file) => !allowedFiles.has(file));
 	if (unexpectedFiles.length > 0) {
 		throw new Error(`Unexpected consumer changes: ${unexpectedFiles.join(', ')}.`);
 	}
+}
+
+function refreshConsumerLockfile(directory, environment) {
+	const result = runVisibleResult('pnpm', ['install', '--lockfile-only'], directory, environment);
+	if (result.status === 0) {
+		return;
+	}
+	if (!denyUnapprovedMonsanUiBuilds(directory)) {
+		throw new Error(`pnpm install exited with code ${result.status ?? 'unknown'}.`);
+	}
+
+	runVisible('pnpm', ['install', '--lockfile-only'], directory, environment);
 }
 
 function propagateToConsumer(repository, sha, rootDirectory) {
@@ -144,12 +212,16 @@ function propagateToConsumer(repository, sha, rootDirectory) {
 	try {
 		runVisible('git', ['switch', '-c', branch], directory);
 		updateMonsanUiReference(directory, sha);
+		updateMonsanUiBuildAllowance(directory, sha);
 		const consumerEnvironment = unprivilegedEnvironment();
-		runVisible('pnpm', ['install', '--lockfile-only'], directory, consumerEnvironment);
+		refreshConsumerLockfile(directory, consumerEnvironment);
+		denyUnapprovedMonsanUiBuilds(directory);
+		assertOnlyDependencyFilesChanged(directory);
+		runVisible('pnpm', ['install', '--frozen-lockfile'], directory, consumerEnvironment);
 		assertOnlyDependencyFilesChanged(directory);
 		runVisible('git', ['diff', '--check'], directory);
 		runVisible('pnpm', ['test'], directory, consumerEnvironment);
-		runVisible('git', ['add', 'package.json', 'pnpm-lock.yaml'], directory);
+		runVisible('git', ['add', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml'], directory);
 		runVisible('git', ['config', 'user.name', 'monsan-suite-automation[bot]'], directory);
 		runVisible(
 			'git',
@@ -200,4 +272,7 @@ function main() {
 	}
 }
 
-main();
+const invokedScriptPath = process.argv[1] ? realpathSync(process.argv[1]) : undefined;
+if (invokedScriptPath === fileURLToPath(import.meta.url)) {
+	main();
+}

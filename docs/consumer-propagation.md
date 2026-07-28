@@ -13,11 +13,14 @@ github:lucasmonsan/MonsanUI#<full-commit-sha>
 ```
 
 It runs `pnpm install --lockfile-only`, allows only `package.json` and
-`pnpm-lock.yaml` to change, runs the consumer's complete `pnpm test`, pushes a
+`pnpm-lock.yaml` and `pnpm-workspace.yaml` to change, then runs a frozen
+install and the consumer's complete `pnpm test`. The workspace allowlist pins
+the MonsanUI Git revision permitted to execute `prepare`. It pushes a
 `chore/update-monsan-ui-<short-sha>` branch and opens a pull request. Existing
 open pull requests or remote branches with that name are never overwritten.
 The automation token is removed from the environment before a consumer install
-or test command runs.
+or test command runs. A prior MonsanUI revision discovered during the lockfile
+rewrite is explicitly denied, never broadly trusted.
 
 ## Required GitHub configuration
 
