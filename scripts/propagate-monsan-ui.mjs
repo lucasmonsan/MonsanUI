@@ -115,10 +115,10 @@ export function updateMonsanUiBuildAllowance(directory, sha) {
 	const workspacePath = join(directory, 'pnpm-workspace.yaml');
 	const workspace = readFileSync(workspacePath, 'utf8');
 	const allowanceReference = `monsan-ui@git+ssh://git@github.com/${MONSAN_UI_REPOSITORY}.git#${sha}`;
-	const allowance = `${allowanceReference}: true`;
+	const allowance = `'${allowanceReference}': true`;
 	const genericAllowance = /^(\s*)monsan-ui:\s+true\s*$/m;
 	const pinnedAllowance =
-		/^(\s*)(?:"?(monsan-ui@git\+ssh:\/\/git@github\.com\/lucasmonsan\/MonsanUI\.git#[0-9a-f]{40})"?):\s+true\s*$/im;
+		/^(\s*)(['"]?)(monsan-ui@git\+ssh:\/\/git@github\.com\/lucasmonsan\/MonsanUI\.git#[0-9a-f]{40})\2:\s+true\s*$/im;
 
 	if (genericAllowance.test(workspace)) {
 		writeFileSync(workspacePath, workspace.replace(genericAllowance, `$1${allowance}`));
@@ -127,11 +127,12 @@ export function updateMonsanUiBuildAllowance(directory, sha) {
 	const pinnedMatch = workspace.match(pinnedAllowance);
 	if (pinnedMatch) {
 		const indentation = pinnedMatch[1];
-		const previousAllowance = pinnedMatch[2];
+		const quote = pinnedMatch[2];
+		const previousAllowance = pinnedMatch[3];
 		const replacement =
 			previousAllowance === allowanceReference
 				? `${indentation}${allowance}`
-				: `${indentation}${previousAllowance}: false\n${indentation}${allowance}`;
+				: `${indentation}${quote}${previousAllowance}${quote}: false\n${indentation}${allowance}`;
 		writeFileSync(workspacePath, workspace.replace(pinnedAllowance, replacement));
 		return;
 	}
@@ -187,6 +188,15 @@ function refreshConsumerLockfile(directory, environment) {
 	runVisible('pnpm', ['install', '--lockfile-only'], directory, environment);
 }
 
+function formatConsumerWorkspace(directory, environment) {
+	runVisible(
+		'pnpm',
+		['exec', 'prettier', '--write', 'pnpm-workspace.yaml'],
+		directory,
+		environment
+	);
+}
+
 function propagateToConsumer(repository, sha, rootDirectory) {
 	const branch = `chore/update-monsan-ui-${sha.slice(0, 12)}`;
 	if (hasOpenPullRequest(repository, branch)) {
@@ -218,6 +228,7 @@ function propagateToConsumer(repository, sha, rootDirectory) {
 		denyUnapprovedMonsanUiBuilds(directory);
 		assertOnlyDependencyFilesChanged(directory);
 		runVisible('pnpm', ['install', '--frozen-lockfile'], directory, consumerEnvironment);
+		formatConsumerWorkspace(directory, consumerEnvironment);
 		assertOnlyDependencyFilesChanged(directory);
 		runVisible('git', ['diff', '--check'], directory);
 		runVisible('pnpm', ['test'], directory, consumerEnvironment);
