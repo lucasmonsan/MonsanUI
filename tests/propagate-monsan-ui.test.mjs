@@ -19,6 +19,7 @@ try {
 		readFileSync(workspacePath, 'utf8'),
 		new RegExp(`monsan-ui@git\\+ssh://git@github\\.com/lucasmonsan/MonsanUI\\.git#${sha}`)
 	);
+	assert.doesNotMatch(readFileSync(workspacePath, 'utf8'), /"monsan-ui@git\+ssh/);
 
 	writeFileSync(
 		workspacePath,

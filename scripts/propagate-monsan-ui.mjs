@@ -114,10 +114,10 @@ function updateMonsanUiReference(directory, sha) {
 export function updateMonsanUiBuildAllowance(directory, sha) {
 	const workspacePath = join(directory, 'pnpm-workspace.yaml');
 	const workspace = readFileSync(workspacePath, 'utf8');
-	const allowance = `"monsan-ui@git+ssh://git@github.com/${MONSAN_UI_REPOSITORY}.git#${sha}": true`;
+	const allowance = `monsan-ui@git+ssh://git@github.com/${MONSAN_UI_REPOSITORY}.git#${sha}: true`;
 	const genericAllowance = /^(\s*)monsan-ui:\s+true\s*$/m;
 	const pinnedAllowance =
-		/^(\s*)"monsan-ui@git\+ssh:\/\/git@github\.com\/lucasmonsan\/MonsanUI\.git#[0-9a-f]{40}":\s+true\s*$/im;
+		/^(\s*)(?:"monsan-ui@git\+ssh:\/\/git@github\.com\/lucasmonsan\/MonsanUI\.git#[0-9a-f]{40}"|monsan-ui@git\+ssh:\/\/git@github\.com\/lucasmonsan\/MonsanUI\.git#[0-9a-f]{40}):\s+true\s*$/im;
 
 	if (genericAllowance.test(workspace)) {
 		writeFileSync(workspacePath, workspace.replace(genericAllowance, `$1${allowance}`));
