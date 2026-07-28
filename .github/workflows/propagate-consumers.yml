@@ -1,0 +1,48 @@
+name: Propagate MonsanUI revision
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'scripts/propagate-monsan-ui.mjs'
+      - 'src/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: monsan-ui-consumer-propagation
+  cancel-in-progress: false
+
+jobs:
+  propagate:
+    if: github.repository == 'lucasmonsan/MonsanUI'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.MONSAN_SUITE_AUTOMATION_TOKEN }}
+      MONSAN_UI_SHA: ${{ github.sha }}
+
+    steps:
+      - name: Checkout MonsanUI
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.17.0 --activate
+
+      - name: Verify automation access
+        run: |
+          test -n "$GH_TOKEN"
+          gh auth status
+
+      - name: Create consumer update pull requests
+        run: node scripts/propagate-monsan-ui.mjs
