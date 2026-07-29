@@ -19,6 +19,10 @@ Use this file as compact context for another AI/chat. Use `README.md` for setup 
   `dev:fresh`, `preview`, `start`, `vite dev`, local app servers and any command
   that launches Owlth or another supporting project. Only the user may start
   project processes or perform manual browser/SSO validation.
+- **Git exception:** AI agents may create and switch branches or isolated
+  worktrees, inspect Git state, stage intended changes and create local commits.
+  Push, pull, fetch, merge, rebase, reset, non-branch checkout and PR creation
+  each require a separate explicit user command.
 
 ## Responsibilities
 
