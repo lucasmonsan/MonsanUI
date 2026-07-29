@@ -48,13 +48,7 @@ export type PaddingPreset =
 export type HeightPreset = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '12px' | '16px' | '20px' | '256px';
 
 export type ActionPanelWidthPreset =
-	| 'dropdown'
-	| 'compact'
-	| 'comfortable'
-	| 'wide'
-	| 'max-content'
-	| '70%'
-	| '80%';
+	'dropdown' | 'compact' | 'comfortable' | 'wide' | 'max-content' | '70%' | '80%';
 
 export type LayerPreset = 'overlay' | 'splash' | 'critical';
 

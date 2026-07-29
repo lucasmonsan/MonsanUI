@@ -19,14 +19,7 @@
 		onFlip?: () => void;
 		onswipe?: (
 			direction:
-				| 'up'
-				| 'down'
-				| 'left'
-				| 'right'
-				| 'up-left'
-				| 'up-right'
-				| 'down-left'
-				| 'down-right'
+				'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right'
 		) => void;
 		ondrag?: (offset: { x: number; y: number }) => void;
 		ondragend?: (offset: { x: number; y: number }) => void;
@@ -98,14 +91,7 @@
 		if (dist > threshold && onswipe) {
 			const angle = Math.atan2($offset.y, $offset.x) * (180 / Math.PI);
 			let direction:
-				| 'up'
-				| 'down'
-				| 'left'
-				| 'right'
-				| 'up-left'
-				| 'up-right'
-				| 'down-left'
-				| 'down-right';
+				'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right';
 
 			if (angle > -22.5 && angle <= 22.5) {
 				direction = 'right';
