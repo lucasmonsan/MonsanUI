@@ -136,13 +136,17 @@
 <main class="monsan-app-shell {viewportScroll ? 'viewport-scroll' : ''}">
 	{#if header}
 		<header class="app-shell-header">
-			{@render header()}
+			<div class="app-shell-header-content">
+				{@render header()}
+			</div>
 		</header>
 	{/if}
 
 	{#if top && showTop}
 		<div class="app-shell-top">
-			{@render top()}
+			<div class="app-shell-top-content">
+				{@render top()}
+			</div>
 		</div>
 	{/if}
 
@@ -200,7 +204,6 @@
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
-		border-bottom: var(--border-width) solid var(--border-color);
 		position: relative;
 		z-index: 60;
 	}
@@ -211,7 +214,6 @@
 		min-width: 0;
 		padding-bottom: var(--space-sm);
 		box-sizing: border-box;
-		border-bottom: var(--border-width) solid var(--border-color);
 		position: relative;
 		z-index: 50;
 	}
@@ -224,7 +226,7 @@
 		box-sizing: border-box;
 	}
 
-	.app-shell-top > :global(* + *),
+	.app-shell-top-content > :global(* + *),
 	.app-shell-bottom > :global(* + *) {
 		padding-top: var(--space-sm);
 		border-top: var(--border-width) solid var(--border-color);
@@ -236,10 +238,23 @@
 	}
 
 	.app-shell-top,
+	.app-shell-header-content,
+	.app-shell-top-content,
 	.app-shell-bottom {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm);
+	}
+
+	.app-shell-header-content,
+	.app-shell-top-content {
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+
+	.app-shell-header-content {
+		border-bottom: var(--border-width) solid var(--border-color);
 	}
 
 	.app-shell-scroll {
@@ -279,6 +294,12 @@
 	}
 
 	.viewport-scroll .app-shell-content {
+		width: min(100%, var(--container-max-width));
+		margin-inline: auto;
+	}
+
+	.viewport-scroll .app-shell-header-content,
+	.viewport-scroll .app-shell-top-content {
 		width: min(100%, var(--container-max-width));
 		margin-inline: auto;
 	}
