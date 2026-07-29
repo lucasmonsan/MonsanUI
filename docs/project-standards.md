@@ -79,6 +79,11 @@ project process or perform a manual browser/SSO validation. AI agents may run
 non-serving static checks only when separately authorized by the workspace
 rules.
 
+AI agents may create and switch branches or isolated worktrees, inspect Git
+state, stage intended changes and create local commits. They must not push,
+pull, fetch, merge, rebase, reset, checkout of a non-branch target or create a
+PR without a separate explicit user command.
+
 Run the full gate before PR:
 
 ```bash
