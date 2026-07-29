@@ -69,6 +69,16 @@ MonsanUI owns `modern-normalize`, global tokens and base CSS. Consumer apps impo
 
 ## Git Flow
 
+## AI Project Execution Prohibition
+
+No AI agent may start, run, preview or serve MonsanUI or any Monsan Suite
+project. This prohibition includes `pnpm dev`, `dev:fast`, `dev:fresh`,
+`preview`, `start`, `vite dev`, local app servers, browser-driven manual flows,
+and starting Owlth or another supporting service. Only the user may start a
+project process or perform a manual browser/SSO validation. AI agents may run
+non-serving static checks only when separately authorized by the workspace
+rules.
+
 Run the full gate before PR:
 
 ```bash

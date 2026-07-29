@@ -14,6 +14,11 @@ Use this file as compact context for another AI/chat. Use `README.md` for setup 
 - Strict ESLint and Prettier.
 - a11y must be built into components.
 - Component APIs must be stable and intentional.
+- **AI execution prohibition:** no AI agent may start, run, preview or serve
+  MonsanUI or any Monsan Suite project. This includes `pnpm dev`, `dev:fast`,
+  `dev:fresh`, `preview`, `start`, `vite dev`, local app servers and any command
+  that launches Owlth or another supporting project. Only the user may start
+  project processes or perform manual browser/SSO validation.
 
 ## Responsibilities
 
