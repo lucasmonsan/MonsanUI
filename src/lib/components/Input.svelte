@@ -9,6 +9,7 @@
 		showPasswordToggle?: boolean;
 		showPasswordLabel?: string;
 		hidePasswordLabel?: string;
+		width?: 'full' | 'auto';
 		id?: string;
 		name?: string;
 		type?: string;
@@ -48,6 +49,7 @@
 		showPasswordToggle = false,
 		showPasswordLabel,
 		hidePasswordLabel,
+		width = 'full',
 		type = 'text',
 		id,
 		name,
@@ -95,7 +97,10 @@
 	}
 </script>
 
-<div class="monsan-input-container" class:with-toggle={type === 'password' && showPasswordToggle}>
+<div
+	class="monsan-input-container width-{width}"
+	class:with-toggle={type === 'password' && showPasswordToggle}
+>
 	<!-- svelte-ignore a11y_autofocus -->
 	<input
 		bind:this={inputEl}
@@ -184,6 +189,10 @@
 	.monsan-input-container {
 		position: relative;
 		width: 100%;
+	}
+
+	.monsan-input-container.width-auto {
+		width: calc(var(--control-height) * 2);
 	}
 
 	.monsan-input {

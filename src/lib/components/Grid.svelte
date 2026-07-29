@@ -61,7 +61,7 @@
 		grid-template-columns: 3fr 1fr;
 	}
 	.columns-row-actions {
-		grid-template-columns: 1fr 100px var(--control-height);
+		grid-template-columns: 1fr calc(var(--control-height) * 2) var(--control-height);
 		align-items: end;
 	}
 	.gap-sm {
