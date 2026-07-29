@@ -39,6 +39,7 @@
 		panelPadding?: 'xs' | 'sm' | 'md';
 		panelGap?: 'xs' | 'sm' | 'md';
 		profileDisabled?: boolean;
+		showProfileAction?: boolean;
 		logoutDisabled?: boolean;
 		onProfile?: (event: MouseEvent) => void;
 		onLogin?: (event: MouseEvent) => void;
@@ -74,6 +75,7 @@
 		panelPadding = 'sm',
 		panelGap = 'sm',
 		profileDisabled = false,
+		showProfileAction = true,
 		logoutDisabled = false,
 		onProfile,
 		onLogin,
@@ -108,10 +110,12 @@
 	{panelGap}
 	{ariaLabel}
 >
-	<MenuItem href={primaryHref} disabled={profileDisabled} onclick={primaryAction} align="right">
-		<UserIcon size={16} />
-		{primaryLabel}
-	</MenuItem>
+	{#if showProfileAction}
+		<MenuItem href={primaryHref} disabled={profileDisabled} onclick={primaryAction} align="right">
+			<UserIcon size={16} />
+			{primaryLabel}
+		</MenuItem>
+	{/if}
 	{@render children?.()}
 	<MenuItem href={termsHref} onclick={onTerms} align="right">
 		<FileTextIcon size={16} />
