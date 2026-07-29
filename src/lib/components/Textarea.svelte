@@ -77,8 +77,7 @@
 		{onkeydown}
 		{onfocus}
 		{onblur}
-		style:--rows={rows}
-	></textarea>
+		style:--rows={rows}></textarea>
 {:else}
 	<textarea
 		bind:value
@@ -101,8 +100,7 @@
 		{onkeydown}
 		{onfocus}
 		{onblur}
-		style:--rows={rows}
-	></textarea>
+		style:--rows={rows}></textarea>
 {/if}
 
 <style>

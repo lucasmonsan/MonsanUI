@@ -31,6 +31,7 @@
 		themeStorageKey?: string;
 		themeAriaLabel?: string;
 		profileDisabled?: boolean;
+		showProfileAction?: boolean;
 		logoutDisabled?: boolean;
 		userMenuPanelShadow?: 'default' | 'none';
 		userMenuPanelPadding?: 'xs' | 'sm' | 'md';
@@ -67,6 +68,7 @@
 		themeStorageKey,
 		themeAriaLabel,
 		profileDisabled = false,
+		showProfileAction = true,
 		logoutDisabled = false,
 		userMenuPanelShadow = 'default',
 		userMenuPanelPadding = 'sm',
@@ -108,6 +110,7 @@
 			{privacyHref}
 			{logoutLabel}
 			{profileDisabled}
+			{showProfileAction}
 			{logoutDisabled}
 			panelShadow={userMenuPanelShadow}
 			panelPadding={userMenuPanelPadding}
@@ -136,6 +139,7 @@
 			{privacyHref}
 			{logoutLabel}
 			{profileDisabled}
+			{showProfileAction}
 			{logoutDisabled}
 			panelShadow={userMenuPanelShadow}
 			panelPadding={userMenuPanelPadding}
