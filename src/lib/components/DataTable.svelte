@@ -1,16 +1,5 @@
 <script lang="ts">
-	export type DataTableColumn = {
-		id: string;
-		label: string;
-		align?: 'start' | 'end';
-		sortable?: boolean;
-	};
-
-	export type DataTableRow = {
-		id: string;
-		cells: Array<string | number | null | undefined>;
-		selectable?: boolean;
-	};
+	import type { DataTableColumn, DataTableRow } from '$lib/types.js';
 
 	interface Props {
 		caption: string;

@@ -1,14 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import type { CommandPaletteCommand } from '$lib/types.js';
 	import Dialog from './Dialog.svelte';
-
-	export type CommandPaletteCommand = {
-		id: string;
-		label: string;
-		description?: string;
-		shortcut?: string;
-		disabled?: boolean;
-	};
 
 	interface Props {
 		open?: boolean;

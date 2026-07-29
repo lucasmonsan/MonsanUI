@@ -38,3 +38,24 @@ export interface SearchResultItem {
 	type: string;
 	iconName?: string;
 }
+
+export interface CommandPaletteCommand {
+	id: string;
+	label: string;
+	description?: string;
+	shortcut?: string;
+	disabled?: boolean;
+}
+
+export interface DataTableColumn {
+	id: string;
+	label: string;
+	align?: 'start' | 'end';
+	sortable?: boolean;
+}
+
+export interface DataTableRow {
+	id: string;
+	cells: Array<string | number | null | undefined>;
+	selectable?: boolean;
+}
