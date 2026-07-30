@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Component, Snippet } from 'svelte';
+	import Badge from './Badge.svelte';
 	import ChevronLeft from './icons/ChevronLeft.svelte';
 	import { i18n } from '../utils/i18n.svelte';
 
@@ -10,6 +11,8 @@
 		id: string;
 		label: string;
 		icon?: IconComponent;
+		badge?: number;
+		badgeLabel?: string;
 	}
 
 	let {
@@ -84,6 +87,11 @@
 	function selectTab(id: string) {
 		value = id;
 		onchange?.(id);
+	}
+
+	function getTabAriaLabel(tab: TabItem): string {
+		if (!tab.badge || tab.badge < 1) return tab.label;
+		return tab.badgeLabel ? `${tab.label}. ${tab.badgeLabel}` : `${tab.label}. ${tab.badge}`;
 	}
 
 	function getTabButtons() {
@@ -225,7 +233,7 @@
 					data-tab-id={tab.id}
 					aria-selected={value === tab.id}
 					aria-controls={getPanelId(tab.id)}
-					aria-label={tab.label}
+					aria-label={getTabAriaLabel(tab)}
 					tabindex={value === tab.id ? 0 : -1}
 				>
 					{#if tab.icon}
@@ -234,6 +242,11 @@
 						</span>
 					{/if}
 					<span class="monsan-tab-text">{tab.label}</span>
+					{#if tab.badge && tab.badge > 0}
+						<span class="monsan-tab-badge" aria-hidden="true">
+							<Badge size="sm" variant="warning" nowrap>{tab.badge}</Badge>
+						</span>
+					{/if}
 				</button>
 			{/if}
 		{/each}
