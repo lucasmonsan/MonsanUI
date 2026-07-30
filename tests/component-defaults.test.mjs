@@ -71,6 +71,15 @@ assert(
 );
 
 assert(
+	appShell.includes('class="app-shell-header-content"') &&
+		appShell.includes('class="app-shell-top-content"') &&
+		appShell.includes('.viewport-scroll .app-shell-header-content') &&
+		appShell.includes('.viewport-scroll .app-shell-top-content') &&
+		appShell.includes('width: min(100%, var(--container-max-width));'),
+	'AppShell viewportScroll must constrain header and top content to the same maximum width as the main content.'
+);
+
+assert(
 	splashScreen.includes('animation: splashFailsafe 0s linear 10s forwards') &&
 		splashScreen.includes('@keyframes splashFailsafe') &&
 		splashScreen.includes('visibility: hidden') &&
