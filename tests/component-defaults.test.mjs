@@ -39,6 +39,8 @@ assert(
 assert(
 	actionFooter.includes('enterMotion?: boolean') &&
 		actionFooter.includes('class:enter-motion={enterMotion}') &&
+		actionFooter.includes('.position-fixed.enter-motion') &&
+		actionFooter.includes('translateX(-50%) translateY') &&
 		actionFooter.includes('@media (prefers-reduced-motion: reduce)'),
 	'ActionFooter must offer optional entrance motion that respects reduced-motion preferences.'
 );
