@@ -9,6 +9,7 @@ async function readComponent(path) {
 }
 
 const appHeader = await readComponent('AppHeader.svelte');
+const actionFooter = await readComponent('ActionFooter.svelte');
 const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
@@ -33,6 +34,13 @@ const themeSelector = await readComponent('ThemeSelector.svelte');
 assert(
 	appHeader.includes("size = 'compact'"),
 	'AppHeader default must be compact, matching the Manki/Koalify suite header pattern.'
+);
+
+assert(
+	actionFooter.includes('enterMotion?: boolean') &&
+		actionFooter.includes('class:enter-motion={enterMotion}') &&
+		actionFooter.includes('@media (prefers-reduced-motion: reduce)'),
+	'ActionFooter must offer optional entrance motion that respects reduced-motion preferences.'
 );
 
 assert(

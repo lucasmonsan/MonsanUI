@@ -8,6 +8,7 @@
 		wrap?: boolean;
 		surface?: 'plain' | 'raised';
 		mobileBlockLast?: boolean;
+		enterMotion?: boolean;
 	}
 
 	let {
@@ -16,7 +17,8 @@
 		align = 'between',
 		wrap = true,
 		surface = 'plain',
-		mobileBlockLast = false
+		mobileBlockLast = false,
+		enterMotion = false
 	}: Props = $props();
 </script>
 
@@ -24,6 +26,7 @@
 	class="monsan-action-footer position-{position} align-{align} surface-{surface}"
 	class:wrap
 	class:mobile-block-last={mobileBlockLast}
+	class:enter-motion={enterMotion}
 >
 	{@render children()}
 </footer>
@@ -106,6 +109,28 @@
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
 		background: var(--bg-primary);
+	}
+
+	.enter-motion {
+		animation: monsan-action-footer-enter 0.28s var(--ease-out) both;
+	}
+
+	@keyframes monsan-action-footer-enter {
+		from {
+			opacity: 0;
+			transform: translateY(var(--space-sm));
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.enter-motion {
+			animation: none;
+		}
 	}
 
 	@media (max-width: 640px) {
