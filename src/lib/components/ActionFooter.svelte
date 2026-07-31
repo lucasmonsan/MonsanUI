@@ -115,6 +115,10 @@
 		animation: monsan-action-footer-enter 0.28s var(--ease-out) both;
 	}
 
+	.position-fixed.enter-motion {
+		animation-name: monsan-action-footer-fixed-enter;
+	}
+
 	@keyframes monsan-action-footer-enter {
 		from {
 			opacity: 0;
@@ -124,6 +128,18 @@
 		to {
 			opacity: 1;
 			transform: translateY(0);
+		}
+	}
+
+	@keyframes monsan-action-footer-fixed-enter {
+		from {
+			opacity: 0;
+			transform: translateX(-50%) translateY(var(--space-sm));
+		}
+
+		to {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
 		}
 	}
 
