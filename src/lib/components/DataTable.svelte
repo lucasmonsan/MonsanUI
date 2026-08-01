@@ -14,8 +14,10 @@
 		pageCount?: number;
 		previousPageLabel: string;
 		nextPageLabel: string;
+		rowActionLabel?: (row: DataTableRow) => string;
 		onSort?: (columnId: string) => void;
 		onPageChange?: (page: number) => void;
+		onRowActivate?: (row: DataTableRow) => void;
 	}
 
 	let {
@@ -31,8 +33,10 @@
 		pageCount = 1,
 		previousPageLabel,
 		nextPageLabel,
+		rowActionLabel,
 		onSort,
-		onPageChange
+		onPageChange,
+		onRowActivate
 	}: Props = $props();
 
 	let selectableRows = $derived(rows.filter((row) => row.selectable !== false));
@@ -77,6 +81,9 @@
 							{/if}
 						</th>
 					{/each}
+					{#if onRowActivate && rowActionLabel}
+						<th class="row-action"><span class="sr-only">{caption}</span></th>
+					{/if}
 				</tr>
 			</thead>
 			<tbody>
@@ -99,6 +106,13 @@
 								{cell ?? emptyCellLabel}
 							</td>
 						{/each}
+						{#if onRowActivate && rowActionLabel}
+							<td class="row-action" data-label={rowActionLabel(row)}>
+								<button type="button" onclick={() => onRowActivate(row)}
+									>{rowActionLabel(row)}</button
+								>
+							</td>
+						{/if}
 					</tr>
 				{/each}
 			</tbody>
@@ -151,6 +165,40 @@
 		font: inherit;
 		font-weight: 800;
 		color: inherit;
+	}
+	.row-action {
+		width: 1%;
+		white-space: nowrap;
+		text-align: right;
+	}
+	.row-action button {
+		padding: var(--space-xs) var(--space-sm);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-sm);
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		font: inherit;
+		font-weight: 800;
+		cursor: pointer;
+	}
+	.row-action button:hover {
+		background: var(--accent-primary);
+		color: var(--bg-primary);
+	}
+	.row-action button:focus-visible {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+	}
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 	.selection {
 		width: 1%;

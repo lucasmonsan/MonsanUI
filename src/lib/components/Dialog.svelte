@@ -25,7 +25,8 @@
 		showSubheader = true,
 		showFooter = true,
 		contentGrow = true,
-		ariaDescribedby
+		ariaDescribedby,
+		showCloseButton = true
 	} = $props<{
 		open: boolean;
 		title: string;
@@ -46,6 +47,7 @@
 		showFooter?: boolean;
 		contentGrow?: boolean;
 		ariaDescribedby?: string;
+		showCloseButton?: boolean;
 	}>();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -188,16 +190,18 @@
 					{#if headerActions}
 						{@render headerActions()}
 					{/if}
-					<Button
-						size="sm"
-						square
-						variant="secondary"
-						title={closeLabel}
-						ariaLabel={closeLabel}
-						onclick={close}
-					>
-						<X size={18} />
-					</Button>
+					{#if showCloseButton}
+						<Button
+							size="sm"
+							square
+							variant="secondary"
+							title={closeLabel}
+							ariaLabel={closeLabel}
+							onclick={close}
+						>
+							<X size={18} />
+						</Button>
+					{/if}
 				</div>
 			</header>
 
