@@ -4,6 +4,7 @@
 	import Button from './Button.svelte';
 	import type { PaddingPreset } from '$lib/utils/layout.js';
 	import { resolvePadding } from '$lib/utils/layout.js';
+	import { popDialog, pushDialog } from '../utils/dialogStack.js';
 
 	let {
 		open = $bindable(false),
@@ -14,6 +15,7 @@
 		subheader,
 		footer,
 		closeLabel = 'Fechar',
+		closeOnBackNavigation = true,
 		closeOnOutsideClick = true,
 		closeOnEscape = true,
 		size = 'md',
@@ -55,6 +57,7 @@
 	const subheaderId = `dialog-${dialogId}-description`;
 	let dialogRef = $state<HTMLDialogElement>();
 	let previousActiveElement: HTMLElement | null = null;
+	let historyAdded = false;
 	let activeDescribedby = $derived(
 		ariaDescribedby ?? (subheader && showSubheader ? subheaderId : undefined)
 	);
@@ -80,6 +83,10 @@
 	});
 
 	onDestroy(() => {
+		if (historyAdded) {
+			popDialog(dialogId);
+			historyAdded = false;
+		}
 		if (dialogRef?.open) {
 			dialogRef.close();
 		}
@@ -117,6 +124,24 @@
 			close();
 		}
 	}
+
+	$effect(() => {
+		if (!closeOnBackNavigation) return;
+		if (open && !historyAdded) {
+			pushDialog(dialogId, close);
+			historyAdded = true;
+		} else if (!open && historyAdded) {
+			popDialog(dialogId);
+			historyAdded = false;
+		}
+
+		return () => {
+			if (historyAdded) {
+				popDialog(dialogId);
+				historyAdded = false;
+			}
+		};
+	});
 </script>
 
 <dialog

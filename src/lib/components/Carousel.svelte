@@ -38,7 +38,6 @@
 		)
 	);
 	let activeItem = $derived(items[activeIndex]);
-	let activeDescendant = $derived(activeItem ? `${carouselId}-item-${activeItem.id}` : undefined);
 
 	$effect(() => {
 		if (!items.length) {
@@ -78,28 +77,47 @@
 		if (next) select(next.id, focus);
 	}
 
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'ArrowLeft') {
-			event.preventDefault();
-			move(-1, true);
-		} else if (event.key === 'ArrowRight') {
-			event.preventDefault();
-			move(1, true);
-		} else if (event.key === 'Home' && items[0]) {
-			event.preventDefault();
-			select(items[0].id, true);
-		} else if (event.key === 'End' && items.at(-1)) {
-			event.preventDefault();
-			select(items.at(-1)?.id ?? '', true);
-		}
-	}
-
 	function handlePointerUp(event: PointerEvent) {
 		if (pointerStartX === null) return;
 		const distance = event.clientX - pointerStartX;
 		pointerStartX = null;
 		if (Math.abs(distance) < 40) return;
 		move(distance < 0 ? 1 : -1);
+	}
+
+	function handleSlideClick(event: MouseEvent, id: string) {
+		const target = event.target;
+		if (
+			target instanceof Element &&
+			target.closest('a, button, input, select, textarea, [contenteditable="true"]')
+		)
+			return;
+		select(id);
+	}
+
+	function swipeable(node: HTMLElement) {
+		const handlePointerDown = (event: PointerEvent) => (pointerStartX = event.clientX);
+		const handlePointerCancel = () => (pointerStartX = null);
+		node.addEventListener('pointerdown', handlePointerDown);
+		node.addEventListener('pointerup', handlePointerUp);
+		node.addEventListener('pointercancel', handlePointerCancel);
+		return {
+			destroy() {
+				node.removeEventListener('pointerdown', handlePointerDown);
+				node.removeEventListener('pointerup', handlePointerUp);
+				node.removeEventListener('pointercancel', handlePointerCancel);
+			}
+		};
+	}
+
+	function selectableSlide(node: HTMLElement, id: string) {
+		const click = (event: MouseEvent) => handleSlideClick(event, id);
+		node.addEventListener('click', click);
+		return {
+			destroy() {
+				node.removeEventListener('click', click);
+			}
+		};
 	}
 </script>
 
@@ -129,14 +147,9 @@
 	<div
 		bind:this={viewport}
 		class="carousel-viewport"
-		role="listbox"
-		tabindex="0"
+		role="group"
 		aria-label={ariaLabel}
-		aria-activedescendant={activeDescendant}
-		onkeydown={handleKeydown}
-		onpointerdown={(event) => (pointerStartX = event.clientX)}
-		onpointerup={handlePointerUp}
-		onpointercancel={() => (pointerStartX = null)}
+		use:swipeable
 	>
 		<div class="carousel-track">
 			{#each items as item, index (item.id)}
@@ -146,17 +159,10 @@
 					class:active={item.id === value}
 					class:adjacent={Math.abs(index - activeIndex) === 1}
 					id={`${carouselId}-item-${item.id}`}
-					role="option"
-					aria-selected={item.id === value}
+					role="group"
+					aria-current={item.id === value ? 'true' : undefined}
 					aria-label={itemLabel(item, index)}
-					tabindex="-1"
-					onclick={() => select(item.id)}
-					onkeydown={(event) => {
-						if (event.key === 'Enter' || event.key === ' ') {
-							event.preventDefault();
-							select(item.id);
-						}
-					}}
+					use:selectableSlide={item.id}
 				>
 					{@render children(item, index, item.id === value)}
 				</div>
