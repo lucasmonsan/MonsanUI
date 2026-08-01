@@ -8,6 +8,7 @@
 		subtitle?: string;
 		logoSrc?: string;
 		logoAlt?: string;
+		logoAppearance?: 'adaptive' | 'original';
 		logo?: Snippet;
 		actions?: Snippet;
 		secondary?: Snippet;
@@ -26,6 +27,7 @@
 		subtitle,
 		logoSrc,
 		logoAlt = '',
+		logoAppearance = 'adaptive',
 		logo,
 		actions,
 		secondary,
@@ -51,7 +53,12 @@
 			<div class="app-header-brand">
 				{#if logoSrc}
 					<div class="app-header-logo" aria-hidden={logoAlt ? undefined : 'true'}>
-						<img class="app-header-logo-image" src={logoSrc} alt={logoAlt} />
+						<img
+							class="app-header-logo-image"
+							class:preserve-logo-color={logoAppearance === 'original'}
+							src={logoSrc}
+							alt={logoAlt}
+						/>
 					</div>
 				{:else if logo}
 					<div class="app-header-logo" aria-hidden="true">
@@ -205,6 +212,10 @@
 		display: block;
 		object-fit: contain;
 		filter: var(--brand-logo-filter);
+	}
+
+	.app-header-logo-image.preserve-logo-color {
+		filter: none;
 	}
 
 	.app-header-title-group {
