@@ -4,7 +4,6 @@
 	import Button from './Button.svelte';
 	import type { PaddingPreset } from '$lib/utils/layout.js';
 	import { resolvePadding } from '$lib/utils/layout.js';
-	import { pushDialog, popDialog } from '../utils/dialogStack.js';
 
 	let {
 		open = $bindable(false),
@@ -15,7 +14,6 @@
 		subheader,
 		footer,
 		closeLabel = 'Fechar',
-		closeOnBackNavigation = true,
 		closeOnOutsideClick = true,
 		closeOnEscape = true,
 		size = 'md',
@@ -55,63 +53,33 @@
 	const dialogId = Math.random().toString(36).substring(2, 9);
 	const titleId = `dialog-${dialogId}-title`;
 	const subheaderId = `dialog-${dialogId}-description`;
-	const closeAnimationMs = 180;
 	let dialogRef = $state<HTMLDialogElement>();
 	let previousActiveElement: HTMLElement | null = null;
-	let historyAdded = false;
-	let mounted = $state(open);
-	let closing = $state(false);
-	let closeAnimationTimer: ReturnType<typeof setTimeout> | undefined;
 	let activeDescribedby = $derived(
 		ariaDescribedby ?? (subheader && showSubheader ? subheaderId : undefined)
 	);
 
-	function clearCloseAnimationTimer() {
-		if (closeAnimationTimer) {
-			clearTimeout(closeAnimationTimer);
-			closeAnimationTimer = undefined;
-		}
-	}
-
-	function finishCloseAnimation() {
-		if (open) return;
-		if (dialogRef?.open) {
-			dialogRef.close();
-		}
-		restoreFocus();
-		mounted = false;
-		closing = false;
-		closeAnimationTimer = undefined;
-	}
-
-	// Keep the native dialog mounted long enough for exit animation to play.
 	$effect(() => {
-		if (open) {
-			clearCloseAnimationTimer();
-			mounted = true;
-			closing = false;
-		} else if (mounted && !closing) {
-			closing = true;
-			clearCloseAnimationTimer();
-			closeAnimationTimer = setTimeout(finishCloseAnimation, closeAnimationMs);
-		}
-	});
-
-	// Control native dialog modal display state after the element is rendered.
-	$effect(() => {
-		if (mounted && dialogRef && !dialogRef.open) {
+		if (!dialogRef) return;
+		if (open && !dialogRef.open) {
 			if (
 				document.activeElement instanceof HTMLElement &&
 				!dialogRef.contains(document.activeElement)
 			) {
 				previousActiveElement = document.activeElement;
 			}
-			dialogRef.showModal();
+			const frame = requestAnimationFrame(() => {
+				if (open && dialogRef && !dialogRef.open) dialogRef.showModal();
+			});
+			return () => cancelAnimationFrame(frame);
+		}
+		if (!open && dialogRef.open) {
+			dialogRef.close();
+			restoreFocus();
 		}
 	});
 
 	onDestroy(() => {
-		clearCloseAnimationTimer();
 		if (dialogRef?.open) {
 			dialogRef.close();
 		}
@@ -149,83 +117,65 @@
 			close();
 		}
 	}
-
-	// Back button/gesture navigation handler using dialogStack
-	$effect(() => {
-		if (!closeOnBackNavigation) return;
-		if (open && !historyAdded) {
-			pushDialog(dialogId, close);
-			historyAdded = true;
-		} else if (!open && historyAdded) {
-			popDialog(dialogId);
-			historyAdded = false;
-		}
-
-		return () => {
-			if (historyAdded) {
-				popDialog(dialogId);
-				historyAdded = false;
-			}
-		};
-	});
 </script>
 
-{#if mounted}
-	<dialog
-		bind:this={dialogRef}
-		oncancel={handleCancel}
-		onclose={handleNativeClose}
-		onpointerdown={handlePointerDown}
-		class="dialog-wrapper"
-		class:closing
-		aria-labelledby={titleId}
-		aria-describedby={activeDescribedby}
-	>
-		<!-- Dialog Content Container -->
-		<div class="modal-container anim-{animation} size-{size}" class:closing role="document">
-			<!-- Header -->
-			<header class="modal-header" class:compact={compactHeader}>
-				<h2 id={titleId}>{title}</h2>
-				<div class="modal-header-actions">
-					{#if headerActions}
-						{@render headerActions()}
-					{/if}
-					{#if showCloseButton}
-						<Button
-							size="sm"
-							square
-							variant="secondary"
-							title={closeLabel}
-							ariaLabel={closeLabel}
-							onclick={close}
-						>
-							<X size={18} />
-						</Button>
-					{/if}
-				</div>
-			</header>
-
-			{#if subheader && showSubheader}
-				<div id={subheaderId} class="modal-subheader">
-					{@render subheader()}
-				</div>
-			{/if}
-
-			<!-- Content -->
-			<div class="modal-content" class:grow={contentGrow} style:padding={resolvedPadding}>
-				{@render children()}
+<dialog
+	bind:this={dialogRef}
+	oncancel={handleCancel}
+	onclose={handleNativeClose}
+	onpointerdown={handlePointerDown}
+	class="dialog-wrapper"
+	aria-labelledby={titleId}
+	aria-describedby={activeDescribedby}
+>
+	<!-- Dialog Content Container -->
+	<div class="modal-container anim-{animation} size-{size}" role="document">
+		<!-- Header -->
+		<header class="modal-header" class:compact={compactHeader}>
+			<h2 id={titleId}>{title}</h2>
+			<div class="modal-header-actions">
+				{#if headerActions}
+					{@render headerActions()}
+				{/if}
+				{#if showCloseButton}
+					<Button
+						size="sm"
+						square
+						variant="secondary"
+						title={closeLabel}
+						ariaLabel={closeLabel}
+						onclick={close}
+					>
+						<X size={18} />
+					</Button>
+				{/if}
 			</div>
+		</header>
 
-			{#if footer && showFooter}
-				<footer class="modal-footer">
-					{@render footer()}
-				</footer>
-			{/if}
+		{#if subheader && showSubheader}
+			<div id={subheaderId} class="modal-subheader">
+				{@render subheader()}
+			</div>
+		{/if}
+
+		<!-- Content -->
+		<div class="modal-content" class:grow={contentGrow} style:padding={resolvedPadding}>
+			{@render children()}
 		</div>
-	</dialog>
-{/if}
+
+		{#if footer && showFooter}
+			<footer class="modal-footer">
+				{@render footer()}
+			</footer>
+		{/if}
+	</div>
+</dialog>
 
 <style>
+	.dialog-wrapper:not([open]) {
+		display: none;
+	}
+
 	.dialog-wrapper {
 		position: fixed;
 		top: 0;
