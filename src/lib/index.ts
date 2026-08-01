@@ -148,6 +148,7 @@ export { default as SettingsIcon } from './components/icons/Settings.svelte';
 export { default as ZapIcon } from './components/icons/Zap.svelte';
 export { default as MicroscopeIcon } from './components/icons/Microscope.svelte';
 export { default as BarChartIcon } from './components/icons/BarChart.svelte';
+export { default as ArchiveIcon } from './components/icons/Archive.svelte';
 export { default as CalendarBlankIcon } from './components/icons/CalendarBlank.svelte';
 export { default as LockIcon } from './components/icons/Lock.svelte';
 export { default as MailIcon } from './components/icons/Mail.svelte';
