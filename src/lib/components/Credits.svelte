@@ -182,6 +182,20 @@
 	}
 
 	@media (max-width: 420px) {
+		.monsan-credits:not(.variant-compact) {
+			max-width: calc(100% - var(--space-md));
+			padding-inline: var(--space-sm);
+		}
+
+		.monsan-credits:not(.variant-compact) .credits-main {
+			flex-wrap: wrap;
+			white-space: normal;
+		}
+
+		.monsan-credits:not(.variant-compact) .credits-copyright {
+			max-width: 100%;
+		}
+
 		.variant-compact {
 			padding-inline: var(--space-sm);
 			font-size: calc(var(--text-xs) * 0.88);
