@@ -9,6 +9,8 @@
 		ariaLabel: string;
 		previousLabel: string;
 		nextLabel: string;
+		variant?: 'default' | 'bare';
+		itemMaxWidth?: string;
 		itemLabel: (item: CarouselItem, index: number) => string;
 		children: import('svelte').Snippet<[CarouselItem, number, boolean]>;
 		onChange?: (id: string) => void;
@@ -20,6 +22,8 @@
 		ariaLabel,
 		previousLabel,
 		nextLabel,
+		variant = 'default',
+		itemMaxWidth = '680px',
 		itemLabel,
 		children,
 		onChange
@@ -121,7 +125,11 @@
 	}
 </script>
 
-<section class="monsan-carousel" aria-label={ariaLabel}>
+<section
+	class="monsan-carousel variant-{variant}"
+	aria-label={ariaLabel}
+	style:--carousel-item-max-width={itemMaxWidth}
+>
 	<div class="carousel-controls">
 		<button
 			type="button"
@@ -143,6 +151,14 @@
 			<ChevronLeft size={18} />
 		</button>
 	</div>
+	{#if variant === 'bare'}
+		<div class="sr-only">
+			<button type="button" aria-label={previousLabel} onclick={() => move(-1)}
+				>{previousLabel}</button
+			>
+			<button type="button" aria-label={nextLabel} onclick={() => move(1)}>{nextLabel}</button>
+		</div>
+	{/if}
 
 	<div
 		bind:this={viewport}
@@ -179,6 +195,13 @@
 		gap: var(--space-sm);
 		width: 100%;
 		min-width: 0;
+	}
+
+	.monsan-carousel.variant-bare {
+		display: block;
+	}
+	.variant-bare .carousel-controls {
+		display: none;
 	}
 
 	.carousel-controls {
@@ -238,7 +261,7 @@
 	}
 
 	.carousel-slide {
-		width: min(680px, 72vw);
+		width: min(var(--carousel-item-max-width), 72vw);
 		scroll-snap-align: center;
 		opacity: 0.48;
 		filter: saturate(0.72);
@@ -248,6 +271,17 @@
 			transform 0.2s var(--ease-out);
 		outline: none;
 		cursor: pointer;
+	}
+
+	.variant-bare .carousel-track {
+		padding-inline: max(
+			var(--space-md),
+			calc((100% - min(var(--carousel-item-max-width), 72vw)) / 2)
+		);
+	}
+
+	.variant-bare .carousel-slide {
+		width: min(var(--carousel-item-max-width), 72vw);
 	}
 
 	.carousel-slide.active {
@@ -275,6 +309,13 @@
 
 		.carousel-slide {
 			width: 78vw;
+		}
+
+		.variant-bare .carousel-track {
+			padding-inline: 0;
+		}
+		.variant-bare .carousel-slide {
+			width: calc(100% - var(--space-md));
 		}
 	}
 
