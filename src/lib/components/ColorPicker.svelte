@@ -3,6 +3,7 @@
 	import { backOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import Dialog from './Dialog.svelte';
 
 	interface Props {
 		value?: string;
@@ -13,6 +14,7 @@
 		ariaLabel?: string;
 		ariaDescribedby?: string;
 		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+		variant?: 'default' | 'swatch-dialog';
 	}
 
 	let {
@@ -23,7 +25,8 @@
 		title,
 		ariaLabel,
 		ariaDescribedby,
-		ariaInvalid
+		ariaInvalid,
+		variant = 'default'
 	}: Props = $props();
 
 	const fallbackId = `colorpicker-${Math.random().toString(36).slice(2, 11)}`;
@@ -168,6 +171,7 @@
 		bind:this={triggerEl}
 		type="button"
 		class="color-picker-trigger"
+		class:swatch={variant === 'swatch-dialog'}
 		class:invalid
 		id={triggerId}
 		{disabled}
@@ -180,22 +184,54 @@
 		aria-controls={panelId}
 	>
 		<div class="color-preview" style:background-color={value}></div>
-		<span class="color-hex">{value.toUpperCase()}</span>
+		{#if variant === 'default'}<span class="color-hex">{value.toUpperCase()}</span>{/if}
 	</button>
 
-	<input
-		bind:this={colorInputEl}
-		id={`${triggerId}-native`}
-		{name}
-		type="color"
-		bind:value
-		class="sr-only"
-		{disabled}
-		aria-invalid={ariaInvalid}
-		aria-describedby={ariaDescribedby}
-	/>
+	{#if variant === 'default'}
+		<input
+			bind:this={colorInputEl}
+			id={`${triggerId}-native`}
+			{name}
+			type="color"
+			bind:value
+			class="sr-only"
+			{disabled}
+			aria-invalid={ariaInvalid}
+			aria-describedby={ariaDescribedby}
+		/>
+	{/if}
 
-	{#if isOpen}
+	{#if variant === 'swatch-dialog'}
+		<Dialog
+			bind:open={isOpen}
+			title={i18n.t('colorPicker.palette')}
+			closeLabel={i18n.t('alert.close')}
+			size="sm"
+		>
+			<div class="color-dialog-content">
+				<div class="preset-grid" role="radiogroup" aria-label={i18n.t('colorPicker.palette')}>
+					{#each presetColors as color, index (color)}
+						<button
+							type="button"
+							class="preset-btn"
+							style:background-color={color}
+							class:active={value.toLowerCase() === color.toLowerCase()}
+							role="radio"
+							aria-checked={value.toLowerCase() === color.toLowerCase()}
+							title={getColorAriaLabel(color)}
+							aria-label={getColorAriaLabel(color)}
+							onkeydown={(event) => handlePresetKeyDown(event, index)}
+							onclick={() => selectPreset(color)}
+						></button>
+					{/each}
+				</div>
+				<label class="custom-color-field" for={`${triggerId}-custom`}
+					>{i18n.t('colorPicker.customize')}</label
+				>
+				<input id={`${triggerId}-custom`} {name} type="color" bind:value {disabled} />
+			</div>
+		</Dialog>
+	{:else if isOpen}
 		<div
 			id={panelId}
 			class="color-picker-dropdown panel"
@@ -263,6 +299,17 @@
 			border-color 0.2s var(--ease-out);
 	}
 
+	.color-picker-trigger.swatch {
+		width: var(--control-height);
+		padding: 0;
+		justify-content: center;
+	}
+
+	.color-picker-trigger.swatch .color-preview {
+		width: calc(var(--control-height) * 0.55);
+		height: calc(var(--control-height) * 0.55);
+	}
+
 	.color-picker-trigger:hover:not(:disabled) {
 		border-color: var(--accent-primary);
 		transform: translate(-1px, -1px);
@@ -319,6 +366,17 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-sm);
+	}
+
+	.color-dialog-content {
+		display: grid;
+		gap: var(--space-md);
+	}
+
+	.custom-color-field {
+		color: var(--text-secondary);
+		font-size: var(--text-xs);
+		font-weight: 700;
 	}
 
 	.dropdown-title {

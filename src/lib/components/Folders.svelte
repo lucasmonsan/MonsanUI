@@ -6,7 +6,10 @@
 	import Pencil from './icons/Pencil.svelte';
 	import QuickActions from './QuickActions.svelte';
 	import Trash from './icons/Trash.svelte';
+	import DotsThreeVertical from './icons/DotsThreeVertical.svelte';
+	import IconButton from './IconButton.svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Folder {
 		id: string;
@@ -43,6 +46,8 @@
 			options?: string;
 			colorLabel?: (color: string) => string;
 		};
+		itemMeta?: Snippet<[Folder]>;
+		maxNameLength?: number;
 	}
 
 	let {
@@ -58,7 +63,9 @@
 		onWarning,
 		showCreateModal = $bindable(false),
 		hideAddButton = false,
-		labels
+		labels,
+		itemMeta,
+		maxNameLength
 	}: Props = $props();
 
 	let foldersBarElement = $state<HTMLElement>();
@@ -233,47 +240,35 @@
 				{folder.name}
 			</button>
 
+			{#if itemMeta}<div class="folder-chip-meta">{@render itemMeta(folder)}</div>{/if}
+
 			<div class="folder-chip-actions">
-				<QuickActions variant="dropdown" align="right">
+				<QuickActions
+					variant="reveal"
+					align="right"
+					width="max-content"
+					placement="before"
+					panelLayout="horizontal"
+					surface="plain"
+					containedReveal
+					triggerLabel={l.options}
+				>
 					{#snippet trigger()}
-						<button
-							type="button"
-							class="folder-options-btn"
-							aria-label={l.options}
-							aria-haspopup="menu"
-						>
-							<svg
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<circle cx="12" cy="12" r="1.5" />
-								<circle cx="12" cy="5" r="1.5" />
-								<circle cx="12" cy="19" r="1.5" />
-							</svg>
-						</button>
+						<IconButton size="sm" variant="ghost" label={l.options}>
+							<DotsThreeVertical size={16} />
+						</IconButton>
 					{/snippet}
-					<button type="button" class="dropdown-item" onclick={(e) => triggerEdit(folder.id, e)}>
-						<span class="dropdown-item-icon" aria-hidden="true">
-							<Pencil size={12} />
-						</span>
-						{l.edit}
-					</button>
-					<button
-						type="button"
-						class="dropdown-item delete-item"
+					<IconButton size="sm" label={l.edit} onclick={(e) => triggerEdit(folder.id, e)}>
+						<Pencil size={16} />
+					</IconButton>
+					<IconButton
+						size="sm"
+						variant="error"
+						label={l.delete}
 						onclick={(e) => triggerDelete(folder.id, e)}
 					>
-						<span class="dropdown-item-icon" aria-hidden="true">
-							<Trash size={12} />
-						</span>
-						{l.delete}
-					</button>
+						<Trash size={16} />
+					</IconButton>
 				</QuickActions>
 			</div>
 		</div>
@@ -308,6 +303,7 @@
 				type="text"
 				bind:value={newFolderName}
 				placeholder={l.folderNamePlaceholder}
+				maxlength={maxNameLength}
 			/>
 		</div>
 		<div class="form-group">
@@ -411,6 +407,22 @@
 		padding: 0;
 		white-space: normal;
 		word-break: break-word;
+	}
+
+	.folders-bar.layout-grid .folder-chip:has(.folder-chip-meta) {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: start;
+	}
+
+	.folders-bar.layout-grid .folder-chip:has(.folder-chip-meta) .folder-chip-text {
+		width: 100%;
+	}
+
+	.folders-bar.layout-grid .folder-chip-meta {
+		grid-column: 1 / -1;
+		padding: 0 var(--space-sm) var(--space-sm);
+		min-width: 0;
 	}
 
 	.folders-bar.layout-grid .folder-chip-all {
@@ -536,71 +548,11 @@
 		transform: translate(2px, 2px);
 	}
 
-	.folder-chip.active .folder-options-btn {
-		color: var(--text-primary);
-		border-left-color: var(--text-primary);
-	}
-
 	.folder-chip-actions {
 		position: relative;
 		display: flex;
 		align-items: center;
 		align-self: stretch;
-	}
-
-	.folder-options-btn {
-		background: transparent;
-		border: none;
-		border-left: 1px solid var(--border-color);
-		height: 100%;
-		padding: 0 var(--space-xs);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--text-secondary);
-		border-radius: 0 var(--radius-md) var(--radius-md) 0;
-	}
-
-	.folder-options-btn:hover {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-	}
-
-	.dropdown-item {
-		background: transparent;
-		border: none;
-		padding: var(--space-xs) var(--space-sm);
-		font-family: var(--font-body);
-		font-size: var(--text-sm);
-		font-weight: 600;
-		color: var(--text-primary);
-		cursor: pointer;
-		text-align: left;
-		display: flex;
-		align-items: center;
-		transition: background-color 0.1s var(--ease-out);
-		width: 100%;
-		box-sizing: border-box;
-	}
-
-	.dropdown-item:hover {
-		background: var(--bg-secondary);
-	}
-
-	.dropdown-item.delete-item {
-		color: var(--error);
-	}
-
-	.dropdown-item.delete-item:hover {
-		background: color-mix(in srgb, var(--error) 10%, var(--bg-primary));
-	}
-
-	.dropdown-item-icon {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		margin-right: var(--space-xs);
 	}
 
 	.folder-chip.mode-edit {
@@ -727,7 +679,6 @@
 	@media (prefers-reduced-motion: reduce) {
 		.folder-chip-all,
 		.folder-chip,
-		.dropdown-item,
 		.add-folder-chip,
 		.color-btn {
 			transition: none;

@@ -1,5 +1,3 @@
-import { pushState } from '$app/navigation';
-
 type DialogInstance = {
 	id: string;
 	close: () => void;
@@ -27,8 +25,9 @@ if (typeof window !== 'undefined') {
 
 export function pushDialog(id: string, closeFn: () => void) {
 	if (typeof window === 'undefined') return;
-	// Push a dummy state to history to enable the back button swipe/click gesture
-	pushState('', { monsanDialogId: id });
+	// Keep the current URL and SvelteKit state intact while adding one history
+	// entry. A Back gesture can then close the dialog before leaving the page.
+	history.pushState({ ...history.state, monsanDialogId: id }, '', window.location.href);
 	stack.push({ id, close: closeFn });
 }
 
