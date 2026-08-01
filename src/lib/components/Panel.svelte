@@ -27,6 +27,8 @@
 		flatInteractive?: boolean;
 		/** Render shadow. Defaults to true */
 		shadow?: boolean;
+		/** Optional non-text accent used for domain-specific card identity. */
+		accentColor?: string;
 	}
 
 	let {
@@ -41,7 +43,8 @@
 		onclick,
 		onkeydown,
 		flatInteractive = false,
-		shadow = true
+		shadow = true,
+		accentColor
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -64,9 +67,11 @@
 	class:flat-interactive={flatInteractive}
 	class:full-height={fullHeight}
 	class:no-shadow={!shadow}
+	class:has-accent={Boolean(accentColor)}
 	style:padding={resolvedPadding}
 	style:max-width={resolvedMaxWidth}
 	style:height={fullHeight ? '100%' : undefined}
+	style:--panel-accent={accentColor}
 	{onclick}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}
@@ -92,6 +97,16 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 0;
+	}
+
+	.monsan-panel.has-accent {
+		box-shadow:
+			inset 5px 0 0 var(--panel-accent),
+			var(--shadow-sm);
+	}
+
+	.monsan-panel.has-accent.no-shadow {
+		box-shadow: inset 5px 0 0 var(--panel-accent);
 	}
 
 	.overflow-x {

@@ -1,0 +1,282 @@
+<script lang="ts">
+	import ChevronLeft from './icons/ChevronLeft.svelte';
+
+	type CarouselItem = { id: string } & Record<string, unknown>;
+
+	interface Props {
+		items: CarouselItem[];
+		value?: string;
+		ariaLabel: string;
+		previousLabel: string;
+		nextLabel: string;
+		itemLabel: (item: CarouselItem, index: number) => string;
+		children: import('svelte').Snippet<[CarouselItem, number, boolean]>;
+		onChange?: (id: string) => void;
+	}
+
+	let {
+		items,
+		value = $bindable(''),
+		ariaLabel,
+		previousLabel,
+		nextLabel,
+		itemLabel,
+		children,
+		onChange
+	}: Props = $props();
+
+	let viewport = $state<HTMLElement>();
+	let itemElements = $state<Record<string, HTMLElement>>({});
+	let pointerStartX = $state<number | null>(null);
+	let reducedMotion = $state(false);
+	const carouselId = `carousel-${Math.random().toString(36).slice(2, 11)}`;
+
+	let activeIndex = $derived(
+		Math.max(
+			0,
+			items.findIndex((item) => item.id === value)
+		)
+	);
+	let activeItem = $derived(items[activeIndex]);
+	let activeDescendant = $derived(activeItem ? `${carouselId}-item-${activeItem.id}` : undefined);
+
+	$effect(() => {
+		if (!items.length) {
+			value = '';
+			return;
+		}
+		if (!items.some((item) => item.id === value)) value = items[0]?.id ?? '';
+	});
+
+	$effect(() => {
+		const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+		reducedMotion = query.matches;
+		const update = (event: MediaQueryListEvent) => (reducedMotion = event.matches);
+		query.addEventListener('change', update);
+		return () => query.removeEventListener('change', update);
+	});
+
+	function select(id: string, focus = false) {
+		if (!items.some((item) => item.id === id) || id === value) return;
+		value = id;
+		onChange?.(id);
+		queueMicrotask(() => {
+			const element = itemElements[id];
+			element?.scrollIntoView({
+				behavior: reducedMotion ? 'auto' : 'smooth',
+				block: 'nearest',
+				inline: 'center'
+			});
+			if (focus) element?.focus();
+		});
+	}
+
+	function move(direction: -1 | 1, focus = false) {
+		if (!items.length) return;
+		const nextIndex = (activeIndex + direction + items.length) % items.length;
+		const next = items[nextIndex];
+		if (next) select(next.id, focus);
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'ArrowLeft') {
+			event.preventDefault();
+			move(-1, true);
+		} else if (event.key === 'ArrowRight') {
+			event.preventDefault();
+			move(1, true);
+		} else if (event.key === 'Home' && items[0]) {
+			event.preventDefault();
+			select(items[0].id, true);
+		} else if (event.key === 'End' && items.at(-1)) {
+			event.preventDefault();
+			select(items.at(-1)?.id ?? '', true);
+		}
+	}
+
+	function handlePointerUp(event: PointerEvent) {
+		if (pointerStartX === null) return;
+		const distance = event.clientX - pointerStartX;
+		pointerStartX = null;
+		if (Math.abs(distance) < 40) return;
+		move(distance < 0 ? 1 : -1);
+	}
+</script>
+
+<section class="monsan-carousel" aria-label={ariaLabel}>
+	<div class="carousel-controls">
+		<button
+			type="button"
+			class="carousel-control"
+			aria-label={previousLabel}
+			onclick={() => move(-1)}
+		>
+			<ChevronLeft size={18} />
+		</button>
+		<span class="sr-only" aria-live="polite">
+			{activeItem ? itemLabel(activeItem, activeIndex) : ''}
+		</span>
+		<button
+			type="button"
+			class="carousel-control next"
+			aria-label={nextLabel}
+			onclick={() => move(1)}
+		>
+			<ChevronLeft size={18} />
+		</button>
+	</div>
+
+	<div
+		bind:this={viewport}
+		class="carousel-viewport"
+		role="listbox"
+		tabindex="0"
+		aria-label={ariaLabel}
+		aria-activedescendant={activeDescendant}
+		onkeydown={handleKeydown}
+		onpointerdown={(event) => (pointerStartX = event.clientX)}
+		onpointerup={handlePointerUp}
+		onpointercancel={() => (pointerStartX = null)}
+	>
+		<div class="carousel-track">
+			{#each items as item, index (item.id)}
+				<div
+					bind:this={itemElements[item.id]}
+					class="carousel-slide"
+					class:active={item.id === value}
+					class:adjacent={Math.abs(index - activeIndex) === 1}
+					id={`${carouselId}-item-${item.id}`}
+					role="option"
+					aria-selected={item.id === value}
+					aria-label={itemLabel(item, index)}
+					tabindex="-1"
+					onclick={() => select(item.id)}
+					onkeydown={(event) => {
+						if (event.key === 'Enter' || event.key === ' ') {
+							event.preventDefault();
+							select(item.id);
+						}
+					}}
+				>
+					{@render children(item, index, item.id === value)}
+				</div>
+			{/each}
+		</div>
+	</div>
+</section>
+
+<style>
+	.monsan-carousel {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: center;
+		gap: var(--space-sm);
+		width: 100%;
+		min-width: 0;
+	}
+
+	.carousel-controls {
+		display: contents;
+	}
+
+	.carousel-control {
+		width: var(--control-height);
+		height: var(--control-height);
+		padding: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-sm);
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		cursor: pointer;
+	}
+
+	.carousel-control:hover {
+		transform: translate(-1px, -1px);
+		box-shadow: var(--shadow-md);
+	}
+
+	.carousel-control.next :global(svg) {
+		transform: rotate(180deg);
+	}
+
+	.carousel-control:focus-visible,
+	.carousel-slide:focus-visible {
+		outline: 3px solid var(--accent-primary);
+		outline-offset: 2px;
+	}
+
+	.carousel-viewport {
+		min-width: 0;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		touch-action: pan-y;
+	}
+
+	.carousel-viewport::-webkit-scrollbar {
+		display: none;
+	}
+
+	.carousel-track {
+		display: flex;
+		align-items: stretch;
+		gap: var(--space-sm);
+		width: max-content;
+		min-width: 100%;
+		padding: var(--space-xs) calc(10% + var(--space-xs));
+		box-sizing: border-box;
+	}
+
+	.carousel-slide {
+		width: min(680px, 72vw);
+		scroll-snap-align: center;
+		opacity: 0.48;
+		filter: saturate(0.72);
+		transition:
+			opacity 0.2s var(--ease-out),
+			filter 0.2s var(--ease-out),
+			transform 0.2s var(--ease-out);
+		outline: none;
+		cursor: pointer;
+	}
+
+	.carousel-slide.active {
+		opacity: 1;
+		filter: none;
+		transform: none;
+	}
+
+	.carousel-slide.adjacent {
+		opacity: 0.7;
+	}
+
+	@media (max-width: 640px) {
+		.monsan-carousel {
+			grid-template-columns: 1fr;
+		}
+
+		.carousel-controls {
+			display: none;
+		}
+
+		.carousel-track {
+			padding-inline: 11%;
+		}
+
+		.carousel-slide {
+			width: 78vw;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.carousel-control:hover,
+		.carousel-slide {
+			transform: none;
+			transition: none;
+		}
+	}
+</style>

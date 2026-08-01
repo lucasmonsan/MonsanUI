@@ -8,8 +8,11 @@
 	import { i18n } from '../utils/i18n.svelte';
 
 	interface Props {
-		deck: { id: string; name: string; cards?: import('../types.js').Card[] };
-		index: number;
+		/** Legacy Manki deck input. Prefer item for generic card usage. */
+		deck?: { id: string; name: string; cards?: import('../types.js').Card[] };
+		/** Generic identity and copy for non-study card collections. */
+		item?: { id: string; title: string; subtitle?: string };
+		index?: number;
 		folderColor?: string;
 		isPopoverOpen?: boolean;
 		isMenuOpen?: boolean;
@@ -41,7 +44,8 @@
 
 	let {
 		deck,
-		index,
+		item,
+		index = 0,
 		folderColor = 'default',
 		isPopoverOpen = $bindable(false),
 		isMenuOpen = $bindable(false),
@@ -63,6 +67,13 @@
 	let isLongPress = false;
 	let touchTimer: ReturnType<typeof setTimeout> | null = null;
 	let deckEl = $state<HTMLDivElement>();
+	let cardId = $derived(item?.id ?? deck?.id ?? `deck-${index}`);
+	let cardTitle = $derived(item?.title ?? deck?.name ?? '');
+	let cardSubtitle = $derived(
+		item?.subtitle ??
+			(deck ? `${deck.cards?.length ?? 0}${labels?.cards ?? i18n.t('deck.cards')}` : '')
+	);
+	let showDefaultActions = $derived(Boolean(deck));
 
 	const l = $derived({
 		cards: labels?.cards ?? i18n.t('deck.cards'),
@@ -95,7 +106,7 @@
 
 <div
 	bind:this={deckEl}
-	id={deck.id}
+	id={cardId}
 	class="deck-card panel appear-animation"
 	class:selected-for-play={isPopoverOpen || isMenuOpen}
 	data-theme={folderColor}
@@ -133,12 +144,9 @@
 	style:--delay={`${index * 0.1}s`}
 >
 	<div class="deck-info">
-		<h3>{deck.name}</h3>
+		<h3>{cardTitle}</h3>
 		<div class="deck-subtitle-row">
-			<p>
-				{deck.cards?.length ?? 0}
-				{l.cards}
-			</p>
+			{#if cardSubtitle}<p>{cardSubtitle}</p>{/if}
 			<div class="deck-badges">
 				{#if badgesSnippet}
 					{@render badgesSnippet()}
@@ -156,7 +164,7 @@
 
 	{#if actionsSnippet}
 		{@render actionsSnippet()}
-	{:else}
+	{:else if showDefaultActions}
 		<div class="quick-actions-menu">
 			<QuickActions
 				bind:open={isMenuOpen}

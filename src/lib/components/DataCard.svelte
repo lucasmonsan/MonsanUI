@@ -22,6 +22,7 @@
 		wrapHeader?: boolean;
 		alignHeader?: 'start' | 'center';
 		flatInteractive?: boolean;
+		accentColor?: string;
 	}
 
 	let {
@@ -41,7 +42,8 @@
 		onclick,
 		wrapHeader = true,
 		alignHeader = 'start',
-		flatInteractive = false
+		flatInteractive = false,
+		accentColor
 	}: Props = $props();
 
 	let panelPadding = $derived<PaddingPreset>(
@@ -60,6 +62,7 @@
 	{fullHeight}
 	interactive={interactive || Boolean(onclick)}
 	{flatInteractive}
+	{accentColor}
 	{onclick}
 >
 	<article class="monsan-data-card" class:full-height={fullHeight} class:wrap-header={wrapHeader}>

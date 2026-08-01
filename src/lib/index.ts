@@ -10,6 +10,8 @@ export { default as Button } from './components/Button.svelte';
 export { default as ButtonLabel } from './components/ButtonLabel.svelte';
 export { default as ChoiceCard } from './components/ChoiceCard.svelte';
 export { default as CardEditor } from './components/CardEditor.svelte';
+export { default as Carousel } from './components/Carousel.svelte';
+export { default as Combobox } from './components/Combobox.svelte';
 export { default as Deck } from './components/Deck.svelte';
 export { default as Folders } from './components/Folders.svelte';
 export { default as Input } from './components/Input.svelte';
