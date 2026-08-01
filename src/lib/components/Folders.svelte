@@ -28,6 +28,7 @@
 		onCreateFolder?: (name: string, color: string) => void | Folder;
 		onUpdateFolder?: (id: string, name: string, color: string) => void;
 		onWarning?: (message: string) => void;
+		showAll?: boolean;
 		showCreateModal?: boolean;
 		hideAddButton?: boolean;
 		labels?: {
@@ -47,6 +48,7 @@
 			colorLabel?: (color: string) => string;
 		};
 		itemMeta?: Snippet<[Folder]>;
+		itemActions?: Snippet<[Folder]>;
 		maxNameLength?: number;
 	}
 
@@ -61,10 +63,12 @@
 		onCreateFolder,
 		onUpdateFolder,
 		onWarning,
+		showAll = true,
 		showCreateModal = $bindable(false),
 		hideAddButton = false,
 		labels,
 		itemMeta,
+		itemActions,
 		maxNameLength
 	}: Props = $props();
 
@@ -201,21 +205,23 @@
 	class:layout-wrap={layout === 'wrap'}
 	class:layout-grid={layout === 'grid'}
 >
-	<button
-		type="button"
-		class="folder-chip-all"
-		class:active={activeId === null}
-		onclick={() => {
-			if (mode === 'select') {
-				activeId = null;
-				onSelect?.(null);
-			} else {
-				onWarning?.(l.cannotDeleteAllFolder);
-			}
-		}}
-	>
-		{l.allFolders}
-	</button>
+	{#if showAll}
+		<button
+			type="button"
+			class="folder-chip-all"
+			class:active={activeId === null}
+			onclick={() => {
+				if (mode === 'select') {
+					activeId = null;
+					onSelect?.(null);
+				} else {
+					onWarning?.(l.cannotDeleteAllFolder);
+				}
+			}}
+		>
+			{l.allFolders}
+		</button>
+	{/if}
 	{#each sortedFolders as folder (folder.id)}
 		<div
 			class="folder-chip"
@@ -243,33 +249,37 @@
 			{#if itemMeta}<div class="folder-chip-meta">{@render itemMeta(folder)}</div>{/if}
 
 			<div class="folder-chip-actions">
-				<QuickActions
-					variant="reveal"
-					align="right"
-					width="max-content"
-					placement="before"
-					panelLayout="horizontal"
-					surface="plain"
-					containedReveal
-					triggerLabel={l.options}
-				>
-					{#snippet trigger()}
-						<IconButton size="sm" variant="ghost" label={l.options}>
-							<DotsThreeVertical size={16} />
-						</IconButton>
-					{/snippet}
-					<IconButton size="sm" label={l.edit} onclick={(e) => triggerEdit(folder.id, e)}>
-						<Pencil size={16} />
-					</IconButton>
-					<IconButton
-						size="sm"
-						variant="error"
-						label={l.delete}
-						onclick={(e) => triggerDelete(folder.id, e)}
+				{#if itemActions}
+					{@render itemActions(folder)}
+				{:else}
+					<QuickActions
+						variant="reveal"
+						align="right"
+						width="max-content"
+						placement="before"
+						panelLayout="horizontal"
+						surface="plain"
+						containedReveal
+						triggerLabel={l.options}
 					>
-						<Trash size={16} />
-					</IconButton>
-				</QuickActions>
+						{#snippet trigger()}
+							<IconButton size="sm" variant="ghost" label={l.options}>
+								<DotsThreeVertical size={16} />
+							</IconButton>
+						{/snippet}
+						<IconButton size="sm" label={l.edit} onclick={(e) => triggerEdit(folder.id, e)}>
+							<Pencil size={16} />
+						</IconButton>
+						<IconButton
+							size="sm"
+							variant="error"
+							label={l.delete}
+							onclick={(e) => triggerDelete(folder.id, e)}
+						>
+							<Trash size={16} />
+						</IconButton>
+					</QuickActions>
+				{/if}
 			</div>
 		</div>
 	{/each}
