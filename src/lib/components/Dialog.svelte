@@ -288,7 +288,7 @@
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-lg);
-		width: 100%;
+		width: calc(100% - var(--space-md) * 2);
 		display: flex;
 		flex-direction: column;
 		position: relative;
@@ -311,6 +311,12 @@
 
 	.modal-container.size-xl {
 		max-width: 960px;
+	}
+
+	@media (max-width: 640px) {
+		.modal-container {
+			width: calc(100% - var(--space-sm) * 2);
+		}
 	}
 
 	.modal-header {
