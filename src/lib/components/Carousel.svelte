@@ -130,28 +130,29 @@
 	aria-label={ariaLabel}
 	style:--carousel-item-max-width={itemMaxWidth}
 >
-	<div class="carousel-controls">
-		<button
-			type="button"
-			class="carousel-control"
-			aria-label={previousLabel}
-			onclick={() => move(-1)}
-		>
-			<ChevronLeft size={18} />
-		</button>
-		<span class="sr-only" aria-live="polite">
-			{activeItem ? itemLabel(activeItem, activeIndex) : ''}
-		</span>
-		<button
-			type="button"
-			class="carousel-control next"
-			aria-label={nextLabel}
-			onclick={() => move(1)}
-		>
-			<ChevronLeft size={18} />
-		</button>
-	</div>
-	{#if variant === 'bare'}
+	{#if variant === 'default'}
+		<div class="carousel-controls">
+			<button
+				type="button"
+				class="carousel-control"
+				aria-label={previousLabel}
+				onclick={() => move(-1)}
+			>
+				<ChevronLeft size={18} />
+			</button>
+			<span class="sr-only" aria-live="polite">
+				{activeItem ? itemLabel(activeItem, activeIndex) : ''}
+			</span>
+			<button
+				type="button"
+				class="carousel-control next"
+				aria-label={nextLabel}
+				onclick={() => move(1)}
+			>
+				<ChevronLeft size={18} />
+			</button>
+		</div>
+	{:else}
 		<div class="sr-only">
 			<button type="button" aria-label={previousLabel} onclick={() => move(-1)}
 				>{previousLabel}</button
@@ -202,6 +203,18 @@
 	}
 	.variant-bare .carousel-controls {
 		display: none;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.carousel-controls {
