@@ -33,32 +33,6 @@
 	let hasOverflowTop = $state(false);
 	let hasOverflowBottom = $state(false);
 
-	function getScrollableContentBounds() {
-		if (!scrollEl || !contentEl) {
-			return null;
-		}
-
-		const children = Array.from(contentEl.children).filter(
-			(child): child is HTMLElement => child instanceof HTMLElement
-		);
-
-		if (children.length === 0) {
-			return null;
-		}
-
-		const scrollRect = scrollEl.getBoundingClientRect();
-		let top = Number.POSITIVE_INFINITY;
-		let bottom = Number.NEGATIVE_INFINITY;
-
-		for (const child of children) {
-			const childRect = child.getBoundingClientRect();
-			top = Math.min(top, childRect.top - scrollRect.top + scrollEl.scrollTop);
-			bottom = Math.max(bottom, childRect.bottom - scrollRect.top + scrollEl.scrollTop);
-		}
-
-		return { top, bottom };
-	}
-
 	function updateOverflowFade() {
 		if (!scrollEl) {
 			hasOverflowTop = false;
@@ -67,29 +41,9 @@
 		}
 
 		const threshold = 2;
-		const contentBounds = getScrollableContentBounds();
-
-		if (contentBounds) {
-			const contentHeight = contentBounds.bottom - contentBounds.top;
-			const hasMeaningfulOverflow = contentHeight > scrollEl.clientHeight + threshold;
-
-			if (!hasMeaningfulOverflow) {
-				hasOverflowTop = false;
-				hasOverflowBottom = false;
-				return;
-			}
-		}
-
-		if (!contentBounds) {
-			hasOverflowTop = scrollEl.scrollTop > threshold;
-			hasOverflowBottom =
-				scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - threshold;
-			return;
-		}
-
-		hasOverflowTop = contentBounds.top < scrollEl.scrollTop - threshold;
+		hasOverflowTop = scrollEl.scrollTop > threshold;
 		hasOverflowBottom =
-			contentBounds.bottom > scrollEl.scrollTop + scrollEl.clientHeight + threshold;
+			scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - threshold;
 	}
 
 	onMount(() => {
