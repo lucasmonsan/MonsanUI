@@ -230,6 +230,12 @@
 	}
 
 	@media (max-width: 600px) {
+		.monsan-action-bar-item.compact-below-sm {
+			flex: 0 0 var(--control-height);
+			width: var(--control-height);
+			padding: 0;
+		}
+
 		.monsan-action-bar-item.compact-below-sm .action-item-label,
 		.monsan-action-bar-item.compact-below-sm .action-item-badge {
 			display: none;

@@ -232,7 +232,7 @@
 		top: calc(100% + var(--space-xs));
 		left: 0;
 		right: 0;
-		max-height: min(18rem, 50vh);
+		max-height: min(18rem, 50dvh);
 		overflow-y: auto;
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);

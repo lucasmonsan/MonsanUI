@@ -109,7 +109,7 @@
 
 	.media-img {
 		max-width: 100%;
-		max-height: 60vh;
+		max-height: 60dvh;
 		object-fit: contain;
 		border-radius: var(--radius-sm);
 		border: var(--border-width) solid var(--border-color);

@@ -133,7 +133,7 @@
 	.command-list {
 		display: grid;
 		gap: var(--space-xs);
-		max-height: min(55vh, 28rem);
+		max-height: min(55dvh, 28rem);
 		overflow-y: auto;
 	}
 	.command-list p {

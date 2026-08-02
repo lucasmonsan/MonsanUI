@@ -329,7 +329,7 @@
 		flex-direction: column;
 		position: relative;
 		z-index: 1;
-		max-height: min(85vh, calc(var(--dialog-visual-height, 100dvh) - var(--space-md) * 2));
+		max-height: min(85dvh, calc(var(--dialog-visual-height, 100dvh) - var(--space-md) * 2));
 		overflow: hidden;
 	}
 
