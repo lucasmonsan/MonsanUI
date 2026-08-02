@@ -133,8 +133,10 @@ assert(
 assert(
 	filterDialog.includes('showTrigger?: boolean') &&
 		filterDialog.includes('showTrigger = true') &&
+		filterDialog.includes('compactActions?: boolean') &&
+		filterDialog.includes('headerActions?: Snippet') &&
 		filterDialog.includes('{#if showTrigger}'),
-	'FilterDialog must support a shared external trigger without changing its dialog structure.'
+	'FilterDialog must support a shared trigger and compact header/footer actions.'
 );
 
 assert(
