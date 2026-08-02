@@ -23,6 +23,8 @@
 		alignHeader?: 'start' | 'center';
 		flatInteractive?: boolean;
 		accentColor?: string;
+		density?: 'default' | 'compact';
+		truncateTitle?: boolean;
 	}
 
 	let {
@@ -43,7 +45,9 @@
 		wrapHeader = true,
 		alignHeader = 'start',
 		flatInteractive = false,
-		accentColor
+		accentColor,
+		density = 'default',
+		truncateTitle = false
 	}: Props = $props();
 
 	let panelPadding = $derived<PaddingPreset>(
@@ -65,7 +69,11 @@
 	{accentColor}
 	{onclick}
 >
-	<article class="monsan-data-card" class:full-height={fullHeight} class:wrap-header={wrapHeader}>
+	<article
+		class="monsan-data-card density-{density}"
+		class:full-height={fullHeight}
+		class:wrap-header={wrapHeader}
+	>
 		{#if hasTop}
 			<header class="data-card-top align-header-{alignHeader}">
 				<div class="data-card-copy">
@@ -85,7 +93,7 @@
 							</Text>
 						{/if}
 						{#if title}
-							<Text tag="h3" family="display" size="lg" weight="bold">
+							<Text tag="h3" family="display" size="lg" weight="bold" truncate={truncateTitle}>
 								{title}
 							</Text>
 						{/if}
@@ -135,6 +143,10 @@
 		min-width: 0;
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	.monsan-data-card.density-compact {
+		gap: var(--space-sm);
 	}
 
 	.full-height {
