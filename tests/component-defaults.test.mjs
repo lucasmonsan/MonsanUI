@@ -36,6 +36,7 @@ const themeSelector = await readComponent('ThemeSelector.svelte');
 const colorPicker = await readComponent('ColorPicker.svelte');
 const badge = await readComponent('Badge.svelte');
 const iconButton = await readComponent('IconButton.svelte');
+const moneyInput = await readComponent('MoneyInput.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -75,6 +76,13 @@ assert(
 assert(
 	badge.includes('onSurface?: boolean') && iconButton.includes('onSurface?: boolean'),
 	'Badge and IconButton must support readable rendering on a custom Panel surface.'
+);
+
+assert(
+	moneyInput.includes("currencyDisplay?: 'code' | 'symbol'") &&
+		moneyInput.includes("currencyDisplay = 'code'") &&
+		moneyInput.includes("currencyDisplay: 'symbol'"),
+	'MoneyInput must support an opt-in locale-aware currency symbol without changing existing code-prefix consumers.'
 );
 
 assert(

@@ -3,6 +3,8 @@
 		/** Integer minor units. The component never emits JavaScript floating-point values. */
 		value?: string;
 		currency: string;
+		/** Whether the visible currency prefix is an ISO code or a locale-aware symbol. */
+		currencyDisplay?: 'code' | 'symbol';
 		locale?: string;
 		id?: string;
 		name?: string;
@@ -20,6 +22,7 @@
 	let {
 		value = $bindable(''),
 		currency,
+		currencyDisplay = 'code',
 		locale = 'pt-BR',
 		id,
 		name,
@@ -47,6 +50,19 @@
 		return (
 			new Intl.NumberFormat(locale).formatToParts(1.1).find((part) => part.type === 'decimal')
 				?.value ?? '.'
+		);
+	}
+
+	function currencyLabel(): string {
+		if (currencyDisplay === 'code') return currency;
+		return (
+			new Intl.NumberFormat(locale, {
+				style: 'currency',
+				currency,
+				currencyDisplay: 'symbol'
+			})
+				.formatToParts(0)
+				.find((part) => part.type === 'currency')?.value ?? currency
 		);
 	}
 
@@ -110,7 +126,7 @@
 </script>
 
 <div class="money-input">
-	<span class="currency" aria-hidden="true">{currency}</span>
+	<span class="currency" aria-hidden="true">{currencyLabel()}</span>
 	<input
 		{id}
 		{name}
