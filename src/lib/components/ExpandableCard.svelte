@@ -14,7 +14,8 @@
 		expandOn = 'card', // 'card' | 'header' | 'indicator'
 		compact = false,
 		variant = 'default',
-		disabled = false
+		disabled = false,
+		accentColor
 	} = $props<{
 		expanded?: boolean;
 		title?: string;
@@ -29,6 +30,7 @@
 		compact?: boolean;
 		variant?: 'default' | 'success' | 'archived';
 		disabled?: boolean;
+		accentColor?: string;
 	}>();
 
 	const contentId = $props.id();
@@ -135,6 +137,8 @@
 	class:compact
 	class:is-expanded={expanded}
 	class:disabled
+	class:has-accent={Boolean(accentColor)}
+	style:--expandable-card-accent={accentColor}
 >
 	{@render content()}
 </article>
@@ -157,6 +161,12 @@
 
 	.monsan-expandable-card.disabled {
 		border-style: dashed;
+	}
+
+	.monsan-expandable-card.has-accent {
+		box-shadow:
+			inset 4px 0 0 var(--expandable-card-accent),
+			var(--shadow-sm);
 	}
 
 	/* Cabeçalho */

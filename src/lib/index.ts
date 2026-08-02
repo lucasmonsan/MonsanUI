@@ -69,6 +69,7 @@ export { default as PortugolRunner } from './components/PortugolRunner.svelte';
 export { default as PortugolCode } from './components/PortugolCode.svelte';
 export { default as SplitPane } from './components/SplitPane.svelte';
 export { default as Checkbox } from './components/Checkbox.svelte';
+export { default as ColorIndicator } from './components/ColorIndicator.svelte';
 export { default as Chips } from './components/Chips.svelte';
 export { default as ColorPicker } from './components/ColorPicker.svelte';
 export { default as DatePicker } from './components/DatePicker.svelte';
