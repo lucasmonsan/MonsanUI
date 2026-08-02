@@ -57,10 +57,12 @@ assert(
 
 assert(
 	dialog.includes("headerActionsGap = 'sm'") &&
+		dialog.includes("size?: 'sm' | 'md' | 'lg' | 'xl'") &&
+		dialog.includes('.modal-container.size-xl') &&
 		dialog.includes('class:closing={isClosing}') &&
 		dialog.includes('prefers-reduced-motion: reduce') &&
 		dialog.includes('setTimeout(finishClose, closeDuration)'),
-	'Dialog must support compact header action gaps and animate its exit unless reduced motion is requested.'
+	'Dialog must support compact header action gaps, an extra-wide content size, and animate its exit unless reduced motion is requested.'
 );
 
 assert(
