@@ -70,9 +70,11 @@ assert(
 );
 
 assert(
-	appShell.includes('hasMeaningfulOverflow') &&
-		appShell.includes('contentHeight > scrollEl.clientHeight + threshold'),
-	'AppShell overflow fade must require meaningful content overflow before showing edge borders.'
+	appShell.includes('hasOverflowTop = scrollEl.scrollTop > threshold') &&
+		appShell.includes(
+			'scrollEl.scrollTop + scrollEl.clientHeight < scrollEl.scrollHeight - threshold'
+		),
+	'AppShell overflow fade must show the top edge only after real upward scrolling.'
 );
 
 assert(

@@ -5,6 +5,7 @@
 	import FileText from './icons/FileText.svelte';
 	import Folder from './icons/Folder.svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import type { Snippet } from 'svelte';
 
 	let {
 		open = $bindable(false),
@@ -14,7 +15,9 @@
 		placeholder,
 		noResultsMessage,
 		loading = false,
-		loadingMessage
+		loadingMessage,
+		controls,
+		result: resultSnippet
 	} = $props<{
 		open: boolean;
 		items: SearchResultItem[];
@@ -24,6 +27,8 @@
 		noResultsMessage?: string;
 		loading?: boolean;
 		loadingMessage?: string;
+		controls?: Snippet;
+		result?: Snippet<[SearchResultItem]>;
 	}>();
 
 	const fallbackId = `search-${Math.random().toString(36).slice(2, 11)}`;
@@ -109,6 +114,10 @@
 			placeholder={activePlaceholder}
 		/>
 
+		{#if controls}
+			<div class="search-controls">{@render controls()}</div>
+		{/if}
+
 		{#if loading && hasQuery}
 			<p class="search-status" role="status" aria-live="polite">{activeLoadingMessage}</p>
 		{/if}
@@ -126,14 +135,18 @@
 						aria-selected={i === selectedIndex}
 						type="button"
 					>
-						<span class="result-type">
-							{#if result.type === 'folder'}
-								<Folder size={16} />
-							{:else}
-								<FileText size={16} />
-							{/if}
-						</span>
-						<span class="result-name">{result.name}</span>
+						{#if resultSnippet}
+							{@render resultSnippet(result)}
+						{:else}
+							<span class="result-type">
+								{#if result.type === 'folder'}
+									<Folder size={16} />
+								{:else}
+									<FileText size={16} />
+								{/if}
+							</span>
+							<span class="result-name">{result.name}</span>
+						{/if}
 					</button>
 				{/each}
 			</div>
@@ -148,6 +161,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-md);
+	}
+
+	.search-controls {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
 	}
 
 	.results-list {

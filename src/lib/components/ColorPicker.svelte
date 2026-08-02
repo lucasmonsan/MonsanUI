@@ -14,7 +14,7 @@
 		ariaLabel?: string;
 		ariaDescribedby?: string;
 		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
-		variant?: 'default' | 'swatch-dialog';
+		variant?: 'default' | 'swatch' | 'swatch-dialog';
 	}
 
 	let {
@@ -171,7 +171,7 @@
 		bind:this={triggerEl}
 		type="button"
 		class="color-picker-trigger"
-		class:swatch={variant === 'swatch-dialog'}
+		class:swatch={variant !== 'default'}
 		class:invalid
 		id={triggerId}
 		{disabled}

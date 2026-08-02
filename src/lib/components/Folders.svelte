@@ -21,7 +21,7 @@
 		items: Folder[];
 		activeId: string | null;
 		onSelect?: (id: string | null) => void;
-		layout?: 'horizontal' | 'grid' | 'wrap';
+		layout?: 'horizontal' | 'grid' | 'wrap' | 'content';
 		editingFolderId?: string | null;
 		mode?: 'select' | 'edit' | 'delete';
 		onAction?: (mode: 'edit' | 'delete', folderId: string) => void;
@@ -47,8 +47,7 @@
 			options?: string;
 			colorLabel?: (color: string) => string;
 		};
-		itemMeta?: Snippet<[Folder]>;
-		itemActions?: Snippet<[Folder]>;
+		itemsContent?: Snippet<[Folder[]]>;
 		maxNameLength?: number;
 	}
 
@@ -67,8 +66,7 @@
 		showCreateModal = $bindable(false),
 		hideAddButton = false,
 		labels,
-		itemMeta,
-		itemActions,
+		itemsContent,
 		maxNameLength
 	}: Props = $props();
 
@@ -204,8 +202,11 @@
 	class:layout-horizontal={layout === 'horizontal'}
 	class:layout-wrap={layout === 'wrap'}
 	class:layout-grid={layout === 'grid'}
+	class:layout-content={layout === 'content'}
 >
-	{#if showAll}
+	{#if itemsContent}
+		{@render itemsContent(sortedFolders)}
+	{:else if showAll}
 		<button
 			type="button"
 			class="folder-chip-all"
@@ -222,36 +223,32 @@
 			{l.allFolders}
 		</button>
 	{/if}
-	{#each sortedFolders as folder (folder.id)}
-		<div
-			class="folder-chip"
-			class:active={activeId === folder.id}
-			class:mode-edit={mode === 'edit'}
-			class:mode-delete={mode === 'delete'}
-			data-deck-theme={folder.color || 'default'}
-		>
-			<button
-				type="button"
-				class="folder-chip-text"
-				title={folder.name}
-				onclick={() => {
-					if (mode === 'select') {
-						activeId = folder.id;
-						onSelect?.(folder.id);
-					} else if (mode === 'edit' || mode === 'delete') {
-						onAction?.(mode, folder.id);
-					}
-				}}
+	{#if !itemsContent}
+		{#each sortedFolders as folder (folder.id)}
+			<div
+				class="folder-chip"
+				class:active={activeId === folder.id}
+				class:mode-edit={mode === 'edit'}
+				class:mode-delete={mode === 'delete'}
+				data-deck-theme={folder.color || 'default'}
 			>
-				{folder.name}
-			</button>
+				<button
+					type="button"
+					class="folder-chip-text"
+					title={folder.name}
+					onclick={() => {
+						if (mode === 'select') {
+							activeId = folder.id;
+							onSelect?.(folder.id);
+						} else if (mode === 'edit' || mode === 'delete') {
+							onAction?.(mode, folder.id);
+						}
+					}}
+				>
+					{folder.name}
+				</button>
 
-			{#if itemMeta}<div class="folder-chip-meta">{@render itemMeta(folder)}</div>{/if}
-
-			<div class="folder-chip-actions">
-				{#if itemActions}
-					{@render itemActions(folder)}
-				{:else}
+				<div class="folder-chip-actions">
 					<QuickActions
 						variant="reveal"
 						align="right"
@@ -279,22 +276,22 @@
 							<Trash size={16} />
 						</IconButton>
 					</QuickActions>
-				{/if}
+				</div>
 			</div>
-		</div>
-	{/each}
-	{#if !hideAddButton}
-		<button
-			type="button"
-			class="folder-chip-all add-folder-chip"
-			onclick={() => {
-				showCreateModal = true;
-			}}
-			title={l.newFolder}
-			aria-label={l.newFolder}
-		>
-			<Plus size={16} />
-		</button>
+		{/each}
+		{#if !hideAddButton}
+			<button
+				type="button"
+				class="folder-chip-all add-folder-chip"
+				onclick={() => {
+					showCreateModal = true;
+				}}
+				title={l.newFolder}
+				aria-label={l.newFolder}
+			>
+				<Plus size={16} />
+			</button>
+		{/if}
 	{/if}
 </div>
 
@@ -403,6 +400,12 @@
 		margin-bottom: 0;
 	}
 
+	.folders-bar.layout-content {
+		display: block;
+		overflow: visible;
+		padding: 0;
+	}
+
 	.folders-bar.layout-grid .folder-chip,
 	.folders-bar.layout-grid .folder-chip-all {
 		width: 100%;
@@ -417,22 +420,6 @@
 		padding: 0;
 		white-space: normal;
 		word-break: break-word;
-	}
-
-	.folders-bar.layout-grid .folder-chip:has(.folder-chip-meta) {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		align-items: start;
-	}
-
-	.folders-bar.layout-grid .folder-chip:has(.folder-chip-meta) .folder-chip-text {
-		width: 100%;
-	}
-
-	.folders-bar.layout-grid .folder-chip-meta {
-		grid-column: 1 / -1;
-		padding: 0 var(--space-sm) var(--space-sm);
-		min-width: 0;
 	}
 
 	.folders-bar.layout-grid .folder-chip-all {
