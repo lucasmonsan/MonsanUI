@@ -4,8 +4,12 @@
 		currency: string;
 		locale: string;
 		label?: string;
+		/** Short mobile-only presentation label; the full label remains available to assistive tech. */
+		compactLabel?: string;
 		ariaLabel?: string;
 		align?: 'start' | 'center' | 'end';
+		/** Optional alignment used below the compact viewport breakpoint. */
+		mobileAlign?: 'start' | 'center' | 'end';
 		fullWidth?: boolean;
 	}
 
@@ -14,8 +18,10 @@
 		currency,
 		locale,
 		label,
+		compactLabel,
 		ariaLabel,
 		align = 'start',
+		mobileAlign,
 		fullWidth = false
 	}: Props = $props();
 
@@ -52,11 +58,16 @@
 </script>
 
 <span
-	class="monsan-money-display align-{align}"
+	class="monsan-money-display align-{align} mobile-align-{mobileAlign ?? align}"
 	class:full-width={fullWidth}
-	aria-label={ariaLabel ?? display.full}
+	aria-label={ariaLabel ?? (label ? `${label}: ${display.full}` : display.full)}
 >
-	{#if label}<span class="money-label">{label}</span>{/if}
+	{#if label}
+		<span class="money-label" title={label}>
+			<span class:has-compact-label={Boolean(compactLabel)} class="money-label-full">{label}</span>
+			{#if compactLabel}<span class="money-label-compact">{compactLabel}</span>{/if}
+		</span>
+	{/if}
 	<span class="money-value" aria-hidden="true">
 		{#if display.negative}<span class="money-sign">-</span>{/if}
 		<span class="money-symbol">{display.symbol}</span>
@@ -87,6 +98,13 @@
 		color: var(--text-secondary);
 		font-size: var(--text-xs);
 		font-weight: 700;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.money-label-compact {
+		display: none;
 	}
 	.money-value {
 		display: inline-flex;
@@ -105,5 +123,26 @@
 	}
 	.money-integer {
 		font-size: var(--text-xl);
+	}
+
+	@media (max-width: 560px) {
+		.monsan-money-display.mobile-align-start {
+			align-items: flex-start;
+			text-align: start;
+		}
+		.monsan-money-display.mobile-align-center {
+			align-items: center;
+			text-align: center;
+		}
+		.monsan-money-display.mobile-align-end {
+			align-items: flex-end;
+			text-align: end;
+		}
+		.money-label-full.has-compact-label {
+			display: none;
+		}
+		.money-label-compact {
+			display: inline;
+		}
 	}
 </style>

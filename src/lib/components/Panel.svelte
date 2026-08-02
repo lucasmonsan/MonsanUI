@@ -21,6 +21,8 @@
 		overflow?: 'visible' | 'x' | 'hidden';
 		/** Click event handler */
 		onclick?: (event: MouseEvent) => void;
+		/** Accessible name for an interactive panel. */
+		ariaLabel?: string;
 		/** Keydown event handler */
 		onkeydown?: (event: KeyboardEvent) => void;
 		/** Disable hover/active physical translation animations while keeping clickability. Defaults to false */
@@ -43,6 +45,7 @@
 		variant = 'primary',
 		overflow = 'visible',
 		onclick,
+		ariaLabel,
 		onkeydown,
 		flatInteractive = false,
 		shadow = true,
@@ -92,6 +95,7 @@
 	style:--panel-surface={surfaceColor}
 	style:--monsan-surface-foreground={resolvedSurfaceForeground}
 	{onclick}
+	aria-label={ariaLabel}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}
 	tabindex={onclick ? 0 : undefined}

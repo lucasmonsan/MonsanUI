@@ -100,8 +100,11 @@ assert(
 
 assert(
 	moneyDisplay.includes("align?: 'start' | 'center' | 'end'") &&
+		moneyDisplay.includes("mobileAlign?: 'start' | 'center' | 'end'") &&
 		moneyDisplay.includes('fullWidth?: boolean') &&
-		metricBar.includes("columns: 'two' | 'three' | 'four'") &&
+		moneyDisplay.includes('compactLabel?: string') &&
+		metricBar.includes("columns: 'one' | 'two' | 'three' | 'four'") &&
+		metricBar.includes("mobileColumns?: 'one' | 'two'") &&
 		metricBar.includes('.divided > :global(:not(:first-child))'),
 	'MoneyDisplay and MetricBar must support aligned, proportionally distributed financial metrics.'
 );
@@ -145,6 +148,11 @@ assert(
 assert(
 	dialog.includes('min(85dvh') && !dialog.includes('min(85vh'),
 	'Dialog viewport caps must use dynamic viewport units.'
+);
+
+assert(
+	panel.includes('ariaLabel?: string') && panel.includes('aria-label={ariaLabel}'),
+	'Panel must support an accessible name when used as an interactive surface.'
 );
 
 assert(
