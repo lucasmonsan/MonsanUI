@@ -33,6 +33,7 @@ export { default as RouteViewport } from './components/RouteViewport.svelte';
 export { default as SkipLink } from './components/SkipLink.svelte';
 export { default as MediaDialog } from './components/MediaDialog.svelte';
 export { default as MoneyDisplay } from './components/MoneyDisplay.svelte';
+export { default as MetricBar } from './components/MetricBar.svelte';
 export { default as ExpandableCard } from './components/ExpandableCard.svelte';
 export { default as FlipCard } from './components/FlipCard.svelte';
 export { default as Tabs } from './components/Tabs.svelte';

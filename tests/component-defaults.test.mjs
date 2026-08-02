@@ -37,6 +37,8 @@ const colorPicker = await readComponent('ColorPicker.svelte');
 const badge = await readComponent('Badge.svelte');
 const iconButton = await readComponent('IconButton.svelte');
 const moneyInput = await readComponent('MoneyInput.svelte');
+const moneyDisplay = await readComponent('MoneyDisplay.svelte');
+const metricBar = await readComponent('MetricBar.svelte');
 const actionBar = await readComponent('ActionBar.svelte');
 const filterDialog = await readComponent('FilterDialog.svelte');
 const folders = await readComponent('Folders.svelte');
@@ -90,6 +92,14 @@ assert(
 		moneyInput.includes("currencyDisplay = 'code'") &&
 		moneyInput.includes("currencyDisplay: 'symbol'"),
 	'MoneyInput must support an opt-in locale-aware currency symbol without changing existing code-prefix consumers.'
+);
+
+assert(
+	moneyDisplay.includes("align?: 'start' | 'center' | 'end'") &&
+		moneyDisplay.includes('fullWidth?: boolean') &&
+		metricBar.includes("columns: 'two' | 'three' | 'four'") &&
+		metricBar.includes('.divided > :global(:not(:first-child))'),
+	'MoneyDisplay and MetricBar must support aligned, proportionally distributed financial metrics.'
 );
 
 assert(
