@@ -5,9 +5,19 @@
 		locale: string;
 		label?: string;
 		ariaLabel?: string;
+		align?: 'start' | 'center' | 'end';
+		fullWidth?: boolean;
 	}
 
-	let { minorUnits, currency, locale, label, ariaLabel }: Props = $props();
+	let {
+		minorUnits,
+		currency,
+		locale,
+		label,
+		ariaLabel,
+		align = 'start',
+		fullWidth = false
+	}: Props = $props();
 
 	function resolvedLocale(value: string) {
 		if (value === 'pt') return 'pt-BR';
@@ -41,7 +51,11 @@
 	let display = $derived(formatMoney(minorUnits, currency, locale));
 </script>
 
-<span class="monsan-money-display" aria-label={ariaLabel ?? display.full}>
+<span
+	class="monsan-money-display align-{align}"
+	class:full-width={fullWidth}
+	aria-label={ariaLabel ?? display.full}
+>
 	{#if label}<span class="money-label">{label}</span>{/if}
 	<span class="money-value" aria-hidden="true">
 		{#if display.negative}<span class="money-sign">-</span>{/if}
@@ -57,6 +71,17 @@
 		display: inline-flex;
 		flex-direction: column;
 		min-width: 0;
+	}
+	.monsan-money-display.full-width {
+		width: 100%;
+	}
+	.monsan-money-display.align-center {
+		align-items: center;
+		text-align: center;
+	}
+	.monsan-money-display.align-end {
+		align-items: flex-end;
+		text-align: end;
 	}
 	.money-label {
 		color: var(--text-secondary);
