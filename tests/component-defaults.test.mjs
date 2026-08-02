@@ -69,8 +69,10 @@ assert(
 		dialog.includes('window.visualViewport') &&
 		dialog.includes('scheduleFocusedElementVisibility') &&
 		dialog.includes('scrollIntoView') &&
+		dialog.includes('dismissVirtualKeyboard') &&
+		dialog.includes('handleBackNavigation') &&
 		dialog.includes('<Separator orientation="vertical" />'),
-	'Dialog must preserve responsive viewport insets, keep focused fields visible above a mobile keyboard, separate header actions from close, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
+	'Dialog must preserve responsive viewport insets, dismiss a mobile virtual keyboard before closing on Back, keep focused fields visible above a mobile keyboard, separate header actions from close, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
 );
 
 assert(
