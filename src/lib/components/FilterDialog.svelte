@@ -3,7 +3,11 @@
 	import Badge from './Badge.svelte';
 	import Button from './Button.svelte';
 	import Dialog from './Dialog.svelte';
+	import IconButton from './IconButton.svelte';
+	import CheckIcon from './icons/Check.svelte';
+	import RotateCwIcon from './icons/RotateCw.svelte';
 	import SlidersHorizontalIcon from './icons/SlidersHorizontal.svelte';
+	import XIcon from './icons/X.svelte';
 
 	interface Props {
 		open?: boolean;
@@ -18,8 +22,11 @@
 		disabled?: boolean;
 		/** Hide the built-in trigger when a shared external control owns the dialog state. */
 		showTrigger?: boolean;
+		/** Uses icon-only footer controls that stay on one line on narrow screens. */
+		compactActions?: boolean;
 		children: Snippet;
 		summary?: Snippet;
+		headerActions?: Snippet;
 		onOpen?: () => void;
 		onApply: () => void;
 		onClear: () => void;
@@ -38,8 +45,10 @@
 		activeCountLabel,
 		disabled = false,
 		showTrigger = true,
+		compactActions = false,
 		children,
 		summary,
+		headerActions: headerActionsContent,
 		onOpen,
 		onApply,
 		onClear,
@@ -101,16 +110,31 @@
 	compactHeader
 	closeOnBackNavigation={false}
 	onClose={onCancel}
+	headerActions={headerActionsContent}
 >
 	{@render children()}
 
 	{#snippet footer()}
-		<div class="filter-dialog-footer">
-			<Button variant="secondary" size="sm" onclick={onClear}>{clearLabel}</Button>
-			<div class="filter-dialog-primary-actions">
-				<Button variant="secondary" size="sm" onclick={cancel}>{cancelLabel}</Button>
-				<Button variant="primary" size="sm" onclick={apply}>{applyLabel}</Button>
-			</div>
+		<div class="filter-dialog-footer" class:compact-actions={compactActions}>
+			{#if compactActions}
+				<IconButton size="sm" variant="secondary" label={clearLabel} onclick={onClear}>
+					<RotateCwIcon size={16} />
+				</IconButton>
+				<div class="filter-dialog-primary-actions">
+					<IconButton size="sm" variant="secondary" label={cancelLabel} onclick={cancel}>
+						<XIcon size={16} />
+					</IconButton>
+					<IconButton size="sm" variant="primary" label={applyLabel} onclick={apply}>
+						<CheckIcon size={16} />
+					</IconButton>
+				</div>
+			{:else}
+				<Button variant="secondary" size="sm" onclick={onClear}>{clearLabel}</Button>
+				<div class="filter-dialog-primary-actions">
+					<Button variant="secondary" size="sm" onclick={cancel}>{cancelLabel}</Button>
+					<Button variant="primary" size="sm" onclick={apply}>{applyLabel}</Button>
+				</div>
+			{/if}
 		</div>
 	{/snippet}
 </Dialog>
@@ -139,13 +163,17 @@
 		width: 100%;
 	}
 
+	.filter-dialog-footer.compact-actions {
+		flex-wrap: nowrap;
+	}
+
 	@media (max-width: 480px) {
 		.monsan-filter-dialog-trigger {
 			align-items: flex-start;
 			flex-direction: column;
 		}
 
-		.filter-dialog-footer {
+		.filter-dialog-footer:not(.compact-actions) {
 			align-items: stretch;
 			flex-direction: column;
 		}
