@@ -65,8 +65,11 @@ assert(
 		dialog.includes('width: calc(100% - var(--space-sm) * 2)') &&
 		dialog.includes('class:closing={isClosing}') &&
 		dialog.includes('prefers-reduced-motion: reduce') &&
-		dialog.includes('setTimeout(finishClose, closeDuration)'),
-	'Dialog must preserve responsive viewport insets, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
+		dialog.includes('setTimeout(finishClose, closeDuration)') &&
+		dialog.includes('window.visualViewport') &&
+		dialog.includes('scheduleFocusedElementVisibility') &&
+		dialog.includes('scrollIntoView'),
+	'Dialog must preserve responsive viewport insets, keep focused fields visible above a mobile keyboard, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
 );
 
 assert(
