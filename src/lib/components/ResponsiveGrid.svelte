@@ -9,7 +9,7 @@
 
 	interface Props {
 		children: Snippet;
-		minItemWidth?: MinItemWidth;
+		minItemWidth?: MinItemWidth | number;
 		gap?: Gap;
 		align?: Align;
 		columns?: Columns;
@@ -50,7 +50,11 @@
 		columnsBreakpoint = 'lg'
 	}: Props = $props();
 
-	let minItemWidthValue = $derived(MIN_ITEM_WIDTH_VALUES[minItemWidth]);
+	let minItemWidthValue = $derived(
+		typeof minItemWidth === 'number' && Number.isFinite(minItemWidth) && minItemWidth > 0
+			? `${minItemWidth}px`
+			: MIN_ITEM_WIDTH_VALUES[minItemWidth as MinItemWidth]
+	);
 	let gapValue = $derived(GAP_VALUES[gap]);
 	let alignValue = $derived(ALIGN_VALUES[align]);
 	let fixedColumnsValue = $derived(columns === 'auto' ? '' : FIXED_COLUMN_VALUES[columns]);

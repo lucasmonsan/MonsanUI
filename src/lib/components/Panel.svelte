@@ -29,6 +29,8 @@
 		shadow?: boolean;
 		/** Optional non-text accent used for domain-specific card identity. */
 		accentColor?: string;
+		/** Optional custom surface color with an automatically contrasting foreground. */
+		surfaceColor?: string;
 	}
 
 	let {
@@ -44,11 +46,25 @@
 		onkeydown,
 		flatInteractive = false,
 		shadow = true,
-		accentColor
+		accentColor,
+		surfaceColor
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
 	let resolvedMaxWidth = $derived(resolveMaxWidth(maxWidth));
+
+	function contrastForeground(color: string | undefined) {
+		if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return undefined;
+		const channels = [1, 3, 5].map(
+			(index) => Number.parseInt(color.slice(index, index + 2), 16) / 255
+		);
+		const luminance = channels
+			.map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4))
+			.reduce((total, channel, index) => total + channel * [0.2126, 0.7152, 0.0722][index], 0);
+		return luminance > 0.179 ? '#171717' : '#ffffff';
+	}
+
+	let resolvedSurfaceForeground = $derived(contrastForeground(surfaceColor));
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (onkeydown) {
@@ -68,10 +84,13 @@
 	class:full-height={fullHeight}
 	class:no-shadow={!shadow}
 	class:has-accent={Boolean(accentColor)}
+	class:has-custom-surface={Boolean(resolvedSurfaceForeground)}
 	style:padding={resolvedPadding}
 	style:max-width={resolvedMaxWidth}
 	style:height={fullHeight ? '100%' : undefined}
 	style:--panel-accent={accentColor}
+	style:--panel-surface={surfaceColor}
+	style:--monsan-surface-foreground={resolvedSurfaceForeground}
 	{onclick}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}
@@ -107,6 +126,15 @@
 
 	.monsan-panel.has-accent.no-shadow {
 		box-shadow: inset 5px 0 0 var(--panel-accent);
+	}
+
+	.monsan-panel.has-custom-surface {
+		background-color: var(--panel-surface);
+		color: var(--monsan-surface-foreground);
+	}
+
+	.monsan-panel.has-custom-surface :global(.monsan-text) {
+		color: var(--monsan-surface-foreground) !important;
 	}
 
 	.overflow-x {

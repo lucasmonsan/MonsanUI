@@ -187,19 +187,17 @@
 		{#if variant === 'default'}<span class="color-hex">{value.toUpperCase()}</span>{/if}
 	</button>
 
-	{#if variant === 'default'}
-		<input
-			bind:this={colorInputEl}
-			id={`${triggerId}-native`}
-			{name}
-			type="color"
-			bind:value
-			class="sr-only"
-			{disabled}
-			aria-invalid={ariaInvalid}
-			aria-describedby={ariaDescribedby}
-		/>
-	{/if}
+	<input
+		bind:this={colorInputEl}
+		id={`${triggerId}-native`}
+		{name}
+		type="color"
+		bind:value
+		class="sr-only"
+		{disabled}
+		aria-invalid={ariaInvalid}
+		aria-describedby={ariaDescribedby}
+	/>
 
 	{#if variant === 'swatch-dialog'}
 		<Dialog

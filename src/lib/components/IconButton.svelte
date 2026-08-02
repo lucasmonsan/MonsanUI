@@ -12,6 +12,7 @@
 		disabled?: boolean;
 		onclick?: (event: MouseEvent) => void;
 		role?: 'menuitem';
+		onSurface?: boolean;
 	}
 
 	let {
@@ -24,7 +25,8 @@
 		selected,
 		disabled = false,
 		onclick,
-		role
+		role,
+		onSurface = false
 	}: Props = $props();
 </script>
 
@@ -36,6 +38,7 @@
 	{role}
 	class="monsan-icon-button {variant} size-{size}"
 	class:selected
+	class:on-surface={onSurface}
 	aria-label={label}
 	aria-pressed={selected}
 >
@@ -91,6 +94,17 @@
 		border-color: transparent !important;
 		box-shadow: none !important;
 		transform: none !important;
+	}
+
+	.monsan-icon-button.on-surface {
+		background: color-mix(in srgb, var(--monsan-surface-foreground) 12%, transparent);
+		border-color: var(--monsan-surface-foreground);
+		box-shadow: 2px 2px 0 var(--monsan-surface-foreground);
+		color: var(--monsan-surface-foreground);
+	}
+
+	.monsan-icon-button.ghost.on-surface:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--monsan-surface-foreground) 18%, transparent) !important;
 	}
 
 	.monsan-icon-button.ghost,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import X from '$lib/components/icons/X.svelte';
 	import Button from './Button.svelte';
 	import type { PaddingPreset } from '$lib/utils/layout.js';
@@ -22,6 +22,7 @@
 		animation = 'pop',
 		padding = 'var(--space-md)',
 		compactHeader = false,
+		headerActionsGap = 'sm',
 		showSubheader = true,
 		showFooter = true,
 		contentGrow = true,
@@ -43,6 +44,7 @@
 		animation?: 'pop' | 'slide' | 'fade' | 'scale';
 		padding?: PaddingPreset;
 		compactHeader?: boolean;
+		headerActionsGap?: 'xs' | 'sm' | 'md';
 		showSubheader?: boolean;
 		showFooter?: boolean;
 		contentGrow?: boolean;
@@ -58,12 +60,31 @@
 	let dialogRef = $state<HTMLDialogElement>();
 	let previousActiveElement: HTMLElement | null = null;
 	let historyAdded = false;
+	let isClosing = $state(false);
+	let closeTimer: ReturnType<typeof setTimeout> | undefined;
+	let prefersReducedMotion = false;
+	const closeDuration = 180;
 	let activeDescribedby = $derived(
 		ariaDescribedby ?? (subheader && showSubheader ? subheaderId : undefined)
 	);
 
+	onMount(() => {
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+		const updateMotionPreference = (event: MediaQueryListEvent) => {
+			prefersReducedMotion = event.matches;
+		};
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => motionQuery.removeEventListener('change', updateMotionPreference);
+	});
+
 	$effect(() => {
 		if (!dialogRef) return;
+		if (open && isClosing) {
+			if (closeTimer) clearTimeout(closeTimer);
+			closeTimer = undefined;
+			isClosing = false;
+		}
 		if (open && !dialogRef.open) {
 			if (
 				document.activeElement instanceof HTMLElement &&
@@ -76,13 +97,13 @@
 			});
 			return () => cancelAnimationFrame(frame);
 		}
-		if (!open && dialogRef.open) {
-			dialogRef.close();
-			restoreFocus();
+		if (!open && dialogRef.open && !isClosing) {
+			beginClose(false);
 		}
 	});
 
 	onDestroy(() => {
+		if (closeTimer) clearTimeout(closeTimer);
 		if (historyAdded) {
 			popDialog(dialogId);
 			historyAdded = false;
@@ -100,9 +121,28 @@
 		previousActiveElement = null;
 	}
 
-	function close() {
+	function finishClose() {
+		if (closeTimer) clearTimeout(closeTimer);
+		closeTimer = undefined;
+		isClosing = false;
+		if (dialogRef?.open) dialogRef.close();
+		restoreFocus();
+	}
+
+	function beginClose(notify: boolean) {
+		if (isClosing) return;
+		if (notify) onClose?.();
 		open = false;
-		onClose?.();
+		if (!dialogRef?.open || prefersReducedMotion) {
+			finishClose();
+			return;
+		}
+		isClosing = true;
+		closeTimer = setTimeout(finishClose, closeDuration);
+	}
+
+	function close() {
+		beginClose(true);
 	}
 
 	function handleCancel(e: Event) {
@@ -110,7 +150,7 @@
 		if (!closeOnEscape) {
 			return;
 		}
-		close();
+		beginClose(true);
 	}
 
 	function handleNativeClose() {
@@ -150,15 +190,23 @@
 	onclose={handleNativeClose}
 	onpointerdown={handlePointerDown}
 	class="dialog-wrapper"
+	class:closing={isClosing}
 	aria-labelledby={titleId}
 	aria-describedby={activeDescribedby}
 >
 	<!-- Dialog Content Container -->
-	<div class="modal-container anim-{animation} size-{size}" role="document">
+	<div
+		class="modal-container anim-{animation} size-{size}"
+		class:closing={isClosing}
+		role="document"
+	>
 		<!-- Header -->
 		<header class="modal-header" class:compact={compactHeader}>
 			<h2 id={titleId}>{title}</h2>
-			<div class="modal-header-actions">
+			<div
+				class="modal-header-actions"
+				style:--modal-header-actions-gap={`var(--space-${headerActionsGap})`}
+			>
 				{#if headerActions}
 					{@render headerActions()}
 				{/if}
@@ -277,7 +325,7 @@
 	.modal-header-actions {
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm);
+		gap: var(--modal-header-actions-gap, var(--space-sm));
 	}
 
 	.modal-header h2 {

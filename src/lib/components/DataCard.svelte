@@ -23,6 +23,7 @@
 		alignHeader?: 'start' | 'center';
 		flatInteractive?: boolean;
 		accentColor?: string;
+		surfaceColor?: string;
 		density?: 'default' | 'compact';
 		truncateTitle?: boolean;
 	}
@@ -46,6 +47,7 @@
 		alignHeader = 'start',
 		flatInteractive = false,
 		accentColor,
+		surfaceColor,
 		density = 'default',
 		truncateTitle = false
 	}: Props = $props();
@@ -67,6 +69,7 @@
 	interactive={interactive || Boolean(onclick)}
 	{flatInteractive}
 	{accentColor}
+	{surfaceColor}
 	{onclick}
 >
 	<article
