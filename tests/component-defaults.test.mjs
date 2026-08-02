@@ -68,8 +68,9 @@ assert(
 		dialog.includes('setTimeout(finishClose, closeDuration)') &&
 		dialog.includes('window.visualViewport') &&
 		dialog.includes('scheduleFocusedElementVisibility') &&
-		dialog.includes('scrollIntoView'),
-	'Dialog must preserve responsive viewport insets, keep focused fields visible above a mobile keyboard, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
+		dialog.includes('scrollIntoView') &&
+		dialog.includes('<Separator orientation="vertical" />'),
+	'Dialog must preserve responsive viewport insets, keep focused fields visible above a mobile keyboard, separate header actions from close, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
 );
 
 assert(
@@ -110,6 +111,7 @@ assert(
 		actionBar.includes("align?: 'center' | 'start'") &&
 		actionBar.includes('badge?: number') &&
 		actionBar.includes("compactBelow?: 'sm'") &&
+		actionBar.includes('flex: 0 0 var(--control-height)') &&
 		actionBar.includes('color-mix(in srgb, var(--action-surface) 10%, var(--bg-primary))'),
 	'ActionBar items must support softened domain colors, alignment and compact accessible counters.'
 );
@@ -134,9 +136,15 @@ assert(
 	filterDialog.includes('showTrigger?: boolean') &&
 		filterDialog.includes('showTrigger = true') &&
 		filterDialog.includes('compactActions?: boolean') &&
+		filterDialog.includes('compactApplyLabel?: string') &&
 		filterDialog.includes('headerActions?: Snippet') &&
 		filterDialog.includes('{#if showTrigger}'),
 	'FilterDialog must support a shared trigger and compact header/footer actions.'
+);
+
+assert(
+	dialog.includes('min(85dvh') && !dialog.includes('min(85vh'),
+	'Dialog viewport caps must use dynamic viewport units.'
 );
 
 assert(

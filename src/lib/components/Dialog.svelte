@@ -2,6 +2,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import X from '$lib/components/icons/X.svelte';
 	import Button from './Button.svelte';
+	import Separator from './Separator.svelte';
 	import type { PaddingPreset } from '$lib/utils/layout.js';
 	import { resolvePadding } from '$lib/utils/layout.js';
 	import { popDialog, pushDialog } from '../utils/dialogStack.js';
@@ -242,6 +243,9 @@
 				{#if headerActions}
 					{@render headerActions()}
 				{/if}
+				{#if headerActions && showCloseButton}
+					<Separator orientation="vertical" />
+				{/if}
 				{#if showCloseButton}
 					<Button
 						size="sm"
@@ -325,7 +329,7 @@
 		flex-direction: column;
 		position: relative;
 		z-index: 1;
-		max-height: min(85vh, calc(var(--dialog-visual-height, 100dvh) - var(--space-md) * 2));
+		max-height: min(85dvh, calc(var(--dialog-visual-height, 100dvh) - var(--space-md) * 2));
 		overflow: hidden;
 	}
 

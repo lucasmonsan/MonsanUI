@@ -24,6 +24,8 @@
 		showTrigger?: boolean;
 		/** Uses icon-only footer controls that stay on one line on narrow screens. */
 		compactActions?: boolean;
+		/** Optional short visible label for the compact apply action. */
+		compactApplyLabel?: string;
 		children: Snippet;
 		summary?: Snippet;
 		headerActions?: Snippet;
@@ -46,6 +48,7 @@
 		disabled = false,
 		showTrigger = true,
 		compactActions = false,
+		compactApplyLabel,
 		children,
 		summary,
 		headerActions: headerActionsContent,
@@ -124,9 +127,16 @@
 					<IconButton size="sm" variant="secondary" label={cancelLabel} onclick={cancel}>
 						<XIcon size={16} />
 					</IconButton>
-					<IconButton size="sm" variant="primary" label={applyLabel} onclick={apply}>
-						<CheckIcon size={16} />
-					</IconButton>
+					{#if compactApplyLabel}
+						<Button size="sm" variant="primary" onclick={apply}>
+							<CheckIcon size={16} />
+							{compactApplyLabel}
+						</Button>
+					{:else}
+						<IconButton size="sm" variant="primary" label={applyLabel} onclick={apply}>
+							<CheckIcon size={16} />
+						</IconButton>
+					{/if}
 				</div>
 			{:else}
 				<Button variant="secondary" size="sm" onclick={onClear}>{clearLabel}</Button>
