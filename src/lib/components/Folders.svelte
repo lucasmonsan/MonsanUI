@@ -8,6 +8,7 @@
 	import Trash from './icons/Trash.svelte';
 	import DotsThreeVertical from './icons/DotsThreeVertical.svelte';
 	import IconButton from './IconButton.svelte';
+	import ColorPicker from './ColorPicker.svelte';
 	import { i18n } from '../utils/i18n.svelte';
 	import type { Snippet } from 'svelte';
 
@@ -160,6 +161,18 @@
 
 	function customColor(color: string | undefined): string | undefined {
 		return color && /^#[0-9a-f]{6}$/i.test(color) ? color : undefined;
+	}
+
+	function colorPickerValue(color: string): string {
+		const legacyColors: Record<string, string> = {
+			blue: '#3d5a80',
+			green: '#2d6a4f',
+			yellow: '#e9c46a',
+			purple: '#9d4edd',
+			orange: '#f4a261',
+			red: '#e63946'
+		};
+		return customColor(color) ?? legacyColors[color] ?? '#c44933';
 	}
 
 	function contrastForeground(color: string | undefined): string | undefined {
@@ -334,23 +347,20 @@
 		<div class="form-group">
 			<span class="label-span">{l.folderColorLabel}</span>
 			<div class="color-options">
-				{#each ['default', 'blue', 'green', 'yellow', 'purple', 'orange', 'red'] as color (color)}
-					<button
-						type="button"
-						class="color-btn"
-						class:default={color === 'default'}
-						class:blue={color === 'blue'}
-						class:green={color === 'green'}
-						class:yellow={color === 'yellow'}
-						class:purple={color === 'purple'}
-						class:orange={color === 'orange'}
-						class:red={color === 'red'}
-						class:selected={newFolderColor === color}
-						onclick={() => (newFolderColor = color)}
-						title={getColorLabel(color)}
-						aria-label={getColorLabel(color)}
-					></button>
-				{/each}
+				<button
+					type="button"
+					class="color-btn default"
+					class:selected={newFolderColor === 'default'}
+					onclick={() => (newFolderColor = 'default')}
+					title={getColorLabel('default')}
+					aria-label={getColorLabel('default')}
+				></button>
+				<ColorPicker
+					value={colorPickerValue(newFolderColor)}
+					variant="swatch"
+					ariaLabel={l.folderColorLabel}
+					onchange={(color) => (newFolderColor = color)}
+				/>
 			</div>
 		</div>
 		<div class="form-actions">
@@ -673,24 +683,6 @@
 
 	.color-btn.default {
 		background: var(--bg-secondary);
-	}
-	.color-btn.blue {
-		background: var(--folder-blue, var(--info));
-	}
-	.color-btn.green {
-		background: var(--folder-green, var(--success));
-	}
-	.color-btn.yellow {
-		background: var(--folder-yellow, var(--warning));
-	}
-	.color-btn.purple {
-		background: var(--folder-purple, var(--accent-secondary));
-	}
-	.color-btn.orange {
-		background: var(--folder-orange, var(--accent-primary));
-	}
-	.color-btn.red {
-		background: var(--folder-red, var(--error));
 	}
 
 	.form-actions {

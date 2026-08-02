@@ -100,8 +100,17 @@ assert(
 assert(
 	folders.includes('function customColor') &&
 		folders.includes('color-mix(in srgb, var(--folder-custom-color) 10%, var(--bg-secondary))') &&
-		folders.includes('background: var(--folder-custom-color)'),
+		folders.includes('background: var(--folder-custom-color)') &&
+		folders.includes('<ColorPicker') &&
+		folders.includes('onchange={(color) => (newFolderColor = color)}'),
 	'Folders must support any ColorPicker hex color as a softened passive surface and a pure active state.'
+);
+
+assert(
+	colorPicker.includes('onchange?: (value: string) => void') &&
+		colorPicker.includes('function handleNativeInput') &&
+		colorPicker.includes('onchange?.(color)'),
+	'ColorPicker must notify consumers about preset and custom color changes.'
 );
 
 assert(

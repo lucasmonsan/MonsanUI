@@ -15,6 +15,7 @@
 		ariaLabel?: string;
 		ariaDescribedby?: string;
 		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+		onchange?: (value: string) => void;
 		variant?: 'default' | 'swatch' | 'swatch-dialog';
 	}
 
@@ -27,6 +28,7 @@
 		ariaLabel,
 		ariaDescribedby,
 		ariaInvalid,
+		onchange,
 		variant = 'default'
 	}: Props = $props();
 
@@ -74,9 +76,16 @@
 	function selectPreset(color: string, close = true) {
 		if (disabled) return;
 		value = color;
+		onchange?.(color);
 		if (close) {
 			closePopover(true);
 		}
+	}
+
+	function handleNativeInput(event: Event) {
+		const nextValue = (event.currentTarget as HTMLInputElement).value;
+		value = nextValue;
+		onchange?.(nextValue);
 	}
 
 	function handleOutsideClick(event: MouseEvent) {
@@ -193,7 +202,8 @@
 		id={`${triggerId}-native`}
 		{name}
 		type="color"
-		bind:value
+		{value}
+		oninput={handleNativeInput}
 		class="sr-only"
 		{disabled}
 		aria-invalid={ariaInvalid}
@@ -227,7 +237,14 @@
 				<label class="custom-color-field" for={`${triggerId}-custom`}
 					>{i18n.t('colorPicker.customize')}</label
 				>
-				<input id={`${triggerId}-custom`} {name} type="color" bind:value {disabled} />
+				<input
+					id={`${triggerId}-custom`}
+					{name}
+					type="color"
+					{value}
+					oninput={handleNativeInput}
+					{disabled}
+				/>
 			</div>
 		</Dialog>
 	{:else if isOpen}
