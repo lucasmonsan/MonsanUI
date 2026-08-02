@@ -62,7 +62,10 @@
 	let historyAdded = false;
 	let isClosing = $state(false);
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
+	let focusedVisibilityFrame: number | undefined;
 	let prefersReducedMotion = false;
+	let visualViewportHeight = $state<string | undefined>(undefined);
+	let visualViewportOffsetTop = $state<string | undefined>(undefined);
 	const closeDuration = 180;
 	let activeDescribedby = $derived(
 		ariaDescribedby ?? (subheader && showSubheader ? subheaderId : undefined)
@@ -74,8 +77,23 @@
 		const updateMotionPreference = (event: MediaQueryListEvent) => {
 			prefersReducedMotion = event.matches;
 		};
+		const viewport = window.visualViewport;
+		const updateVisualViewport = () => {
+			if (!viewport) return;
+			visualViewportHeight = `${viewport.height}px`;
+			visualViewportOffsetTop = `${viewport.offsetTop}px`;
+			scheduleFocusedElementVisibility();
+		};
+
 		motionQuery.addEventListener('change', updateMotionPreference);
-		return () => motionQuery.removeEventListener('change', updateMotionPreference);
+		updateVisualViewport();
+		viewport?.addEventListener('resize', updateVisualViewport);
+		viewport?.addEventListener('scroll', updateVisualViewport);
+		return () => {
+			motionQuery.removeEventListener('change', updateMotionPreference);
+			viewport?.removeEventListener('resize', updateVisualViewport);
+			viewport?.removeEventListener('scroll', updateVisualViewport);
+		};
 	});
 
 	$effect(() => {
@@ -104,6 +122,7 @@
 
 	onDestroy(() => {
 		if (closeTimer) clearTimeout(closeTimer);
+		if (focusedVisibilityFrame) cancelAnimationFrame(focusedVisibilityFrame);
 		if (historyAdded) {
 			popDialog(dialogId);
 			historyAdded = false;
@@ -143,6 +162,16 @@
 
 	function close() {
 		beginClose(true);
+	}
+
+	function scheduleFocusedElementVisibility() {
+		if (focusedVisibilityFrame) cancelAnimationFrame(focusedVisibilityFrame);
+		focusedVisibilityFrame = requestAnimationFrame(() => {
+			focusedVisibilityFrame = undefined;
+			const activeElement = document.activeElement;
+			if (!(activeElement instanceof HTMLElement) || !dialogRef?.contains(activeElement)) return;
+			activeElement.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
+		});
 	}
 
 	function handleCancel(e: Event) {
@@ -189,8 +218,11 @@
 	oncancel={handleCancel}
 	onclose={handleNativeClose}
 	onpointerdown={handlePointerDown}
+	onfocusin={scheduleFocusedElementVisibility}
 	class="dialog-wrapper"
 	class:closing={isClosing}
+	style:--dialog-visual-height={visualViewportHeight}
+	style:--dialog-visual-offset-top={visualViewportOffsetTop}
 	aria-labelledby={titleId}
 	aria-describedby={activeDescribedby}
 >
@@ -251,12 +283,12 @@
 
 	.dialog-wrapper {
 		position: fixed;
-		top: 0;
+		top: var(--dialog-visual-offset-top, 0px);
 		left: 0;
 		width: 100vw;
-		height: 100vh;
+		height: var(--dialog-visual-height, 100dvh);
 		max-width: 100vw;
-		max-height: 100vh;
+		max-height: var(--dialog-visual-height, 100dvh);
 		background: rgba(0, 0, 0, 0.6);
 		backdrop-filter: blur(4px);
 		border: none;
@@ -293,7 +325,7 @@
 		flex-direction: column;
 		position: relative;
 		z-index: 1;
-		max-height: min(85vh, calc(100dvh - var(--space-md) * 2));
+		max-height: min(85vh, calc(var(--dialog-visual-height, 100dvh) - var(--space-md) * 2));
 		overflow: hidden;
 	}
 
@@ -357,6 +389,7 @@
 		flex: 0 1 auto;
 		min-height: 0;
 		overflow-y: auto;
+		scroll-padding-block: var(--space-md);
 	}
 
 	.modal-content.grow {
