@@ -15,6 +15,7 @@ const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
 const dndMatch = await readComponent('DndMatch.svelte');
 const dndOrder = await readComponent('DndOrder.svelte');
+const dialog = await readComponent('Dialog.svelte');
 const expandableCard = await readComponent('ExpandableCard.svelte');
 const filterToolbar = await readComponent('FilterToolbar.svelte');
 const formField = await readComponent('FormField.svelte');
@@ -23,6 +24,8 @@ const floatingPortal = await readFile(
 	'utf8'
 );
 const multipleChoice = await readComponent('questions/MultipleChoice.svelte');
+const panel = await readComponent('Panel.svelte');
+const responsiveGrid = await readComponent('ResponsiveGrid.svelte');
 const singleChoice = await readComponent('questions/SingleChoice.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
 const splashScreen = await readComponent('SplashScreen.svelte');
@@ -30,6 +33,9 @@ const stack = await readComponent('Stack.svelte');
 const suiteHeaderActions = await readComponent('SuiteHeaderActions.svelte');
 const suiteUserMenu = await readComponent('SuiteUserMenu.svelte');
 const themeSelector = await readComponent('ThemeSelector.svelte');
+const colorPicker = await readComponent('ColorPicker.svelte');
+const badge = await readComponent('Badge.svelte');
+const iconButton = await readComponent('IconButton.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -43,6 +49,38 @@ assert(
 		actionFooter.includes('translateX(-50%) translateY') &&
 		actionFooter.includes('@media (prefers-reduced-motion: reduce)'),
 	'ActionFooter must offer optional entrance motion that respects reduced-motion preferences.'
+);
+
+assert(
+	dialog.includes("headerActionsGap = 'sm'") &&
+		dialog.includes('class:closing={isClosing}') &&
+		dialog.includes('prefers-reduced-motion: reduce') &&
+		dialog.includes('setTimeout(finishClose, closeDuration)'),
+	'Dialog must support compact header action gaps and animate its exit unless reduced motion is requested.'
+);
+
+assert(
+	responsiveGrid.includes('minItemWidth?: MinItemWidth | number') &&
+		responsiveGrid.includes('`${minItemWidth}px`'),
+	'ResponsiveGrid must support an explicit reusable pixel minimum for dense card dialogs.'
+);
+
+assert(
+	panel.includes('surfaceColor?: string') &&
+		panel.includes('contrastForeground(surfaceColor)') &&
+		panel.includes('--monsan-surface-foreground'),
+	'Panel must expose a custom color surface with a computed contrasting foreground.'
+);
+
+assert(
+	badge.includes('onSurface?: boolean') && iconButton.includes('onSurface?: boolean'),
+	'Badge and IconButton must support readable rendering on a custom Panel surface.'
+);
+
+assert(
+	colorPicker.includes('bind:this={colorInputEl}') &&
+		!colorPicker.includes("{#if variant === 'default'}\n\t\t<input"),
+	'ColorPicker swatches must retain access to the native custom-color input.'
 );
 
 assert(

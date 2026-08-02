@@ -7,6 +7,7 @@
 		nowrap = false,
 		title,
 		ariaLabel,
+		onSurface = false,
 		children
 	} = $props<{
 		variant?: 'default' | 'primary' | 'secondary' | 'success' | 'due' | 'new' | 'warning';
@@ -16,6 +17,7 @@
 		nowrap?: boolean;
 		title?: string;
 		ariaLabel?: string;
+		onSurface?: boolean;
 		children?: import('svelte').Snippet;
 	}>();
 </script>
@@ -25,6 +27,7 @@
 	class:no-shrink={noShrink}
 	class:full-width={fullWidth}
 	class:nowrap
+	class:on-surface={onSurface}
 	{title}
 	role={ariaLabel ? 'img' : undefined}
 	aria-label={ariaLabel}
@@ -135,5 +138,12 @@
 
 	.nowrap {
 		white-space: nowrap;
+	}
+
+	.monsan-badge.on-surface {
+		background: color-mix(in srgb, var(--monsan-surface-foreground) 16%, transparent);
+		border-color: var(--monsan-surface-foreground);
+		box-shadow: 1px 1px 0 var(--monsan-surface-foreground);
+		color: var(--monsan-surface-foreground);
 	}
 </style>
