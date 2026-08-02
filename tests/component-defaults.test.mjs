@@ -37,6 +37,9 @@ const colorPicker = await readComponent('ColorPicker.svelte');
 const badge = await readComponent('Badge.svelte');
 const iconButton = await readComponent('IconButton.svelte');
 const moneyInput = await readComponent('MoneyInput.svelte');
+const actionBar = await readComponent('ActionBar.svelte');
+const filterDialog = await readComponent('FilterDialog.svelte');
+const folders = await readComponent('Folders.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -83,6 +86,38 @@ assert(
 		moneyInput.includes("currencyDisplay = 'code'") &&
 		moneyInput.includes("currencyDisplay: 'symbol'"),
 	'MoneyInput must support an opt-in locale-aware currency symbol without changing existing code-prefix consumers.'
+);
+
+assert(
+	actionBar.includes('surfaceColor?: string') &&
+		actionBar.includes("align?: 'center' | 'start'") &&
+		actionBar.includes('badge?: number') &&
+		actionBar.includes("compactBelow?: 'sm'") &&
+		actionBar.includes('color-mix(in srgb, var(--action-surface) 10%, var(--bg-primary))'),
+	'ActionBar items must support softened domain colors, alignment and compact accessible counters.'
+);
+
+assert(
+	folders.includes('function customColor') &&
+		folders.includes('color-mix(in srgb, var(--folder-custom-color) 10%, var(--bg-secondary))') &&
+		folders.includes('background: var(--folder-custom-color)') &&
+		folders.includes('<ColorPicker') &&
+		folders.includes('onchange={(color) => (newFolderColor = color)}'),
+	'Folders must support any ColorPicker hex color as a softened passive surface and a pure active state.'
+);
+
+assert(
+	colorPicker.includes('onchange?: (value: string) => void') &&
+		colorPicker.includes('function handleNativeInput') &&
+		colorPicker.includes('onchange?.(color)'),
+	'ColorPicker must notify consumers about preset and custom color changes.'
+);
+
+assert(
+	filterDialog.includes('showTrigger?: boolean') &&
+		filterDialog.includes('showTrigger = true') &&
+		filterDialog.includes('{#if showTrigger}'),
+	'FilterDialog must support a shared external trigger without changing its dialog structure.'
 );
 
 assert(

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
+	import Badge from './Badge.svelte';
 
 	type IconComponent = Component<{ size?: number }>;
 
@@ -10,6 +11,16 @@
 		flex?: 1 | 2 | 3;
 		onlyIcon?: boolean;
 		folderTheme?: string;
+		/** Optional custom color for a domain item. It is blended into a readable surface. */
+		surfaceColor?: string;
+		/** Align the action contents inside its available width. */
+		align?: 'center' | 'start';
+		/** Optional compact count displayed after the action label. */
+		badge?: number;
+		/** Accessible description of the count, appended to the action label. */
+		badgeLabel?: string;
+		/** Keep the icon while hiding label and count below this breakpoint. */
+		compactBelow?: 'sm';
 		title?: string;
 		disabled?: boolean;
 		onclick?: (e: MouseEvent) => void;
@@ -26,6 +37,12 @@
 	}>();
 
 	let containerEl = $state<HTMLElement>();
+
+	function actionAriaLabel(action: ActionItem): string {
+		return action.badge && action.badge > 0 && action.badgeLabel
+			? `${action.label}. ${action.badgeLabel}`
+			: action.label;
+	}
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (!containerEl) return;
@@ -67,14 +84,18 @@
 				type="button"
 				class="monsan-action-bar-item"
 				class:only-icon={action.onlyIcon}
+				class:align-start={action.align === 'start'}
+				class:has-surface={Boolean(action.surfaceColor)}
+				class:compact-below-sm={action.compactBelow === 'sm'}
 				class:disabled={action.disabled}
 				class:flex-1={(action.flex ?? 1) === 1}
 				class:flex-2={action.flex === 2}
 				class:flex-3={action.flex === 3}
 				data-deck-theme={action.folderTheme}
+				style:--action-surface={action.surfaceColor}
 				onclick={action.onclick}
 				title={action.title ?? action.label}
-				aria-label={action.label}
+				aria-label={actionAriaLabel(action)}
 				disabled={action.disabled}
 				tabindex={index === 0 ? 0 : -1}
 			>
@@ -86,6 +107,11 @@
 				{#if !action.onlyIcon}
 					<span class="action-item-label">
 						{action.label}
+					</span>
+				{/if}
+				{#if action.badge && action.badge > 0}
+					<span class="action-item-badge" aria-hidden="true">
+						<Badge size="sm" variant="primary">{action.badge}</Badge>
 					</span>
 				{/if}
 			</button>
@@ -122,6 +148,14 @@
 			background-color 0.2s var(--ease-out);
 		cursor: pointer;
 		box-sizing: border-box;
+	}
+
+	.monsan-action-bar-item.has-surface {
+		background: color-mix(in srgb, var(--action-surface) 10%, var(--bg-primary));
+	}
+
+	.monsan-action-bar-item.align-start {
+		justify-content: flex-start;
 	}
 
 	.flex-1 {
@@ -180,12 +214,25 @@
 		text-overflow: ellipsis;
 	}
 
+	.action-item-badge {
+		display: flex;
+		align-items: center;
+		flex: 0 0 auto;
+	}
+
 	@media (max-width: 480px) {
 		.monsan-action-bar-item {
 			padding: 0 var(--space-xs);
 		}
 		.monsan-action-bar-item.only-icon {
 			padding: 0;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.monsan-action-bar-item.compact-below-sm .action-item-label,
+		.monsan-action-bar-item.compact-below-sm .action-item-badge {
+			display: none;
 		}
 	}
 
