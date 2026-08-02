@@ -40,7 +40,7 @@
 		closeOnBackNavigation?: boolean;
 		closeOnOutsideClick?: boolean;
 		closeOnEscape?: boolean;
-		size?: 'sm' | 'md' | 'lg';
+		size?: 'sm' | 'md' | 'lg' | 'xl';
 		animation?: 'pop' | 'slide' | 'fade' | 'scale';
 		padding?: PaddingPreset;
 		compactHeader?: boolean;
@@ -307,6 +307,10 @@
 
 	.modal-container.size-lg {
 		max-width: 800px;
+	}
+
+	.modal-container.size-xl {
+		max-width: 960px;
 	}
 
 	.modal-header {
