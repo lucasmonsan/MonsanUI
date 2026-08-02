@@ -3,6 +3,7 @@
 	import { backOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import { floatingPortal } from '../utils/floatingPortal.js';
 	import Dialog from './Dialog.svelte';
 
 	interface Props {
@@ -233,6 +234,15 @@
 		<div
 			id={panelId}
 			class="color-picker-dropdown panel"
+			use:floatingPortal={{
+				anchor: triggerEl,
+				align: 'auto',
+				placement: 'auto',
+				minWidth: 190,
+				maxWidth: 280,
+				offset: 6,
+				zIndex: 1002
+			}}
 			transition:scale={{
 				duration: prefersReducedMotion ? 0 : 200,
 				easing: backOut,

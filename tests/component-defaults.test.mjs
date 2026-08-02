@@ -84,6 +84,13 @@ assert(
 );
 
 assert(
+	colorPicker.includes("import { floatingPortal } from '../utils/floatingPortal.js'") &&
+		colorPicker.includes('use:floatingPortal={{') &&
+		colorPicker.includes('anchor: triggerEl'),
+	'ColorPicker must portal its palette outside clipping dialog content while retaining dialog-stack ownership.'
+);
+
+assert(
 	avatarMenu.includes("size = 'control'"),
 	'AvatarMenu default must match control height for header/account actions.'
 );
