@@ -39,6 +39,7 @@ const iconButton = await readComponent('IconButton.svelte');
 const moneyInput = await readComponent('MoneyInput.svelte');
 const actionBar = await readComponent('ActionBar.svelte');
 const filterDialog = await readComponent('FilterDialog.svelte');
+const folders = await readComponent('Folders.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -92,8 +93,15 @@ assert(
 		actionBar.includes("align?: 'center' | 'start'") &&
 		actionBar.includes('badge?: number') &&
 		actionBar.includes("compactBelow?: 'sm'") &&
-		actionBar.includes('contrastForeground(action.surfaceColor)'),
-	'ActionBar items must support domain surfaces, alignment and compact accessible counters.'
+		actionBar.includes('color-mix(in srgb, var(--action-surface) 10%, var(--bg-primary))'),
+	'ActionBar items must support softened domain colors, alignment and compact accessible counters.'
+);
+
+assert(
+	folders.includes('function customColor') &&
+		folders.includes('color-mix(in srgb, var(--folder-custom-color) 10%, var(--bg-secondary))') &&
+		folders.includes('background: var(--folder-custom-color)'),
+	'Folders must support any ColorPicker hex color as a softened passive surface and a pure active state.'
 );
 
 assert(

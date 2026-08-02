@@ -11,7 +11,7 @@
 		flex?: 1 | 2 | 3;
 		onlyIcon?: boolean;
 		folderTheme?: string;
-		/** Optional custom surface for a domain item, with automatic foreground contrast. */
+		/** Optional custom color for a domain item. It is blended into a readable surface. */
 		surfaceColor?: string;
 		/** Align the action contents inside its available width. */
 		align?: 'center' | 'start';
@@ -37,17 +37,6 @@
 	}>();
 
 	let containerEl = $state<HTMLElement>();
-
-	function contrastForeground(color: string | undefined): string | undefined {
-		if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return undefined;
-		const channels = [1, 3, 5].map(
-			(index) => Number.parseInt(color.slice(index, index + 2), 16) / 255
-		);
-		const luminance = channels
-			.map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4))
-			.reduce((total, channel, index) => total + channel * [0.2126, 0.7152, 0.0722][index], 0);
-		return luminance > 0.179 ? '#171717' : '#ffffff';
-	}
 
 	function actionAriaLabel(action: ActionItem): string {
 		return action.badge && action.badge > 0 && action.badgeLabel
@@ -96,7 +85,7 @@
 				class="monsan-action-bar-item"
 				class:only-icon={action.onlyIcon}
 				class:align-start={action.align === 'start'}
-				class:has-surface={Boolean(contrastForeground(action.surfaceColor))}
+				class:has-surface={Boolean(action.surfaceColor)}
 				class:compact-below-sm={action.compactBelow === 'sm'}
 				class:disabled={action.disabled}
 				class:flex-1={(action.flex ?? 1) === 1}
@@ -104,7 +93,6 @@
 				class:flex-3={action.flex === 3}
 				data-deck-theme={action.folderTheme}
 				style:--action-surface={action.surfaceColor}
-				style:--action-foreground={contrastForeground(action.surfaceColor)}
 				onclick={action.onclick}
 				title={action.title ?? action.label}
 				aria-label={actionAriaLabel(action)}
@@ -163,8 +151,7 @@
 	}
 
 	.monsan-action-bar-item.has-surface {
-		background: var(--action-surface);
-		color: var(--action-foreground);
+		background: color-mix(in srgb, var(--action-surface) 10%, var(--bg-primary));
 	}
 
 	.monsan-action-bar-item.align-start {
