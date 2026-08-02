@@ -37,6 +37,8 @@ const colorPicker = await readComponent('ColorPicker.svelte');
 const badge = await readComponent('Badge.svelte');
 const iconButton = await readComponent('IconButton.svelte');
 const moneyInput = await readComponent('MoneyInput.svelte');
+const actionBar = await readComponent('ActionBar.svelte');
+const filterDialog = await readComponent('FilterDialog.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -83,6 +85,22 @@ assert(
 		moneyInput.includes("currencyDisplay = 'code'") &&
 		moneyInput.includes("currencyDisplay: 'symbol'"),
 	'MoneyInput must support an opt-in locale-aware currency symbol without changing existing code-prefix consumers.'
+);
+
+assert(
+	actionBar.includes('surfaceColor?: string') &&
+		actionBar.includes("align?: 'center' | 'start'") &&
+		actionBar.includes('badge?: number') &&
+		actionBar.includes("compactBelow?: 'sm'") &&
+		actionBar.includes('contrastForeground(action.surfaceColor)'),
+	'ActionBar items must support domain surfaces, alignment and compact accessible counters.'
+);
+
+assert(
+	filterDialog.includes('showTrigger?: boolean') &&
+		filterDialog.includes('showTrigger = true') &&
+		filterDialog.includes('{#if showTrigger}'),
+	'FilterDialog must support a shared external trigger without changing its dialog structure.'
 );
 
 assert(

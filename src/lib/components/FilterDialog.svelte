@@ -16,6 +16,8 @@
 		activeCount?: number;
 		activeCountLabel?: string;
 		disabled?: boolean;
+		/** Hide the built-in trigger when a shared external control owns the dialog state. */
+		showTrigger?: boolean;
 		children: Snippet;
 		summary?: Snippet;
 		onOpen?: () => void;
@@ -35,6 +37,7 @@
 		activeCount = 0,
 		activeCountLabel,
 		disabled = false,
+		showTrigger = true,
 		children,
 		summary,
 		onOpen,
@@ -63,29 +66,31 @@
 	}
 </script>
 
-<div class="monsan-filter-dialog-trigger">
-	<Button
-		variant="secondary"
-		{disabled}
-		ariaLabel={triggerAriaLabel}
-		ariaExpanded={open}
-		iconOnlyBelow="sm"
-		onclick={showDialog}
-	>
-		<SlidersHorizontalIcon size={16} />
-		<span class="monsan-button-label">{triggerLabel}</span>
-		{#if activeCount > 0}
-			<span class="filter-dialog-count" aria-hidden="true">
-				<Badge size="sm" variant="primary">{activeCount}</Badge>
-			</span>
+{#if showTrigger}
+	<div class="monsan-filter-dialog-trigger">
+		<Button
+			variant="secondary"
+			{disabled}
+			ariaLabel={triggerAriaLabel}
+			ariaExpanded={open}
+			iconOnlyBelow="sm"
+			onclick={showDialog}
+		>
+			<SlidersHorizontalIcon size={16} />
+			<span class="monsan-button-label">{triggerLabel}</span>
+			{#if activeCount > 0}
+				<span class="filter-dialog-count" aria-hidden="true">
+					<Badge size="sm" variant="primary">{activeCount}</Badge>
+				</span>
+			{/if}
+		</Button>
+		{#if summary}
+			<div class="filter-dialog-summary">
+				{@render summary()}
+			</div>
 		{/if}
-	</Button>
-	{#if summary}
-		<div class="filter-dialog-summary">
-			{@render summary()}
-		</div>
-	{/if}
-</div>
+	</div>
+{/if}
 
 <Dialog
 	bind:open
