@@ -68,8 +68,9 @@ assert(
 		dialog.includes('setTimeout(finishClose, closeDuration)') &&
 		dialog.includes('window.visualViewport') &&
 		dialog.includes('scheduleFocusedElementVisibility') &&
-		dialog.includes('scrollIntoView'),
-	'Dialog must preserve responsive viewport insets, keep focused fields visible above a mobile keyboard, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
+		dialog.includes('scrollIntoView') &&
+		dialog.includes('<Separator orientation="vertical" />'),
+	'Dialog must preserve responsive viewport insets, keep focused fields visible above a mobile keyboard, separate header actions from close, support compact header action gaps and an extra-wide content size, and animate its exit unless reduced motion is requested.'
 );
 
 assert(

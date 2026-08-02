@@ -2,6 +2,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import X from '$lib/components/icons/X.svelte';
 	import Button from './Button.svelte';
+	import Separator from './Separator.svelte';
 	import type { PaddingPreset } from '$lib/utils/layout.js';
 	import { resolvePadding } from '$lib/utils/layout.js';
 	import { popDialog, pushDialog } from '../utils/dialogStack.js';
@@ -241,6 +242,9 @@
 			>
 				{#if headerActions}
 					{@render headerActions()}
+				{/if}
+				{#if headerActions && showCloseButton}
+					<Separator orientation="vertical" />
 				{/if}
 				{#if showCloseButton}
 					<Button
