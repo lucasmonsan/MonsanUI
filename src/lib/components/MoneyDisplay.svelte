@@ -11,6 +11,8 @@
 		/** Optional alignment used below the compact viewport breakpoint. */
 		mobileAlign?: 'start' | 'center' | 'end';
 		fullWidth?: boolean;
+		/** Tightens label/value rhythm where several monetary metrics share one compact surface. */
+		density?: 'default' | 'compact';
 	}
 
 	let {
@@ -22,7 +24,8 @@
 		ariaLabel,
 		align = 'start',
 		mobileAlign,
-		fullWidth = false
+		fullWidth = false,
+		density = 'default'
 	}: Props = $props();
 
 	function resolvedLocale(value: string) {
@@ -58,7 +61,7 @@
 </script>
 
 <span
-	class="monsan-money-display align-{align} mobile-align-{mobileAlign ?? align}"
+	class="monsan-money-display density-{density} align-{align} mobile-align-{mobileAlign ?? align}"
 	class:full-width={fullWidth}
 	aria-label={ariaLabel ?? (label ? `${label}: ${display.full}` : display.full)}
 >
@@ -102,6 +105,12 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+	.monsan-money-display.density-compact .money-label {
+		line-height: 1;
+	}
+	.monsan-money-display.density-compact .money-value {
+		line-height: 1.02;
 	}
 	.money-label-compact {
 		display: none;
