@@ -100,6 +100,10 @@
 		min-width: 0;
 	}
 
+	.field-label-addon {
+		margin-left: auto;
+	}
+
 	.is-disabled {
 		opacity: 0.7;
 	}

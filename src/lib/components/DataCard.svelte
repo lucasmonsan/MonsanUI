@@ -24,7 +24,7 @@
 		flatInteractive?: boolean;
 		accentColor?: string;
 		surfaceColor?: string;
-		density?: 'default' | 'compact';
+		density?: 'default' | 'compact' | 'dense';
 		truncateTitle?: boolean;
 	}
 
@@ -152,6 +152,10 @@
 		gap: var(--space-sm);
 	}
 
+	.monsan-data-card.density-dense {
+		gap: var(--space-xs);
+	}
+
 	.full-height {
 		height: 100%;
 	}
@@ -175,6 +179,10 @@
 		flex-direction: column;
 		gap: var(--space-xs);
 		min-width: 0;
+	}
+
+	.data-card-copy {
+		width: 100%;
 	}
 
 	.data-card-body {

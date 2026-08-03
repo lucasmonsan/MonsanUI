@@ -28,7 +28,7 @@
 		loading?: boolean;
 		loadingMessage?: string;
 		controls?: Snippet;
-		result?: Snippet<[SearchResultItem]>;
+		result?: Snippet<[SearchResultItem, boolean]>;
 	}>();
 
 	const fallbackId = `search-${Math.random().toString(36).slice(2, 11)}`;
@@ -136,7 +136,7 @@
 						type="button"
 					>
 						{#if resultSnippet}
-							{@render resultSnippet(result)}
+							{@render resultSnippet(result, i === selectedIndex)}
 						{:else}
 							<span class="result-type">
 								{#if result.type === 'folder'}
@@ -203,6 +203,8 @@
 	.result-item:hover {
 		background: var(--accent-primary);
 		color: var(--bg-primary);
+		--text-primary: var(--bg-primary);
+		--text-secondary: color-mix(in srgb, var(--bg-primary) 82%, transparent);
 		outline: none;
 	}
 

@@ -32,7 +32,12 @@
 	}: Props = $props();
 </script>
 
-<label class="monsan-checkbox-wrapper" class:size-sm={size === 'sm'} class:disabled>
+<label
+	class="monsan-checkbox-wrapper"
+	class:size-sm={size === 'sm'}
+	class:disabled
+	class:unlabeled={!label}
+>
 	<input
 		type="checkbox"
 		bind:checked
@@ -76,6 +81,17 @@
 		opacity: 0.6;
 	}
 
+	/*
+	 * In a table cell an inline-flex element participates in line-box baseline
+	 * calculation. The check SVG only exists when checked, so without a fixed
+	 * baseline it could change the computed row height. Unlabeled checkboxes are
+	 * controls only; normalize their line box while preserving labeled fields.
+	 */
+	.monsan-checkbox-wrapper.unlabeled {
+		vertical-align: middle;
+		line-height: 0;
+	}
+
 	.sr-only {
 		position: absolute;
 		width: 1px;
@@ -101,8 +117,6 @@
 		flex-shrink: 0;
 		color: var(--bg-primary);
 		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
 			background-color 0.2s var(--ease-out),
 			border-color 0.2s var(--ease-out);
 	}
@@ -121,8 +135,6 @@
 
 	.monsan-checkbox-wrapper:hover:not(.disabled) .checkbox-box {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.checkbox-box.checked {
@@ -132,8 +144,7 @@
 	}
 
 	.monsan-checkbox-wrapper:hover:not(.disabled) .checkbox-box.checked {
-		border-color: var(--border-color);
-		box-shadow: 3px 3px 0px var(--border-color);
+		border-color: var(--accent-primary);
 	}
 
 	input:focus-visible + .checkbox-box {

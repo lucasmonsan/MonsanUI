@@ -6,6 +6,7 @@
 	import type { PaddingPreset } from '$lib/utils/layout.js';
 	import { resolvePadding } from '$lib/utils/layout.js';
 	import { popDialog, pushDialog } from '../utils/dialogStack.js';
+	import { hasActiveNativePicker } from '../utils/nativePicker.js';
 
 	let {
 		open = $bindable(false),
@@ -203,6 +204,7 @@
 
 	function handleCancel(e: Event) {
 		e.preventDefault();
+		if (hasActiveNativePicker()) return;
 		if (dismissVirtualKeyboard()) return;
 		if (!closeOnEscape) {
 			return;

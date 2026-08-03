@@ -19,6 +19,7 @@
 		emptyCellLabel: string;
 		selectAllLabel: string;
 		selectRowLabel: (row: DataTableRow) => string;
+		selectionCheckboxSize?: 'sm' | 'md';
 		page?: number;
 		pageCount?: number;
 		previousPageLabel: string;
@@ -43,6 +44,7 @@
 		emptyCellLabel,
 		selectAllLabel,
 		selectRowLabel,
+		selectionCheckboxSize = 'sm',
 		page = 1,
 		pageCount = 1,
 		previousPageLabel,
@@ -128,7 +130,7 @@
 				<tr>
 					<th class="selection">
 						<Checkbox
-							size="sm"
+							size={selectionCheckboxSize}
 							checked={allSelected}
 							onchange={toggleAll}
 							ariaLabel={selectAllLabel}
@@ -153,7 +155,7 @@
 					<tr onclick={() => onRowActivate?.(row)} class:clickable={Boolean(onRowActivate)}>
 						<td class="selection" onclick={(event) => event.stopPropagation()}>
 							<Checkbox
-								size="sm"
+								size={selectionCheckboxSize}
 								checked={selectedIds.includes(row.id)}
 								disabled={row.selectable === false}
 								onchange={() => toggleRow(row)}

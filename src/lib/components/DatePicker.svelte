@@ -203,9 +203,9 @@
 	.datepicker-trigger {
 		display: flex;
 		align-items: center;
-		gap: var(--space-md);
+		gap: var(--space-sm);
 		height: var(--control-height);
-		padding: 0 var(--space-md);
+		padding: 0 var(--space-sm);
 		background-color: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
@@ -255,6 +255,10 @@
 	.datepicker-text {
 		font-size: var(--text-md);
 		letter-spacing: 0;
+		min-width: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.datepicker-dropdown {

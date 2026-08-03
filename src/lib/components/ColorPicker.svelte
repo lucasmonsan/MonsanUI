@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
 	import { floatingPortal } from '../utils/floatingPortal.js';
+	import { beginNativePicker } from '../utils/nativePicker.js';
 	import Dialog from './Dialog.svelte';
 
 	interface Props {
@@ -39,6 +40,8 @@
 	let containerEl = $state<HTMLDivElement>();
 	let triggerEl = $state<HTMLButtonElement>();
 	let prefersReducedMotion = $state(false);
+	let finishNativePicker: (() => void) | undefined;
+	let nativePickerSettleTimer: ReturnType<typeof setTimeout> | undefined;
 	let triggerId = $derived(id || fallbackId);
 	let panelId = $derived(`${triggerId}-panel`);
 	let paletteId = $derived(`${triggerId}-palette`);
@@ -68,10 +71,33 @@
 		}
 
 		motionQuery.addEventListener('change', updateMotionPreference);
+		const handleWindowFocus = () => scheduleNativePickerSettle();
+		window.addEventListener('focus', handleWindowFocus);
 		return () => {
 			motionQuery.removeEventListener('change', updateMotionPreference);
+			window.removeEventListener('focus', handleWindowFocus);
 		};
 	});
+
+	onDestroy(settleNativePicker);
+
+	function settleNativePicker() {
+		if (nativePickerSettleTimer) clearTimeout(nativePickerSettleTimer);
+		nativePickerSettleTimer = undefined;
+		finishNativePicker?.();
+		finishNativePicker = undefined;
+	}
+
+	function scheduleNativePickerSettle() {
+		if (!finishNativePicker || nativePickerSettleTimer) return;
+		nativePickerSettleTimer = setTimeout(settleNativePicker, 0);
+	}
+
+	function openNativePicker() {
+		if (disabled || !colorInputEl) return;
+		finishNativePicker ??= beginNativePicker();
+		colorInputEl.click();
+	}
 
 	function selectPreset(color: string, close = true) {
 		if (disabled) return;
@@ -86,6 +112,7 @@
 		const nextValue = (event.currentTarget as HTMLInputElement).value;
 		value = nextValue;
 		onchange?.(nextValue);
+		scheduleNativePickerSettle();
 	}
 
 	function handleOutsideClick(event: MouseEvent) {
@@ -204,6 +231,7 @@
 		type="color"
 		{value}
 		oninput={handleNativeInput}
+		onclick={() => (finishNativePicker ??= beginNativePicker())}
 		class="sr-only"
 		{disabled}
 		aria-invalid={ariaInvalid}
@@ -243,6 +271,7 @@
 					type="color"
 					{value}
 					oninput={handleNativeInput}
+					onclick={() => (finishNativePicker ??= beginNativePicker())}
 					{disabled}
 				/>
 			</div>
@@ -289,7 +318,7 @@
 				type="button"
 				class="custom-color-btn"
 				onclick={() => {
-					colorInputEl?.click();
+					openNativePicker();
 					closePopover(true);
 				}}
 			>
