@@ -165,6 +165,32 @@
 		beginClose(true);
 	}
 
+	function dismissVirtualKeyboard(): boolean {
+		const viewport = window.visualViewport;
+		const activeElement = document.activeElement;
+		if (
+			!viewport ||
+			!(activeElement instanceof HTMLElement) ||
+			!dialogRef?.contains(activeElement)
+		) {
+			return false;
+		}
+		const acceptsText =
+			activeElement.matches('input:not([type="checkbox"]):not([type="radio"]), textarea') ||
+			activeElement.isContentEditable;
+		const keyboardInset = window.innerHeight - viewport.height - viewport.offsetTop;
+		const touchInput = window.matchMedia('(pointer: coarse)').matches && acceptsText;
+		if (!acceptsText || (keyboardInset <= 120 && !touchInput)) return false;
+		activeElement.blur();
+		return true;
+	}
+
+	function handleBackNavigation(): boolean {
+		if (dismissVirtualKeyboard()) return false;
+		close();
+		return true;
+	}
+
 	function scheduleFocusedElementVisibility() {
 		if (focusedVisibilityFrame) cancelAnimationFrame(focusedVisibilityFrame);
 		focusedVisibilityFrame = requestAnimationFrame(() => {
@@ -177,6 +203,7 @@
 
 	function handleCancel(e: Event) {
 		e.preventDefault();
+		if (dismissVirtualKeyboard()) return;
 		if (!closeOnEscape) {
 			return;
 		}
@@ -198,7 +225,7 @@
 	$effect(() => {
 		if (!closeOnBackNavigation) return;
 		if (open && !historyAdded) {
-			pushDialog(dialogId, close);
+			pushDialog(dialogId, close, handleBackNavigation);
 			historyAdded = true;
 		} else if (!open && historyAdded) {
 			popDialog(dialogId);

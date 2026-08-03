@@ -1,8 +1,17 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+	import Checkbox from './Checkbox.svelte';
 	import type { DataTableColumn, DataTableRow } from '$lib/types.js';
+
+	export interface DataTableMobileRowContext {
+		selected: boolean;
+		selectionMode: boolean;
+		toggleSelection: () => void;
+	}
 
 	interface Props {
 		caption: string;
+		captionVisible?: boolean;
 		columns: DataTableColumn[];
 		rows: DataTableRow[];
 		selectedIds?: string[];
@@ -18,10 +27,15 @@
 		onSort?: (columnId: string) => void;
 		onPageChange?: (page: number) => void;
 		onRowActivate?: (row: DataTableRow) => void;
+		mobileRow?: Snippet<[DataTableRow, DataTableMobileRowContext]>;
+		mobileSelectionMode?: boolean;
+		onMobileSelectionModeChange?: (active: boolean) => void;
+		longPressDuration?: number;
 	}
 
 	let {
 		caption,
+		captionVisible = true,
 		columns,
 		rows,
 		selectedIds = $bindable([]),
@@ -36,13 +50,20 @@
 		rowActionLabel,
 		onSort,
 		onPageChange,
-		onRowActivate
+		onRowActivate,
+		mobileRow,
+		mobileSelectionMode = $bindable(false),
+		onMobileSelectionModeChange,
+		longPressDuration = 500
 	}: Props = $props();
 
 	let selectableRows = $derived(rows.filter((row) => row.selectable !== false));
 	let allSelected = $derived(
 		selectableRows.length > 0 && selectableRows.every((row) => selectedIds.includes(row.id))
 	);
+	let longPressTimer: ReturnType<typeof setTimeout> | undefined;
+	let pointerStart: { x: number; y: number } | null = null;
+	let suppressClick = false;
 
 	function toggleAll() {
 		selectedIds = allSelected ? [] : selectableRows.map((row) => row.id);
@@ -54,22 +75,63 @@
 			? selectedIds.filter((id) => id !== row.id)
 			: [...selectedIds, row.id];
 	}
+
+	function setMobileSelectionMode(active: boolean) {
+		if (mobileSelectionMode === active) return;
+		mobileSelectionMode = active;
+		onMobileSelectionModeChange?.(active);
+	}
+
+	function clearLongPress() {
+		if (longPressTimer) clearTimeout(longPressTimer);
+		longPressTimer = undefined;
+		pointerStart = null;
+	}
+
+	function startLongPress(event: PointerEvent, row: DataTableRow) {
+		if (event.pointerType === 'mouse' || mobileSelectionMode || row.selectable === false) return;
+		pointerStart = { x: event.clientX, y: event.clientY };
+		longPressTimer = setTimeout(() => {
+			setMobileSelectionMode(true);
+			toggleRow(row);
+			suppressClick = true;
+			clearLongPress();
+		}, longPressDuration);
+	}
+
+	function cancelLongPress(event?: PointerEvent) {
+		if (
+			event &&
+			pointerStart &&
+			Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) < 8
+		) {
+			return;
+		}
+		clearLongPress();
+	}
+
+	function handleMobileClick(event: MouseEvent) {
+		if (!suppressClick) return;
+		event.preventDefault();
+		event.stopPropagation();
+		suppressClick = false;
+	}
 </script>
 
 {#if rows.length === 0}
 	<div class="empty" role="status">{emptyLabel}</div>
 {:else}
-	<div class="table-scroll">
+	<div class="table-scroll" class:has-mobile-row={Boolean(mobileRow)}>
 		<table>
-			<caption>{caption}</caption>
+			<caption class:sr-only={!captionVisible}>{caption}</caption>
 			<thead>
 				<tr>
 					<th class="selection">
-						<input
-							type="checkbox"
+						<Checkbox
+							size="sm"
 							checked={allSelected}
 							onchange={toggleAll}
-							aria-label={selectAllLabel}
+							ariaLabel={selectAllLabel}
 						/>
 					</th>
 					{#each columns as column (column.id)}
@@ -88,14 +150,14 @@
 			</thead>
 			<tbody>
 				{#each rows as row (row.id)}
-					<tr>
-						<td class="selection">
-							<input
-								type="checkbox"
+					<tr onclick={() => onRowActivate?.(row)} class:clickable={Boolean(onRowActivate)}>
+						<td class="selection" onclick={(event) => event.stopPropagation()}>
+							<Checkbox
+								size="sm"
 								checked={selectedIds.includes(row.id)}
 								disabled={row.selectable === false}
 								onchange={() => toggleRow(row)}
-								aria-label={selectRowLabel(row)}
+								ariaLabel={selectRowLabel(row)}
 							/>
 						</td>
 						{#each row.cells as cell, index (columns[index]?.id)}
@@ -107,8 +169,12 @@
 							</td>
 						{/each}
 						{#if onRowActivate && rowActionLabel}
-							<td class="row-action" data-label={rowActionLabel(row)}>
-								<button type="button" onclick={() => onRowActivate(row)}
+							<td
+								class="row-action"
+								data-label={rowActionLabel(row)}
+								onclick={(event) => event.stopPropagation()}
+							>
+								<button type="button" onclick={() => onRowActivate?.(row)}
 									>{rowActionLabel(row)}</button
 								>
 							</td>
@@ -117,6 +183,27 @@
 				{/each}
 			</tbody>
 		</table>
+		{#if mobileRow}
+			<div class="mobile-list" aria-label={caption}>
+				{#each rows as row (row.id)}
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div
+						class="mobile-row"
+						onpointerdown={(event) => startLongPress(event, row)}
+						onpointermove={cancelLongPress}
+						onpointerup={clearLongPress}
+						onpointercancel={clearLongPress}
+						onclickcapture={handleMobileClick}
+					>
+						{@render mobileRow(row, {
+							selected: selectedIds.includes(row.id),
+							selectionMode: mobileSelectionMode,
+							toggleSelection: () => toggleRow(row)
+						})}
+					</div>
+				{/each}
+			</div>
+		{/if}
 	</div>
 	{#if pageCount > 1}
 		<nav class="pagination" aria-label={caption}>
@@ -166,15 +253,24 @@
 		font-weight: 800;
 		color: inherit;
 	}
+	tr.clickable {
+		cursor: pointer;
+	}
+	tr.clickable:hover {
+		background: var(--bg-secondary);
+	}
 	.row-action {
 		width: 1%;
 		white-space: nowrap;
 		text-align: right;
 	}
-	.row-action button {
+	.row-action button,
+	.pagination button {
 		padding: var(--space-xs) var(--space-sm);
-		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-sm);
+	}
+	.row-action button {
+		border: var(--border-width) solid var(--border-color);
 		background: var(--bg-primary);
 		color: var(--text-primary);
 		font: inherit;
@@ -221,30 +317,41 @@
 		gap: var(--space-sm);
 		margin-top: var(--space-sm);
 	}
-	.pagination button {
-		padding: var(--space-xs) var(--space-sm);
-		border-radius: var(--radius-sm);
+	.mobile-list {
+		display: none;
 	}
 	@media (max-width: 640px) {
-		thead {
+		.table-scroll.has-mobile-row {
+			overflow: visible;
+			border: 0;
+			border-radius: 0;
+		}
+		.table-scroll.has-mobile-row table {
+			display: none;
+		}
+		.mobile-list {
+			display: grid;
+			gap: var(--space-sm);
+		}
+		.table-scroll:not(.has-mobile-row) thead {
 			position: absolute;
 			width: 1px;
 			height: 1px;
 			overflow: hidden;
 			clip: rect(0 0 0 0);
 		}
-		table,
-		tbody,
-		tr,
-		td {
+		.table-scroll:not(.has-mobile-row) table,
+		.table-scroll:not(.has-mobile-row) tbody,
+		.table-scroll:not(.has-mobile-row) tr,
+		.table-scroll:not(.has-mobile-row) td {
 			display: block;
 			width: 100%;
 		}
-		tr {
+		.table-scroll:not(.has-mobile-row) tr {
 			border-top: var(--border-width) solid var(--border-color);
 			padding: var(--space-sm);
 		}
-		td {
+		.table-scroll:not(.has-mobile-row) td {
 			border: 0;
 			display: grid;
 			grid-template-columns: minmax(7rem, 40%) 1fr;
@@ -252,17 +359,17 @@
 			padding: var(--space-xs) 0;
 			text-align: right;
 		}
-		td::before {
+		.table-scroll:not(.has-mobile-row) td::before {
 			content: attr(data-label);
 			text-align: left;
 			font-weight: 800;
 			color: var(--text-secondary);
 		}
-		td.selection {
+		.table-scroll:not(.has-mobile-row) td.selection {
 			display: flex;
 			justify-content: end;
 		}
-		td.selection::before {
+		.table-scroll:not(.has-mobile-row) td.selection::before {
 			content: '';
 		}
 	}

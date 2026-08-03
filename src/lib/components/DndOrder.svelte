@@ -12,6 +12,7 @@
 		disabled?: boolean;
 		columns?: number;
 		formatIndex?: (index: number) => string;
+		itemLabel?: (item: string) => string;
 		showNumbers?: boolean;
 	}
 
@@ -21,6 +22,7 @@
 		disabled = false,
 		columns = 1,
 		formatIndex = (idx) => `${idx + 1}`,
+		itemLabel = (item) => item,
 		showNumbers = true
 	}: Props = $props();
 
@@ -177,7 +179,10 @@
 				newItems.splice(index - 1, 0, removed);
 				value = [...newItems];
 
-				srAnnouncement = i18n.t('dndOrder.movedUp', { item: itemMoved, position: index });
+				srAnnouncement = i18n.t('dndOrder.movedUp', {
+					item: itemLabel(itemMoved),
+					position: index
+				});
 
 				setTimeout(() => {
 					const el = listEl?.querySelector(`[data-index="${index - 1}"]`) as HTMLElement;
@@ -194,7 +199,7 @@
 				value = [...newItems];
 
 				srAnnouncement = i18n.t('dndOrder.movedDown', {
-					item: itemMoved,
+					item: itemLabel(itemMoved),
 					position: index + 2
 				});
 
@@ -239,7 +244,7 @@
 			tabindex="0"
 			onkeydown={(e) => handleKeyDown(e, index)}
 			aria-label={i18n.t('dndOrder.itemLabel', {
-				item,
+				item: itemLabel(item),
 				position: index + 1,
 				total: items.length
 			})}
@@ -248,7 +253,7 @@
 				<GripVertical size={18} />
 			</div>
 			<div class="item-content">
-				{item}
+				{itemLabel(item)}
 			</div>
 			{#if showNumbers}
 				<div class="order-number">
