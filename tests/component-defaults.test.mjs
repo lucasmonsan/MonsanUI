@@ -23,6 +23,10 @@ const floatingPortal = await readFile(
 	new URL('../src/lib/utils/floatingPortal.ts', import.meta.url),
 	'utf8'
 );
+const dialogStack = await readFile(
+	new URL('../src/lib/utils/dialogStack.ts', import.meta.url),
+	'utf8'
+);
 const multipleChoice = await readComponent('questions/MultipleChoice.svelte');
 const panel = await readComponent('Panel.svelte');
 const responsiveGrid = await readComponent('ResponsiveGrid.svelte');
@@ -42,6 +46,7 @@ const metricBar = await readComponent('MetricBar.svelte');
 const actionBar = await readComponent('ActionBar.svelte');
 const filterDialog = await readComponent('FilterDialog.svelte');
 const folders = await readComponent('Folders.svelte');
+const portugolRunner = await readComponent('PortugolRunner.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -150,6 +155,20 @@ assert(
 assert(
 	dialog.includes('min(85dvh') && !dialog.includes('min(85vh'),
 	'Dialog viewport caps must use dynamic viewport units.'
+);
+
+assert(
+	dialog.includes('window.visualViewport') &&
+		dialog.includes('scheduleFocusedElementVisibility') &&
+		dialog.includes('dismissVirtualKeyboard') &&
+		dialogStack.includes('history.pushState'),
+	'Dialog must preserve the visual viewport, keep a focused field visible, dismiss the virtual keyboard safely and retain the current route in history.'
+);
+
+assert(
+	portugolRunner.includes('if (pendingInputVar) return;') &&
+		/disabled=\{disabled\s*\|\|\s*Boolean\(pendingInputVar\)/.test(portugolRunner),
+	'PortugolRunner must not advance step execution while a read input is pending.'
 );
 
 assert(
