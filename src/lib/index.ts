@@ -155,12 +155,14 @@ export { default as ArrowCounterClockwiseIcon } from './components/icons/ArrowCo
 export { default as CalendarBlankIcon } from './components/icons/CalendarBlank.svelte';
 export { default as LockIcon } from './components/icons/Lock.svelte';
 export { default as MailIcon } from './components/icons/Mail.svelte';
+export { default as MicrophoneIcon } from './components/icons/Microphone.svelte';
 export { default as UnlockIcon } from './components/icons/Unlock.svelte';
 export { default as RotateCwIcon } from './components/icons/RotateCw.svelte';
 export { default as SaveIcon } from './components/icons/Save.svelte';
 export { default as PlayIcon } from './components/icons/Play.svelte';
 export { default as SkipForwardIcon } from './components/icons/SkipForward.svelte';
 export { default as TextIndentIcon } from './components/icons/TextIndent.svelte';
+export { default as StopIcon } from './components/icons/Stop.svelte';
 export { default as TerminalIcon } from './components/icons/Terminal.svelte';
 export { default as BracketsCurlyIcon } from './components/icons/BracketsCurly.svelte';
 export { default as FolderIcon } from './components/icons/Folder.svelte';
