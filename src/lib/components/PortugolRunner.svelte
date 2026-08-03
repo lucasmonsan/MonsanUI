@@ -573,6 +573,7 @@ fimalgoritmo`),
 	}
 
 	function handleStep() {
+		if (pendingInputVar) return;
 		if (!isRunning) {
 			startExecution(true);
 		} else {
@@ -761,7 +762,9 @@ fimalgoritmo`),
 							variant="secondary"
 							size="sm"
 							onclick={handleStep}
-							disabled={disabled || (isRunning && !isStepMode && !isPaused)}
+							disabled={disabled ||
+								Boolean(pendingInputVar) ||
+								(isRunning && !isStepMode && !isPaused)}
 							title={i18n.t('portugolRunner.step')}
 						>
 							<SkipForwardIcon size={16} />
