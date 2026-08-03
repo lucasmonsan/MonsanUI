@@ -53,6 +53,13 @@
 		);
 	}
 
+	function groupSeparator(): string {
+		return (
+			new Intl.NumberFormat(locale).formatToParts(1000).find((part) => part.type === 'group')
+				?.value ?? ','
+		);
+	}
+
 	function currencyLabel(): string {
 		if (currencyDisplay === 'code') return currency;
 		return (
@@ -78,29 +85,53 @@
 	}
 
 	function parseDisplay(input: string): string | null {
-		const separator = decimalSeparator();
-		const normalized = input
-			.trim()
-			.replaceAll(/\s/g, '')
-			.replaceAll('.', separator)
-			.replaceAll(',', separator);
+		const normalized = input.trim().replaceAll(/\s/g, '');
 		if (!normalized) return '';
 		const sign = normalized.startsWith('-') ? '-' : '';
 		if (sign && !allowNegative) return null;
 		const unsigned = sign ? normalized.slice(1) : normalized;
-		const [wholeRaw, ...fractions] = unsigned.split(separator);
-		if (fractions.length > 1 || !/^\d*$/.test(wholeRaw)) return null;
-		const fractionRaw = fractions[0] ?? '';
+		if (!/^[\d.,]*$/.test(unsigned)) return null;
+
+		const separators = [...unsigned.matchAll(/[.,]/g)];
+		const lastSeparator = separators.at(-1);
+		const fractionDigitsCount = fractionDigits();
+		const trailing = lastSeparator ? unsigned.slice((lastSeparator.index ?? 0) + 1) : '';
+		const hasDecimal = Boolean(lastSeparator) && trailing.length <= fractionDigitsCount;
+		const wholeRaw = hasDecimal
+			? unsigned.slice(0, lastSeparator?.index ?? 0).replaceAll(/[.,]/g, '')
+			: unsigned.replaceAll(/[.,]/g, '');
+		const fractionRaw = hasDecimal ? trailing : '';
+		if (!/^\d*$/.test(wholeRaw) || !/^\d*$/.test(fractionRaw)) return null;
 		const digits = fractionDigits();
-		if (!/^\d*$/.test(fractionRaw) || fractionRaw.length > digits) return null;
+		if (fractionRaw.length > digits) return null;
 		const whole = wholeRaw || '0';
 		const fraction = fractionRaw.padEnd(digits, '0');
 		const minor = `${whole}${fraction}`.replace(/^0+(?=\d)/, '');
 		return sign && minor !== '0' ? `-${minor}` : minor;
 	}
 
+	function formatEditableDisplay(input: string): string {
+		const trimmed = input.trim().replaceAll(/\s/g, '');
+		if (!trimmed || trimmed === '-') return trimmed;
+		const sign = trimmed.startsWith('-') ? '-' : '';
+		const unsigned = sign ? trimmed.slice(1) : trimmed;
+		const separators = [...unsigned.matchAll(/[.,]/g)];
+		const lastSeparator = separators.at(-1);
+		const digits = fractionDigits();
+		const trailing = lastSeparator ? unsigned.slice((lastSeparator.index ?? 0) + 1) : '';
+		const hasDecimal = Boolean(lastSeparator) && trailing.length <= digits;
+		const whole = (hasDecimal ? unsigned.slice(0, lastSeparator?.index ?? 0) : unsigned).replaceAll(
+			/[.,]/g,
+			''
+		);
+		if (!/^\d*$/.test(whole) || (hasDecimal && !/^\d*$/.test(trailing))) return input;
+		const grouped = (whole || '0').replace(/\B(?=(\d{3})+(?!\d))/g, groupSeparator());
+		return `${sign}${grouped}${hasDecimal ? `${decimalSeparator()}${trailing}` : ''}`;
+	}
+
 	let displayValue = $state(formatMinorUnits(value));
 	let lastValue = $state(value);
+	let resolvedPlaceholder = $derived(placeholder ?? formatMinorUnits('0'));
 
 	$effect(() => {
 		if (value !== lastValue) {
@@ -111,9 +142,12 @@
 
 	function handleInput(event: Event) {
 		const nextDisplay = (event.currentTarget as HTMLInputElement).value;
-		displayValue = nextDisplay;
 		const parsed = parseDisplay(nextDisplay);
-		if (parsed === null) return;
+		if (parsed === null) {
+			displayValue = nextDisplay;
+			return;
+		}
+		displayValue = formatEditableDisplay(nextDisplay);
 		value = parsed;
 		lastValue = parsed;
 		oninput?.(parsed);
@@ -133,7 +167,7 @@
 		value={displayValue}
 		oninput={handleInput}
 		onblur={handleBlur}
-		{placeholder}
+		placeholder={resolvedPlaceholder}
 		{disabled}
 		{required}
 		inputmode="decimal"
