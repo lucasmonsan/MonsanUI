@@ -5,7 +5,7 @@
 		children: Snippet;
 		columns: 'one' | 'two' | 'three' | 'four';
 		/** Opt-in compact column count for narrow viewports. */
-		mobileColumns?: 'one' | 'two';
+		mobileColumns?: 'one' | 'two' | 'three';
 		divided?: boolean;
 	}
 
@@ -49,6 +49,9 @@
 		}
 		.mobile-columns-two {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.mobile-columns-three {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 		}
 		.mobile-columns-two.divided > :global(:nth-child(odd)) {
 			border-left: 0;

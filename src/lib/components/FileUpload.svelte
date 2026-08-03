@@ -13,7 +13,7 @@
 		required?: boolean;
 		disabled?: boolean;
 		placeholder?: string;
-		variant?: 'default' | 'invisible' | 'compact' | 'overlay';
+		variant?: 'default' | 'invisible' | 'compact' | 'overlay' | 'replace';
 		/** Trigger snippet for variant="invisible". */
 		trigger?: Snippet<[{ open: () => void }]>;
 		/** Button text for variants that show a browse button. */
@@ -94,6 +94,7 @@
 	}
 
 	function removeFile(index: number, e: MouseEvent) {
+		e.preventDefault();
 		e.stopPropagation();
 		if (disabled || !files) return;
 
@@ -269,6 +270,45 @@
 
 		{@render fileList(false)}
 	</div>
+{:else if variant === 'replace'}
+	<div class="monsan-file-upload-container monsan-file-replace" class:invalid>
+		<label
+			for={inputId}
+			class="monsan-file-dropzone"
+			class:file-selected={Boolean(files?.length)}
+			class:dragover={isDragOver}
+			class:disabled
+			class:invalid
+			ondragover={handleDragOver}
+			ondragleave={handleDragLeave}
+			ondrop={handleDrop}
+		>
+			{#if files?.length}
+				{#each Array.from(files) as file, index (file.name + file.size + index)}
+					<div class="replace-file-summary">
+						<div class="file-info-col">
+							<span class="file-name" title={file.name}>{file.name}</span>
+							<span class="file-size">{formatSize(file.size)}</span>
+						</div>
+						<button
+							type="button"
+							class="file-remove-btn"
+							{disabled}
+							onclick={(event) => removeFile(index, event)}
+							aria-label={i18n.t('fileUpload.removeFile')}
+						>
+							<X size={18} />
+						</button>
+					</div>
+				{/each}
+			{:else}
+				<div class="dropzone-content">
+					<span class="upload-icon"><Upload size={32} /></span>
+					<span class="placeholder-text">{activePlaceholder}</span>
+				</div>
+			{/if}
+		</label>
+	</div>
 {:else}
 	<div class="monsan-file-upload-container" class:invalid>
 		<label
@@ -363,6 +403,25 @@
 	.monsan-file-dropzone.disabled {
 		cursor: not-allowed;
 		opacity: 0.6;
+	}
+
+	.monsan-file-replace {
+		gap: 0;
+	}
+
+	.monsan-file-dropzone.file-selected {
+		min-height: var(--control-height);
+		padding: var(--space-sm) var(--space-md);
+		align-items: stretch;
+	}
+
+	.replace-file-summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-sm);
+		width: 100%;
+		min-width: 0;
 	}
 
 	.dropzone-content {
