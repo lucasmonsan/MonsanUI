@@ -177,6 +177,10 @@
 		min-width: 0;
 	}
 
+	.data-card-copy {
+		width: 100%;
+	}
+
 	.data-card-body {
 		gap: var(--space-sm);
 		flex: 1 1 auto;

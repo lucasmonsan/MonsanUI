@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { onDestroy, onMount, type Snippet } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
+	import { beginNativePicker } from '../utils/nativePicker.js';
 	import Upload from './icons/Upload.svelte';
 	import X from './icons/X.svelte';
 
@@ -50,10 +51,26 @@
 	let isDragOver = $state(false);
 	let isWindowDragOver = $state(false);
 	let windowDragCounter = $state(0);
+	let finishNativePicker: (() => void) | undefined;
+	let nativePickerSettleTimer: ReturnType<typeof setTimeout> | undefined;
 	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 
+	function settleNativePicker() {
+		if (nativePickerSettleTimer) clearTimeout(nativePickerSettleTimer);
+		nativePickerSettleTimer = undefined;
+		finishNativePicker?.();
+		finishNativePicker = undefined;
+	}
+
+	function scheduleNativePickerSettle() {
+		if (!finishNativePicker || nativePickerSettleTimer) return;
+		nativePickerSettleTimer = setTimeout(settleNativePicker, 0);
+	}
+
 	function open() {
-		if (!disabled) fileInputEl?.click();
+		if (disabled || !fileInputEl) return;
+		finishNativePicker ??= beginNativePicker();
+		fileInputEl.click();
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -80,6 +97,7 @@
 		if (target.files && target.files.length > 0) {
 			files = target.files;
 		}
+		scheduleNativePickerSettle();
 	}
 
 	function applyFiles(incoming: FileList | null) {
@@ -120,6 +138,14 @@
 				: i18n.t('fileUpload.filesSelected', { count: files.length })
 			: null
 	);
+
+	onMount(() => {
+		const handleWindowFocus = () => scheduleNativePickerSettle();
+		window.addEventListener('focus', handleWindowFocus);
+		return () => window.removeEventListener('focus', handleWindowFocus);
+	});
+
+	onDestroy(settleNativePicker);
 
 	$effect(() => {
 		if (variant !== 'overlay') return;
