@@ -13,6 +13,8 @@
 		folderTheme?: string;
 		/** Optional custom color for a domain item. It is blended into a readable surface. */
 		surfaceColor?: string;
+		/** Controls how prominently an optional custom surface color is blended. */
+		surfaceColorStrength?: 'subtle' | 'strong';
 		/** Align the action contents inside its available width. */
 		align?: 'center' | 'start';
 		/** Optional compact count displayed after the action label. */
@@ -86,6 +88,7 @@
 				class:only-icon={action.onlyIcon}
 				class:align-start={action.align === 'start'}
 				class:has-surface={Boolean(action.surfaceColor)}
+				class:surface-strong={action.surfaceColorStrength === 'strong'}
 				class:compact-below-sm={action.compactBelow === 'sm'}
 				class:disabled={action.disabled}
 				class:flex-1={(action.flex ?? 1) === 1}
@@ -152,6 +155,10 @@
 
 	.monsan-action-bar-item.has-surface {
 		background: color-mix(in srgb, var(--action-surface) 10%, var(--bg-primary));
+	}
+
+	.monsan-action-bar-item.has-surface.surface-strong {
+		background: color-mix(in srgb, var(--action-surface) 32%, var(--bg-primary));
 	}
 
 	.monsan-action-bar-item.align-start {

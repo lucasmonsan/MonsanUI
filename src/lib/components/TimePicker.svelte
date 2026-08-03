@@ -12,6 +12,7 @@
 		ariaLabel?: string;
 		ariaDescribedby?: string;
 		ariaInvalid?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+		width?: 'auto' | 'full';
 	}
 
 	let {
@@ -21,7 +22,8 @@
 		title,
 		ariaLabel,
 		ariaDescribedby,
-		ariaInvalid
+		ariaInvalid,
+		width = 'auto'
 	}: Props = $props();
 
 	const fallbackId = `timepicker-${Math.random().toString(36).slice(2, 11)}`;
@@ -150,7 +152,7 @@
 	}
 </script>
 
-<div bind:this={containerEl} class="monsan-time-picker-container">
+<div bind:this={containerEl} class="monsan-time-picker-container width-{width}">
 	<button
 		bind:this={triggerEl}
 		type="button"
@@ -263,6 +265,10 @@
 		position: relative;
 		display: inline-block;
 		font-family: var(--font-body);
+	}
+	.monsan-time-picker-container.width-full,
+	.monsan-time-picker-container.width-full .time-picker-trigger {
+		width: 100%;
 	}
 
 	.time-picker-trigger {
