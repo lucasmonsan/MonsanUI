@@ -45,12 +45,15 @@ export function pushDialog(id: string, closeFn: () => void, onBackNavigation?: (
 export function popDialog(id: string) {
 	if (typeof window === 'undefined') return;
 	const index = stack.findIndex((item) => item.id === id);
-	if (index !== -1) {
-		const item = stack[index];
-		stack.splice(index, 1);
-		if (!item.popstateClosed) {
-			ignorePopstate = true;
-			history.back();
-		}
-	}
+	if (index === -1) return;
+
+	const [item] = stack.splice(index, 1);
+	if (!item || item.popstateClosed) return;
+
+	// A dialog can only consume the history entry it owns when it is the top
+	// surface. Closing a parent while a child is mounted must never navigate
+	// away from that child (or from the page behind it).
+	if (index !== stack.length) return;
+	ignorePopstate = true;
+	history.back();
 }
