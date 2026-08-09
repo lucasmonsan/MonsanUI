@@ -357,10 +357,15 @@ fimalgoritmo`),
 	});
 
 	function setExecutionError(error: unknown) {
-		const message = error instanceof Error ? error.message : String(error);
-		errorMsg = message || i18n.t('portugolRunner.executionError');
+		const rawMessage = error instanceof Error ? error.message : String(error);
+		const message = rawMessage.replace(/\s+/g, ' ').trim();
+		const maxMessageLength = 180;
+		errorMsg =
+			message.length > maxMessageLength
+				? `${message.slice(0, maxMessageLength).trimEnd()}…`
+				: message || i18n.t('portugolRunner.executionError');
 		errorSourceCode = code;
-		const lineMatch = errorMsg.match(/(?:linha|line)\s+(\d+)/i);
+		const lineMatch = message.match(/(?:linha|line)\s+(\d+)/i);
 		errorLine = lineMatch ? parseInt(lineMatch[1], 10) : 0;
 		onFailure?.(errorMsg);
 	}
