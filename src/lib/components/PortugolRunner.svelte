@@ -7,6 +7,7 @@
 	import Stack from './Stack.svelte';
 	import Inline from './Inline.svelte';
 	import Alert from './Alert.svelte';
+	import Dialog from './Dialog.svelte';
 	import Text from './Text.svelte';
 	import RotateCwIcon from './icons/RotateCw.svelte';
 	import TriangleAlertIcon from './icons/TriangleAlert.svelte';
@@ -73,6 +74,8 @@ fimalgoritmo`),
 	let variables = $state<Record<string, { value: unknown; type: string }>>({});
 	let outputs = $state<string[]>([]);
 	let errorMsg = $state('');
+	let fullErrorMsg = $state('');
+	let errorDetailsOpen = $state(false);
 	let errorSourceCode = $state('');
 	let hasRun = $state(false);
 
@@ -358,16 +361,35 @@ fimalgoritmo`),
 
 	function setExecutionError(error: unknown) {
 		const rawMessage = error instanceof Error ? error.message : String(error);
-		const message = rawMessage.replace(/\s+/g, ' ').trim();
-		const maxMessageLength = 180;
+		const message = formatExecutionError(rawMessage);
+		const maxMessageLength = 64;
 		errorMsg =
 			message.length > maxMessageLength
 				? `${message.slice(0, maxMessageLength).trimEnd()}…`
 				: message || i18n.t('portugolRunner.executionError');
+		fullErrorMsg = message || i18n.t('portugolRunner.executionError');
 		errorSourceCode = code;
-		const lineMatch = message.match(/(?:linha|line)\s+(\d+)/i);
+		const lineMatch = rawMessage.match(/(?:linha|line)\s+(\d+)/i);
 		errorLine = lineMatch ? parseInt(lineMatch[1], 10) : 0;
 		onFailure?.(errorMsg);
+	}
+
+	function formatExecutionError(value: string): string {
+		const message = value.replace(/\s+/g, ' ').trim();
+		const position = message.match(/linha\s+(\d+)(?:,\s*coluna\s+(\d+))?/i);
+		const text = message
+			.replace(
+				/^erro\s+(?:léxico|de sintaxe|em tempo de execução)\s*:?(?:\s+na)?\s+linha\s+\d+(?:,\s*coluna\s+\d+)?\s*:\s*/i,
+				''
+			)
+			.replace(/^erro\s+na\s+linha\s+\d+(?:,\s*coluna\s+\d+)?\s*:\s*/i, '')
+			.replace(/^linha\s+\d+(?:,\s*coluna\s+\d+)?\s*:\s*/i, '')
+			.trim();
+		if (!position) return text || message;
+		const prefix = position[2]
+			? `Linha ${position[1]}, coluna ${position[2]}: `
+			: `Linha ${position[1]}: `;
+		return `${prefix}${text || message}`;
 	}
 
 	function clearScheduledRun() {
@@ -980,9 +1002,22 @@ fimalgoritmo`),
 				<div class="error-msg-box">
 					<TriangleAlertIcon size="16" />
 					<span style="margin-left: 8px;">{errorMsg}</span>
+					{#if fullErrorMsg.length > errorMsg.length}
+						<Button variant="secondary" size="sm" onclick={() => (errorDetailsOpen = true)}>
+							{i18n.t('portugolRunner.errorDetails')}
+						</Button>
+					{/if}
 				</div>
 			</Alert>
 		{/if}
+
+		<Dialog
+			open={errorDetailsOpen}
+			title={i18n.t('portugolRunner.errorDetailsTitle')}
+			onClose={() => (errorDetailsOpen = false)}
+		>
+			<Text tag="p">{fullErrorMsg}</Text>
+		</Dialog>
 	</Stack>
 </div>
 
