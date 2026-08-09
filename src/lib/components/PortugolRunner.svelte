@@ -7,6 +7,7 @@
 	import Stack from './Stack.svelte';
 	import Inline from './Inline.svelte';
 	import Alert from './Alert.svelte';
+	import Dialog from './Dialog.svelte';
 	import Text from './Text.svelte';
 	import RotateCwIcon from './icons/RotateCw.svelte';
 	import TriangleAlertIcon from './icons/TriangleAlert.svelte';
@@ -73,12 +74,13 @@ fimalgoritmo`),
 	let variables = $state<Record<string, { value: unknown; type: string }>>({});
 	let outputs = $state<string[]>([]);
 	let errorMsg = $state('');
+	let fullErrorMsg = $state('');
+	let errorDetailsOpen = $state(false);
+	let errorSourceCode = $state('');
 	let hasRun = $state(false);
 
 	// Zoom and Font Size State
 	let fontSize = $state(14);
-	let showBlur = $state(true);
-	let animateBackground = $state(true);
 	let isFocusMode = $state(false);
 	let floatingWidth = $state(320);
 	let isFloatingDragging = $state(false);
@@ -176,56 +178,6 @@ fimalgoritmo`),
 	$effect(() => {
 		if (isLoaded) {
 			localStorage.setItem(floatingWidthKey, floatingWidth.toString());
-		}
-	});
-
-	// Load showBlur and animateBackground preferences
-	$effect(() => {
-		const saved = localStorage.getItem('monsan-suite-no-blur');
-		if (saved === 'true') {
-			showBlur = false;
-		} else if (saved === 'false') {
-			showBlur = true;
-		} else {
-			if (typeof document !== 'undefined') {
-				showBlur = !document.documentElement.classList.contains('monsan-no-blur');
-			}
-		}
-	});
-
-	$effect(() => {
-		const saved = localStorage.getItem('monsan-suite-no-bg-animation');
-		if (saved === 'true') {
-			animateBackground = false;
-		} else if (saved === 'false') {
-			animateBackground = true;
-		} else {
-			if (typeof document !== 'undefined') {
-				animateBackground = !document.documentElement.classList.contains('monsan-no-bg-animation');
-			}
-		}
-	});
-
-	// Save preferences reactively and toggle classes on root element
-	$effect(() => {
-		localStorage.setItem('monsan-suite-no-blur', (!showBlur).toString());
-		if (typeof document !== 'undefined') {
-			if (!showBlur) {
-				document.documentElement.classList.add('monsan-no-blur');
-			} else {
-				document.documentElement.classList.remove('monsan-no-blur');
-			}
-		}
-	});
-
-	$effect(() => {
-		localStorage.setItem('monsan-suite-no-bg-animation', (!animateBackground).toString());
-		if (typeof document !== 'undefined') {
-			if (!animateBackground) {
-				document.documentElement.classList.add('monsan-no-bg-animation');
-			} else {
-				document.documentElement.classList.remove('monsan-no-bg-animation');
-			}
 		}
 	});
 
@@ -400,6 +352,46 @@ fimalgoritmo`),
 		}
 	});
 
+	$effect(() => {
+		if (errorMsg && code !== errorSourceCode) {
+			errorMsg = '';
+			errorLine = 0;
+		}
+	});
+
+	function setExecutionError(error: unknown) {
+		const rawMessage = error instanceof Error ? error.message : String(error);
+		const message = formatExecutionError(rawMessage);
+		const maxMessageLength = 64;
+		errorMsg =
+			message.length > maxMessageLength
+				? `${message.slice(0, maxMessageLength).trimEnd()}…`
+				: message || i18n.t('portugolRunner.executionError');
+		fullErrorMsg = message || i18n.t('portugolRunner.executionError');
+		errorSourceCode = code;
+		const lineMatch = rawMessage.match(/(?:linha|line)\s+(\d+)/i);
+		errorLine = lineMatch ? parseInt(lineMatch[1], 10) : 0;
+		onFailure?.(errorMsg);
+	}
+
+	function formatExecutionError(value: string): string {
+		const message = value.replace(/\s+/g, ' ').trim();
+		const position = message.match(/linha\s+(\d+)(?:,\s*coluna\s+(\d+))?/i);
+		const text = message
+			.replace(
+				/^erro\s+(?:léxico|de sintaxe|em tempo de execução)\s*:?(?:\s+na)?\s+linha\s+\d+(?:,\s*coluna\s+\d+)?\s*:\s*/i,
+				''
+			)
+			.replace(/^erro\s+na\s+linha\s+\d+(?:,\s*coluna\s+\d+)?\s*:\s*/i, '')
+			.replace(/^linha\s+\d+(?:,\s*coluna\s+\d+)?\s*:\s*/i, '')
+			.trim();
+		if (!position) return text || message;
+		const prefix = position[2]
+			? `Linha ${position[1]}, coluna ${position[2]}: `
+			: `Linha ${position[1]}: `;
+		return `${prefix}${text || message}`;
+	}
+
 	function clearScheduledRun() {
 		if (scheduledRun) {
 			clearTimeout(scheduledRun);
@@ -439,6 +431,7 @@ fimalgoritmo`),
 		clearScheduledRun();
 		prepareConsoleForExecution();
 		errorMsg = '';
+		errorSourceCode = '';
 		errorLine = 0;
 		outputs = [];
 		variables = {};
@@ -452,6 +445,7 @@ fimalgoritmo`),
 			if (!indentResult.ok) {
 				errorMsg = indentResult.errorMsg || i18n.t('portugolRunner.indentationError');
 				errorLine = indentResult.line || 0;
+				errorSourceCode = code;
 				onFailure?.(errorMsg);
 				return;
 			}
@@ -473,15 +467,11 @@ fimalgoritmo`),
 			isPaused = false;
 
 			runNext();
-		} catch (e: unknown) {
-			const err = e as Error;
-			errorMsg = err.message || String(e);
-			const lineMatch = errorMsg.match(/(?:linha|line)\s+(\d+)/i);
-			errorLine = lineMatch ? parseInt(lineMatch[1], 10) : 0;
+		} catch (error: unknown) {
+			setExecutionError(error);
 			isRunning = false;
 			isStepMode = false;
 			isPaused = false;
-			onFailure?.(errorMsg);
 		}
 	}
 
@@ -553,22 +543,18 @@ fimalgoritmo`),
 			interpreter = null;
 			generator = null;
 			onSuccess?.();
-		} catch (e: unknown) {
+		} catch (error: unknown) {
 			if (interpreter) {
 				variables = interpreter.getGlobalVariables();
 			}
 			clearScheduledRun();
-			const err = e as Error;
-			errorMsg = err.message || String(e);
-			const lineMatch = errorMsg.match(/(?:linha|line)\s+(\d+)/i);
-			errorLine = lineMatch ? parseInt(lineMatch[1], 10) : 0;
+			setExecutionError(error);
 			isRunning = false;
 			isStepMode = false;
 			isPaused = false;
 			stopRequested = false;
 			interpreter = null;
 			generator = null;
-			onFailure?.(errorMsg);
 		}
 	}
 
@@ -611,6 +597,7 @@ fimalgoritmo`),
 		variables = {};
 		outputs = [];
 		errorMsg = '';
+		errorSourceCode = '';
 		pendingInputVar = null;
 		currentInputValue = '';
 		interpreter = null;
@@ -729,10 +716,10 @@ fimalgoritmo`),
 						{autoCloseBrackets}
 						{autoCloseQuotes}
 						{lineWrapping}
-						disabled={disabled || (isFocusMode ? isRunning || hasRun : isRunning && !isPaused)}
+						disabled={disabled || (isRunning && !isPaused)}
 						{onsave}
 					/>
-					{#if isFocusMode && (isRunning || hasRun)}
+					{#if isFocusMode && isRunning}
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div class="editor-blocked-overlay" onclick={handleStop}></div>
@@ -864,38 +851,6 @@ fimalgoritmo`),
 										<span style="width: 14px"></span>
 									{/if}
 									<span>{i18n.t('portugolRunner.lineWrappingLabel')}</span>
-								</Inline>
-							</MenuItem>
-
-							<MenuItem
-								checked={showBlur}
-								onclick={() => (showBlur = !showBlur)}
-								align="left"
-								data-menu-persistent
-							>
-								<Inline gap="sm" align="center">
-									{#if showBlur}
-										<CheckIcon size={14} />
-									{:else}
-										<span style="width: 14px"></span>
-									{/if}
-									<span>{i18n.t('portugolRunner.settingsBlurLabel')}</span>
-								</Inline>
-							</MenuItem>
-
-							<MenuItem
-								checked={animateBackground}
-								onclick={() => (animateBackground = !animateBackground)}
-								align="left"
-								data-menu-persistent
-							>
-								<Inline gap="sm" align="center">
-									{#if animateBackground}
-										<CheckIcon size={14} />
-									{:else}
-										<span style="width: 14px"></span>
-									{/if}
-									<span>{i18n.t('portugolRunner.settingsBgAnimLabel')}</span>
 								</Inline>
 							</MenuItem>
 
@@ -1047,9 +1002,22 @@ fimalgoritmo`),
 				<div class="error-msg-box">
 					<TriangleAlertIcon size="16" />
 					<span style="margin-left: 8px;">{errorMsg}</span>
+					{#if fullErrorMsg.length > errorMsg.length}
+						<Button variant="secondary" size="sm" onclick={() => (errorDetailsOpen = true)}>
+							{i18n.t('portugolRunner.errorDetails')}
+						</Button>
+					{/if}
 				</div>
 			</Alert>
 		{/if}
+
+		<Dialog
+			open={errorDetailsOpen}
+			title={i18n.t('portugolRunner.errorDetailsTitle')}
+			onClose={() => (errorDetailsOpen = false)}
+		>
+			<Text tag="p">{fullErrorMsg}</Text>
+		</Dialog>
 	</Stack>
 </div>
 
@@ -1072,8 +1040,7 @@ fimalgoritmo`),
 		inset: 0;
 		z-index: 40;
 		cursor: pointer;
-		background: rgba(0, 0, 0, 0.04);
-		backdrop-filter: blur(2px);
+		background: rgba(0, 0, 0, 0.22);
 		box-sizing: border-box;
 	}
 

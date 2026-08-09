@@ -93,7 +93,7 @@ export class Lexer {
 	}
 
 	private isValidIdentifier(id: string): boolean {
-		return /^[A-Za-z_][A-Za-z0-9_]*$/.test(id);
+		return /^[A-Za-z_À-ÿ][A-Za-z0-9_À-ÿ]*$/.test(id);
 	}
 
 	private pushIdentifierToken(tokens: Token[], value: string, line: number, column: number) {
@@ -106,7 +106,7 @@ export class Lexer {
 	}
 
 	public tokenize(): Token[] {
-		const isVisualg = /algoritmo|fimalgoritmo/i.test(this.input);
+		const isVisualg = /^\s*algoritmo\b/i.test(this.input);
 		const tokens: Token[] = [];
 		while (this.pos < this.input.length) {
 			const char = this.peek();
