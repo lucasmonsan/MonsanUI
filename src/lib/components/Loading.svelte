@@ -70,8 +70,7 @@
 		max-height: none;
 		margin: 0;
 		border: 0;
-		background-color: color-mix(in srgb, var(--bg-primary) 45%, transparent);
-		backdrop-filter: blur(4px);
+		background-color: rgba(0, 0, 0, 0.55);
 		align-items: center;
 		justify-content: center;
 		padding: var(--space-md);

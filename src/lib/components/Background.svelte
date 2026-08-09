@@ -6,7 +6,12 @@
 		direction?: 'up' | 'down' | 'left' | 'right' | 'diagonal' | 'diagonal-reverse';
 	}
 
-	let { pattern = 'grid', local = false, animate = true, direction = 'diagonal' }: Props = $props();
+	let {
+		pattern = 'dots',
+		local = false,
+		animate = false,
+		direction = 'diagonal'
+	}: Props = $props();
 </script>
 
 <div
@@ -248,9 +253,5 @@
 		.background-grid {
 			animation: none !important;
 		}
-	}
-
-	:global(.monsan-no-bg-animation) .background-grid {
-		animation: none !important;
 	}
 </style>

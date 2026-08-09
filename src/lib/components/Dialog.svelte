@@ -323,7 +323,6 @@
 		max-width: 100vw;
 		max-height: var(--dialog-visual-height, 100dvh);
 		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(4px);
 		border: none;
 		padding: 0;
 		margin: 0;
@@ -333,10 +332,6 @@
 		justify-content: center;
 		z-index: 1000;
 		animation: dialogBackdropIn 0.18s ease-out forwards;
-	}
-
-	:global(.monsan-no-blur) .dialog-wrapper {
-		backdrop-filter: none;
 	}
 
 	.dialog-wrapper.closing {
