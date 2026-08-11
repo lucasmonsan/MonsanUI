@@ -176,6 +176,7 @@ export { default as CrocodeIcon } from './components/icons/Crocode.svelte';
 export { default as MankiIcon } from './components/icons/Manki.svelte';
 export { default as KoalifyIcon } from './components/icons/Koalify.svelte';
 export { default as RoosterIcon } from './components/icons/Rooster.svelte';
+export { default as WhalletIcon } from './components/icons/Whallet.svelte';
 
 // Types
 export * from './types.js';
