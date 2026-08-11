@@ -82,6 +82,7 @@ export { default as TimePicker } from './components/TimePicker.svelte';
 export { default as Text } from './components/Text.svelte';
 export { default as Markdown } from './components/Markdown.svelte';
 export { default as Loading } from './components/Loading.svelte';
+export { default as AudioLevelMeter } from './components/AudioLevelMeter.svelte';
 export { default as Alert } from './components/Alert.svelte';
 export { default as ProgressBar } from './components/ProgressBar.svelte';
 export { default as Avatar } from './components/Avatar.svelte';
