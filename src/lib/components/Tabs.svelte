@@ -24,6 +24,7 @@
 		showNavButtons = false,
 		hideLabels = false,
 		hideLabelsBelow = 'never',
+		width = 'full',
 		embedded = false,
 		scrollLeftLabel,
 		scrollRightLabel,
@@ -39,6 +40,7 @@
 		showNavButtons?: boolean;
 		hideLabels?: boolean;
 		hideLabelsBelow?: 'never' | 'sm';
+		width?: 'full' | 'fit';
 		embedded?: boolean;
 		scrollLeftLabel?: string;
 		scrollRightLabel?: string;
@@ -190,7 +192,7 @@
 	});
 </script>
 
-<div class="monsan-tabs-wrapper" class:is-scrollable={scrollable}>
+<div class="monsan-tabs-wrapper" class:is-scrollable={scrollable} class:fit-width={width === 'fit'}>
 	{#if scrollable && showLeftGradient}
 		<div class="monsan-tabs-nav-wrapper nav-left-wrapper">
 			{#if showNavButtons}
@@ -278,6 +280,11 @@
 		display: flex;
 		align-items: center;
 		overflow: visible;
+	}
+
+	.monsan-tabs-wrapper.fit-width,
+	.monsan-tabs-wrapper.fit-width .monsan-tabs-container {
+		width: fit-content;
 	}
 
 	.monsan-tabs-wrapper.is-scrollable {
