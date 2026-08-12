@@ -42,9 +42,19 @@
 </script>
 
 {#if active && inline}
-	<div class="monsan-loading-inline" role="status" aria-live="polite" aria-atomic="true">
-		<div class="brutalist-spinner" aria-hidden="true"></div>
-		{#if displayMessage}<span class="loading-text">{displayMessage}</span>{/if}
+	<div
+		class="monsan-loading-inline"
+		role="status"
+		aria-live="polite"
+		aria-atomic="true"
+		aria-busy="true"
+	>
+		<div class="spinner-box">
+			<div class="brutalist-spinner"></div>
+		</div>
+		{#if displayMessage}
+			<span id={messageId} class="loading-text">{displayMessage}</span>
+		{/if}
 	</div>
 {:else if active}
 	<dialog
@@ -67,21 +77,6 @@
 {/if}
 
 <style>
-	.monsan-loading-inline {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: var(--space-sm);
-		min-height: var(--control-height);
-		padding: var(--space-sm);
-		color: var(--text-primary);
-	}
-
-	.monsan-loading-inline .brutalist-spinner {
-		width: 1.5rem;
-		height: 1.5rem;
-	}
-
 	.monsan-loading-overlay {
 		position: fixed;
 		inset: 0;
@@ -97,6 +92,22 @@
 		padding: var(--space-md);
 		outline: none;
 		animation: overlayFadeIn 0.2s var(--ease-out);
+	}
+
+	.monsan-loading-inline {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-md);
+		min-height: 160px;
+		padding: var(--space-xl);
+		box-sizing: border-box;
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-md);
+		background: var(--bg-secondary);
+		box-shadow: var(--shadow-sm);
+		text-align: center;
 	}
 
 	.monsan-loading-overlay[open] {
