@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import Button from './Button.svelte';
 	import Checkbox from './Checkbox.svelte';
 	import type { DataTableColumn, DataTableRow } from '$lib/types.js';
 
@@ -22,8 +23,8 @@
 		selectionCheckboxSize?: 'sm' | 'md';
 		page?: number;
 		pageCount?: number;
-		previousPageLabel: string;
-		nextPageLabel: string;
+		previousPageLabel?: string;
+		nextPageLabel?: string;
 		rowActionLabel?: (row: DataTableRow) => string;
 		onSort?: (columnId: string) => void;
 		onPageChange?: (page: number) => void;
@@ -32,6 +33,11 @@
 		mobileSelectionMode?: boolean;
 		onMobileSelectionModeChange?: (active: boolean) => void;
 		longPressDuration?: number;
+		hasMore?: boolean;
+		loadingMore?: boolean;
+		loadMoreLabel?: string;
+		loadingMoreLabel?: string;
+		onLoadMore?: () => void;
 	}
 
 	let {
@@ -56,7 +62,12 @@
 		mobileRow,
 		mobileSelectionMode = $bindable(false),
 		onMobileSelectionModeChange,
-		longPressDuration = 500
+		longPressDuration = 500,
+		hasMore = false,
+		loadingMore = false,
+		loadMoreLabel,
+		loadingMoreLabel,
+		onLoadMore
 	}: Props = $props();
 
 	let selectableRows = $derived(rows.filter((row) => row.selectable !== false));
@@ -117,6 +128,20 @@
 		event.preventDefault();
 		event.stopPropagation();
 		suppressClick = false;
+	}
+
+	function observeProgressiveLoad(node: HTMLElement) {
+		if (!('IntersectionObserver' in window)) return;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((entry) => entry.isIntersecting) && hasMore && !loadingMore) {
+					onLoadMore?.();
+				}
+			},
+			{ rootMargin: '240px 0px' }
+		);
+		observer.observe(node);
+		return { destroy: () => observer.disconnect() };
 	}
 </script>
 
@@ -207,7 +232,15 @@
 			</div>
 		{/if}
 	</div>
-	{#if pageCount > 1}
+	{#if hasMore && onLoadMore && loadMoreLabel}
+		<div class="progressive-load">
+			<div class="progressive-sentinel" use:observeProgressiveLoad aria-hidden="true"></div>
+			<Button variant="secondary" size="sm" onclick={onLoadMore} disabled={loadingMore}>
+				{loadingMore && loadingMoreLabel ? loadingMoreLabel : loadMoreLabel}
+			</Button>
+		</div>
+	{/if}
+	{#if pageCount > 1 && previousPageLabel && nextPageLabel}
 		<nav class="pagination" aria-label={caption}>
 			<button type="button" disabled={page <= 1} onclick={() => onPageChange?.(page - 1)}>
 				{previousPageLabel}
@@ -318,6 +351,16 @@
 		align-items: center;
 		gap: var(--space-sm);
 		margin-top: var(--space-sm);
+	}
+	.progressive-load {
+		display: grid;
+		justify-items: center;
+		gap: var(--space-sm);
+		margin-top: var(--space-sm);
+	}
+	.progressive-sentinel {
+		width: 100%;
+		height: 1px;
 	}
 	.mobile-list {
 		display: none;

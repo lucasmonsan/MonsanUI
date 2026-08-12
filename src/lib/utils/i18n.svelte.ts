@@ -120,6 +120,8 @@ class I18n {
 			portugolRunner: {
 				consoleTitle: 'Console',
 				variablesTitle: 'Variáveis',
+				hideResults: 'Ocultar resultados',
+				showResults: 'Ver resultados',
 				hide: 'Ocultar',
 				floatConsole: 'Flutuar',
 				dockConsole: 'Embutir',
@@ -346,6 +348,8 @@ class I18n {
 			portugolRunner: {
 				consoleTitle: 'Console',
 				variablesTitle: 'Variables',
+				hideResults: 'Hide results',
+				showResults: 'Show results',
 				hide: 'Hide',
 				floatConsole: 'Float',
 				dockConsole: 'Dock',
@@ -573,6 +577,8 @@ class I18n {
 			portugolRunner: {
 				consoleTitle: 'Consola',
 				variablesTitle: 'Variables',
+				hideResults: 'Ocultar resultados',
+				showResults: 'Ver resultados',
 				hide: 'Ocultar',
 				floatConsole: 'Flotar',
 				dockConsole: 'Acoplar',

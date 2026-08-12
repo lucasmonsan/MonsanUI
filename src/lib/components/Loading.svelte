@@ -4,16 +4,17 @@
 	interface Props {
 		active?: boolean;
 		message?: string;
+		inline?: boolean;
 	}
 
-	let { active = false, message }: Props = $props();
+	let { active = false, message, inline = false }: Props = $props();
 
 	let containerEl = $state<HTMLDialogElement>();
 	let previousActiveElement = $state<HTMLElement | null>(null);
 	const messageId = `loading-${Math.random().toString(36).slice(2, 9)}-message`;
 
 	$effect(() => {
-		if (!active || !containerEl || typeof document === 'undefined') {
+		if (!active || inline || !containerEl || typeof document === 'undefined') {
 			return;
 		}
 
@@ -40,7 +41,12 @@
 	}
 </script>
 
-{#if active}
+{#if active && inline}
+	<div class="monsan-loading-inline" role="status" aria-live="polite" aria-atomic="true">
+		<div class="brutalist-spinner" aria-hidden="true"></div>
+		{#if displayMessage}<span class="loading-text">{displayMessage}</span>{/if}
+	</div>
+{:else if active}
 	<dialog
 		bind:this={containerEl}
 		class="monsan-loading-overlay"
@@ -61,6 +67,21 @@
 {/if}
 
 <style>
+	.monsan-loading-inline {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-sm);
+		min-height: var(--control-height);
+		padding: var(--space-sm);
+		color: var(--text-primary);
+	}
+
+	.monsan-loading-inline .brutalist-spinner {
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+
 	.monsan-loading-overlay {
 		position: fixed;
 		inset: 0;
