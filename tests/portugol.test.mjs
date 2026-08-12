@@ -1708,35 +1708,66 @@ console.log('Running Portugol editor behavior tests...');
 		4,
 		'CodeMirror indentation should reduce before block closer'
 	);
-	const unindentedGuides = getPortugolStructureGuides(`algoritmo "Guias"
+	const indentedGuides = getPortugolStructureGuides(`algoritmo "Guias"
+var
+	nota : inteiro
 inicio
-se nota >= 6 entao
-escreval("Aprovado")
-senao
-escreval("Recuperação")
-fimse
-escolha opcao
-caso 1
-escreval("Um")
-fimescolha
+	se nota >= 6 entao
+		escreval("Aprovado")
+	senao
+		escreval("Recuperação")
+	fimse
+	escolha opcao
+		caso 1
+			escreval("Um")
+	fimescolha
 fimalgoritmo`);
-	assertEquals(unindentedGuides.length, 3, 'Structure guides should pair unindented blocks');
-	assert(
-		unindentedGuides.some(
-			(guide) => guide.type === 'if' && guide.startLine === 3 && guide.endLine === 7
-		),
-		'Structure guides should pair se/fimse independently from indentation'
+	assertEquals(
+		indentedGuides.length,
+		3,
+		'Structure guides should pair consistently indented blocks'
 	);
 	assert(
-		unindentedGuides.some(
-			(guide) => guide.type === 'switch' && guide.startLine === 8 && guide.endLine === 11
+		indentedGuides.some(
+			(guide) =>
+				guide.type === 'if' &&
+				guide.startLine === 5 &&
+				guide.endLine === 9 &&
+				guide.indentColumns === 4
 		),
-		'Structure guides should pair escolha/fimescolha'
+		'Structure guides should pair an indented se/fimse block'
+	);
+	assert(
+		indentedGuides.some(
+			(guide) =>
+				guide.type === 'switch' &&
+				guide.startLine === 10 &&
+				guide.endLine === 13 &&
+				guide.indentColumns === 4
+		),
+		'Structure guides should pair an indented escolha/fimescolha block'
+	);
+	assertEquals(
+		getPortugolStructureGuides(`se verdadeiro entao
+escreval("sem indentação")
+fimse`).length,
+		0,
+		'Misindented blocks should not render a structure connector'
+	);
+	const nestedGuides = getPortugolStructureGuides(`se verdadeiro entao
+	enquanto verdadeiro faca
+		escreval("aninhado")
+	fimenquanto
+fimse`);
+	assertEquals(
+		nestedGuides.length,
+		2,
+		'Nested consistently indented blocks should render both connectors'
 	);
 	const ignoredGuideKeywords = getPortugolStructureGuides(`algoritmo "Texto"
 inicio
 // se falso entao
-escreval("fimse escolha fimescolha")
+	escreval("fimse escolha fimescolha")
 fimalgoritmo`);
 	assertEquals(
 		ignoredGuideKeywords.length,

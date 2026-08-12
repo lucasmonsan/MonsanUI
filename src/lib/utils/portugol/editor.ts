@@ -14,7 +14,8 @@ export interface PortugolPairEdit {
 export interface PortugolStructureGuide {
 	startLine: number;
 	endLine: number;
-	depth: number;
+	indentColumns: number;
+	indentOffset: number;
 	type: 'algorithm' | 'if' | 'while' | 'for' | 'repeat' | 'switch';
 }
 
@@ -59,15 +60,64 @@ function stripPortugolStringsAndComments(line: string) {
 	return value.trim().toLocaleLowerCase('pt-BR');
 }
 
+function getPortugolLineIndentation(line: string) {
+	const indent = line.match(/^[\t ]*/)?.[0] ?? '';
+	return {
+		columns: getPortugolIndentColumns(indent),
+		offset: indent.length
+	};
+}
+
+function isBranchLine(type: PortugolStructureType, content: string) {
+	if (type === 'if') return /^(senao|senão)\b/i.test(content);
+	if (type === 'switch') return /^(caso|outrocaso)\b/i.test(content);
+	return false;
+}
+
+function isAlgorithmSection(content: string) {
+	return /^(var|inicio)\b/i.test(content);
+}
+
+function hasConsistentStructureIndentation(
+	lines: readonly string[],
+	startLine: number,
+	endLine: number,
+	type: PortugolStructureType,
+	indentColumns: number
+) {
+	const closingIndent = getPortugolLineIndentation(lines[endLine - 1]);
+	if (closingIndent.columns !== indentColumns) return false;
+
+	for (let lineNumber = startLine + 1; lineNumber < endLine; lineNumber += 1) {
+		const content = stripPortugolStringsAndComments(lines[lineNumber - 1]);
+		if (!content) continue;
+
+		const indent = getPortugolLineIndentation(lines[lineNumber - 1]);
+		if (type === 'algorithm' && isAlgorithmSection(content)) {
+			if (indent.columns !== indentColumns) return false;
+			continue;
+		}
+		if (type === 'if' && isBranchLine(type, content)) {
+			if (indent.columns !== indentColumns) return false;
+			continue;
+		}
+		if (indent.columns <= indentColumns) return false;
+	}
+
+	return true;
+}
+
 /**
- * Resolves Visualg block pairs without depending on indentation. The editor
- * uses the resulting line ranges to draw semantic gutters; incomplete or
- * malformed structures deliberately stay unpaired so we never imply valid code.
+ * Resolves Visualg block pairs with consistent indentation. The editor uses
+ * the resulting line ranges to draw physical connectors in the code surface;
+ * incomplete, malformed or misindented structures deliberately stay unpaired
+ * so we never imply valid code.
  */
 export function getPortugolStructureGuides(source: string): PortugolStructureGuide[] {
 	type OpenStructure = {
 		startLine: number;
-		depth: number;
+		indentColumns: number;
+		indentOffset: number;
 		type: PortugolStructureType;
 		closer: string;
 	};
@@ -80,17 +130,29 @@ export function getPortugolStructureGuides(source: string): PortugolStructureGui
 		const content = stripPortugolStringsAndComments(line);
 		if (!content) continue;
 		const lineNumber = index + 1;
+		const indentation = getPortugolLineIndentation(line);
 		const closer = content.match(/^([a-záéíóúâêîôûç]+)/i)?.[1];
 		const current = stack.at(-1);
 
 		if (current && closer === current.closer) {
 			stack.pop();
-			guides.push({
-				startLine: current.startLine,
-				endLine: lineNumber,
-				depth: current.depth,
-				type: current.type
-			});
+			if (
+				hasConsistentStructureIndentation(
+					lines,
+					current.startLine,
+					lineNumber,
+					current.type,
+					current.indentColumns
+				)
+			) {
+				guides.push({
+					startLine: current.startLine,
+					endLine: lineNumber,
+					indentColumns: current.indentColumns,
+					indentOffset: current.indentOffset,
+					type: current.type
+				});
+			}
 			continue;
 		}
 
@@ -98,13 +160,16 @@ export function getPortugolStructureGuides(source: string): PortugolStructureGui
 		if (!opener) continue;
 		stack.push({
 			startLine: lineNumber,
-			depth: stack.length,
+			indentColumns: indentation.columns,
+			indentOffset: indentation.offset,
 			type: opener.type,
 			closer: opener.closer
 		});
 	}
 
-	return guides.sort((left, right) => left.startLine - right.startLine || left.depth - right.depth);
+	return guides.sort(
+		(left, right) => left.startLine - right.startLine || left.indentColumns - right.indentColumns
+	);
 }
 
 export function getPortugolLineIndent(text: string) {
