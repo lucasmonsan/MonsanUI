@@ -337,7 +337,8 @@ fimalgoritmo`),
 	let stopRequested = false;
 	let scheduledRun: ReturnType<typeof setTimeout> | null = null;
 	const executionChunkSize = 500;
-	let sidebarHidden = $derived(!resultsVisible);
+	let resultsPanelVisible = $derived(resultsVisible && (isRunning || hasRun));
+	let sidebarHidden = $derived(!resultsPanelVisible || isFocusMode);
 	let sidebarRows = $derived(
 		`${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`
 	);
@@ -909,7 +910,7 @@ fimalgoritmo`),
 				<!-- Terminal de I/O e inspetor de variáveis -->
 				<div
 					class="sidebar-col"
-					class:hidden={!resultsVisible || !(isRunning || hasRun)}
+					class:hidden={!resultsPanelVisible}
 					class:focus-floating={isFocusMode}
 					style="grid-template-rows: {sidebarRows}"
 					style:--floating-width={isFocusMode ? `${floatingWidth}px` : undefined}

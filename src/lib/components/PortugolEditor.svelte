@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import {
 		EditorView,
 		keymap,
@@ -19,7 +18,7 @@
 		RangeSet,
 		RangeSetBuilder,
 		Compartment,
-		Transaction,
+		type Transaction,
 		EditorSelection
 	} from '@codemirror/state';
 	import { history, historyKeymap, indentWithTab, defaultKeymap } from '@codemirror/commands';
@@ -67,6 +66,9 @@
 
 	let editorContainer = $state<HTMLDivElement | null>(null);
 	let view = $state<EditorView | null>(null);
+	let structureGuideFrame: number | null = null;
+	let structureGuidePaths = $state<Array<{ key: string; d: string }>>([]);
+	let structureGuideOverlaySize = $state({ width: 0, height: 0 });
 
 	// Compartment to allow dynamic read-only toggling
 	const readOnlyCompartment = new Compartment();
@@ -100,60 +102,6 @@
 			return span;
 		}
 	}
-
-	class StructureGuideMarker extends GutterMarker {
-		private readonly depths: readonly number[];
-
-		constructor(depths: readonly number[]) {
-			super();
-			this.depths = depths;
-		}
-
-		toDOM() {
-			const container = document.createElement('span');
-			container.className = 'portugol-structure-guides';
-			container.setAttribute('aria-hidden', 'true');
-			for (const depth of this.depths) {
-				const guide = document.createElement('span');
-				guide.className = 'portugol-structure-guide';
-				guide.style.setProperty('--portugol-structure-depth', String(depth));
-				container.appendChild(guide);
-			}
-			return container;
-		}
-	}
-
-	function buildStructureGuideMarkers(doc: EditorState['doc']) {
-		const depthsByLine = new SvelteMap<number, SvelteSet<number>>();
-		for (const guide of getPortugolStructureGuides(doc.toString())) {
-			for (let lineNumber = guide.startLine; lineNumber <= guide.endLine; lineNumber += 1) {
-				const depths = depthsByLine.get(lineNumber) ?? new SvelteSet<number>();
-				depths.add(guide.depth);
-				depthsByLine.set(lineNumber, depths);
-			}
-		}
-
-		const builder = new RangeSetBuilder<GutterMarker>();
-		for (const [lineNumber, depths] of [...depthsByLine.entries()].sort(
-			([left], [right]) => left - right
-		)) {
-			builder.add(
-				doc.line(lineNumber).from,
-				doc.line(lineNumber).from,
-				new StructureGuideMarker([...depths])
-			);
-		}
-		return builder.finish();
-	}
-
-	const structureGuidesField = StateField.define<RangeSet<GutterMarker>>({
-		create(state) {
-			return buildStructureGuideMarkers(state.doc);
-		},
-		update(markers: RangeSet<GutterMarker>, tr: Transaction) {
-			return tr.docChanged ? buildStructureGuideMarkers(tr.state.doc) : markers.map(tr.changes);
-		}
-	});
 
 	// State field to store gutter markers
 	const lineMarkersField = StateField.define<RangeSet<GutterMarker>>({
@@ -235,18 +183,72 @@
 		initialSpacer: () => new ActiveLineMarker()
 	});
 
-	const structureGuideGutter = gutter({
-		class: 'cm-portugol-structure-gutter',
-		markers(v: EditorView) {
-			return v.state.field(structureGuidesField);
-		},
-		initialSpacer: () => new StructureGuideMarker([0, 1, 2, 3, 4, 5])
-	});
-
 	function getGutterExtensions() {
-		return showLineNumbers
-			? [lineNumbers(), indicatorGutter, structureGuideGutter]
-			: [structureGuideGutter];
+		return showLineNumbers ? [lineNumbers(), indicatorGutter] : [];
+	}
+
+	function getStructureGuidePath(
+		x: number,
+		startY: number,
+		endY: number,
+		connectStart: boolean,
+		connectEnd: boolean
+	) {
+		const connectorLength = 5;
+		const segments = [`M ${x} ${startY}`, `L ${x} ${endY}`];
+		if (connectStart) segments.push(`M ${x} ${startY} L ${x + connectorLength} ${startY}`);
+		if (connectEnd) segments.push(`M ${x} ${endY} L ${x + connectorLength} ${endY}`);
+		return segments.join(' ');
+	}
+
+	function renderStructureGuides() {
+		if (!view || !editorContainer) return;
+
+		const document = view.state.doc;
+		const viewportStart = document.lineAt(view.viewport.from).number;
+		const viewportEnd = document.lineAt(view.viewport.to).number;
+		const containerRect = editorContainer.getBoundingClientRect();
+		const contentRect = view.contentDOM.getBoundingClientRect();
+		const nextPaths: Array<{ key: string; d: string }> = [];
+
+		for (const guide of getPortugolStructureGuides(document.toString())) {
+			if (guide.endLine < viewportStart || guide.startLine > viewportEnd) continue;
+
+			const visibleStart = Math.max(guide.startLine, viewportStart);
+			const visibleEnd = Math.min(guide.endLine, viewportEnd);
+			const startRect = view.coordsAtPos(document.line(visibleStart).from);
+			const endRect = view.coordsAtPos(document.line(visibleEnd).from);
+			if (!startRect || !endRect) continue;
+
+			const x =
+				contentRect.left -
+				containerRect.left +
+				guide.indentColumns * view.defaultCharacterWidth -
+				2;
+			const startY = (startRect.top + startRect.bottom) / 2 - containerRect.top;
+			const endY = (endRect.top + endRect.bottom) / 2 - containerRect.top;
+			nextPaths.push({
+				key: `${guide.type}-${guide.startLine}-${guide.endLine}`,
+				d: getStructureGuidePath(
+					x,
+					startY,
+					endY,
+					visibleStart === guide.startLine,
+					visibleEnd === guide.endLine
+				)
+			});
+		}
+
+		structureGuideOverlaySize = { width: containerRect.width, height: containerRect.height };
+		structureGuidePaths = nextPaths;
+	}
+
+	function queueStructureGuideRender() {
+		if (structureGuideFrame !== null || typeof window === 'undefined') return;
+		structureGuideFrame = window.requestAnimationFrame(() => {
+			structureGuideFrame = null;
+			renderStructureGuides();
+		});
 	}
 
 	// Custom Portugol language syntax highlighter
@@ -472,24 +474,6 @@
 				minWidth: '16px',
 				paddingLeft: '4px'
 			},
-			'.cm-portugol-structure-gutter': {
-				minWidth: '42px',
-				position: 'relative'
-			},
-			'.portugol-structure-guides': {
-				display: 'block',
-				height: '1.45em',
-				position: 'relative'
-			},
-			'.portugol-structure-guide': {
-				position: 'absolute',
-				top: '-0.2em',
-				bottom: '-0.2em',
-				left: 'calc(4px + var(--portugol-structure-depth) * 6px)',
-				width: '2px',
-				borderRadius: '999px',
-				backgroundColor: 'color-mix(in srgb, var(--accent-primary) 44%, transparent)'
-			},
 			'.cm-activeLine': {
 				backgroundColor: 'rgba(224, 123, 57, 0.06) !important'
 			},
@@ -518,7 +502,6 @@
 					lineNumbersCompartment.of(getGutterExtensions()),
 					highlightActiveLine(),
 					lineMarkersField,
-					structureGuidesField,
 					lineHighlightField,
 					history(),
 					keymap.of([
@@ -609,6 +592,9 @@
 						if (update.docChanged) {
 							code = update.state.doc.toString();
 						}
+						if (update.docChanged || update.viewportChanged || update.geometryChanged) {
+							queueStructureGuideRender();
+						}
 					}),
 					readOnlyCompartment.of(EditorState.readOnly.of(disabled))
 				]
@@ -623,10 +609,16 @@
 			view.dispatch({
 				effects: highlightEffect.of({ activeLine, errorLine })
 			});
+			view.scrollDOM.addEventListener('scroll', queueStructureGuideRender);
+			queueStructureGuideRender();
 		}
 	});
 
 	onDestroy(() => {
+		if (structureGuideFrame !== null) {
+			window.cancelAnimationFrame(structureGuideFrame);
+		}
+		view?.scrollDOM.removeEventListener('scroll', queueStructureGuideRender);
 		if (view) {
 			view.destroy();
 		}
@@ -679,7 +671,17 @@
 </script>
 
 <div class="portugol-editor-container notranslate" class:disabled style:height translate="no">
-	<div class="editor-wrapper notranslate" bind:this={editorContainer} translate="no"></div>
+	<div class="editor-wrapper notranslate" bind:this={editorContainer} translate="no">
+		<svg
+			class="portugol-structure-overlay"
+			aria-hidden="true"
+			viewBox={`0 0 ${structureGuideOverlaySize.width} ${structureGuideOverlaySize.height}`}
+		>
+			{#each structureGuidePaths as path (path.key)}
+				<path class="portugol-structure-guide-path" d={path.d}></path>
+			{/each}
+		</svg>
+	</div>
 </div>
 
 <style>
@@ -704,6 +706,7 @@
 	}
 
 	.editor-wrapper {
+		position: relative;
 		width: 100%;
 		height: 100%;
 		min-height: 0;
@@ -712,5 +715,22 @@
 
 	:global(.cm-editor) {
 		height: 100%;
+	}
+
+	.portugol-structure-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		overflow: visible;
+	}
+
+	:global(.portugol-structure-guide-path) {
+		fill: none;
+		stroke: color-mix(in srgb, var(--accent-primary) 64%, transparent);
+		stroke-linecap: round;
+		stroke-width: 1.5;
 	}
 </style>
