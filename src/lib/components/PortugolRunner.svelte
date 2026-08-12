@@ -14,6 +14,7 @@
 	import PlayIcon from './icons/Play.svelte';
 	import SaveIcon from './icons/Save.svelte';
 	import SkipForwardIcon from './icons/SkipForward.svelte';
+	import TerminalIcon from './icons/Terminal.svelte';
 	import XIcon from './icons/X.svelte';
 	import SettingsIcon from './icons/Settings.svelte';
 	import CheckIcon from './icons/Check.svelte';
@@ -262,9 +263,7 @@ fimalgoritmo`),
 	let currentInputValue = $state('');
 	let terminalInputElement = $state<HTMLInputElement | null>(null);
 
-	// Collapsible state
-	let isConsoleCollapsed = $state(false);
-	let isVariablesCollapsed = $state(false);
+	let resultsVisible = $state(true);
 	let showLineNumbers = $state(true);
 
 	// Resizable state
@@ -338,12 +337,9 @@ fimalgoritmo`),
 	let stopRequested = false;
 	let scheduledRun: ReturnType<typeof setTimeout> | null = null;
 	const executionChunkSize = 500;
-	let embeddedConsoleVisible = $derived(!isConsoleCollapsed);
-	let sidebarHidden = $derived(isFocusMode || (!embeddedConsoleVisible && isVariablesCollapsed));
+	let sidebarHidden = $derived(!resultsVisible);
 	let sidebarRows = $derived(
-		embeddedConsoleVisible && !isVariablesCollapsed
-			? `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`
-			: '1fr'
+		`${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`
 	);
 
 	$effect(() => {
@@ -421,9 +417,7 @@ fimalgoritmo`),
 	}
 
 	function prepareConsoleForExecution() {
-		if (isConsoleCollapsed) {
-			isConsoleCollapsed = false;
-		}
+		resultsVisible = true;
 	}
 
 	function startExecution(step = false) {
@@ -602,6 +596,11 @@ fimalgoritmo`),
 		currentInputValue = '';
 		interpreter = null;
 		generator = null;
+		resultsVisible = true;
+	}
+
+	function toggleResults() {
+		resultsVisible = !resultsVisible;
 	}
 </script>
 
@@ -680,19 +679,12 @@ fimalgoritmo`),
 	</div>
 {/snippet}
 
-<div
-	class="portugol-runner"
-	class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}
-	style="--runner-font-size: {fontSize}px;"
-	style:height
->
+<div class="portugol-runner" style="--runner-font-size: {fontSize}px;" style:height>
 	<Stack gap="sm" fullHeight={true}>
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
 		<div class="runner-workspace">
 			<div
 				class="workspace-grid"
-				class:has-collapsed-panel={isConsoleCollapsed || isVariablesCollapsed}
-				class:all-panels-collapsed={isConsoleCollapsed && isVariablesCollapsed}
 				style={sidebarHidden
 					? 'grid-template-columns: 100% 0px 0px'
 					: 'grid-template-columns: ' +
@@ -765,6 +757,18 @@ fimalgoritmo`),
 						>
 							<RotateCwIcon size={16} />
 						</Button>
+						{#if hasRun && !isRunning}
+							<Button
+								variant="secondary"
+								size="sm"
+								onclick={toggleResults}
+								title={resultsVisible
+									? i18n.t('portugolRunner.hideResults')
+									: i18n.t('portugolRunner.showResults')}
+							>
+								<TerminalIcon size={16} />
+							</Button>
+						{/if}
 						{#if onsave}
 							<Button
 								variant="secondary"
@@ -905,7 +909,7 @@ fimalgoritmo`),
 				<!-- Terminal de I/O e inspetor de variáveis -->
 				<div
 					class="sidebar-col"
-					class:hidden={isFocusMode ? !(isRunning || hasRun) : sidebarHidden}
+					class:hidden={!resultsVisible || !(isRunning || hasRun)}
 					class:focus-floating={isFocusMode}
 					style="grid-template-rows: {sidebarRows}"
 					style:--floating-width={isFocusMode ? `${floatingWidth}px` : undefined}
@@ -920,28 +924,23 @@ fimalgoritmo`),
 						></div>
 					{/if}
 					<!-- Console/Terminal -->
-					{#if isFocusMode || embeddedConsoleVisible}
+					{#if resultsVisible}
 						<div class="terminal-card" style="grid-row: 1;">
 							{#if isFocusMode}
 								<div class="focus-panel-header">
 									<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+									<button type="button" class="collapse-btn" onclick={toggleResults}>
+										{i18n.t('portugolRunner.hideResults')}
+									</button>
 								</div>
 								{@render consoleContent()}
 							{:else}
 								<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
 									<div class="panel-header">
 										<span>{i18n.t('portugolRunner.consoleTitle')}</span>
-										{#if !isFocusMode}
-											<div class="panel-header-actions">
-												<button
-													type="button"
-													class="collapse-btn"
-													onclick={() => (isConsoleCollapsed = true)}
-												>
-													{i18n.t('portugolRunner.hide')}
-												</button>
-											</div>
-										{/if}
+										<button type="button" class="collapse-btn" onclick={toggleResults}>
+											{i18n.t('portugolRunner.hideResults')}
+										</button>
 									</div>
 									{@render consoleContent()}
 								</Panel>
@@ -950,7 +949,7 @@ fimalgoritmo`),
 					{/if}
 
 					<!-- Barra de redimensionamento horizontal -->
-					{#if isFocusMode || (embeddedConsoleVisible && !isVariablesCollapsed)}
+					{#if resultsVisible}
 						<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 						<div
 							class="horizontal-resize-bar"
@@ -963,11 +962,8 @@ fimalgoritmo`),
 					{/if}
 
 					<!-- Inspetor de Variáveis -->
-					{#if isFocusMode || !isVariablesCollapsed}
-						<div
-							class="variables-panel-wrapper"
-							style="grid-row: {isFocusMode ? 3 : embeddedConsoleVisible ? 3 : 1};"
-						>
+					{#if resultsVisible}
+						<div class="variables-panel-wrapper" style="grid-row: 3;">
 							{#if isFocusMode}
 								<div class="focus-panel-header">
 									<span>{i18n.t('portugolRunner.variablesTitle')}</span>
@@ -977,15 +973,6 @@ fimalgoritmo`),
 								<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
 									<div class="panel-header">
 										<span>{i18n.t('portugolRunner.variablesTitle')}</span>
-										{#if !isFocusMode}
-											<button
-												type="button"
-												class="collapse-btn"
-												onclick={() => (isVariablesCollapsed = true)}
-											>
-												{i18n.t('portugolRunner.hide')}
-											</button>
-										{/if}
 									</div>
 									{@render variablesContent()}
 								</Panel>
@@ -999,15 +986,15 @@ fimalgoritmo`),
 		<!-- Alerta de erro de compilação/execução -->
 		{#if errorMsg}
 			<Alert type="error" title={i18n.t('portugolRunner.executionError')}>
-				<div class="error-msg-box">
+				<Inline align="start" gap="sm" wrap fullWidth>
 					<TriangleAlertIcon size="16" />
-					<span style="margin-left: 8px;">{errorMsg}</span>
+					<span class="error-message">{errorMsg}</span>
 					{#if fullErrorMsg.length > errorMsg.length}
 						<Button variant="secondary" size="sm" onclick={() => (errorDetailsOpen = true)}>
 							{i18n.t('portugolRunner.errorDetails')}
 						</Button>
 					{/if}
-				</div>
+				</Inline>
 			</Alert>
 		{/if}
 
@@ -1350,9 +1337,10 @@ fimalgoritmo`),
 		color: var(--text-primary);
 	}
 
-	.error-msg-box {
-		display: flex;
-		align-items: center;
+	.error-message {
+		flex: 1 1 18rem;
+		min-width: 0;
+		overflow-wrap: anywhere;
 	}
 
 	.panel-header {
@@ -1376,12 +1364,6 @@ fimalgoritmo`),
 		display: inline-flex;
 		align-items: center;
 		min-height: 1.25em;
-	}
-
-	.panel-header-actions {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-xs);
 	}
 
 	.collapse-btn {
@@ -1467,32 +1449,6 @@ fimalgoritmo`),
 			padding: 0;
 		}
 
-		.workspace-grid.has-collapsed-panel {
-			flex: 1 1 auto;
-			height: auto;
-			min-height: 0;
-			overflow: hidden;
-		}
-
-		.workspace-grid.has-collapsed-panel .editor-col {
-			height: auto;
-			min-height: 0;
-			flex: 1 1 0;
-		}
-
-		.workspace-grid.all-panels-collapsed {
-			height: auto;
-		}
-
-		.workspace-grid.all-panels-collapsed .editor-col {
-			height: auto;
-			flex: 1 1 0;
-		}
-
-		.workspace-grid.all-panels-collapsed .resize-bar {
-			display: none;
-		}
-
 		.runner-floating-actions {
 			position: absolute;
 			top: var(--space-sm);
@@ -1517,13 +1473,6 @@ fimalgoritmo`),
 			min-height: 0;
 		}
 
-		.workspace-grid.has-collapsed-panel .sidebar-col {
-			flex: 1 1 0;
-			height: auto;
-			min-height: 0;
-			overflow: hidden;
-		}
-
 		.terminal-card {
 			height: 180px;
 			flex: 0 0 180px;
@@ -1532,13 +1481,6 @@ fimalgoritmo`),
 		.variables-panel-wrapper {
 			height: 160px;
 			flex: 0 0 160px;
-		}
-
-		.workspace-grid.has-collapsed-panel .terminal-card,
-		.workspace-grid.has-collapsed-panel .variables-panel-wrapper {
-			height: auto;
-			min-height: 0;
-			flex: 1 1 0;
 		}
 
 		.horizontal-resize-bar {

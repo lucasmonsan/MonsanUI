@@ -57,6 +57,7 @@ export { default as Credits } from './components/Credits.svelte';
 export { default as SplashScreen } from './components/SplashScreen.svelte';
 /** Toolbar content only; parent layout such as AppShell owns structural spacing. */
 export { default as ActionBar } from './components/ActionBar.svelte';
+export { default as AudioLevelMeter } from './components/AudioLevelMeter.svelte';
 export { default as FilterToolbar } from './components/FilterToolbar.svelte';
 export { default as FilterDialog } from './components/FilterDialog.svelte';
 export { default as SingleChoice } from './components/questions/SingleChoice.svelte';
@@ -82,7 +83,6 @@ export { default as TimePicker } from './components/TimePicker.svelte';
 export { default as Text } from './components/Text.svelte';
 export { default as Markdown } from './components/Markdown.svelte';
 export { default as Loading } from './components/Loading.svelte';
-export { default as AudioLevelMeter } from './components/AudioLevelMeter.svelte';
 export { default as Alert } from './components/Alert.svelte';
 export { default as ProgressBar } from './components/ProgressBar.svelte';
 export { default as Avatar } from './components/Avatar.svelte';

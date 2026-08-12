@@ -19,6 +19,7 @@ import {
 	getPortugolEditorIndentColumns,
 	getPortugolNextLineIndent,
 	getPortugolPairEdit,
+	getPortugolStructureGuides,
 	PORTUGOL_EDITOR_CARET_COLOR
 } from '../dist/utils/portugol/editor.js';
 import { readFileSync } from 'node:fs';
@@ -1706,6 +1707,47 @@ console.log('Running Portugol editor behavior tests...');
 		getPortugolEditorIndentColumns('\t\tescreval("Aprovado")', 'fimse'),
 		4,
 		'CodeMirror indentation should reduce before block closer'
+	);
+	const unindentedGuides = getPortugolStructureGuides(`algoritmo "Guias"
+inicio
+se nota >= 6 entao
+escreval("Aprovado")
+senao
+escreval("Recuperação")
+fimse
+escolha opcao
+caso 1
+escreval("Um")
+fimescolha
+fimalgoritmo`);
+	assertEquals(unindentedGuides.length, 3, 'Structure guides should pair unindented blocks');
+	assert(
+		unindentedGuides.some(
+			(guide) => guide.type === 'if' && guide.startLine === 3 && guide.endLine === 7
+		),
+		'Structure guides should pair se/fimse independently from indentation'
+	);
+	assert(
+		unindentedGuides.some(
+			(guide) => guide.type === 'switch' && guide.startLine === 8 && guide.endLine === 11
+		),
+		'Structure guides should pair escolha/fimescolha'
+	);
+	const ignoredGuideKeywords = getPortugolStructureGuides(`algoritmo "Texto"
+inicio
+// se falso entao
+escreval("fimse escolha fimescolha")
+fimalgoritmo`);
+	assertEquals(
+		ignoredGuideKeywords.length,
+		1,
+		'Guide resolver should ignore block keywords inside comments and strings'
+	);
+	assertEquals(
+		getPortugolStructureGuides(`se verdadeiro entao
+escreval("incompleto")`).length,
+		0,
+		'Incomplete blocks should not render misleading guides'
 	);
 	assertEquals(getPortugolPairEdit('', '', '"').insert, '""', 'Double quote should create a pair');
 	assertEquals(

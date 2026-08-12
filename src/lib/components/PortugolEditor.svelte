@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import {
 		EditorView,
 		keymap,
@@ -34,6 +35,7 @@
 		getPortugolEditorIndentColumns,
 		getPortugolNextLineIndent,
 		getPortugolPairEdit,
+		getPortugolStructureGuides,
 		PORTUGOL_EDITOR_CARET_COLOR
 	} from '../utils/portugol/editor.js';
 
@@ -98,6 +100,60 @@
 			return span;
 		}
 	}
+
+	class StructureGuideMarker extends GutterMarker {
+		private readonly depths: readonly number[];
+
+		constructor(depths: readonly number[]) {
+			super();
+			this.depths = depths;
+		}
+
+		toDOM() {
+			const container = document.createElement('span');
+			container.className = 'portugol-structure-guides';
+			container.setAttribute('aria-hidden', 'true');
+			for (const depth of this.depths) {
+				const guide = document.createElement('span');
+				guide.className = 'portugol-structure-guide';
+				guide.style.setProperty('--portugol-structure-depth', String(depth));
+				container.appendChild(guide);
+			}
+			return container;
+		}
+	}
+
+	function buildStructureGuideMarkers(doc: EditorState['doc']) {
+		const depthsByLine = new SvelteMap<number, SvelteSet<number>>();
+		for (const guide of getPortugolStructureGuides(doc.toString())) {
+			for (let lineNumber = guide.startLine; lineNumber <= guide.endLine; lineNumber += 1) {
+				const depths = depthsByLine.get(lineNumber) ?? new SvelteSet<number>();
+				depths.add(guide.depth);
+				depthsByLine.set(lineNumber, depths);
+			}
+		}
+
+		const builder = new RangeSetBuilder<GutterMarker>();
+		for (const [lineNumber, depths] of [...depthsByLine.entries()].sort(
+			([left], [right]) => left - right
+		)) {
+			builder.add(
+				doc.line(lineNumber).from,
+				doc.line(lineNumber).from,
+				new StructureGuideMarker([...depths])
+			);
+		}
+		return builder.finish();
+	}
+
+	const structureGuidesField = StateField.define<RangeSet<GutterMarker>>({
+		create(state) {
+			return buildStructureGuideMarkers(state.doc);
+		},
+		update(markers: RangeSet<GutterMarker>, tr: Transaction) {
+			return tr.docChanged ? buildStructureGuideMarkers(tr.state.doc) : markers.map(tr.changes);
+		}
+	});
 
 	// State field to store gutter markers
 	const lineMarkersField = StateField.define<RangeSet<GutterMarker>>({
@@ -179,8 +235,18 @@
 		initialSpacer: () => new ActiveLineMarker()
 	});
 
+	const structureGuideGutter = gutter({
+		class: 'cm-portugol-structure-gutter',
+		markers(v: EditorView) {
+			return v.state.field(structureGuidesField);
+		},
+		initialSpacer: () => new StructureGuideMarker([0, 1, 2, 3, 4, 5])
+	});
+
 	function getGutterExtensions() {
-		return showLineNumbers ? [lineNumbers(), indicatorGutter] : [];
+		return showLineNumbers
+			? [lineNumbers(), indicatorGutter, structureGuideGutter]
+			: [structureGuideGutter];
 	}
 
 	// Custom Portugol language syntax highlighter
@@ -406,6 +472,24 @@
 				minWidth: '16px',
 				paddingLeft: '4px'
 			},
+			'.cm-portugol-structure-gutter': {
+				minWidth: '42px',
+				position: 'relative'
+			},
+			'.portugol-structure-guides': {
+				display: 'block',
+				height: '1.45em',
+				position: 'relative'
+			},
+			'.portugol-structure-guide': {
+				position: 'absolute',
+				top: '-0.2em',
+				bottom: '-0.2em',
+				left: 'calc(4px + var(--portugol-structure-depth) * 6px)',
+				width: '2px',
+				borderRadius: '999px',
+				backgroundColor: 'color-mix(in srgb, var(--accent-primary) 44%, transparent)'
+			},
 			'.cm-activeLine': {
 				backgroundColor: 'rgba(224, 123, 57, 0.06) !important'
 			},
@@ -434,6 +518,7 @@
 					lineNumbersCompartment.of(getGutterExtensions()),
 					highlightActiveLine(),
 					lineMarkersField,
+					structureGuidesField,
 					lineHighlightField,
 					history(),
 					keymap.of([

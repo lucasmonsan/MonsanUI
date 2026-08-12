@@ -14,24 +14,37 @@ const stack: DialogInstance[] = [];
 let ignorePopstate = false;
 
 if (typeof window !== 'undefined') {
-	window.addEventListener('popstate', () => {
-		if (ignorePopstate) {
-			ignorePopstate = false;
-			return;
-		}
-		if (stack.length > 0) {
-			const top = stack.pop();
-			if (top) {
-				if (top.onBackNavigation?.() === false) {
-					history.pushState({ ...history.state, monsanDialogId: top.id }, '', window.location.href);
-					stack.push(top);
-					return;
-				}
-				top.popstateClosed = true;
-				top.close();
+	// Dialog history is an interaction layer, not application navigation. Listen
+	// during capture and consume the entry we own so route guards never mistake a
+	// close action for an attempt to leave the current screen.
+	window.addEventListener(
+		'popstate',
+		(event) => {
+			if (ignorePopstate) {
+				ignorePopstate = false;
+				event.stopImmediatePropagation();
+				return;
 			}
-		}
-	});
+			if (stack.length > 0) {
+				event.stopImmediatePropagation();
+				const top = stack.pop();
+				if (top) {
+					if (top.onBackNavigation?.() === false) {
+						history.pushState(
+							{ ...history.state, monsanDialogId: top.id },
+							'',
+							window.location.href
+						);
+						stack.push(top);
+						return;
+					}
+					top.popstateClosed = true;
+					top.close();
+				}
+			}
+		},
+		true
+	);
 }
 
 export function pushDialog(id: string, closeFn: () => void, onBackNavigation?: () => boolean) {
