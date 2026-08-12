@@ -23,6 +23,7 @@
 		scrollable = false,
 		showNavButtons = false,
 		hideLabels = false,
+		hideLabelsBelow = 'never',
 		embedded = false,
 		scrollLeftLabel,
 		scrollRightLabel,
@@ -37,6 +38,7 @@
 		scrollable?: boolean;
 		showNavButtons?: boolean;
 		hideLabels?: boolean;
+		hideLabelsBelow?: 'never' | 'sm';
 		embedded?: boolean;
 		scrollLeftLabel?: string;
 		scrollRightLabel?: string;
@@ -211,6 +213,7 @@
 		class:scrollable
 		class:has-nav-buttons={scrollable && showNavButtons}
 		class:hide-labels={hideLabels}
+		class:hide-labels-below-sm={hideLabelsBelow === 'sm'}
 		class:embedded
 		role="tablist"
 		tabindex="-1"
@@ -509,15 +512,18 @@
 	}
 
 	@media (max-width: 600px) {
-		.monsan-tabs-container.hide-labels .monsan-tab-text {
+		.monsan-tabs-container.hide-labels .monsan-tab-text,
+		.monsan-tabs-container.hide-labels-below-sm .monsan-tab-text {
 			display: none;
 		}
 
-		.monsan-tabs-container.hide-labels {
+		.monsan-tabs-container.hide-labels,
+		.monsan-tabs-container.hide-labels-below-sm {
 			flex-wrap: nowrap;
 		}
 
-		.monsan-tabs-container.hide-labels .monsan-tab-item {
+		.monsan-tabs-container.hide-labels .monsan-tab-item,
+		.monsan-tabs-container.hide-labels-below-sm .monsan-tab-item {
 			flex: 1 1 0;
 			min-width: 0;
 			padding-right: var(--space-sm);

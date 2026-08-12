@@ -1908,4 +1908,16 @@ fimalgoritmo`;
 	assertEquals(result.line, 3, 'Should detect error on line 3');
 }
 
+{
+	const code = `algoritmo "Comentário"
+var
+	// se verdadeiro entao
+	x : inteiro
+inicio
+	// fimse
+	x <- 10
+fimalgoritmo`;
+	assert(checkIndentation(code).ok, 'Should ignore indentation-like comment content');
+}
+
 console.log('All Portugol core tests passed successfully.');
