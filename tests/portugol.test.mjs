@@ -1187,6 +1187,48 @@ console.log('Running Visualg essential function tests...');
 	assertEquals(outputs.join(''), '5|3|8|16|8|1|2|3|2|7|ABC|abc|roc|4|0|pi');
 }
 
+console.log('Running Visualg arithmetic symbol and output format tests...');
+{
+	const outputs = runProgram(`
+		algoritmo "OperadoresVisualg"
+		var
+			valor : real
+		inicio
+			valor <- 3.14159
+			escreva(10 \\ 3, "|")
+			escreva(2 ^ 3, "|")
+			escreva(2 ^ 3 ^ 2, "|")
+			escreva(-2 ^ 2, "|")
+			escreva(valor:0:3, "|")
+			escreva(valor:8:2, "|")
+			escreva(valor:3)
+		fimalgoritmo
+	`);
+
+	assertEquals(
+		outputs.join(''),
+		'3|8|512|-4|3.142|    3.14|3.14159',
+		'Should support Visualg integer division, exponentiation and output-only formatting'
+	);
+}
+
+{
+	assertThrowsMessage(
+		() =>
+			runProgram(`
+				algoritmo "FormatoInvalido"
+				var
+					valor : real
+				inicio
+					valor <- 3.14
+					escreval(valor:0:-1)
+				fimalgoritmo
+			`),
+		'casas decimais da formatação deve ser um inteiro não negativo',
+		'Should reject negative decimal precision'
+	);
+}
+
 {
 	const outputs = runProgram(`
 		algoritmo "LimpaTela"
@@ -1519,6 +1561,14 @@ console.log('Running Visualg reference catalog tests...');
 	}
 
 	assertEquals(getVisualgReferenceItem('limpatela')?.name, 'limpa');
+	assert(
+		getVisualgReferenceItem('div')?.aliases?.includes('\\'),
+		'Reference should expose \\ as div alias'
+	);
+	assert(
+		getVisualgReferenceItem('pot')?.aliases?.includes('^'),
+		'Reference should expose ^ as pot alias'
+	);
 	assertEquals(getVisualgReferenceItem('randi')?.status, 'supported');
 	assertEquals(getVisualgReferenceItem('numpcarac')?.status, 'supported');
 	assertEquals(getVisualgReferenceItem('log')?.status, 'supported');

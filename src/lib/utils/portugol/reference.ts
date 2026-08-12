@@ -139,18 +139,20 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 		name: 'escreva',
 		category: 'input-output',
 		status: 'supported',
-		syntax: 'escreva(valor)',
-		description: 'Escreve no console sem quebrar linha automaticamente.',
-		example: 'escreva("Resultado: ", total)',
+		syntax: 'escreva(valor[:largura[:casas]])',
+		description:
+			'Escreve no console sem quebrar linha automaticamente. Em valores numéricos, :largura:casas formata a saída sem alterar o valor.',
+		example: 'escreva("Resultado: ", total:0:2)',
 		compatibility: 'Visualg'
 	},
 	{
 		name: 'escreval',
 		category: 'input-output',
 		status: 'supported',
-		syntax: 'escreval(valor)',
-		description: 'Escreve no console e quebra linha ao final.',
-		example: 'escreval("Linha 1")',
+		syntax: 'escreval(valor[:largura[:casas]])',
+		description:
+			'Escreve no console e quebra linha ao final. Em valores numéricos, :largura:casas formata a saída sem alterar o valor.',
+		example: 'escreval(media:0:2)',
 		compatibility: 'Visualg'
 	},
 	{
@@ -174,11 +176,13 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 	},
 	{
 		name: 'div',
+		aliases: ['\\'],
 		category: 'operator',
 		status: 'supported',
-		syntax: 'a div b',
-		description: 'Retorna a parte inteira da divisão. Também pode ser usado como div(a, b).',
-		example: 'escreva(10 div 3)',
+		syntax: 'a \\ b ou a div b',
+		description:
+			'Retorna a parte inteira da divisão por truncamento. Também pode ser usado como div(a, b).',
+		example: 'escreva(10 \\ 3)',
 		compatibility: 'Visualg'
 	},
 	{
@@ -219,11 +223,12 @@ export const visualgReferenceItems: VisualgReferenceItem[] = [
 	},
 	{
 		name: 'pot',
+		aliases: ['^'],
 		category: 'math',
 		status: 'supported',
-		syntax: 'pot(base, expoente)',
+		syntax: 'base ^ expoente ou pot(base, expoente)',
 		description: 'Retorna a potência de base elevada ao expoente.',
-		example: 'escreva(pot(2, 3))',
+		example: 'escreva(2 ^ 3)',
 		compatibility: 'Visualg'
 	},
 	{

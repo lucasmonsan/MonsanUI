@@ -24,6 +24,7 @@ export type TokenType =
 	| 'SLASH'
 	| 'PERCENT'
 	| 'INTDIV'
+	| 'POWER'
 	| 'EQ'
 	| 'NEQ'
 	| 'LT'
@@ -256,6 +257,16 @@ export class Lexer {
 				this.advance();
 				continue;
 			}
+			if (isVisualg && char === '\\') {
+				tokens.push({ type: 'INTDIV', value: '\\', line: this.line, column: this.column });
+				this.advance();
+				continue;
+			}
+			if (isVisualg && char === '^') {
+				tokens.push({ type: 'POWER', value: '^', line: this.line, column: this.column });
+				this.advance();
+				continue;
+			}
 			if (char === '<') {
 				tokens.push({ type: 'LT', value: '<', line: this.line, column: this.column });
 				this.advance();
@@ -470,6 +481,7 @@ export type ASTNode =
 	| CallNode
 	| BinaryNode
 	| UnaryNode
+	| FormattedOutputNode
 	| LiteralNode
 	| IdentifierNode;
 
@@ -578,6 +590,14 @@ export interface UnaryNode {
 	type: 'Unary';
 	operator: string;
 	right: ASTNode;
+	line: number;
+}
+
+export interface FormattedOutputNode {
+	type: 'FormattedOutput';
+	value: ASTNode;
+	width: ASTNode;
+	decimals?: ASTNode;
 	line: number;
 }
 
@@ -982,13 +1002,28 @@ export class Parser {
 		return expr;
 	}
 
+	private parsePower(): ASTNode {
+		const expr = this.parsePrimary();
+		if (this.match('POWER')) {
+			const op = this.tokens[this.current - 1];
+			return {
+				type: 'Binary',
+				left: expr,
+				operator: op.value,
+				right: this.parseUnary(),
+				line: op.line
+			};
+		}
+		return expr;
+	}
+
 	private parseUnary(): ASTNode {
 		if (this.match('MINUS', 'NOT')) {
 			const op = this.tokens[this.current - 1];
 			const right = this.parseUnary();
 			return { type: 'Unary', operator: op.value, right, line: op.line };
 		}
-		return this.parsePrimary();
+		return this.parsePower();
 	}
 
 	private parsePrimary(): ASTNode {
@@ -1022,9 +1057,24 @@ export class Parser {
 			// Chamada de função
 			if (this.match('LPAREN')) {
 				const args: ASTNode[] = [];
+				const supportsOutputFormat = ['escreva', 'escreval'].includes(name.toLowerCase());
 				if (!this.check('RPAREN')) {
 					do {
-						args.push(this.parseExpression());
+						const value = this.parseExpression();
+						if (supportsOutputFormat && this.match('COLON')) {
+							const formatToken = this.tokens[this.current - 1];
+							const width = this.parseExpression();
+							const decimals = this.match('COLON') ? this.parseExpression() : undefined;
+							args.push({
+								type: 'FormattedOutput',
+								value,
+								width,
+								decimals,
+								line: formatToken.line
+							});
+						} else {
+							args.push(value);
+						}
 					} while (this.match('COMMA'));
 				}
 				this.consume('RPAREN', "Esperado ')' após argumentos");
@@ -1568,6 +1618,66 @@ export class Interpreter {
 		return value;
 	}
 
+	private assertOutputFormatInteger(
+		value: unknown,
+		name: 'largura' | 'casas decimais',
+		line: number
+	): number {
+		if (
+			typeof value !== 'number' ||
+			!Number.isFinite(value) ||
+			!Number.isInteger(value) ||
+			value < 0
+		) {
+			throw new Error(
+				`Erro na linha ${line}: A ${name} da formatação deve ser um inteiro não negativo.`
+			);
+		}
+		if (value > 10000) {
+			throw new Error(
+				`Erro na linha ${line}: A ${name} da formatação não pode ser maior que 10000.`
+			);
+		}
+		return value;
+	}
+
+	private *formatOutputValue(
+		node: FormattedOutputNode,
+		env: Environment
+	): Generator<unknown, string, unknown> {
+		const value = yield* this.evaluate(node.value, env);
+		const width = this.assertOutputFormatInteger(
+			yield* this.evaluate(node.width, env),
+			'largura',
+			node.line
+		);
+		const decimals = node.decimals
+			? this.assertOutputFormatInteger(
+					yield* this.evaluate(node.decimals, env),
+					'casas decimais',
+					node.line
+				)
+			: undefined;
+
+		if (decimals !== undefined && decimals > 100) {
+			throw new Error(
+				`Erro na linha ${node.line}: A quantidade de casas decimais não pode ser maior que 100.`
+			);
+		}
+		let formatted: string;
+		if (decimals === undefined) {
+			formatted = String(value);
+		} else {
+			if (typeof value !== 'number' || !Number.isFinite(value)) {
+				throw new Error(
+					`Erro na linha ${node.line}: Casas decimais só podem formatar valores numéricos finitos.`
+				);
+			}
+			formatted = value.toFixed(decimals);
+		}
+		return formatted.padStart(width);
+	}
+
 	private assertEqualityOperands(operator: string, left: unknown, right: unknown, line: number) {
 		const leftType = this.runtimeType(left);
 		const rightType = this.runtimeType(right);
@@ -1923,11 +2033,15 @@ export class Interpreter {
 						this.assertNumberOperands(node.operator, left, right, node.line);
 						return (left as number) % (right as number);
 					case 'div':
+					case '\\':
 						this.assertNumberOperands(node.operator, left, right, node.line);
 						if (right === 0) {
 							throw new Error(`Erro em Tempo de Execução na linha ${node.line}: Divisão por zero.`);
 						}
 						return Math.trunc((left as number) / (right as number));
+					case '^':
+						this.assertNumberOperands(node.operator, left, right, node.line);
+						return Math.pow(left as number, right as number);
 					case '==':
 					case '=':
 						this.assertEqualityOperands(node.operator, left, right, node.line);
@@ -1984,6 +2098,10 @@ export class Interpreter {
 			}
 			case 'Call':
 				return yield* this.evaluateCall(node, env);
+			case 'FormattedOutput':
+				throw new Error(
+					`Erro na linha ${node.line}: A formatação com ':' só pode ser usada em escreva ou escreval.`
+				);
 			default:
 				throw new Error(`Nó inválido na árvore de expressões: ${node.type}`);
 		}
@@ -1995,8 +2113,12 @@ export class Interpreter {
 		if (lowerCallee === 'escreva' || lowerCallee === 'escreval') {
 			const outputs: string[] = [];
 			for (const arg of node.args) {
-				const val = yield* this.evaluate(arg, env);
-				outputs.push(val === undefined ? 'vazio' : String(val));
+				if (arg.type === 'FormattedOutput') {
+					outputs.push(yield* this.formatOutputValue(arg, env));
+				} else {
+					const val = yield* this.evaluate(arg, env);
+					outputs.push(val === undefined ? 'vazio' : String(val));
+				}
 			}
 			if (lowerCallee === 'escreval') {
 				outputs.push('\n');
@@ -2333,6 +2455,11 @@ export class SemanticValidator {
 				}
 				break;
 			}
+			case 'FormattedOutput':
+				this.validateNode(node.value);
+				this.validateNode(node.width);
+				if (node.decimals) this.validateNode(node.decimals);
+				break;
 			case 'Binary':
 				this.validateNode(node.left);
 				this.validateNode(node.right);
