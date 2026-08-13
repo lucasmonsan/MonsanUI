@@ -4,8 +4,9 @@
 	type MinItemWidth = 'xs' | 'sm' | 'md' | 'lg';
 	type Gap = 'sm' | 'md' | 'lg';
 	type Align = 'stretch' | 'start';
-	type Columns = 'auto' | '1' | '2' | '3' | '4';
-	type ColumnsBreakpoint = 'md' | 'lg';
+	type Columns = 'auto' | '1' | '2' | '3' | '4' | '5';
+	type FixedColumns = Exclude<Columns, 'auto'>;
+	type ColumnsBreakpoint = 'sm' | 'md' | 'lg';
 
 	interface Props {
 		children: Snippet;
@@ -14,6 +15,7 @@
 		align?: Align;
 		columns?: Columns;
 		columnsBreakpoint?: ColumnsBreakpoint;
+		mobileColumns?: FixedColumns;
 	}
 
 	const MIN_ITEM_WIDTH_VALUES: Record<MinItemWidth, string> = {
@@ -34,11 +36,12 @@
 		start: 'start'
 	};
 
-	const FIXED_COLUMN_VALUES: Record<Exclude<Columns, 'auto'>, string> = {
+	const FIXED_COLUMN_VALUES: Record<FixedColumns, string> = {
 		'1': 'minmax(0, 1fr)',
 		'2': 'repeat(2, minmax(0, 1fr))',
 		'3': 'repeat(3, minmax(0, 1fr))',
-		'4': 'repeat(4, minmax(0, 1fr))'
+		'4': 'repeat(4, minmax(0, 1fr))',
+		'5': 'repeat(5, minmax(0, 1fr))'
 	};
 
 	let {
@@ -47,7 +50,8 @@
 		gap = 'md',
 		align = 'stretch',
 		columns = 'auto',
-		columnsBreakpoint = 'lg'
+		columnsBreakpoint = 'lg',
+		mobileColumns
 	}: Props = $props();
 
 	let minItemWidthValue = $derived(
@@ -58,15 +62,18 @@
 	let gapValue = $derived(GAP_VALUES[gap]);
 	let alignValue = $derived(ALIGN_VALUES[align]);
 	let fixedColumnsValue = $derived(columns === 'auto' ? '' : FIXED_COLUMN_VALUES[columns]);
+	let mobileColumnsValue = $derived(mobileColumns ? FIXED_COLUMN_VALUES[mobileColumns] : '');
 </script>
 
 <div
 	class="monsan-responsive-grid columns-breakpoint-{columnsBreakpoint}"
 	class:fixed-columns={columns !== 'auto'}
+	class:has-mobile-columns={Boolean(mobileColumns)}
 	style:--monsan-responsive-grid-min-width={minItemWidthValue}
 	style:--monsan-responsive-grid-gap={gapValue}
 	style:--monsan-responsive-grid-align={alignValue}
 	style:--monsan-responsive-grid-fixed-columns={fixedColumnsValue}
+	style:--monsan-responsive-grid-mobile-columns={mobileColumnsValue}
 >
 	{@render children()}
 </div>
@@ -83,6 +90,16 @@
 		);
 		gap: var(--monsan-responsive-grid-gap);
 		align-items: var(--monsan-responsive-grid-align);
+	}
+
+	.has-mobile-columns {
+		grid-template-columns: var(--monsan-responsive-grid-mobile-columns);
+	}
+
+	@media (min-width: 480px) {
+		.columns-breakpoint-sm.fixed-columns {
+			grid-template-columns: var(--monsan-responsive-grid-fixed-columns);
+		}
 	}
 
 	@media (min-width: 768px) {
