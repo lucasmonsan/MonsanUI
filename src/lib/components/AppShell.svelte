@@ -229,9 +229,7 @@
 	}
 
 	.full-height {
-		flex: 1 1 auto;
-		min-height: 0;
-		height: auto;
+		height: 100%;
 	}
 
 	.app-shell-content {

@@ -3,8 +3,7 @@
 
 	interface Props {
 		children: Snippet;
-		columns?:
-			'one' | 'two' | 'three' | '1-2' | '2-1' | '1-3' | '3-1' | 'row-actions' | 'media-fields';
+		columns?: 'one' | 'two' | 'three' | '1-2' | '2-1' | '1-3' | '3-1' | 'row-actions';
 		gap?: 'sm' | 'md' | 'lg';
 		responsive?: boolean;
 		fullHeight?: boolean;
@@ -63,10 +62,6 @@
 	}
 	.columns-row-actions {
 		grid-template-columns: 1fr calc(var(--control-height) * 2) var(--control-height);
-		align-items: end;
-	}
-	.columns-media-fields {
-		grid-template-columns: minmax(8.5rem, 0.8fr) minmax(0, 2fr) auto;
 		align-items: end;
 	}
 	.gap-sm {
