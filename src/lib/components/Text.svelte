@@ -14,6 +14,7 @@
 		/** Variante de cor do MonsanUI. Padrão: 'primary' */
 		variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'neutral';
 		truncate?: boolean;
+		nowrap?: boolean;
 		align?: 'left' | 'center' | 'right';
 		transform?: 'none' | 'uppercase' | 'capitalize';
 		id?: string;
@@ -29,6 +30,7 @@
 		weight = 'normal',
 		variant = 'primary',
 		truncate = false,
+		nowrap = false,
 		align = 'left',
 		transform = 'none',
 		id,
@@ -44,6 +46,7 @@
 	{title}
 	class="monsan-text {family} size-{size} weight-{weight} color-{variant} align-{align} transform-{transform}"
 	class:truncate
+	class:nowrap
 >
 	{@render children()}
 </svelte:element>
@@ -165,5 +168,10 @@
 		display: inline-block;
 		max-width: 100%;
 		vertical-align: bottom;
+	}
+
+	.nowrap {
+		white-space: nowrap;
+		overflow-wrap: normal;
 	}
 </style>
