@@ -51,10 +51,15 @@
 		min-width: 0;
 		/* The outer gutter owns the space needed by Panel's border and shadow. */
 		padding-block: var(--monsan-centered-panel-padding);
-		padding-inline: max(
+		padding-inline-start: max(
 			var(--monsan-centered-panel-padding),
 			var(--space-sm),
 			env(safe-area-inset-left)
+		);
+		padding-inline-end: max(
+			var(--monsan-centered-panel-padding),
+			var(--space-sm),
+			env(safe-area-inset-right)
 		);
 	}
 
@@ -64,10 +69,15 @@
 
 	@media (min-width: 480px) {
 		.monsan-centered-panel {
-			padding-inline: max(
+			padding-inline-start: max(
 				var(--monsan-centered-panel-padding),
 				var(--space-md),
 				env(safe-area-inset-left)
+			);
+			padding-inline-end: max(
+				var(--monsan-centered-panel-padding),
+				var(--space-md),
+				env(safe-area-inset-right)
 			);
 		}
 	}
