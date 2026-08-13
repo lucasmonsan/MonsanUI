@@ -2,8 +2,10 @@
 	import type { Snippet } from 'svelte';
 
 	interface Props {
+		navigation?: Snippet;
 		filters?: Snippet;
 		search?: Snippet;
+		mobileSearch?: Snippet;
 		actions?: Snippet;
 		hasFilters?: boolean;
 		hasSearch?: boolean;
@@ -12,7 +14,9 @@
 
 	let {
 		filters,
+		navigation,
 		search,
+		mobileSearch,
 		actions,
 		hasFilters = Boolean(filters),
 		hasSearch = Boolean(search),
@@ -21,6 +25,9 @@
 </script>
 
 <div class="monsan-filter-toolbar">
+	{#if navigation}
+		<div class="filter-toolbar-navigation">{@render navigation()}</div>
+	{/if}
 	{#if filters && hasFilters}
 		<div class="filter-toolbar-filters">
 			{@render filters()}
@@ -33,6 +40,9 @@
 				<div class="filter-toolbar-search">
 					{@render search()}
 				</div>
+			{/if}
+			{#if mobileSearch}
+				<div class="filter-toolbar-mobile-search">{@render mobileSearch()}</div>
 			{/if}
 
 			{#if actions && hasActions}
@@ -53,8 +63,8 @@
 		min-width: 0;
 		box-sizing: border-box;
 	}
-
 	.filter-toolbar-filters,
+	.filter-toolbar-navigation,
 	.filter-toolbar-search-row {
 		display: flex;
 		align-items: center;
@@ -66,6 +76,16 @@
 	.filter-toolbar-filters {
 		flex: 0 0 auto;
 		flex-wrap: nowrap;
+	}
+
+	.filter-toolbar-navigation {
+		flex: 0 1 auto;
+		min-width: 0;
+	}
+
+	.filter-toolbar-mobile-search {
+		display: none;
+		flex: 0 0 auto;
 	}
 
 	.filter-toolbar-filters > :global(.monsan-select-container),
@@ -126,6 +146,10 @@
 
 		.filter-toolbar-search {
 			min-width: 0;
+		}
+
+		.filter-toolbar-mobile-search {
+			display: flex;
 		}
 	}
 </style>

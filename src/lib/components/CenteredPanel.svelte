@@ -19,7 +19,7 @@
 		align = 'center',
 		animate = true,
 		fullHeight = true,
-		padding = 'none'
+		padding = 'sm'
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -29,7 +29,7 @@
 	class="monsan-centered-panel"
 	class:is-animated={animate}
 	class:is-full-height={fullHeight}
-	style:padding={resolvedPadding}
+	style:--monsan-centered-panel-padding={resolvedPadding}
 >
 	<Panel tag="section" {maxWidth}>
 		<div class="centered-panel-content align-{align}">
@@ -49,10 +49,27 @@
 		position: relative;
 		z-index: 10;
 		min-width: 0;
+		/* The outer gutter owns the space needed by Panel's border and shadow. */
+		padding-block: var(--monsan-centered-panel-padding);
+		padding-inline: max(
+			var(--monsan-centered-panel-padding),
+			var(--space-sm),
+			env(safe-area-inset-left)
+		);
 	}
 
 	.is-full-height {
 		flex: 1 1 auto;
+	}
+
+	@media (min-width: 480px) {
+		.monsan-centered-panel {
+			padding-inline: max(
+				var(--monsan-centered-panel-padding),
+				var(--space-md),
+				env(safe-area-inset-left)
+			);
+		}
 	}
 
 	.monsan-centered-panel :global(.centered-panel-surface) {

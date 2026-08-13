@@ -10,7 +10,7 @@
 		padding?: 'none' | 'sm' | 'md';
 	}
 
-	let { children, gap = 'md', scroll = true, fade = 'auto', padding = 'none' }: Props = $props();
+	let { children, gap = 'md', scroll = true, fade = 'auto', padding = 'sm' }: Props = $props();
 
 	let regionEl = $state<HTMLElement>();
 	let hasOverflowTop = $state(false);

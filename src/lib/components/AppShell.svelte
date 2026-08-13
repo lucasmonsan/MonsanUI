@@ -243,6 +243,7 @@
 		gap: var(--space-md);
 		box-sizing: border-box;
 		position: relative;
+		padding-bottom: var(--space-md);
 	}
 
 	.viewport-scroll {

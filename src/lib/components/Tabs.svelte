@@ -25,6 +25,7 @@
 		hideLabels = false,
 		hideLabelsBelow = 'never',
 		width = 'full',
+		comfortable = false,
 		embedded = false,
 		scrollLeftLabel,
 		scrollRightLabel,
@@ -41,6 +42,7 @@
 		hideLabels?: boolean;
 		hideLabelsBelow?: 'never' | 'sm';
 		width?: 'full' | 'fit';
+		comfortable?: boolean;
 		embedded?: boolean;
 		scrollLeftLabel?: string;
 		scrollRightLabel?: string;
@@ -192,7 +194,12 @@
 	});
 </script>
 
-<div class="monsan-tabs-wrapper" class:is-scrollable={scrollable} class:fit-width={width === 'fit'}>
+<div
+	class="monsan-tabs-wrapper"
+	class:is-scrollable={scrollable}
+	class:fit-width={width === 'fit'}
+	class:comfortable
+>
 	{#if scrollable && showLeftGradient}
 		<div class="monsan-tabs-nav-wrapper nav-left-wrapper">
 			{#if showNavButtons}
@@ -372,6 +379,10 @@
 		box-sizing: border-box;
 	}
 
+	.comfortable .monsan-tab-item {
+		min-width: 7.25rem;
+	}
+
 	.monsan-tab-icon {
 		display: inline-flex;
 		align-items: center;
@@ -535,6 +546,10 @@
 			min-width: 0;
 			padding-right: var(--space-sm);
 			padding-left: var(--space-sm);
+		}
+
+		.comfortable .monsan-tabs-container.hide-labels-below-sm .monsan-tab-item {
+			min-width: 2.75rem;
 		}
 	}
 

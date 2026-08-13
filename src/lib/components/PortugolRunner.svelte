@@ -41,6 +41,7 @@
 		userId?: string;
 		fileName?: string;
 		height?: string;
+		fill?: boolean;
 		defaultFocusMode?: boolean;
 	}
 
@@ -60,6 +61,7 @@ fimalgoritmo`),
 		userId,
 		fileName,
 		height = '100%',
+		fill = false,
 		defaultFocusMode = true
 	}: Props = $props();
 
@@ -680,7 +682,7 @@ fimalgoritmo`),
 	</div>
 {/snippet}
 
-<div class="portugol-runner" style="--runner-font-size: {fontSize}px;" style:height>
+<div class="portugol-runner" class:fill style="--runner-font-size: {fontSize}px;" style:height>
 	<Stack gap="sm" fullHeight={true}>
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
 		<div class="runner-workspace">
@@ -1095,8 +1097,14 @@ fimalgoritmo`),
 		position: relative;
 		width: 100%;
 		height: 100%;
-		min-height: 0;
+		min-height: min(28rem, 60dvh);
 		overflow: visible !important;
+	}
+
+	.portugol-runner.fill {
+		min-height: max(28rem, 100%);
+		display: flex;
+		flex-direction: column;
 	}
 
 	.runner-workspace {

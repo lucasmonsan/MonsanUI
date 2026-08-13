@@ -101,6 +101,7 @@ export { default as Divider } from './components/Divider.svelte';
 export { default as ButtonGroup } from './components/ButtonGroup.svelte';
 export { default as PreferenceBar } from './components/PreferenceBar.svelte';
 export { default as ProfileSummary } from './components/ProfileSummary.svelte';
+export { default as ProfileHandoff } from './components/ProfileHandoff.svelte';
 export { default as IconButton } from './components/IconButton.svelte';
 export { default as MetricButton } from './components/MetricButton.svelte';
 export { default as MetaDisclosure } from './components/MetaDisclosure.svelte';
