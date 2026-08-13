@@ -37,6 +37,7 @@
 	function selectLocale(localeId: string) {
 		value = localeId;
 		onChange?.(localeId);
+		window.dispatchEvent(new CustomEvent('monsan-locale-change', { detail: { locale: localeId } }));
 		isOpen = false;
 	}
 

@@ -13,6 +13,7 @@
 		fullHeight?: boolean;
 		showTop?: boolean;
 		viewportScroll?: boolean;
+		showScrollFades?: boolean;
 	}
 
 	let {
@@ -25,7 +26,8 @@
 		resetKey = null,
 		fullHeight = false,
 		showTop = true,
-		viewportScroll = false
+		viewportScroll = false,
+		showScrollFades = true
 	}: Props = $props();
 
 	let scrollEl = $state<HTMLElement>();
@@ -108,8 +110,8 @@
 		id={contentId}
 		bind:this={scrollEl}
 		class="app-shell-scroll"
-		class:has-overflow-top={hasOverflowTop}
-		class:has-overflow-bottom={hasOverflowBottom}
+		class:has-overflow-top={showScrollFades && hasOverflowTop}
+		class:has-overflow-bottom={showScrollFades && hasOverflowBottom}
 		tabindex="-1"
 		onscroll={updateOverflowFade}
 	>
