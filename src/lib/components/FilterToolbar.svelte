@@ -24,7 +24,7 @@
 	}: Props = $props();
 </script>
 
-<div class="monsan-filter-toolbar" class:has-mobile-search={Boolean(mobileSearch)}>
+<div class="monsan-filter-toolbar">
 	{#if navigation}
 		<div class="filter-toolbar-navigation">{@render navigation()}</div>
 	{/if}
@@ -146,10 +146,6 @@
 
 		.filter-toolbar-search {
 			min-width: 0;
-		}
-
-		.has-mobile-search .filter-toolbar-search {
-			display: none;
 		}
 
 		.filter-toolbar-mobile-search {
