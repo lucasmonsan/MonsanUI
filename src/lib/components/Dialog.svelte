@@ -66,6 +66,7 @@
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
 	let focusedVisibilityFrame: number | undefined;
 	let prefersReducedMotion = false;
+	let isDestroying = false;
 	let visualViewportHeight = $state<string | undefined>(undefined);
 	let visualViewportOffsetTop = $state<string | undefined>(undefined);
 	const closeDuration = 180;
@@ -123,6 +124,7 @@
 	});
 
 	onDestroy(() => {
+		isDestroying = true;
 		if (closeTimer) clearTimeout(closeTimer);
 		if (focusedVisibilityFrame) cancelAnimationFrame(focusedVisibilityFrame);
 		if (historyAdded) {
@@ -213,6 +215,9 @@
 	}
 
 	function handleNativeClose() {
+		// Closing the native dialog during component teardown is not a user
+		// dismissal and must not trigger the consumer's navigation callback.
+		if (isDestroying) return;
 		if (open) {
 			close();
 		}
