@@ -4,7 +4,6 @@
 	import BrandHeader from './BrandHeader.svelte';
 	import CenteredPanel from './CenteredPanel.svelte';
 	import Credits from './Credits.svelte';
-	import Divider from './Divider.svelte';
 	import PreferenceBar from './PreferenceBar.svelte';
 	import Stack from './Stack.svelte';
 	import Text from './Text.svelte';
@@ -61,8 +60,6 @@
 			<Stack gap="sm" fullWidth>
 				{@render actions()}
 			</Stack>
-
-			<Divider />
 
 			<PreferenceBar>
 				{@render preferences()}
