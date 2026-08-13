@@ -75,9 +75,12 @@
 
 	function getBoundaryIndex(direction: 'first' | 'last') {
 		if (filteredOptions.length === 0) return -1;
-		return direction === 'last'
-			? filteredOptions.findLastIndex((option: Option) => !option.disabled)
-			: filteredOptions.findIndex((option: Option) => !option.disabled);
+		if (direction === 'first')
+			return filteredOptions.findIndex((option: Option) => !option.disabled);
+		for (let index = filteredOptions.length - 1; index >= 0; index -= 1) {
+			if (!filteredOptions[index].disabled) return index;
+		}
+		return -1;
 	}
 
 	function getInitialIndex(direction: 'first' | 'last' = 'first') {
