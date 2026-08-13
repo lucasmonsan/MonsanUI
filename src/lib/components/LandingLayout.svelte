@@ -35,7 +35,7 @@
 	}: Props = $props();
 </script>
 
-<AppShell {fullHeight}>
+<AppShell {fullHeight} showScrollFades={false}>
 	{#snippet bottom()}
 		<Credits placement="page-bottom" variant="compact" spacing="default" />
 	{/snippet}

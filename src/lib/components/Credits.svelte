@@ -126,6 +126,7 @@
 	.credits-author {
 		color: var(--accent-primary);
 		font-weight: 700;
+		text-decoration: none;
 	}
 
 	.credits-tech {
@@ -136,6 +137,7 @@
 	.credits-tech-link {
 		color: var(--accent-primary);
 		font-weight: 700;
+		text-decoration: none;
 	}
 
 	a.credits-author:focus-visible,

@@ -219,7 +219,7 @@ assert(
 
 assert(
 	landingLayout.includes('descriptionLines: readonly [string, string]') &&
-		landingLayout.includes('<AppShell {fullHeight}>') &&
+		landingLayout.includes('<AppShell {fullHeight} showScrollFades={false}>') &&
 		landingLayout.includes('{#snippet bottom()}') &&
 		landingLayout.includes('<CenteredPanel {fullHeight}>') &&
 		landingLayout.includes('<Stack gap="md" fullWidth align="center" textAlign="center">') &&
