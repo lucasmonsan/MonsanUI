@@ -14,7 +14,6 @@ const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
 const centeredPanel = await readComponent('CenteredPanel.svelte');
-const credits = await readComponent('Credits.svelte');
 const landingLayout = await readComponent('LandingLayout.svelte');
 const dndMatch = await readComponent('DndMatch.svelte');
 const dndOrder = await readComponent('DndOrder.svelte');
@@ -224,11 +223,12 @@ assert(
 		landingLayout.includes('<CenteredPanel {fullHeight}>') &&
 		landingLayout.includes('<Stack gap="md" fullWidth align="center" textAlign="center">') &&
 		landingLayout.includes('<Stack gap="sm" fullWidth>') &&
+		landingLayout.includes('<Divider />') &&
 		landingLayout.includes('<PreferenceBar>') &&
 		landingLayout.includes(
 			'<Credits placement="page-bottom" variant="compact" spacing="default" />'
 		),
-	'LandingLayout must own the common two-line landing composition, action rhythm, preferences controls and structural Credits.'
+	'LandingLayout must own the common two-line landing composition, action rhythm, preferences divider and structural Credits.'
 );
 
 assert(
@@ -238,14 +238,6 @@ assert(
 		centeredPanel.includes('padding-inline-end: max(') &&
 		centeredPanel.includes('env(safe-area-inset-right)'),
 	'LandingLayout must preserve two visual description lines and CenteredPanel must protect both horizontal safe areas.'
-);
-
-assert(
-	credits.includes("'https://github.com/lucasmonsan'") &&
-		credits.includes('color: var(--accent-primary)') &&
-		!credits.includes('text-decoration-line: underline') &&
-		!credits.includes('⚡'),
-	'Credits must link the default Monsan author to its GitHub profile, use the suite accent and avoid decorative lightning or underlines.'
 );
 
 assert(

@@ -176,7 +176,7 @@ class I18n {
 				remove: 'Remover tag {tag}'
 			},
 			credits: {
-				madeWithText: 'Feito por',
+				madeWithText: 'Feito com ⚡ por',
 				createdWithText: 'Criado com'
 			},
 			confirmDialog: {
@@ -404,7 +404,7 @@ class I18n {
 				remove: 'Remove tag {tag}'
 			},
 			credits: {
-				madeWithText: 'Made by',
+				madeWithText: 'Made with ⚡ by',
 				createdWithText: 'Created with'
 			},
 			confirmDialog: {
@@ -633,7 +633,7 @@ class I18n {
 				remove: 'Eliminar etiqueta {tag}'
 			},
 			credits: {
-				madeWithText: 'Hecho por',
+				madeWithText: 'Hecho con ⚡ por',
 				createdWithText: 'Creado con'
 			},
 			confirmDialog: {

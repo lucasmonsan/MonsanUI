@@ -27,9 +27,6 @@
 
 	let activeMadeWithText = $derived(madeWithText ?? i18n.t('credits.madeWithText'));
 	let activeCreatedWithText = $derived(createdWithText ?? i18n.t('credits.createdWithText'));
-	let resolvedAuthorLink = $derived(
-		authorLink || (authorName === 'Monsan' ? 'https://github.com/lucasmonsan' : '')
-	);
 </script>
 
 <footer class="monsan-credits placement-{placement} variant-{variant} spacing-{spacing}">
@@ -43,12 +40,9 @@
 			{:else}
 				<span>
 					{activeMadeWithText}
-					{#if resolvedAuthorLink}
-						<a
-							href={resolvedAuthorLink}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="credits-author">{authorName}</a
+					{#if authorLink}
+						<a href={authorLink} target="_blank" rel="noopener noreferrer" class="credits-author"
+							>{authorName}</a
 						>
 					{:else}
 						<span class="credits-author">{authorName}</span>
@@ -124,8 +118,16 @@
 	}
 
 	.credits-author {
-		color: var(--accent-primary);
+		color: var(--text-primary);
+		text-decoration-line: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.16em;
 		font-weight: 700;
+		transition: text-decoration-thickness 0.2s ease;
+	}
+
+	a.credits-author:hover {
+		text-decoration-thickness: 0.14em;
 	}
 
 	.credits-tech {
@@ -134,8 +136,16 @@
 	}
 
 	.credits-tech-link {
-		color: var(--accent-primary);
+		color: var(--text-primary);
 		font-weight: 700;
+		text-decoration-line: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.16em;
+		transition: text-decoration-thickness 0.2s ease;
+	}
+
+	a.credits-tech-link:hover {
+		text-decoration-thickness: 0.14em;
 	}
 
 	a.credits-author:focus-visible,
