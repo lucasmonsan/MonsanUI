@@ -7,6 +7,7 @@
 	type Columns = 'auto' | '1' | '2' | '3' | '4' | '5';
 	type FixedColumns = Exclude<Columns, 'auto'>;
 	type ColumnsBreakpoint = 'sm' | 'md' | 'lg';
+	type Preset = 'default' | 'launcher';
 
 	interface Props {
 		children: Snippet;
@@ -16,6 +17,8 @@
 		columns?: Columns;
 		columnsBreakpoint?: ColumnsBreakpoint;
 		mobileColumns?: FixedColumns;
+		/** Shared responsive composition. Launcher is 3 columns from 320px and 5 from 480px. */
+		preset?: Preset;
 	}
 
 	const MIN_ITEM_WIDTH_VALUES: Record<MinItemWidth, string> = {
@@ -51,7 +54,8 @@
 		align = 'stretch',
 		columns = 'auto',
 		columnsBreakpoint = 'lg',
-		mobileColumns
+		mobileColumns,
+		preset = 'default'
 	}: Props = $props();
 
 	let minItemWidthValue = $derived(
@@ -61,14 +65,21 @@
 	);
 	let gapValue = $derived(GAP_VALUES[gap]);
 	let alignValue = $derived(ALIGN_VALUES[align]);
-	let fixedColumnsValue = $derived(columns === 'auto' ? '' : FIXED_COLUMN_VALUES[columns]);
-	let mobileColumnsValue = $derived(mobileColumns ? FIXED_COLUMN_VALUES[mobileColumns] : '');
+	let resolvedColumns = $derived(preset === 'launcher' ? '5' : columns);
+	let resolvedColumnsBreakpoint = $derived(preset === 'launcher' ? 'sm' : columnsBreakpoint);
+	let resolvedMobileColumns = $derived(preset === 'launcher' ? '3' : mobileColumns);
+	let fixedColumnsValue = $derived(
+		resolvedColumns === 'auto' ? '' : FIXED_COLUMN_VALUES[resolvedColumns]
+	);
+	let mobileColumnsValue = $derived(
+		resolvedMobileColumns ? FIXED_COLUMN_VALUES[resolvedMobileColumns] : ''
+	);
 </script>
 
 <div
-	class="monsan-responsive-grid columns-breakpoint-{columnsBreakpoint}"
-	class:fixed-columns={columns !== 'auto'}
-	class:has-mobile-columns={Boolean(mobileColumns)}
+	class="monsan-responsive-grid columns-breakpoint-{resolvedColumnsBreakpoint} preset-{preset}"
+	class:fixed-columns={resolvedColumns !== 'auto'}
+	class:has-mobile-columns={Boolean(resolvedMobileColumns)}
 	style:--monsan-responsive-grid-min-width={minItemWidthValue}
 	style:--monsan-responsive-grid-gap={gapValue}
 	style:--monsan-responsive-grid-align={alignValue}

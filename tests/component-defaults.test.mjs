@@ -13,6 +13,8 @@ const actionFooter = await readComponent('ActionFooter.svelte');
 const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
+const centeredPanel = await readComponent('CenteredPanel.svelte');
+const landingLayout = await readComponent('LandingLayout.svelte');
 const dndMatch = await readComponent('DndMatch.svelte');
 const dndOrder = await readComponent('DndOrder.svelte');
 const dialog = await readComponent('Dialog.svelte');
@@ -84,6 +86,14 @@ assert(
 	responsiveGrid.includes('minItemWidth?: MinItemWidth | number') &&
 		responsiveGrid.includes('`${minItemWidth}px`'),
 	'ResponsiveGrid must support an explicit reusable pixel minimum for dense card dialogs.'
+);
+
+assert(
+	responsiveGrid.includes('preset?: Preset') &&
+		responsiveGrid.includes("preset === 'launcher' ? '5' : columns") &&
+		responsiveGrid.includes("preset === 'launcher' ? '3' : mobileColumns") &&
+		responsiveGrid.includes("preset === 'launcher' ? 'sm' : columnsBreakpoint"),
+	'ResponsiveGrid launcher preset must keep three mobile columns and five columns from the shared 480px breakpoint.'
 );
 
 assert(
@@ -204,6 +214,30 @@ assert(
 		brandHeader.includes('class="brand-logo brand-logo-image"') &&
 		brandHeader.includes('class="brand-logo brand-logo-mask"'),
 	'BrandHeader must preserve source logo colors by default and reserve adaptive masking for explicit opt-in.'
+);
+
+assert(
+	landingLayout.includes('descriptionLines: readonly [string, string]') &&
+		landingLayout.includes('<AppShell {fullHeight}>') &&
+		landingLayout.includes('{#snippet bottom()}') &&
+		landingLayout.includes('<CenteredPanel {fullHeight}>') &&
+		landingLayout.includes('<Stack gap="md" fullWidth align="center" textAlign="center">') &&
+		landingLayout.includes('<Stack gap="sm" fullWidth>') &&
+		landingLayout.includes('<Divider />') &&
+		landingLayout.includes('<PreferenceBar>') &&
+		landingLayout.includes(
+			'<Credits placement="page-bottom" variant="compact" spacing="default" />'
+		),
+	'LandingLayout must own the common two-line landing composition, action rhythm, preferences divider and structural Credits.'
+);
+
+assert(
+	landingLayout.includes('white-space: nowrap') &&
+		centeredPanel.includes('padding-inline-start: max(') &&
+		centeredPanel.includes('env(safe-area-inset-left)') &&
+		centeredPanel.includes('padding-inline-end: max(') &&
+		centeredPanel.includes('env(safe-area-inset-right)'),
+	'LandingLayout must preserve two visual description lines and CenteredPanel must protect both horizontal safe areas.'
 );
 
 assert(

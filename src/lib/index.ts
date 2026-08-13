@@ -92,6 +92,8 @@ export { default as SuiteUserMenu } from './components/SuiteUserMenu.svelte';
 export { default as Separator } from './components/Separator.svelte';
 /** Centers panel content inside its parent. AppShell owns page sizing and viewport padding. */
 export { default as CenteredPanel } from './components/CenteredPanel.svelte';
+/** Canonical product landing composition. */
+export { default as LandingLayout } from './components/LandingLayout.svelte';
 export { default as BrandHeader } from './components/BrandHeader.svelte';
 export { default as StatusBanner } from './components/StatusBanner.svelte';
 export { default as StepTransition } from './components/StepTransition.svelte';
