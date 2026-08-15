@@ -230,10 +230,16 @@
 		display: none;
 	}
 
-	.full-height {
+	/*
+	 * Opt-in workspace contract: descendants that use height: 100% (for example
+	 * SplitPane and PortugolRunner) need a real containing height. Keep this
+	 * out of the default content path so ordinary pages can keep their natural
+	 * vertical flow and card shadows.
+	 */
+	.app-shell-content.full-height {
 		flex: 1 1 auto;
 		min-height: 0;
-		height: auto;
+		height: 100%;
 	}
 
 	.app-shell-content {

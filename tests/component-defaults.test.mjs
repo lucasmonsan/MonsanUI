@@ -375,6 +375,13 @@ assert(
 );
 
 assert(
+	/\.app-shell-content\.full-height\s*\{[\s\S]*?flex:\s*1 1 auto;[\s\S]*?min-height:\s*0;[\s\S]*?height:\s*100%;/.test(
+		appShell
+	),
+	'AppShell fullHeight must establish a concrete content height for constrained workspaces without changing normal page flow.'
+);
+
+assert(
 	/\.full-height\s*\{[\s\S]*?flex:\s*1 1 auto;[\s\S]*?height:\s*100%;[\s\S]*?min-height:\s*0;/.test(
 		stack
 	),
