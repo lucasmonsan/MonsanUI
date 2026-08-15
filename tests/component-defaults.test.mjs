@@ -50,6 +50,8 @@ const actionBar = await readComponent('ActionBar.svelte');
 const filterDialog = await readComponent('FilterDialog.svelte');
 const folders = await readComponent('Folders.svelte');
 const portugolRunner = await readComponent('PortugolRunner.svelte');
+const portugolEditor = await readComponent('PortugolEditor.svelte');
+const splitPane = await readComponent('SplitPane.svelte');
 
 assert(
 	appHeader.includes("size = 'compact'"),
@@ -180,6 +182,28 @@ assert(
 	portugolRunner.includes('if (pendingInputVar) return;') &&
 		/disabled=\{disabled\s*\|\|\s*Boolean\(pendingInputVar\)/.test(portugolRunner),
 	'PortugolRunner must not advance step execution while a read input is pending.'
+);
+
+assert(
+	splitPane.includes('fill?: boolean') &&
+		splitPane.includes('class:fill') &&
+		splitPane.includes('.monsan-split-pane.fill') &&
+		splitPane.includes('flex: 1 1 auto'),
+	'SplitPane must opt into filling its constrained parent without expanding the page scroll region.'
+);
+
+assert(
+	portugolRunner.includes('min-height: 0;') &&
+		portugolRunner.includes('flex: 1 1 auto;') &&
+		portugolRunner.includes('position: absolute;') &&
+		portugolRunner.includes('bottom: 16px;'),
+	'PortugolRunner fill mode must retain a constrained editor area and its floating controls.'
+);
+
+assert(
+	portugolEditor.includes("scrollbarWidth: 'none'") &&
+		portugolEditor.includes("'& .cm-scroller::-webkit-scrollbar'"),
+	'PortugolEditor must keep its code scroll area visually discreet without disabling scrolling.'
 );
 
 assert(

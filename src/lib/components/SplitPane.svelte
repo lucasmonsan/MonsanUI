@@ -7,6 +7,7 @@
 		ratio?: number;
 		ratioMobile?: number;
 		persistKey?: string;
+		fill?: boolean;
 	}
 
 	let {
@@ -14,7 +15,8 @@
 		right,
 		ratio = $bindable(50),
 		ratioMobile = $bindable(40),
-		persistKey
+		persistKey,
+		fill = false
 	}: Props = $props();
 
 	let isDragging = $state(false);
@@ -79,6 +81,7 @@
 
 <div
 	class="monsan-split-pane"
+	class:fill
 	style="--split-ratio: {ratio}%; --split-ratio-mobile: {ratioMobile}%;"
 >
 	<div class="split-pane-left">
@@ -107,6 +110,10 @@
 		height: 100%;
 		min-height: 0;
 		box-sizing: border-box;
+	}
+
+	.monsan-split-pane.fill {
+		flex: 1 1 auto;
 	}
 
 	.split-pane-left,

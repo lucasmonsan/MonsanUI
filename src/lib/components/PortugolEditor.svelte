@@ -449,7 +449,11 @@
 			'.cm-scroller': {
 				fontFamily: 'inherit',
 				overflow: 'auto',
+				scrollbarWidth: 'none',
 				caretColor: PORTUGOL_EDITOR_CARET_COLOR
+			},
+			'& .cm-scroller::-webkit-scrollbar': {
+				display: 'none'
 			},
 			'.cm-content': {
 				fontFamily: 'inherit',
