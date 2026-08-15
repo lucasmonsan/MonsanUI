@@ -1102,7 +1102,8 @@ fimalgoritmo`),
 	}
 
 	.portugol-runner.fill {
-		min-height: max(28rem, 100%);
+		min-height: 0;
+		flex: 1 1 auto;
 		display: flex;
 		flex-direction: column;
 	}
