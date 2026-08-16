@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, tick, type Snippet } from 'svelte';
+	import { popBackLayer, pushBackLayer } from '../utils/dialogStack.js';
 	import Button from './Button.svelte';
 	import Checkbox from './Checkbox.svelte';
 	import type { DataTableColumn, DataTableRow } from '$lib/types.js';
@@ -32,7 +33,10 @@
 		mobileRow?: Snippet<[DataTableRow, DataTableMobileRowContext]>;
 		mobileSelectionMode?: boolean;
 		onMobileSelectionModeChange?: (active: boolean) => void;
+		closeMobileSelectionOnBack?: boolean;
 		longPressDuration?: number;
+		groupBy?: (row: DataTableRow) => string | undefined;
+		groupLabel?: (key: string, row: DataTableRow) => string;
 		hasMore?: boolean;
 		loadingMore?: boolean;
 		loadMoreLabel?: string;
@@ -64,7 +68,10 @@
 		mobileRow,
 		mobileSelectionMode = $bindable(false),
 		onMobileSelectionModeChange,
+		closeMobileSelectionOnBack = false,
 		longPressDuration = 500,
+		groupBy,
+		groupLabel,
 		hasMore = false,
 		loadingMore = false,
 		loadMoreLabel,
@@ -85,6 +92,8 @@
 	let automaticLoadAvailable = $state(false);
 	let automaticLoadPending = $state(false);
 	let progressiveLoadStarted = $state(false);
+	const selectionLayerId = `data-table-selection-${Math.random().toString(36).slice(2, 9)}`;
+	let selectionLayerAdded = false;
 	let isProgressivelyLoading = $derived(loadingMore || automaticLoadPending);
 	let progressiveStatus = $derived(
 		isProgressivelyLoading
@@ -117,6 +126,40 @@
 		mobileSelectionMode = active;
 		onMobileSelectionModeChange?.(active);
 	}
+
+	function exitMobileSelection() {
+		selectedIds = [];
+		setMobileSelectionMode(false);
+	}
+
+	function rowGroup(row: DataTableRow): string | undefined {
+		return groupBy?.(row);
+	}
+
+	function isGroupStart(row: DataTableRow, index: number): boolean {
+		const group = rowGroup(row);
+		return Boolean(group) && group !== rowGroup(rows[index - 1]!);
+	}
+
+	let groupColumnSpan = $derived(columns.length + 1 + (onRowActivate && rowActionLabel ? 1 : 0));
+
+	$effect(() => {
+		if (mobileSelectionMode && selectedIds.length === 0) setMobileSelectionMode(false);
+	});
+
+	$effect(() => {
+		if (!closeMobileSelectionOnBack || !mobileSelectionMode || selectionLayerAdded) return;
+		pushBackLayer(selectionLayerId, exitMobileSelection, () => {
+			exitMobileSelection();
+			return true;
+		});
+		selectionLayerAdded = true;
+		return () => {
+			if (!selectionLayerAdded) return;
+			popBackLayer(selectionLayerId);
+			selectionLayerAdded = false;
+		};
+	});
 
 	function clearLongPress() {
 		if (longPressTimer) clearTimeout(longPressTimer);
@@ -214,7 +257,14 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each rows as row (row.id)}
+				{#each rows as row, index (row.id)}
+					{#if isGroupStart(row, index)}
+						<tr class="table-group-header"
+							><th colspan={groupColumnSpan}
+								>{groupLabel?.(rowGroup(row)!, row) ?? rowGroup(row)}</th
+							></tr
+						>
+					{/if}
 					<tr onclick={() => onRowActivate?.(row)} class:clickable={Boolean(onRowActivate)}>
 						<td class="selection" onclick={(event) => event.stopPropagation()}>
 							<Checkbox
@@ -250,7 +300,12 @@
 		</table>
 		{#if mobileRow}
 			<div class="mobile-list" aria-label={caption}>
-				{#each rows as row (row.id)}
+				{#each rows as row, index (row.id)}
+					{#if isGroupStart(row, index)}
+						<div class="mobile-group-header">
+							{groupLabel?.(rowGroup(row)!, row) ?? rowGroup(row)}
+						</div>
+					{/if}
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						class="mobile-row"
@@ -333,6 +388,14 @@
 	th {
 		background: var(--bg-secondary);
 		font-size: var(--text-sm);
+	}
+	.table-group-header th {
+		text-align: left;
+		background: var(--bg-secondary);
+		color: var(--text-secondary);
+		font-family: var(--font-display);
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
 	}
 	th button {
 		border: 0;
@@ -419,6 +482,9 @@
 	.mobile-list {
 		display: none;
 	}
+	.mobile-group-header {
+		display: none;
+	}
 	@media (max-width: 640px) {
 		.table-scroll.has-mobile-row {
 			overflow: visible;
@@ -431,6 +497,27 @@
 		.mobile-list {
 			display: grid;
 			gap: var(--space-sm);
+		}
+		.mobile-group-header {
+			display: flex;
+			align-items: center;
+			gap: var(--space-sm);
+			position: sticky;
+			top: 0;
+			z-index: 4;
+			padding: var(--space-xs) 0;
+			background: var(--bg-primary);
+			color: var(--text-secondary);
+			font-family: var(--font-display);
+			font-size: var(--text-xs);
+			font-weight: 800;
+			letter-spacing: 0.08em;
+		}
+		.mobile-group-header::after {
+			content: '';
+			height: var(--border-width);
+			flex: 1;
+			background: var(--border-color);
 		}
 		.table-scroll:not(.has-mobile-row) thead {
 			position: absolute;

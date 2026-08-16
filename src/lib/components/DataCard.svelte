@@ -26,6 +26,9 @@
 		surfaceColor?: string;
 		density?: 'default' | 'compact' | 'dense';
 		truncateTitle?: boolean;
+		selected?: boolean;
+		muted?: boolean;
+		textSelectable?: boolean;
 	}
 
 	let {
@@ -49,7 +52,10 @@
 		accentColor,
 		surfaceColor,
 		density = 'default',
-		truncateTitle = false
+		truncateTitle = false,
+		selected = false,
+		muted = false,
+		textSelectable = true
 	}: Props = $props();
 
 	let panelPadding = $derived<PaddingPreset>(
@@ -70,6 +76,9 @@
 	{flatInteractive}
 	{accentColor}
 	{surfaceColor}
+	{selected}
+	{muted}
+	{textSelectable}
 	{onclick}
 >
 	<article

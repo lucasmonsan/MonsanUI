@@ -7,6 +7,7 @@
 	interface ActionItem {
 		id: string;
 		label: string;
+		subtitle?: string;
 		icon?: IconComponent;
 		flex?: 1 | 2 | 3;
 		onlyIcon?: boolean;
@@ -90,6 +91,7 @@
 				class:has-surface={Boolean(action.surfaceColor)}
 				class:surface-strong={action.surfaceColorStrength === 'strong'}
 				class:compact-below-sm={action.compactBelow === 'sm'}
+				class:has-subtitle={Boolean(action.subtitle)}
 				class:disabled={action.disabled}
 				class:flex-1={(action.flex ?? 1) === 1}
 				class:flex-2={action.flex === 2}
@@ -109,7 +111,8 @@
 				{/if}
 				{#if !action.onlyIcon}
 					<span class="action-item-label">
-						{action.label}
+						<span>{action.label}</span>
+						{#if action.subtitle}<small>{action.subtitle}</small>{/if}
 					</span>
 				{/if}
 				{#if action.badge && action.badge > 0}
@@ -151,6 +154,12 @@
 			background-color 0.2s var(--ease-out);
 		cursor: pointer;
 		box-sizing: border-box;
+	}
+
+	.monsan-action-bar-item.has-subtitle {
+		height: auto;
+		min-height: var(--control-height);
+		padding-block: var(--space-xs);
 	}
 
 	.monsan-action-bar-item.has-surface {
@@ -214,9 +223,19 @@
 
 	.action-item-label {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		gap: var(--space-xs);
 		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.action-item-label small {
+		font: inherit;
+		font-size: var(--text-xs);
+		font-weight: 500;
+		color: var(--text-secondary);
+		max-width: 100%;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
