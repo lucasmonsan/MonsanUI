@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { onMount, tick, type Snippet } from 'svelte';
 	import Button from './Button.svelte';
 	import Checkbox from './Checkbox.svelte';
 	import type { DataTableColumn, DataTableRow } from '$lib/types.js';
@@ -37,7 +37,9 @@
 		loadingMore?: boolean;
 		loadMoreLabel?: string;
 		loadingMoreLabel?: string;
-		onLoadMore?: () => void;
+		autoLoadStatusLabel?: string;
+		loadCompleteLabel?: string;
+		onLoadMore?: () => void | Promise<void>;
 	}
 
 	let {
@@ -67,6 +69,8 @@
 		loadingMore = false,
 		loadMoreLabel,
 		loadingMoreLabel,
+		autoLoadStatusLabel,
+		loadCompleteLabel,
 		onLoadMore
 	}: Props = $props();
 
@@ -77,6 +81,25 @@
 	let longPressTimer: ReturnType<typeof setTimeout> | undefined;
 	let pointerStart: { x: number; y: number } | null = null;
 	let suppressClick = false;
+	let isClient = $state(false);
+	let automaticLoadAvailable = $state(false);
+	let automaticLoadPending = $state(false);
+	let progressiveLoadStarted = $state(false);
+	let isProgressivelyLoading = $derived(loadingMore || automaticLoadPending);
+	let progressiveStatus = $derived(
+		isProgressivelyLoading
+			? (loadingMoreLabel ?? '')
+			: hasMore
+				? (autoLoadStatusLabel ?? '')
+				: progressiveLoadStarted
+					? (loadCompleteLabel ?? '')
+					: ''
+	);
+
+	onMount(() => {
+		isClient = true;
+		automaticLoadAvailable = 'IntersectionObserver' in window;
+	});
 
 	function toggleAll() {
 		selectedIds = allSelected ? [] : selectableRows.map((row) => row.id);
@@ -130,12 +153,27 @@
 		suppressClick = false;
 	}
 
+	async function requestProgressiveLoad() {
+		if (!hasMore || !onLoadMore || isProgressivelyLoading) return;
+
+		progressiveLoadStarted = true;
+		automaticLoadPending = true;
+		try {
+			await onLoadMore();
+		} finally {
+			await tick();
+			automaticLoadPending = false;
+		}
+	}
+
 	function observeProgressiveLoad(node: HTMLElement) {
-		if (!('IntersectionObserver' in window)) return;
+		const supported = 'IntersectionObserver' in window;
+		automaticLoadAvailable = supported;
+		if (!supported) return;
 		const observer = new IntersectionObserver(
 			(entries) => {
-				if (entries.some((entry) => entry.isIntersecting) && hasMore && !loadingMore) {
-					onLoadMore?.();
+				if (entries.some((entry) => entry.isIntersecting)) {
+					void requestProgressiveLoad();
 				}
 			},
 			{ rootMargin: '240px 0px' }
@@ -232,13 +270,29 @@
 			</div>
 		{/if}
 	</div>
-	{#if hasMore && onLoadMore && loadMoreLabel}
+	{#if hasMore && onLoadMore}
 		<div class="progressive-load">
 			<div class="progressive-sentinel" use:observeProgressiveLoad aria-hidden="true"></div>
-			<Button variant="secondary" size="sm" onclick={onLoadMore} disabled={loadingMore}>
-				{loadingMore && loadingMoreLabel ? loadingMoreLabel : loadMoreLabel}
-			</Button>
+			{#if progressiveStatus}
+				<span class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+					{progressiveStatus}
+				</span>
+			{/if}
+			{#if isClient && !automaticLoadAvailable && loadMoreLabel}
+				<Button
+					variant="secondary"
+					size="sm"
+					onclick={() => void requestProgressiveLoad()}
+					disabled={isProgressivelyLoading}
+				>
+					{isProgressivelyLoading && loadingMoreLabel ? loadingMoreLabel : loadMoreLabel}
+				</Button>
+			{/if}
 		</div>
+	{:else if progressiveLoadStarted && progressiveStatus}
+		<span class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+			{progressiveStatus}
+		</span>
 	{/if}
 	{#if pageCount > 1 && previousPageLabel && nextPageLabel}
 		<nav class="pagination" aria-label={caption}>
