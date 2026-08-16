@@ -41,7 +41,9 @@ const suiteHeaderActions = await readComponent('SuiteHeaderActions.svelte');
 const suiteUserMenu = await readComponent('SuiteUserMenu.svelte');
 const themeSelector = await readComponent('ThemeSelector.svelte');
 const colorPicker = await readComponent('ColorPicker.svelte');
+const dataTable = await readComponent('DataTable.svelte');
 const badge = await readComponent('Badge.svelte');
+const badgeGroup = await readComponent('BadgeGroup.svelte');
 const iconButton = await readComponent('IconButton.svelte');
 const moneyInput = await readComponent('MoneyInput.svelte');
 const moneyDisplay = await readComponent('MoneyDisplay.svelte');
@@ -65,6 +67,16 @@ assert(
 		actionFooter.includes('translateX(-50%) translateY') &&
 		actionFooter.includes('@media (prefers-reduced-motion: reduce)'),
 	'ActionFooter must offer optional entrance motion that respects reduced-motion preferences.'
+);
+
+assert(
+	dataTable.includes('automaticLoadAvailable = $state(false)') &&
+		dataTable.includes("'IntersectionObserver' in window") &&
+		dataTable.includes('void requestProgressiveLoad()') &&
+		dataTable.includes('{#if isClient && !automaticLoadAvailable && loadMoreLabel}') &&
+		dataTable.includes('role="status"') &&
+		dataTable.includes('aria-live="polite"'),
+	'DataTable progressive loading must load automatically when supported, expose a manual fallback only when needed and announce its state accessibly.'
 );
 
 assert(
@@ -109,6 +121,16 @@ assert(
 assert(
 	badge.includes('onSurface?: boolean') && iconButton.includes('onSurface?: boolean'),
 	'Badge and IconButton must support readable rendering on a custom Panel surface.'
+);
+
+assert(
+	badgeGroup.includes('fit?: boolean') &&
+		badgeGroup.includes('moreLabel?: (hiddenLabels: readonly string[]) => string') &&
+		badgeGroup.includes('new ResizeObserver(scheduleFit)') &&
+		badgeGroup.includes('data-badge-summary') &&
+		badgeGroup.includes('min-width: 0;') &&
+		badgeGroup.includes('text-overflow: ellipsis;'),
+	'BadgeGroup must support width-aware fitting with accessible consumer-provided overflow labels without enlarging constrained cards.'
 );
 
 assert(
