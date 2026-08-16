@@ -33,6 +33,12 @@
 		accentColor?: string;
 		/** Optional custom surface color with an automatically contrasting foreground. */
 		surfaceColor?: string;
+		/** A semantic, non-domain selection state for interactive panels. */
+		selected?: boolean;
+		/** Reduces emphasis while a sibling item is selected. */
+		muted?: boolean;
+		/** Disable native text selection when the whole panel is a gesture target. */
+		textSelectable?: boolean;
 	}
 
 	let {
@@ -50,7 +56,10 @@
 		flatInteractive = false,
 		shadow = true,
 		accentColor,
-		surfaceColor
+		surfaceColor,
+		selected = false,
+		muted = false,
+		textSelectable = true
 	}: Props = $props();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -88,6 +97,9 @@
 	class:no-shadow={!shadow}
 	class:has-accent={Boolean(accentColor)}
 	class:has-custom-surface={Boolean(resolvedSurfaceForeground)}
+	class:selected
+	class:muted
+	class:text-unselectable={!textSelectable}
 	style:padding={resolvedPadding}
 	style:max-width={resolvedMaxWidth}
 	style:height={fullHeight ? '100%' : undefined}
@@ -96,6 +108,7 @@
 	style:--monsan-surface-foreground={resolvedSurfaceForeground}
 	{onclick}
 	aria-label={ariaLabel}
+	aria-pressed={onclick ? selected : undefined}
 	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
 	role={onclick ? 'button' : undefined}
 	tabindex={onclick ? 0 : undefined}
@@ -214,5 +227,20 @@
 	}
 	.monsan-panel.no-shadow {
 		box-shadow: none !important;
+	}
+	.monsan-panel.selected {
+		outline: 3px solid var(--text-primary);
+		outline-offset: 2px;
+		box-shadow:
+			inset 0 0 0 3px var(--bg-primary),
+			var(--shadow-md);
+	}
+	.monsan-panel.muted {
+		opacity: 0.56;
+	}
+	.monsan-panel.text-unselectable,
+	.monsan-panel.text-unselectable * {
+		user-select: none;
+		-webkit-user-select: none;
 	}
 </style>

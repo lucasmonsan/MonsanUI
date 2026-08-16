@@ -29,7 +29,8 @@
 		showFooter = true,
 		contentGrow = true,
 		ariaDescribedby,
-		showCloseButton = true
+		showCloseButton = true,
+		onBeforeClose
 	} = $props<{
 		open: boolean;
 		title: string;
@@ -52,6 +53,7 @@
 		contentGrow?: boolean;
 		ariaDescribedby?: string;
 		showCloseButton?: boolean;
+		onBeforeClose?: (reason: 'back' | 'escape' | 'outside' | 'close-button') => boolean;
 	}>();
 
 	let resolvedPadding = $derived(resolvePadding(padding));
@@ -164,8 +166,10 @@
 		closeTimer = setTimeout(finishClose, closeDuration);
 	}
 
-	function close() {
+	function close(reason: 'back' | 'escape' | 'outside' | 'close-button' = 'close-button') {
+		if (onBeforeClose?.(reason) === false) return false;
 		beginClose(true);
+		return true;
 	}
 
 	function dismissVirtualKeyboard(): boolean {
@@ -182,16 +186,14 @@
 			activeElement.matches('input:not([type="checkbox"]):not([type="radio"]), textarea') ||
 			activeElement.isContentEditable;
 		const keyboardInset = window.innerHeight - viewport.height - viewport.offsetTop;
-		const touchInput = window.matchMedia('(pointer: coarse)').matches && acceptsText;
-		if (!acceptsText || (keyboardInset <= 120 && !touchInput)) return false;
+		if (!acceptsText || keyboardInset <= 120) return false;
 		activeElement.blur();
 		return true;
 	}
 
 	function handleBackNavigation(): boolean {
 		if (dismissVirtualKeyboard()) return false;
-		close();
-		return true;
+		return close('back');
 	}
 
 	function scheduleFocusedElementVisibility() {
@@ -211,7 +213,7 @@
 		if (!closeOnEscape) {
 			return;
 		}
-		beginClose(true);
+		close('escape');
 	}
 
 	function handleNativeClose() {
@@ -219,13 +221,13 @@
 		// dismissal and must not trigger the consumer's navigation callback.
 		if (isDestroying) return;
 		if (open) {
-			close();
+			close('escape');
 		}
 	}
 
 	function handlePointerDown(e: PointerEvent) {
 		if (closeOnOutsideClick && e.target === dialogRef) {
-			close();
+			close('outside');
 		}
 	}
 
@@ -287,7 +289,7 @@
 						variant="secondary"
 						title={closeLabel}
 						ariaLabel={closeLabel}
-						onclick={close}
+						onclick={() => close('close-button')}
 					>
 						<X size={18} />
 					</Button>

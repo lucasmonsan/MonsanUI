@@ -1,4 +1,4 @@
-type DialogInstance = {
+type BackLayer = {
 	id: string;
 	close: () => void;
 	/**
@@ -10,7 +10,7 @@ type DialogInstance = {
 	popstateClosed?: boolean;
 };
 
-const stack: DialogInstance[] = [];
+const stack: BackLayer[] = [];
 let ignorePopstate = false;
 
 if (typeof window !== 'undefined') {
@@ -47,7 +47,7 @@ if (typeof window !== 'undefined') {
 	);
 }
 
-export function pushDialog(id: string, closeFn: () => void, onBackNavigation?: () => boolean) {
+export function pushBackLayer(id: string, closeFn: () => void, onBackNavigation?: () => boolean) {
 	if (typeof window === 'undefined') return;
 	// Keep the current URL and SvelteKit state intact while adding one history
 	// entry. A Back gesture can then close the dialog before leaving the page.
@@ -55,7 +55,7 @@ export function pushDialog(id: string, closeFn: () => void, onBackNavigation?: (
 	stack.push({ id, close: closeFn, onBackNavigation });
 }
 
-export function popDialog(id: string) {
+export function popBackLayer(id: string) {
 	if (typeof window === 'undefined') return;
 	const index = stack.findIndex((item) => item.id === id);
 	if (index === -1) return;
@@ -70,3 +70,6 @@ export function popDialog(id: string) {
 	ignorePopstate = true;
 	history.back();
 }
+
+export const pushDialog = pushBackLayer;
+export const popDialog = popBackLayer;

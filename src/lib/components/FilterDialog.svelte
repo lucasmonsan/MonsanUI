@@ -22,6 +22,8 @@
 		disabled?: boolean;
 		/** Hide the built-in trigger when a shared external control owns the dialog state. */
 		showTrigger?: boolean;
+		/** Keep the filter draft open when the backdrop is tapped. */
+		closeOnOutsideClick?: boolean;
 		/** Uses icon-only footer controls that stay on one line on narrow screens. */
 		compactActions?: boolean;
 		/** Optional short visible label for the compact apply action. */
@@ -47,6 +49,7 @@
 		activeCountLabel,
 		disabled = false,
 		showTrigger = true,
+		closeOnOutsideClick = true,
 		compactActions = false,
 		compactApplyLabel,
 		children,
@@ -112,6 +115,7 @@
 	contentGrow={false}
 	compactHeader
 	closeOnBackNavigation={false}
+	{closeOnOutsideClick}
 	onClose={onCancel}
 	headerActions={headerActionsContent}
 >
