@@ -24,8 +24,10 @@
 		showTrigger?: boolean;
 		/** Keep the filter draft open when the backdrop is tapped. */
 		closeOnOutsideClick?: boolean;
-		/** Uses icon-only footer controls that stay on one line on narrow screens. */
+		/** Keeps the footer controls on one line on narrow screens. */
 		compactActions?: boolean;
+		/** Hides the redundant cancel action when the dialog header already owns dismissal. */
+		showCancelAction?: boolean;
 		/** Optional short visible label for the compact apply action. */
 		compactApplyLabel?: string;
 		children: Snippet;
@@ -51,6 +53,7 @@
 		showTrigger = true,
 		closeOnOutsideClick = true,
 		compactActions = false,
+		showCancelAction = true,
 		compactApplyLabel,
 		children,
 		summary,
@@ -124,13 +127,16 @@
 	{#snippet footer()}
 		<div class="filter-dialog-footer" class:compact-actions={compactActions}>
 			{#if compactActions}
-				<IconButton size="sm" variant="secondary" label={clearLabel} onclick={onClear}>
+				<Button size="sm" variant="secondary" onclick={onClear}>
 					<RotateCwIcon size={16} />
-				</IconButton>
+					{clearLabel}
+				</Button>
 				<div class="filter-dialog-primary-actions">
-					<IconButton size="sm" variant="secondary" label={cancelLabel} onclick={cancel}>
-						<XIcon size={16} />
-					</IconButton>
+					{#if showCancelAction}
+						<IconButton size="sm" variant="secondary" label={cancelLabel} onclick={cancel}>
+							<XIcon size={16} />
+						</IconButton>
+					{/if}
 					{#if compactApplyLabel}
 						<Button size="sm" variant="primary" onclick={apply}>
 							<CheckIcon size={16} />
@@ -145,7 +151,9 @@
 			{:else}
 				<Button variant="secondary" size="sm" onclick={onClear}>{clearLabel}</Button>
 				<div class="filter-dialog-primary-actions">
-					<Button variant="secondary" size="sm" onclick={cancel}>{cancelLabel}</Button>
+					{#if showCancelAction}
+						<Button variant="secondary" size="sm" onclick={cancel}>{cancelLabel}</Button>
+					{/if}
 					<Button variant="primary" size="sm" onclick={apply}>{applyLabel}</Button>
 				</div>
 			{/if}

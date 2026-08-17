@@ -63,6 +63,89 @@ Use existing primitives before adding new ones:
 
 Only add new primitives when the existing API cannot express the required layout or behavior cleanly.
 
+## Interaction And Mobile Composition Contract
+
+### Dialogs And Editable Forms
+
+- `Dialog` owns the modal history layer, focus restoration, Escape handling and
+  mobile virtual-keyboard handling. Consumers must not add parallel browser
+  history or keyboard listeners for a dialog.
+- When a focused text control is covered by the virtual keyboard, browser back
+  first dismisses that keyboard. A subsequent back action may close the dialog
+  according to its close policy.
+- An editor with unsaved data must use `onBeforeClose(reason)` as a synchronous
+  close guard. Return `false`, retain the editor state and open an app-owned
+  discard confirmation. The reason is one of `back`, `escape`, `outside` or
+  `close-button`.
+- Editors that can lose work must set `closeOnOutsideClick={false}`. They must
+  use the header close control as the dismissal affordance; do not duplicate it
+  with an X control in the footer.
+- A confirmation dialog is a decision surface, not an editor. Its explicit
+  cancel and confirm actions may remain in the footer.
+
+### Action Hierarchy And Footer Alignment
+
+- Completion actions — save, add, apply, continue, finish, confirm and similar
+  actions that advance or commit work — use `Button` with both a meaningful
+  shared icon and visible text. They are placed at the extreme end (right in
+  left-to-right layouts) of their action region.
+- Supporting, reset and navigation actions begin at the opposite edge and are
+  ordered from that edge inward. A footer with a reset and an apply action,
+  for example, places reset at the start and apply at the end.
+- Dense, reversible utilities may use `IconButton` with an accessible `label`.
+  Destructive actions may remain icon-only when the trash/archive icon is
+  unambiguous and still has that accessible label.
+- Consumers compose these regions with `Inline` or `ActionFooter`; they do not
+  use app-owned CSS to reposition MonsanUI buttons.
+
+### Search And Filters
+
+- `Search` renders controls below its query field by default. Set
+  `inlineControlsOnMobile` only when a short search scope or filter must share
+  one row with the query field on narrow screens. The control must remain
+  usable with an ellipsized label and an accessible name.
+- `FilterDialog` keeps reset/clear at the start of its footer and apply at the
+  end. With `compactActions`, both actions retain an icon and visible text.
+  Use `showCancelAction={false}` when the header close control already owns
+  dismissal.
+- Filter labels describe the field; option labels describe the resulting state.
+  Do not repeat a long field label verbatim as an option label.
+- `FormField gridSpan="full"` spans every column of a parent CSS grid. Use it
+  for a long or conceptually independent field so short related fields can
+  remain paired in the remaining grid rows.
+
+### Mobile Data Lists
+
+- A selectable mobile `DataTable` is opt-in: provide `mobileRow`, bind
+  `mobileSelectionMode`, and set `closeMobileSelectionOnBack` when browser back
+  must clear selection before navigation. `DataTable` owns the temporary back
+  layer and clears the selection when its final item is deselected.
+- The default long-press duration is 500 ms. The table cancels the gesture on
+  pointer movement, scrolling/cancellation or pointer release, and suppresses
+  the activation click after a successful long press.
+- For a card that is one interactive target, use `DataCard` with
+  `textSelectable={false}`. The normal press opens the row; long press enters
+  selection. In selection mode, pass `selected` to the selected card and
+  `muted` to its peers. Selection must use the semantic selected treatment,
+  not a domain-specific surface color.
+- `DataTable` groups rows with `groupBy`. `groupLabel` may return a string or
+  `{ leading, trailing }` for labels such as a localized month and year.
+  Group labels render in desktop tables and mobile lists. On mobile, only the
+  active group heading becomes sticky; it transitions as the next group reaches
+  the top and owns the single gradient used to separate it from scrolling
+  content. Its heading stays above the `Content` scroll fade while `AppShell`
+  keeps the content edge line above it. Filtering happens before grouping and
+  app-specific sorting stays within each group.
+
+### Compact Context Labels
+
+- `ActionBar` supports `inlineSubtitle` for a secondary, semantically distinct
+  value shown after the main label. It is part of the accessible action label
+  and is the preferred pattern for compact name–type context such as a wallet
+  name followed by its mode.
+- Use `FormField`, `ActionBar` and `DataCard` props for these composition needs
+  instead of adding consumer classes or selectors.
+
 ## Shared CSS
 
 MonsanUI owns `modern-normalize`, global tokens and base CSS. Consumer apps import `monsan-ui/monsan-ui.css` once and do not import another normalize file.

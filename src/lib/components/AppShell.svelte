@@ -115,6 +115,11 @@
 		tabindex="-1"
 		onscroll={updateOverflowFade}
 	>
+		<div
+			class="app-shell-scroll-top-edge"
+			class:is-visible={showScrollFades && hasOverflowTop}
+			aria-hidden="true"
+		></div>
 		<div bind:this={contentEl} class="app-shell-content" class:full-height={fullHeight}>
 			{@render children()}
 		</div>
@@ -230,6 +235,31 @@
 		display: none;
 	}
 
+	.app-shell-scroll-top-edge {
+		position: sticky;
+		top: 0;
+		z-index: 5;
+		display: block;
+		height: 0;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.18s var(--ease-out);
+	}
+
+	.app-shell-scroll-top-edge::before {
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		height: var(--border-width);
+		background: var(--border-color);
+		content: '';
+	}
+
+	.app-shell-scroll-top-edge.is-visible {
+		opacity: 1;
+	}
+
 	/*
 	 * Opt-in workspace contract: descendants that use height: 100% (for example
 	 * SplitPane and PortugolRunner) need a real containing height. Keep this
@@ -287,7 +317,6 @@
 	.app-shell-content::before {
 		top: 0;
 		margin-bottom: calc((var(--space-xl) + var(--space-md)) * -1);
-		border-top: var(--border-width) solid var(--border-color);
 		background: linear-gradient(to bottom, var(--bg-primary), transparent);
 	}
 
@@ -304,6 +333,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.app-shell-scroll-top-edge,
 		.app-shell-content::before,
 		.app-shell-content::after {
 			transition: none;

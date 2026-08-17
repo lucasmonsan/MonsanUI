@@ -19,6 +19,8 @@
 		errorId?: string;
 		info?: string;
 		tooltipPosition?: 'top' | 'bottom';
+		/** Makes this field span every column of its parent CSS grid. */
+		gridSpan?: 'auto' | 'full';
 		children?: Snippet;
 		control?: Snippet<[ControlContext]>;
 		labelAddon?: Snippet;
@@ -35,6 +37,7 @@
 		errorId,
 		info,
 		tooltipPosition = 'top',
+		gridSpan = 'auto',
 		children,
 		control,
 		labelAddon
@@ -48,7 +51,12 @@
 	let invalid = $derived(Boolean(error));
 </script>
 
-<div class="monsan-form-field" class:is-disabled={disabled} class:is-invalid={invalid}>
+<div
+	class="monsan-form-field"
+	class:is-disabled={disabled}
+	class:is-invalid={invalid}
+	class:grid-span-full={gridSpan === 'full'}
+>
 	<div class="field-label-row">
 		<label for={forId}>
 			<Text tag="span" size="xs" weight="bold" variant="secondary">
@@ -86,6 +94,10 @@
 		flex-direction: column;
 		gap: var(--space-xs);
 		width: 100%;
+	}
+
+	.grid-span-full {
+		grid-column: 1 / -1;
 	}
 
 	label {
