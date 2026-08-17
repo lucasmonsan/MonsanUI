@@ -17,6 +17,7 @@
 		loading = false,
 		loadingMessage,
 		controls,
+		inlineControlsOnMobile = false,
 		result: resultSnippet
 	} = $props<{
 		open: boolean;
@@ -28,6 +29,8 @@
 		loading?: boolean;
 		loadingMessage?: string;
 		controls?: Snippet;
+		/** Keeps the query input and optional controls on one row on narrow screens. */
+		inlineControlsOnMobile?: boolean;
 		result?: Snippet<[SearchResultItem, boolean]>;
 	}>();
 
@@ -100,23 +103,30 @@
 
 <Dialog bind:open title={activeTitle}>
 	<div class="search-container" role="search">
-		<Input
-			type="text"
-			bind:value={searchQuery}
-			bind:this={inputEl}
-			onkeydown={handleKeyDown}
-			id={inputId}
-			role="combobox"
-			ariaAutocomplete="list"
-			ariaExpanded={isExpanded}
-			ariaControls={listboxId}
-			ariaActivedescendant={activeDescendant}
-			placeholder={activePlaceholder}
-		/>
+		<div
+			class="search-input-row"
+			class:inline-controls-on-mobile={inlineControlsOnMobile && controls}
+		>
+			<div class="search-input">
+				<Input
+					type="text"
+					bind:value={searchQuery}
+					bind:this={inputEl}
+					onkeydown={handleKeyDown}
+					id={inputId}
+					role="combobox"
+					ariaAutocomplete="list"
+					ariaExpanded={isExpanded}
+					ariaControls={listboxId}
+					ariaActivedescendant={activeDescendant}
+					placeholder={activePlaceholder}
+				/>
+			</div>
 
-		{#if controls}
-			<div class="search-controls">{@render controls()}</div>
-		{/if}
+			{#if controls}
+				<div class="search-controls">{@render controls()}</div>
+			{/if}
+		</div>
 
 		{#if loading && hasQuery}
 			<p class="search-status" role="status" aria-live="polite">{activeLoadingMessage}</p>
@@ -162,11 +172,39 @@
 		flex-direction: column;
 		gap: var(--space-md);
 	}
+	.search-input-row,
+	.search-input {
+		display: contents;
+	}
 
 	.search-controls {
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
+	}
+
+	@media (max-width: 640px) {
+		.search-input-row.inline-controls-on-mobile {
+			display: flex;
+			align-items: center;
+			gap: var(--space-sm);
+			min-width: 0;
+		}
+
+		.inline-controls-on-mobile .search-input {
+			display: block;
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		.inline-controls-on-mobile .search-controls {
+			flex: 0 1 48%;
+			min-width: 0;
+		}
+
+		.inline-controls-on-mobile .search-controls :global(.monsan-select-container) {
+			min-width: 0;
+		}
 	}
 
 	.results-list {

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount, tick, type Snippet } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
+	import { fade } from 'svelte/transition';
 	import { popBackLayer, pushBackLayer } from '../utils/dialogStack.js';
 	import Button from './Button.svelte';
 	import Checkbox from './Checkbox.svelte';
@@ -10,6 +12,16 @@
 		selectionMode: boolean;
 		toggleSelection: () => void;
 	}
+
+	export interface DataTableGroupLabel {
+		leading: string;
+		trailing?: string;
+	}
+
+	type MobileGroup = {
+		key: string;
+		heading: DataTableGroupLabel;
+	};
 
 	interface Props {
 		caption: string;
@@ -36,7 +48,7 @@
 		closeMobileSelectionOnBack?: boolean;
 		longPressDuration?: number;
 		groupBy?: (row: DataTableRow) => string | undefined;
-		groupLabel?: (key: string, row: DataTableRow) => string;
+		groupLabel?: (key: string, row: DataTableRow) => string | DataTableGroupLabel;
 		hasMore?: boolean;
 		loadingMore?: boolean;
 		loadMoreLabel?: string;
@@ -92,6 +104,13 @@
 	let automaticLoadAvailable = $state(false);
 	let automaticLoadPending = $state(false);
 	let progressiveLoadStarted = $state(false);
+	let prefersReducedMotion = $state(false);
+	let mobileListElement = $state<HTMLDivElement>();
+	let activeMobileGroupIndex = $state(0);
+	let mobileStickyVisible = $state(false);
+	let mobileScrollRoot: HTMLElement | null = null;
+	let mobileGroupFrame: number | undefined;
+	const mobileGroupHeaderNodes = new SvelteMap<number, HTMLElement>();
 	const selectionLayerId = `data-table-selection-${Math.random().toString(36).slice(2, 9)}`;
 	let selectionLayerAdded = false;
 	let isProgressivelyLoading = $derived(loadingMore || automaticLoadPending);
@@ -108,6 +127,13 @@
 	onMount(() => {
 		isClient = true;
 		automaticLoadAvailable = 'IntersectionObserver' in window;
+		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		prefersReducedMotion = motionQuery.matches;
+		const updateMotionPreference = (event: MediaQueryListEvent) => {
+			prefersReducedMotion = event.matches;
+		};
+		motionQuery.addEventListener('change', updateMotionPreference);
+		return () => motionQuery.removeEventListener('change', updateMotionPreference);
 	});
 
 	function toggleAll() {
@@ -136,10 +162,37 @@
 		return groupBy?.(row);
 	}
 
+	function groupHeading(row: DataTableRow): DataTableGroupLabel {
+		const group = rowGroup(row) ?? '';
+		const label = groupLabel?.(group, row) ?? group;
+		return typeof label === 'string' ? { leading: label } : label;
+	}
+
 	function isGroupStart(row: DataTableRow, index: number): boolean {
 		const group = rowGroup(row);
 		return Boolean(group) && (index === 0 || group !== rowGroup(rows[index - 1]!));
 	}
+
+	let mobileGroupPresentation = $derived.by(() => {
+		const groups: MobileGroup[] = [];
+		const indexByRowId = new SvelteMap<string, number>();
+		let previousGroup: string | undefined;
+
+		for (const [index, row] of rows.entries()) {
+			const group = rowGroup(row);
+			if (group && group !== previousGroup) {
+				groups.push({ key: `${group}-${index}`, heading: groupHeading(row) });
+			}
+			if (group) indexByRowId.set(row.id, groups.length - 1);
+			previousGroup = group;
+		}
+
+		return { groups, indexByRowId };
+	});
+
+	let activeMobileGroup = $derived(
+		mobileGroupPresentation.groups[activeMobileGroupIndex] ?? mobileGroupPresentation.groups[0]
+	);
 
 	let groupColumnSpan = $derived(columns.length + 1 + (onRowActivate && rowActionLabel ? 1 : 0));
 
@@ -161,10 +214,75 @@
 		};
 	});
 
+	$effect(() => {
+		const groupCount = mobileGroupPresentation.groups.length;
+		if (!mobileListElement || groupCount === 0) {
+			mobileStickyVisible = false;
+			return;
+		}
+
+		mobileScrollRoot = mobileListElement.closest('.app-shell-scroll');
+		const handleScroll = () => {
+			clearLongPress();
+			scheduleMobileGroupUpdate();
+		};
+		const handleResize = () => scheduleMobileGroupUpdate();
+		mobileScrollRoot?.addEventListener('scroll', handleScroll, { passive: true });
+		window.addEventListener('resize', handleResize);
+		scheduleMobileGroupUpdate();
+
+		return () => {
+			mobileScrollRoot?.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('resize', handleResize);
+			if (mobileGroupFrame) cancelAnimationFrame(mobileGroupFrame);
+			mobileGroupFrame = undefined;
+			mobileScrollRoot = null;
+		};
+	});
+
 	function clearLongPress() {
 		if (longPressTimer) clearTimeout(longPressTimer);
 		longPressTimer = undefined;
 		pointerStart = null;
+	}
+
+	function registerMobileGroupHeader(node: HTMLElement, groupIndex: number | undefined) {
+		if (groupIndex === undefined) return;
+		mobileGroupHeaderNodes.set(groupIndex, node);
+		scheduleMobileGroupUpdate();
+		return {
+			destroy() {
+				if (mobileGroupHeaderNodes.get(groupIndex) === node) {
+					mobileGroupHeaderNodes.delete(groupIndex);
+				}
+			}
+		};
+	}
+
+	function scheduleMobileGroupUpdate() {
+		if (!isClient || mobileGroupFrame) return;
+		mobileGroupFrame = requestAnimationFrame(() => {
+			mobileGroupFrame = undefined;
+			updateMobileGroupHeading();
+		});
+	}
+
+	function updateMobileGroupHeading() {
+		if (!mobileListElement || mobileGroupHeaderNodes.size === 0) {
+			mobileStickyVisible = false;
+			return;
+		}
+
+		const rootTop = mobileScrollRoot?.getBoundingClientRect().top ?? 0;
+		mobileStickyVisible = mobileListElement.getBoundingClientRect().top < rootTop;
+		let nextGroupIndex = 0;
+		for (const [groupIndex, node] of [...mobileGroupHeaderNodes.entries()].sort(
+			([left], [right]) => left - right
+		)) {
+			if (node.getBoundingClientRect().top > rootTop + 1) break;
+			nextGroupIndex = groupIndex;
+		}
+		activeMobileGroupIndex = nextGroupIndex;
 	}
 
 	function startLongPress(event: PointerEvent, row: DataTableRow) {
@@ -226,6 +344,20 @@
 	}
 </script>
 
+{#snippet renderGroupHeading(heading: DataTableGroupLabel)}
+	<span class="group-heading-label">
+		<span class="group-heading-outline" aria-hidden="true">{heading.leading}</span>
+		<span class="group-heading-text">{heading.leading}</span>
+	</span>
+	<span class="group-heading-line"></span>
+	{#if heading.trailing}
+		<span class="group-heading-label">
+			<span class="group-heading-outline" aria-hidden="true">{heading.trailing}</span>
+			<span class="group-heading-text">{heading.trailing}</span>
+		</span>
+	{/if}
+{/snippet}
+
 {#if rows.length === 0}
 	<div class="empty" role="status">{emptyLabel}</div>
 {:else}
@@ -259,9 +391,10 @@
 			<tbody>
 				{#each rows as row, index (row.id)}
 					{#if isGroupStart(row, index)}
+						{@const heading = groupHeading(row)}
 						<tr class="table-group-header"
 							><th colspan={groupColumnSpan}
-								>{groupLabel?.(rowGroup(row)!, row) ?? rowGroup(row)}</th
+								><span class="group-heading">{@render renderGroupHeading(heading)}</span></th
 							></tr
 						>
 					{/if}
@@ -299,11 +432,28 @@
 			</tbody>
 		</table>
 		{#if mobileRow}
-			<div class="mobile-list" aria-label={caption}>
+			<div bind:this={mobileListElement} class="mobile-list" aria-label={caption}>
+				{#if mobileStickyVisible && activeMobileGroup}
+					<div class="mobile-group-sticky" aria-hidden="true">
+						{#key activeMobileGroup.key}
+							<div
+								class="mobile-group-heading-active"
+								in:fade={{ duration: prefersReducedMotion ? 0 : 160 }}
+								out:fade={{ duration: prefersReducedMotion ? 0 : 120 }}
+							>
+								{@render renderGroupHeading(activeMobileGroup.heading)}
+							</div>
+						{/key}
+					</div>
+				{/if}
 				{#each rows as row, index (row.id)}
 					{#if isGroupStart(row, index)}
-						<div class="mobile-group-header">
-							{groupLabel?.(rowGroup(row)!, row) ?? rowGroup(row)}
+						{@const heading = groupHeading(row)}
+						<div
+							class="mobile-group-header"
+							use:registerMobileGroupHeader={mobileGroupPresentation.indexByRowId.get(row.id)}
+						>
+							{@render renderGroupHeading(heading)}
 						</div>
 					{/if}
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -391,11 +541,56 @@
 	}
 	.table-group-header th {
 		text-align: left;
-		background: var(--bg-secondary);
+		border-top: 0;
+		background: transparent;
 		color: var(--text-secondary);
 		font-family: var(--font-display);
+		font-size: var(--text-md);
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
+	}
+	.group-heading,
+	.mobile-group-header,
+	.mobile-group-heading-active {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		--group-heading-color: var(--text-secondary);
+		color: var(--group-heading-color);
+	}
+	.group-heading-line {
+		flex: 1;
+		height: 0;
+		border-top: var(--border-width) solid currentColor;
+		opacity: 0.5;
+	}
+	.group-heading-label {
+		position: relative;
+		display: inline-grid;
+		white-space: nowrap;
+	}
+	.group-heading-outline,
+	.group-heading-text {
+		grid-area: 1 / 1;
+	}
+	.group-heading-text {
+		position: relative;
+		z-index: 1;
+	}
+	.group-heading-outline {
+		z-index: 0;
+		color: var(--bg-primary);
+		pointer-events: none;
+		text-shadow:
+			-2px -2px 0 var(--bg-primary),
+			0 -2px 0 var(--bg-primary),
+			2px -2px 0 var(--bg-primary),
+			-2px 0 0 var(--bg-primary),
+			2px 0 0 var(--bg-primary),
+			-2px 2px 0 var(--bg-primary),
+			0 2px 0 var(--bg-primary),
+			2px 2px 0 var(--bg-primary);
+		user-select: none;
 	}
 	th button {
 		border: 0;
@@ -485,6 +680,9 @@
 	.mobile-group-header {
 		display: none;
 	}
+	.mobile-group-sticky {
+		display: none;
+	}
 	@media (max-width: 640px) {
 		.table-scroll.has-mobile-row {
 			overflow: visible;
@@ -500,24 +698,49 @@
 		}
 		.mobile-group-header {
 			display: flex;
-			align-items: center;
-			gap: var(--space-sm);
-			position: sticky;
-			top: 0;
-			z-index: 4;
 			padding: var(--space-xs) 0;
-			background: var(--bg-primary);
+			background: transparent;
 			color: var(--text-secondary);
 			font-family: var(--font-display);
-			font-size: var(--text-xs);
+			font-size: var(--text-md);
 			font-weight: 800;
 			letter-spacing: 0.08em;
 		}
-		.mobile-group-header::after {
+		.mobile-group-sticky {
+			display: block;
+			position: sticky;
+			top: 0;
+			z-index: 4;
+			align-self: start;
+			height: 0;
+			margin-bottom: calc(var(--space-sm) * -1);
+			pointer-events: none;
+		}
+		.mobile-group-sticky::before {
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+			height: calc(var(--control-height) * 1.15);
+			background: linear-gradient(
+				to bottom,
+				var(--bg-primary) 0%,
+				var(--bg-primary) 56%,
+				transparent 100%
+			);
 			content: '';
-			height: var(--border-width);
-			flex: 1;
-			background: var(--border-color);
+		}
+		.mobile-group-heading-active {
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+			z-index: 1;
+			padding: var(--space-xs) 0;
+			font-family: var(--font-display);
+			font-size: var(--text-md);
+			font-weight: 800;
+			letter-spacing: 0.08em;
 		}
 		.table-scroll:not(.has-mobile-row) thead {
 			position: absolute;

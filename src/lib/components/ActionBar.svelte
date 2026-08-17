@@ -252,6 +252,7 @@
 	}
 
 	.action-item-label .inline-subtitle {
+		margin-inline-start: var(--space-xxs);
 		white-space: nowrap;
 	}
 
