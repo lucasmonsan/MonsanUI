@@ -1,9 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import Inline from './Inline.svelte';
-	import LanguageSelector from './LanguageSelector.svelte';
 	import SuiteUserMenu from './SuiteUserMenu.svelte';
-	import ThemeSelector from './ThemeSelector.svelte';
 
 	interface User {
 		name?: string | null;
@@ -46,6 +44,10 @@
 		children?: Snippet;
 		/** Official extension point forwarded to SuiteUserMenu for custom links, such as About. */
 		userMenuExtras?: Snippet;
+		/** App-specific compact actions shown alongside the standard theme and locale controls. */
+		userMenuShortcuts?: Snippet;
+		/** Destructive app actions shown at the end of the avatar menu. */
+		userMenuDangerActions?: Snippet;
 	}
 
 	let {
@@ -81,74 +83,48 @@
 		onPrivacy,
 		onLogout,
 		children,
-		userMenuExtras
+		userMenuExtras,
+		userMenuShortcuts,
+		userMenuDangerActions
 	}: Props = $props();
 </script>
 
 <Inline gap="sm" align="center">
 	{@render children?.()}
-	<ThemeSelector
-		value={themeValue}
-		storageKey={themeStorageKey}
-		ariaLabel={themeAriaLabel}
-		onChange={onThemeChange}
+	<SuiteUserMenu
+		{user}
+		src={src ?? undefined}
+		{name}
+		{alt}
+		ariaLabel={userMenuAriaLabel}
+		{profileLabel}
+		{loginLabel}
+		{loginHref}
+		{termsLabel}
+		{termsHref}
+		{privacyLabel}
+		{privacyHref}
+		{logoutLabel}
+		{localeValue}
+		{localeAriaLabel}
+		{themeValue}
+		{themeStorageKey}
+		{themeAriaLabel}
+		{profileDisabled}
+		{showProfileAction}
+		{logoutDisabled}
+		panelShadow={userMenuPanelShadow}
+		panelPadding={userMenuPanelPadding}
+		panelGap={userMenuPanelGap}
+		{onThemeChange}
+		{onLocaleChange}
+		{onProfile}
+		{onLogin}
+		{onTerms}
+		{onPrivacy}
+		{onLogout}
+		{userMenuExtras}
+		{userMenuShortcuts}
+		{userMenuDangerActions}
 	/>
-	<LanguageSelector value={localeValue} ariaLabel={localeAriaLabel} onChange={onLocaleChange} />
-	{#if userMenuExtras}
-		<SuiteUserMenu
-			{user}
-			src={src ?? undefined}
-			{name}
-			{alt}
-			ariaLabel={userMenuAriaLabel}
-			{profileLabel}
-			{loginLabel}
-			{loginHref}
-			{termsLabel}
-			{termsHref}
-			{privacyLabel}
-			{privacyHref}
-			{logoutLabel}
-			{profileDisabled}
-			{showProfileAction}
-			{logoutDisabled}
-			panelShadow={userMenuPanelShadow}
-			panelPadding={userMenuPanelPadding}
-			panelGap={userMenuPanelGap}
-			{onProfile}
-			{onLogin}
-			{onTerms}
-			{onPrivacy}
-			{onLogout}
-		>
-			{@render userMenuExtras()}
-		</SuiteUserMenu>
-	{:else}
-		<SuiteUserMenu
-			{user}
-			src={src ?? undefined}
-			{name}
-			{alt}
-			ariaLabel={userMenuAriaLabel}
-			{profileLabel}
-			{loginLabel}
-			{loginHref}
-			{termsLabel}
-			{termsHref}
-			{privacyLabel}
-			{privacyHref}
-			{logoutLabel}
-			{profileDisabled}
-			{showProfileAction}
-			{logoutDisabled}
-			panelShadow={userMenuPanelShadow}
-			panelPadding={userMenuPanelPadding}
-			panelGap={userMenuPanelGap}
-			{onProfile}
-			{onLogin}
-			{onTerms}
-			{onPrivacy}
-			{onLogout}
-		/>
-	{/if}
 </Inline>

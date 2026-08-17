@@ -21,6 +21,11 @@ const dndOrder = await readComponent('DndOrder.svelte');
 const dialog = await readComponent('Dialog.svelte');
 const expandableCard = await readComponent('ExpandableCard.svelte');
 const filterToolbar = await readComponent('FilterToolbar.svelte');
+const floatingActionMenu = await readComponent('FloatingActionMenu.svelte');
+const floatingActionMenuTypes = await readFile(
+	new URL('../src/lib/components/floating-action-menu.ts', import.meta.url),
+	'utf8'
+);
 const formField = await readComponent('FormField.svelte');
 const floatingPortal = await readFile(
 	new URL('../src/lib/utils/floatingPortal.ts', import.meta.url),
@@ -326,6 +331,28 @@ assert(
 );
 
 assert(
+	appShell.includes('floatingAction?: Snippet') &&
+		appShell.includes('status?: Snippet') &&
+		appShell.includes('class="app-shell-bottom-dock"') &&
+		appShell.includes('class="app-shell-status" role="status"'),
+	'AppShell must provide shared floating-action and bottom-status regions outside its scroll area.'
+);
+
+assert(
+	floatingActionMenu.includes('transform: rotate(45deg)') &&
+		floatingActionMenu.includes("document.addEventListener('pointerdown'") &&
+		floatingActionMenu.includes("event.key !== 'Escape'") &&
+		floatingActionMenu.includes('pushBackLayer') &&
+		floatingActionMenu.includes('requestAnimationFrame(item.onSelect)') &&
+		floatingActionMenu.includes("variant-{item.variant ?? 'secondary'}") &&
+		floatingActionMenuTypes.includes(
+			"variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'"
+		) &&
+		floatingActionMenu.includes('@media (prefers-reduced-motion: reduce)'),
+	'FloatingActionMenu must rotate its full trigger, close safely through pointer, Escape and browser history, and respect reduced motion.'
+);
+
+assert(
 	appShell.includes('class="app-shell-header-content"') &&
 		appShell.includes('class="app-shell-top-content"') &&
 		appShell.includes('.viewport-scroll .app-shell-header-content') &&
@@ -403,7 +430,7 @@ assert(
 );
 
 assert(
-	!/\.app-shell-content\s*\{[\s\S]*?\n\s*height:\s*100%;/.test(appShell),
+	!/\.app-shell-content\s*\{[^}]*(?:^|[\s;])height:\s*100%;/.test(appShell),
 	'AppShell content must not force height: 100%; it clips card shadows and vertical content flow.'
 );
 
@@ -450,5 +477,15 @@ for (const [name, source] of [
 		`${name} menu panel gap must default to sm.`
 	);
 }
+
+assert(
+	!suiteHeaderActions.includes('import LanguageSelector') &&
+		!suiteHeaderActions.includes('import ThemeSelector') &&
+		suiteUserMenu.includes('<ThemeSelector') &&
+		suiteUserMenu.includes('<LanguageSelector') &&
+		suiteUserMenu.includes('userMenuShortcuts') &&
+		suiteUserMenu.includes('userMenuDangerActions'),
+	'Suite header preferences must live in the Avatar menu, with structured slots for app shortcuts and destructive actions.'
+);
 
 console.log('Component default tests passed.');

@@ -60,6 +60,7 @@ export { default as ActionBar } from './components/ActionBar.svelte';
 export { default as AudioLevelMeter } from './components/AudioLevelMeter.svelte';
 export { default as FilterToolbar } from './components/FilterToolbar.svelte';
 export { default as FilterDialog } from './components/FilterDialog.svelte';
+export { default as FloatingActionMenu } from './components/FloatingActionMenu.svelte';
 export { default as SingleChoice } from './components/questions/SingleChoice.svelte';
 export { default as MultipleChoice } from './components/questions/MultipleChoice.svelte';
 export { default as DndOrder } from './components/DndOrder.svelte';
@@ -114,6 +115,7 @@ export { default as CommandPalette } from './components/CommandPalette.svelte';
 export { default as DataTable } from './components/DataTable.svelte';
 export { default as MoneyInput } from './components/MoneyInput.svelte';
 export type { CommandPaletteCommand, DataTableColumn, DataTableRow } from './types.js';
+export type { FloatingActionMenuItem } from './components/floating-action-menu.js';
 export { default as Stack } from './components/Stack.svelte';
 export { default as Inline } from './components/Inline.svelte';
 export { default as ProgressSummary } from './components/ProgressSummary.svelte';
@@ -180,6 +182,7 @@ export { default as MankiIcon } from './components/icons/Manki.svelte';
 export { default as KoalifyIcon } from './components/icons/Koalify.svelte';
 export { default as RoosterIcon } from './components/icons/Rooster.svelte';
 export { default as WhalletIcon } from './components/icons/Whallet.svelte';
+export { default as WalletIcon } from './components/icons/Wallet.svelte';
 
 // Types
 export * from './types.js';

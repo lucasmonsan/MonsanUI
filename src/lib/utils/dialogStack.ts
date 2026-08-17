@@ -12,6 +12,14 @@ type BackLayer = {
 
 const stack: BackLayer[] = [];
 let ignorePopstate = false;
+let pendingHistoryBack: Promise<void> | undefined;
+let resolvePendingHistoryBack: (() => void) | undefined;
+
+function finishPendingHistoryBack() {
+	resolvePendingHistoryBack?.();
+	resolvePendingHistoryBack = undefined;
+	pendingHistoryBack = undefined;
+}
 
 if (typeof window !== 'undefined') {
 	// Dialog history is an interaction layer, not application navigation. Listen
@@ -22,6 +30,7 @@ if (typeof window !== 'undefined') {
 		(event) => {
 			if (ignorePopstate) {
 				ignorePopstate = false;
+				finishPendingHistoryBack();
 				event.stopImmediatePropagation();
 				return;
 			}
@@ -68,7 +77,19 @@ export function popBackLayer(id: string) {
 	// away from that child (or from the page behind it).
 	if (index !== stack.length) return;
 	ignorePopstate = true;
+	pendingHistoryBack = new Promise((resolve) => {
+		resolvePendingHistoryBack = resolve;
+	});
 	history.back();
+}
+
+/**
+ * Resolves after a programmatic layer close has consumed its browser-history
+ * entry. Use this before opening a new temporary layer in the same gesture so
+ * its entry is never interleaved with the previous layer's `history.back()`.
+ */
+export function waitForBackLayerHistory(): Promise<void> {
+	return pendingHistoryBack ?? Promise.resolve();
 }
 
 export const pushDialog = pushBackLayer;
