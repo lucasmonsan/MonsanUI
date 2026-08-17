@@ -7,6 +7,8 @@
 		children: Snippet;
 		/** Optional visual context centered over the panel's top border. */
 		plaque?: Snippet;
+		/** Moves an optional plaque down from the panel's top border using suite spacing. */
+		plaqueInset?: 'none' | 'xs' | 'sm';
 		/** Semantic HTML tag to render. Defaults to 'div' */
 		tag?: 'div' | 'section' | 'article' | 'aside' | 'main';
 		/** Enables hover and click neubrutalist micro-interactions */
@@ -46,6 +48,7 @@
 	let {
 		children,
 		plaque,
+		plaqueInset = 'none',
 		tag = 'div',
 		interactive = false,
 		padding = 'var(--space-lg)',
@@ -67,6 +70,9 @@
 
 	let resolvedPadding = $derived(resolvePadding(padding));
 	let resolvedMaxWidth = $derived(resolveMaxWidth(maxWidth));
+	let resolvedPlaqueInset = $derived(
+		plaqueInset === 'sm' ? 'var(--space-sm)' : plaqueInset === 'xs' ? 'var(--space-xxs)' : '0px'
+	);
 
 	function contrastForeground(color: string | undefined) {
 		if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return undefined;
@@ -95,6 +101,7 @@
 	class="monsan-panel-frame"
 	class:has-plaque={Boolean(plaque)}
 	style:max-width={resolvedMaxWidth}
+	style:--panel-plaque-inset={resolvedPlaqueInset}
 >
 	{#if plaque}
 		<div class="monsan-panel-plaque-region">
@@ -139,7 +146,7 @@
 
 	.monsan-panel-plaque-region {
 		position: absolute;
-		top: 0;
+		top: var(--panel-plaque-inset);
 		left: 50%;
 		z-index: 1;
 		transform: translate(-50%, -50%);
