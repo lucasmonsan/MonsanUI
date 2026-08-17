@@ -8,6 +8,8 @@
 		top?: Snippet;
 		bottom?: Snippet;
 		footer?: Snippet;
+		floatingAction?: Snippet;
+		status?: Snippet;
 		contentId?: string;
 		resetKey?: string | number | boolean | null;
 		fullHeight?: boolean;
@@ -22,6 +24,8 @@
 		top,
 		bottom,
 		footer,
+		floatingAction,
+		status,
 		contentId = 'main-content',
 		resetKey = null,
 		fullHeight = false,
@@ -89,7 +93,11 @@
 	});
 </script>
 
-<main class="monsan-app-shell {viewportScroll ? 'viewport-scroll' : ''}">
+<main
+	class="monsan-app-shell {viewportScroll ? 'viewport-scroll' : ''}"
+	class:has-floating-action={Boolean(floatingAction)}
+	class:has-status={Boolean(status)}
+>
 	{#if header}
 		<header class="app-shell-header">
 			<div class="app-shell-header-content">
@@ -135,6 +143,21 @@
 		<footer class="app-shell-footer">
 			{@render footer()}
 		</footer>
+	{/if}
+
+	{#if floatingAction || status}
+		<div class="app-shell-bottom-dock">
+			{#if floatingAction}
+				<div class="app-shell-floating-action">
+					{@render floatingAction()}
+				</div>
+			{/if}
+			{#if status}
+				<div class="app-shell-status" role="status">
+					{@render status()}
+				</div>
+			{/if}
+		</div>
 	{/if}
 </main>
 
@@ -185,6 +208,56 @@
 		width: 100%;
 		min-width: 0;
 		box-sizing: border-box;
+	}
+
+	.app-shell-bottom-dock {
+		position: absolute;
+		inset-inline: 0;
+		bottom: max(var(--space-md), env(safe-area-inset-bottom));
+		z-index: 40;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-xs);
+		box-sizing: border-box;
+		pointer-events: none;
+	}
+
+	.monsan-app-shell.has-status .app-shell-bottom-dock {
+		bottom: 0;
+	}
+
+	.app-shell-floating-action {
+		display: flex;
+		justify-content: center;
+		width: 100%;
+		min-width: 0;
+		padding-inline: var(--space-md);
+		box-sizing: border-box;
+		pointer-events: auto;
+	}
+
+	.app-shell-status {
+		align-self: stretch;
+		box-sizing: border-box;
+		min-height: calc(var(--control-height) * 0.55);
+		padding: var(--space-xxs) var(--space-sm) max(var(--space-xxs), env(safe-area-inset-bottom));
+		border-top: var(--border-width) solid var(--border-color);
+		background: var(--bg-secondary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+
+	.monsan-app-shell.has-floating-action .app-shell-content {
+		padding-bottom: calc(var(--control-height) * 1.1 + var(--space-md));
+	}
+
+	.monsan-app-shell.has-floating-action.has-status .app-shell-content {
+		padding-bottom: calc(
+			var(--control-height) * 1.55 + var(--space-md) + env(safe-area-inset-bottom)
+		);
 	}
 
 	.app-shell-top-content > :global(* + *),

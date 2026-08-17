@@ -52,7 +52,7 @@ New visual or layout needs should be added to MonsanUI first. Consumer apps shou
 
 Use existing primitives before adding new ones:
 
-- `AppShell` for every app page, with fixed suite padding, max-width, optional header/top/bottom/footer regions and internally scrolling content.
+- `AppShell` for every app page, with fixed suite padding, max-width, optional header/top/bottom/footer, `floatingAction` and `status` regions and internally scrolling content.
 - `AppHeader` and `ContentRegion` for page structure inside the shell.
 - `Stack`, `Inline`, `Grid` and `ResponsiveGrid` for composition.
 - `ActionFooter`, `ActionBar`, `ButtonGroup`, `QuickActions` and `Tabs` for actions and navigation.
@@ -97,6 +97,37 @@ Only add new primitives when the existing API cannot express the required layout
   unambiguous and still has that accessible label.
 - Consumers compose these regions with `Inline` or `ActionFooter`; they do not
   use app-owned CSS to reposition MonsanUI buttons.
+
+### Workspace Primary Actions And Status
+
+- A workspace whose primary creation actions must remain available uses
+  `AppShell.floatingAction` with `FloatingActionMenu`, instead of an app-owned
+  fixed footer. The dock overlays the scroll area instead of consuming a
+  layout row; the shell owns its safe-area spacing and the content clearance
+  that keeps the last item visible above it.
+- `FloatingActionMenu` is for one primary action with up to three closely
+  related choices. Its square trigger rotates as a whole by 45 degrees when
+  open, so the plus becomes a close affordance. The choices fan out above it,
+  retain visible icon-and-text labels, may use semantic variants for distinct
+  domains, and close on outside press, Escape, browser back or selection.
+- `AppShell.status` is a non-interactive, bottom-most status region. It is
+  outside the scroll area and below the floating action. Consumers use a short
+  localized `Text nowrap` message when the status must stay on one line; they
+  do not add their own fixed positioning or safe-area CSS.
+- During a temporary mode such as list selection, the consumer may replace the
+  floating action snippet with that mode's action bar. The temporary mode must
+  still own browser back before page navigation.
+
+### Avatar Preferences And Shortcuts
+
+- `SuiteHeaderActions` and `SuiteUserMenu` place suite preferences inside the
+  Avatar menu. Theme remains an icon button and locale remains the compact
+  `PT`/`EN`/`ES` control, both with accessible names and their existing
+  behavior.
+- App-specific compact shortcuts belong in `userMenuShortcuts`; destructive
+  app actions belong in `userMenuDangerActions`, after ordinary links. Both
+  slots keep application copy and behavior out of MonsanUI while preserving the
+  shared menu structure.
 
 ### Search And Filters
 
