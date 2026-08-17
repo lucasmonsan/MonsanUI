@@ -154,6 +154,7 @@ assert(
 assert(
 	actionBar.includes('surfaceColor?: string') &&
 		actionBar.includes("align?: 'center' | 'start'") &&
+		actionBar.includes('inlineSubtitle?: string') &&
 		actionBar.includes('badge?: number') &&
 		actionBar.includes("compactBelow?: 'sm'") &&
 		actionBar.includes('flex: 0 0 var(--control-height)') &&
