@@ -168,6 +168,11 @@ assert(
 );
 
 assert(
+	moneyDisplay.includes('role="img"') && moneyDisplay.includes('aria-label={ariaLabel'),
+	'MoneyDisplay must expose its labeled value through a valid accessible role.'
+);
+
+assert(
 	folders.includes('function customColor') &&
 		folders.includes('color-mix(in srgb, var(--folder-custom-color) 10%, var(--bg-secondary))') &&
 		folders.includes('background: var(--folder-custom-color)') &&
