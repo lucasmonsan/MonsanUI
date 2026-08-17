@@ -181,8 +181,10 @@ Only add new primitives when the existing API cannot express the required layout
 
 - `Panel` accepts an optional `plaque` snippet for compact context that must sit
   over the centre of the top border. Use `PanelPlaque` for the shared title and
-  optional subtitle treatment. The panel reserves its own internal clearance;
-  consumers must not position, pad or style the plaque themselves.
+  optional subtitle treatment. Use `plaqueInset` only when the context needs a
+  token-sized downward offset; consumers must not position, pad or style the
+  plaque themselves. A plaque overlays the panel and does not add content
+  clearance.
 - A plaque is visual context, not a nested control. When the whole panel opens
   a detail or chooser, make the `Panel` the single interactive target and give
   it an accessible name that includes the relevant context.

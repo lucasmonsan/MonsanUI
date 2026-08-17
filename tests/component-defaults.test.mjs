@@ -254,11 +254,12 @@ assert(
 
 assert(
 	panel.includes('plaque?: Snippet') &&
+		panel.includes("plaqueInset?: 'none' | 'xs' | 'sm'") &&
 		panel.includes('monsan-panel-plaque-region') &&
 		panel.includes('class:has-plaque={Boolean(plaque)}') &&
 		panelPlaque.includes('title: string') &&
 		panelPlaque.includes('subtitle?: string'),
-	'Panel must offer an internally-spaced, non-interactive compact context plaque.'
+	'Panel must offer a non-interactive compact context plaque with a token-sized inset.'
 );
 
 assert(
