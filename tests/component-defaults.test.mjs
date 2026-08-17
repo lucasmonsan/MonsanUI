@@ -163,6 +163,11 @@ assert(
 );
 
 assert(
+	dataTable.includes('index === 0 || group !== rowGroup(rows[index - 1]!)'),
+	'DataTable group headers must treat the first row as a group start without reading a missing prior row.'
+);
+
+assert(
 	folders.includes('function customColor') &&
 		folders.includes('color-mix(in srgb, var(--folder-custom-color) 10%, var(--bg-secondary))') &&
 		folders.includes('background: var(--folder-custom-color)') &&
