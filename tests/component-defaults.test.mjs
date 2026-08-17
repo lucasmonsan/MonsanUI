@@ -154,11 +154,22 @@ assert(
 assert(
 	actionBar.includes('surfaceColor?: string') &&
 		actionBar.includes("align?: 'center' | 'start'") &&
+		actionBar.includes('inlineSubtitle?: string') &&
 		actionBar.includes('badge?: number') &&
 		actionBar.includes("compactBelow?: 'sm'") &&
 		actionBar.includes('flex: 0 0 var(--control-height)') &&
 		actionBar.includes('color-mix(in srgb, var(--action-surface) 10%, var(--bg-primary))'),
 	'ActionBar items must support softened domain colors, alignment and compact accessible counters.'
+);
+
+assert(
+	dataTable.includes('index === 0 || group !== rowGroup(rows[index - 1]!)'),
+	'DataTable group headers must treat the first row as a group start without reading a missing prior row.'
+);
+
+assert(
+	moneyDisplay.includes('role="img"') && moneyDisplay.includes('aria-label={ariaLabel'),
+	'MoneyDisplay must expose its labeled value through a valid accessible role.'
 );
 
 assert(

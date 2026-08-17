@@ -138,7 +138,7 @@
 
 	function isGroupStart(row: DataTableRow, index: number): boolean {
 		const group = rowGroup(row);
-		return Boolean(group) && group !== rowGroup(rows[index - 1]!);
+		return Boolean(group) && (index === 0 || group !== rowGroup(rows[index - 1]!));
 	}
 
 	let groupColumnSpan = $derived(columns.length + 1 + (onRowActivate && rowActionLabel ? 1 : 0));

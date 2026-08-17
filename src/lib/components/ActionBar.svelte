@@ -8,6 +8,8 @@
 		id: string;
 		label: string;
 		subtitle?: string;
+		/** Secondary text shown on the same line as the label. */
+		inlineSubtitle?: string;
 		icon?: IconComponent;
 		flex?: 1 | 2 | 3;
 		onlyIcon?: boolean;
@@ -41,10 +43,15 @@
 
 	let containerEl = $state<HTMLElement>();
 
+	function actionLabel(action: ActionItem): string {
+		return action.inlineSubtitle ? `${action.label} - ${action.inlineSubtitle}` : action.label;
+	}
+
 	function actionAriaLabel(action: ActionItem): string {
+		const label = actionLabel(action);
 		return action.badge && action.badge > 0 && action.badgeLabel
-			? `${action.label}. ${action.badgeLabel}`
-			: action.label;
+			? `${label}. ${action.badgeLabel}`
+			: label;
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -92,6 +99,7 @@
 				class:surface-strong={action.surfaceColorStrength === 'strong'}
 				class:compact-below-sm={action.compactBelow === 'sm'}
 				class:has-subtitle={Boolean(action.subtitle)}
+				class:has-inline-subtitle={Boolean(action.inlineSubtitle)}
 				class:disabled={action.disabled}
 				class:flex-1={(action.flex ?? 1) === 1}
 				class:flex-2={action.flex === 2}
@@ -99,7 +107,7 @@
 				data-deck-theme={action.folderTheme}
 				style:--action-surface={action.surfaceColor}
 				onclick={action.onclick}
-				title={action.title ?? action.label}
+				title={action.title ?? actionLabel(action)}
 				aria-label={actionAriaLabel(action)}
 				disabled={action.disabled}
 				tabindex={index === 0 ? 0 : -1}
@@ -112,6 +120,9 @@
 				{#if !action.onlyIcon}
 					<span class="action-item-label">
 						<span>{action.label}</span>
+						{#if action.inlineSubtitle}<small class="inline-subtitle">
+								- {action.inlineSubtitle}</small
+							>{/if}
 						{#if action.subtitle}<small>{action.subtitle}</small>{/if}
 					</span>
 				{/if}
@@ -238,6 +249,15 @@
 		max-width: 100%;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.action-item-label .inline-subtitle {
+		white-space: nowrap;
+	}
+
+	.monsan-action-bar-item.has-inline-subtitle .action-item-label {
+		flex-direction: row;
+		gap: 0;
 	}
 
 	.action-item-badge {

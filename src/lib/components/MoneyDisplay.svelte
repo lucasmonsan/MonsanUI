@@ -61,6 +61,7 @@
 </script>
 
 <span
+	role="img"
 	class="monsan-money-display density-{density} align-{align} mobile-align-{mobileAlign ?? align}"
 	class:full-width={fullWidth}
 	aria-label={ariaLabel ?? (label ? `${label}: ${display.full}` : display.full)}
