@@ -160,10 +160,6 @@
 			background-color 0.2s var(--ease-out);
 	}
 
-	.monsan-panel.has-plaque {
-		padding-top: calc(var(--panel-padding) + var(--space-xl));
-	}
-
 	.monsan-panel.full-height {
 		display: flex;
 		flex-direction: column;
