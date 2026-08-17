@@ -9,6 +9,8 @@
 		variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost';
 		size?: 'sm' | 'md';
 		selected?: boolean;
+		/** Optional visible numeric counter. Zero and negative values are hidden. */
+		count?: number;
 		disabled?: boolean;
 		onclick?: (event: MouseEvent) => void;
 		role?: 'menuitem';
@@ -23,11 +25,15 @@
 		variant = 'secondary',
 		size = 'md',
 		selected,
+		count = 0,
 		disabled = false,
 		onclick,
 		role,
 		onSurface = false
 	}: Props = $props();
+
+	let visibleCount = $derived(Math.max(0, Math.trunc(count)));
+	let accessibleLabel = $derived(visibleCount > 0 ? `${label}: ${visibleCount}` : label);
 </script>
 
 <button
@@ -39,14 +45,18 @@
 	class="monsan-icon-button {variant} size-{size}"
 	class:selected
 	class:on-surface={onSurface}
-	aria-label={label}
+	aria-label={accessibleLabel}
 	aria-pressed={selected}
 >
 	{@render children()}
+	{#if visibleCount > 0}
+		<span class="icon-button-count" aria-hidden="true">{visibleCount}</span>
+	{/if}
 </button>
 
 <style>
 	.monsan-icon-button {
+		position: relative;
 		width: var(--control-height);
 		height: var(--control-height);
 		padding: 0;
@@ -66,6 +76,24 @@
 			background-color 0.1s var(--ease-out),
 			border-color 0.1s var(--ease-out),
 			color 0.1s var(--ease-out);
+	}
+
+	.icon-button-count {
+		position: absolute;
+		top: -0.45rem;
+		right: -0.45rem;
+		min-width: 1.1rem;
+		height: 1.1rem;
+		padding: 0 var(--space-xxs);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: 999px;
+		background: var(--error);
+		color: var(--bg-primary);
+		font-family: var(--font-display);
+		font-size: 0.625rem;
+		font-weight: 800;
+		line-height: calc(1.1rem - var(--border-width) * 2);
+		pointer-events: none;
 	}
 
 	.primary,

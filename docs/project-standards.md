@@ -177,6 +177,24 @@ Only add new primitives when the existing API cannot express the required layout
 - Use `FormField`, `ActionBar` and `DataCard` props for these composition needs
   instead of adding consumer classes or selectors.
 
+### Compact Panel Context And Feedback
+
+- `Panel` accepts an optional `plaque` snippet for compact context that must sit
+  over the centre of the top border. Use `PanelPlaque` for the shared title and
+  optional subtitle treatment. The panel reserves its own internal clearance;
+  consumers must not position, pad or style the plaque themselves.
+- A plaque is visual context, not a nested control. When the whole panel opens
+  a detail or chooser, make the `Panel` the single interactive target and give
+  it an accessible name that includes the relevant context.
+- Use `IconButton count` for a compact active-filter counter. The visible count
+  is included in its accessible name; do not add an app-owned badge around the
+  button.
+- Use one `ToastViewport` per app shell for transient feedback. It shows at
+  most three notifications, keeps warnings, errors and action-required items
+  visible until dismissal or resolution, and automatically expires ordinary
+  information and success feedback. Provide localized `dismissLabel` and let
+  validation messages remain associated with their own form fields.
+
 ## Shared CSS
 
 MonsanUI owns `modern-normalize`, global tokens and base CSS. Consumer apps import `monsan-ui/monsan-ui.css` once and do not import another normalize file.
