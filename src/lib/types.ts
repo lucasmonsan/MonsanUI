@@ -29,7 +29,11 @@ export interface Toast {
 	message: string;
 	type: 'success' | 'error' | 'warning' | 'info';
 	actionLabel?: string;
-	onAction?: () => void;
+	onAction?: () => void | Promise<void>;
+	/** Keeps the notification visible until the user dismisses or resolves it. */
+	persistent?: boolean;
+	/** Overrides the automatic dismissal delay in milliseconds. */
+	duration?: number;
 }
 
 export interface SearchResultItem {

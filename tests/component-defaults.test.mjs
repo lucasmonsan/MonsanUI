@@ -37,6 +37,7 @@ const dialogStack = await readFile(
 );
 const multipleChoice = await readComponent('questions/MultipleChoice.svelte');
 const panel = await readComponent('Panel.svelte');
+const panelPlaque = await readComponent('PanelPlaque.svelte');
 const responsiveGrid = await readComponent('ResponsiveGrid.svelte');
 const singleChoice = await readComponent('questions/SingleChoice.svelte');
 const ssoLoginButton = await readComponent('SSOLoginButton.svelte');
@@ -50,6 +51,8 @@ const dataTable = await readComponent('DataTable.svelte');
 const badge = await readComponent('Badge.svelte');
 const badgeGroup = await readComponent('BadgeGroup.svelte');
 const iconButton = await readComponent('IconButton.svelte');
+const toast = await readComponent('Toast.svelte');
+const toastViewport = await readComponent('ToastViewport.svelte');
 const moneyInput = await readComponent('MoneyInput.svelte');
 const moneyDisplay = await readComponent('MoneyDisplay.svelte');
 const metricBar = await readComponent('MetricBar.svelte');
@@ -247,6 +250,31 @@ assert(
 assert(
 	panel.includes('ariaLabel?: string') && panel.includes('aria-label={ariaLabel}'),
 	'Panel must support an accessible name when used as an interactive surface.'
+);
+
+assert(
+	panel.includes('plaque?: Snippet') &&
+		panel.includes('monsan-panel-plaque-region') &&
+		panel.includes('class:has-plaque={Boolean(plaque)}') &&
+		panelPlaque.includes('title: string') &&
+		panelPlaque.includes('subtitle?: string'),
+	'Panel must offer an internally-spaced, non-interactive compact context plaque.'
+);
+
+assert(
+	iconButton.includes('count?: number') &&
+		iconButton.includes('accessibleLabel') &&
+		iconButton.includes('icon-button-count'),
+	'IconButton must expose an optional visible count through its accessible name.'
+);
+
+assert(
+	toast.includes('dismissLabel?: string') &&
+		toast.includes('toast-dismiss') &&
+		toastViewport.includes('maxVisible = 3') &&
+		toastViewport.includes('isPersistent(toast)') &&
+		toastViewport.includes('safe-area-inset-top'),
+	'ToastViewport must limit the queue, preserve actionable feedback and provide safe-area-aware dismissal.'
 );
 
 assert(

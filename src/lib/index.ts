@@ -51,6 +51,7 @@ export { default as ConsolePanel } from './components/ConsolePanel.svelte';
 /** @deprecated Use AppShell for page structure. PageContainer remains only for legacy migrations. */
 export { default as PageContainer } from './components/PageContainer.svelte';
 export { default as Panel } from './components/Panel.svelte';
+export { default as PanelPlaque } from './components/PanelPlaque.svelte';
 export { default as Badge } from './components/Badge.svelte';
 export { default as QuickActions } from './components/QuickActions.svelte';
 export { default as Credits } from './components/Credits.svelte';

@@ -5,6 +5,8 @@
 
 	interface Props {
 		children: Snippet;
+		/** Optional visual context centered over the panel's top border. */
+		plaque?: Snippet;
 		/** Semantic HTML tag to render. Defaults to 'div' */
 		tag?: 'div' | 'section' | 'article' | 'aside' | 'main';
 		/** Enables hover and click neubrutalist micro-interactions */
@@ -43,6 +45,7 @@
 
 	let {
 		children,
+		plaque,
 		tag = 'div',
 		interactive = false,
 		padding = 'var(--space-lg)',
@@ -88,37 +91,65 @@
 	}
 </script>
 
-<svelte:element
-	this={tag}
-	class="monsan-panel {variant} overflow-{overflow}"
-	class:is-interactive={interactive}
-	class:flat-interactive={flatInteractive}
-	class:full-height={fullHeight}
-	class:no-shadow={!shadow}
-	class:has-accent={Boolean(accentColor)}
-	class:has-custom-surface={Boolean(resolvedSurfaceForeground)}
-	class:selected
-	class:muted
-	class:text-unselectable={!textSelectable}
-	style:padding={resolvedPadding}
+<div
+	class="monsan-panel-frame"
+	class:has-plaque={Boolean(plaque)}
 	style:max-width={resolvedMaxWidth}
-	style:height={fullHeight ? '100%' : undefined}
-	style:--panel-accent={accentColor}
-	style:--panel-surface={surfaceColor}
-	style:--monsan-surface-foreground={resolvedSurfaceForeground}
-	{onclick}
-	aria-label={ariaLabel}
-	aria-pressed={onclick ? selected : undefined}
-	onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
-	role={onclick ? 'button' : undefined}
-	tabindex={onclick ? 0 : undefined}
 >
-	{@render children()}
-</svelte:element>
+	{#if plaque}
+		<div class="monsan-panel-plaque-region">
+			{@render plaque()}
+		</div>
+	{/if}
+	<svelte:element
+		this={tag}
+		class="monsan-panel {variant} overflow-{overflow}"
+		class:is-interactive={interactive}
+		class:flat-interactive={flatInteractive}
+		class:full-height={fullHeight}
+		class:no-shadow={!shadow}
+		class:has-accent={Boolean(accentColor)}
+		class:has-custom-surface={Boolean(resolvedSurfaceForeground)}
+		class:has-plaque={Boolean(plaque)}
+		class:selected
+		class:muted
+		class:text-unselectable={!textSelectable}
+		style:--panel-padding={resolvedPadding}
+		style:height={fullHeight ? '100%' : undefined}
+		style:--panel-accent={accentColor}
+		style:--panel-surface={surfaceColor}
+		style:--monsan-surface-foreground={resolvedSurfaceForeground}
+		{onclick}
+		aria-label={ariaLabel}
+		aria-pressed={onclick ? selected : undefined}
+		onkeydown={onclick || onkeydown ? handleKeyDown : undefined}
+		role={onclick ? 'button' : undefined}
+		tabindex={onclick ? 0 : undefined}
+	>
+		{@render children()}
+	</svelte:element>
+</div>
 
 <style>
+	.monsan-panel-frame {
+		position: relative;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.monsan-panel-plaque-region {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		z-index: 1;
+		transform: translate(-50%, -50%);
+		pointer-events: none;
+	}
+
 	.monsan-panel {
 		width: 100%;
+		max-width: 100%;
+		padding: var(--panel-padding);
 		border: var(--border-width) solid var(--border-color);
 		box-shadow: var(--shadow-sm);
 		border-radius: var(--radius-md);
@@ -127,6 +158,10 @@
 			transform 0.2s var(--ease-out),
 			box-shadow 0.2s var(--ease-out),
 			background-color 0.2s var(--ease-out);
+	}
+
+	.monsan-panel.has-plaque {
+		padding-top: calc(var(--panel-padding) + var(--space-xl));
 	}
 
 	.monsan-panel.full-height {
@@ -239,7 +274,7 @@
 		opacity: 0.56;
 	}
 	.monsan-panel.text-unselectable,
-	.monsan-panel.text-unselectable * {
+	.monsan-panel.text-unselectable :global(*) {
 		user-select: none;
 		-webkit-user-select: none;
 	}

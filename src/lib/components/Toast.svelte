@@ -1,28 +1,34 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import type { Toast as ToastItem } from '$lib/types.js';
 	import Check from './icons/Check.svelte';
 	import CircleAlert from './icons/CircleAlert.svelte';
 	import TriangleAlert from './icons/TriangleAlert.svelte';
-
-	interface Toast {
-		message: string;
-		type: 'success' | 'error' | 'warning' | 'info';
-		actionLabel?: string;
-		onAction?: () => void;
-	}
+	import X from './icons/X.svelte';
 
 	interface Props {
-		toast: Toast;
+		toast: ToastItem;
 		role?: string;
 		ariaLive?: 'polite' | 'assertive' | 'off';
 		announce?: boolean;
+		dismissLabel?: string;
+		onDismiss?: () => void;
+		onAction?: () => void | Promise<void>;
 	}
 
-	let { toast, role = 'status', ariaLive = 'polite', announce = true }: Props = $props();
+	let {
+		toast,
+		role = 'status',
+		ariaLive = 'polite',
+		announce = true,
+		dismissLabel,
+		onDismiss,
+		onAction
+	}: Props = $props();
 	let prefersReducedMotion = $state(false);
 
-	const colors: Record<Toast['type'], string> = {
+	const colors: Record<ToastItem['type'], string> = {
 		success: 'var(--success)',
 		error: 'var(--error)',
 		warning: '#facc15',
@@ -30,6 +36,11 @@
 	};
 
 	let toastColor = $derived(colors[toast.type]);
+	let resolvedOnAction = $derived(onAction ?? toast.onAction);
+
+	function handleAction(): void {
+		void resolvedOnAction?.();
+	}
 
 	onMount(() => {
 		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -82,9 +93,14 @@
 		{/if}
 	</div>
 	<p class="toast-message">{toast.message}</p>
-	{#if toast.actionLabel && toast.onAction}
-		<button type="button" class="toast-action" onclick={toast.onAction}>
+	{#if toast.actionLabel && resolvedOnAction}
+		<button type="button" class="toast-action" onclick={handleAction}>
 			{toast.actionLabel}
+		</button>
+	{/if}
+	{#if onDismiss && dismissLabel}
+		<button type="button" class="toast-dismiss" aria-label={dismissLabel} onclick={onDismiss}>
+			<X size={16} />
 		</button>
 	{/if}
 </div>
@@ -138,6 +154,32 @@
 		line-height: 1;
 		padding: var(--space-xs) var(--space-sm);
 		cursor: pointer;
+	}
+
+	.toast-dismiss {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		margin: calc(var(--space-xxs) * -1) calc(var(--space-xxs) * -1) calc(var(--space-xxs) * -1) 0;
+		padding: 0;
+		border: 0;
+		border-radius: var(--radius-sm);
+		background: transparent;
+		color: var(--text-secondary);
+		cursor: pointer;
+	}
+
+	.toast-dismiss:hover,
+	.toast-dismiss:focus-visible {
+		background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+		color: var(--text-primary);
+	}
+
+	.toast-dismiss:focus-visible {
+		outline: 2px solid var(--accent-primary);
+		outline-offset: 1px;
 	}
 
 	.toast-action:hover,
