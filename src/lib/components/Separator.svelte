@@ -20,10 +20,11 @@
 	}
 	.monsan-separator.vertical {
 		border-left: var(--border-width, 2px) solid var(--border-color, var(--text-primary));
-		margin: 0 var(--space-xs);
-		height: 24px;
+		margin: 0;
+		height: 20px;
 		width: 0px;
 		display: inline-block;
 		vertical-align: middle;
+		flex-shrink: 0;
 	}
 </style>

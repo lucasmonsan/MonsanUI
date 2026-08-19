@@ -200,6 +200,7 @@
 		box-sizing: border-box;
 		position: relative;
 		z-index: 50;
+		overflow: visible;
 	}
 
 	.app-shell-bottom,

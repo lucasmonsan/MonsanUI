@@ -105,8 +105,15 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: var(--space-sm);
+		gap: var(--space-xs);
 		font-size: var(--text-md);
+		line-height: 1;
+	}
+
+	.monsan-button-label {
+		display: inline-flex;
+		align-items: center;
+		line-height: 1;
 	}
 
 	.block {

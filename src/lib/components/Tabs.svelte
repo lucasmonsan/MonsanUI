@@ -284,14 +284,13 @@
 	.monsan-tabs-wrapper {
 		position: relative;
 		width: 100%;
-		display: flex;
-		align-items: center;
-		overflow: visible;
+		flex-shrink: 0;
 	}
 
 	.monsan-tabs-wrapper.fit-width,
 	.monsan-tabs-wrapper.fit-width .monsan-tabs-container {
 		width: fit-content;
+		flex-shrink: 0;
 	}
 
 	.monsan-tabs-wrapper.is-scrollable {
@@ -305,7 +304,8 @@
 		padding: 2px 4px 4px 2px;
 		margin: -2px -4px -4px -2px;
 		width: 100%;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
+		white-space: nowrap;
 		overflow: visible;
 		scrollbar-width: auto;
 		box-sizing: border-box;
@@ -360,7 +360,10 @@
 		font-weight: 800;
 		text-transform: uppercase;
 		font-size: var(--text-sm);
-		padding: var(--space-sm) var(--space-md);
+		height: calc(var(--control-height) * 0.8);
+		min-height: calc(var(--control-height) * 0.8);
+		flex-shrink: 0;
+		padding: 0 var(--space-md);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-sm);
 		background-color: var(--bg-primary);
@@ -376,7 +379,14 @@
 		justify-content: center;
 		white-space: nowrap;
 		gap: var(--space-xs);
+		line-height: 1;
 		box-sizing: border-box;
+	}
+
+	.monsan-tab-text {
+		display: inline-flex;
+		align-items: center;
+		line-height: 1;
 	}
 
 	.comfortable .monsan-tab-item {
@@ -387,6 +397,7 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+		line-height: 0;
 	}
 
 	.monsan-tab-item:hover:not(.active) {

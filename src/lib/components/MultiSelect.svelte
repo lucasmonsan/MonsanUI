@@ -14,6 +14,7 @@
 	let {
 		value = $bindable([]),
 		options = [],
+		size = 'md',
 		placeholder,
 		id = '',
 		disabled = false,
@@ -28,6 +29,7 @@
 	} = $props<{
 		value: (string | number)[];
 		options: Option[];
+		size?: 'sm' | 'md';
 		placeholder?: string;
 		id?: string;
 		disabled?: boolean;
@@ -248,6 +250,7 @@
 		type="button"
 		id={triggerId}
 		class="monsan-multiselect-trigger"
+		class:size-sm={size === 'sm'}
 		class:open={isOpen}
 		onclick={toggleDropdown}
 		{disabled}
@@ -337,7 +340,9 @@
 
 	.monsan-multiselect-container.width-auto {
 		width: auto;
-		min-width: min(100%, 160px);
+		min-width: min(100%, 110px);
+		max-width: 180px;
+		flex-shrink: 1;
 	}
 
 	.monsan-multiselect-trigger {
@@ -362,6 +367,12 @@
 		user-select: none;
 		text-align: left;
 		box-sizing: border-box;
+	}
+
+	.monsan-multiselect-trigger.size-sm {
+		height: calc(var(--control-height) * 0.8);
+		padding: 0 var(--space-sm);
+		font-size: var(--text-sm);
 	}
 
 	.monsan-multiselect-trigger:focus:not(:disabled),

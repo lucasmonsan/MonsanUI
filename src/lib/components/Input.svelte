@@ -43,7 +43,7 @@
 	}
 
 	let {
-		value = $bindable(''),
+		value = $bindable(),
 		size = 'md',
 		variant = 'default',
 		showPasswordToggle = false,
@@ -258,22 +258,22 @@
 
 	/* Password Toggle Styles */
 	.monsan-input-container.with-toggle .monsan-input {
-		padding-right: calc(var(--space-lg) * 2.5 + 20px);
+		padding-right: 36px;
 	}
 
 	.monsan-input-container.with-toggle .monsan-input.size-sm {
-		padding-right: calc(var(--space-md) * 2.5 + 16px);
+		padding-right: 32px;
 	}
 
 	.password-toggle-btn {
 		position: absolute;
-		right: var(--space-md);
+		right: 8px;
 		top: 50%;
 		transform: translateY(-50%);
 		background: transparent;
 		border: none;
 		cursor: pointer;
-		padding: var(--space-xs);
+		padding: 4px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
