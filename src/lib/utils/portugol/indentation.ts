@@ -76,7 +76,8 @@ function hasConsistentStructureIndentation(
 	startLine: number,
 	endLine: number,
 	type: PortugolStructureType,
-	indentColumns: number
+	indentColumns: number,
+	directBranchLines: ReadonlySet<number>
 ) {
 	if (getIndentation(lines[endLine - 1]).columns !== indentColumns) return false;
 
@@ -89,7 +90,7 @@ function hasConsistentStructureIndentation(
 			if (indent.columns !== indentColumns) return false;
 			continue;
 		}
-		if (isBranchLine(type, content)) {
+		if (directBranchLines.has(lineNumber)) {
 			if (indent.columns !== indentColumns) return false;
 			continue;
 		}
@@ -106,6 +107,7 @@ export function getPortugolStructureGuides(source: string): PortugolStructureGui
 		indentOffset: number;
 		type: PortugolStructureType;
 		closer: string;
+		directBranchLines: Set<number>;
 	};
 
 	const stack: OpenStructure[] = [];
@@ -128,7 +130,8 @@ export function getPortugolStructureGuides(source: string): PortugolStructureGui
 					current.startLine,
 					lineNumber,
 					current.type,
-					current.indentColumns
+					current.indentColumns,
+					current.directBranchLines
 				)
 			) {
 				guides.push({
@@ -142,6 +145,11 @@ export function getPortugolStructureGuides(source: string): PortugolStructureGui
 			continue;
 		}
 
+		if (current?.type === 'if' && isBranchLine(current.type, content)) {
+			current.directBranchLines.add(lineNumber);
+			continue;
+		}
+
 		const opener = STRUCTURE_OPENERS.find((candidate) => candidate.pattern.test(content));
 		if (!opener) continue;
 		stack.push({
@@ -149,7 +157,8 @@ export function getPortugolStructureGuides(source: string): PortugolStructureGui
 			indentColumns: indentation.columns,
 			indentOffset: indentation.offset,
 			type: opener.type,
-			closer: opener.closer
+			closer: opener.closer,
+			directBranchLines: new Set()
 		});
 	}
 

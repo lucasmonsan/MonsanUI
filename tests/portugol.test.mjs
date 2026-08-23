@@ -1804,6 +1804,36 @@ fimse`).length,
 		0,
 		'Misindented blocks should not render a structure connector'
 	);
+	const nestedBranchGuides = getPortugolStructureGuides(`se externo entao
+	escreval("antes")
+	se interno entao
+		escreval("sim")
+	senao
+		escreval("não")
+	fimse
+senao
+	escreval("alternativa externa")
+fimse`);
+	assertEquals(
+		nestedBranchGuides.length,
+		2,
+		'A nested senao should not invalidate its correctly indented outer structure guide'
+	);
+	assert(
+		nestedBranchGuides.some(
+			(guide) => guide.type === 'if' && guide.startLine === 1 && guide.endLine === 10
+		),
+		'Structure guides should keep the outer se/fimse pair when it contains a nested senao'
+	);
+	assertEquals(
+		getPortugolStructureGuides(`se verdadeiro entao
+	escreval("comando")
+		senao
+	escreval("alternativa")
+fimse`).length,
+		0,
+		'A direct senao with inconsistent indentation should not render a structure connector'
+	);
 	const nestedGuides = getPortugolStructureGuides(`se verdadeiro entao
 	enquanto verdadeiro faca
 		escreval("aninhado")
