@@ -22,7 +22,7 @@
 		justify-items: center;
 		gap: 1px;
 		max-width: min(82vw, 24rem);
-		padding: var(--space-xxs) var(--space-md);
+		padding: var(--space-xxs) var(--space-sm);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		background: var(--bg-primary);
@@ -47,7 +47,7 @@
 		overflow: hidden;
 		color: var(--text-secondary);
 		font-family: var(--font-body);
-		font-size: var(--text-xs);
+		font-size: var(--text-xxs);
 		font-weight: 600;
 		text-overflow: ellipsis;
 		white-space: nowrap;

@@ -118,6 +118,18 @@ Only add new primitives when the existing API cannot express the required layout
   floating action snippet with that mode's action bar. The temporary mode must
   still own browser back before page navigation.
 
+### Bounded Context Navigation
+
+- Use `PanelNavigator` when a single context panel has preceding and following
+  items. It shows only available directional controls on wide screens and
+  leaves the panel full-width on compact screens. Consumers provide localized
+  labels and selection callbacks; they do not add app-owned navigation layout.
+- Use `FloatingActionNavigator` only with an `AppShell.floatingAction` primary
+  action when its unused horizontal dock area navigates the same bounded
+  context on compact screens. It supplies compact side controls and ignores
+  swipes that begin in an interactive child. Set `disabled` while the context
+  has no finite sequence or the primary menu is open.
+
 ### Avatar Preferences And Shortcuts
 
 - `SuiteHeaderActions` and `SuiteUserMenu` place suite preferences inside the

@@ -150,8 +150,10 @@ Completed and validated locally:
 - `Folders`: added explicit button types, shared edit/delete icons, Svelte
   class directives for color swatches, menu trigger semantics and
   reduced-motion handling.
-- `DndOrder`: moved grid columns to a Svelte style directive and added
-  reduced-motion handling for `animate:flip` and item transitions.
+- `DndOrder`: supports consumer-rendered items, optional contextual content
+  before an item, per-item surface colour, selection callbacks and final-order
+  callbacks while preserving desktop drag, touch, keyboard and reduced-motion
+  handling.
 - `DndMatch`: added reduced-motion handling for Svelte scale transitions and
   area/chip transitions without changing drag logic.
 - `Terminal`: moved tree indentation to a Svelte style directive and added
