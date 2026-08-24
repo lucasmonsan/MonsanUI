@@ -103,6 +103,7 @@
 <div
 	class="monsan-panel-frame"
 	class:has-plaque={Boolean(plaque)}
+	class:full-height={fullHeight}
 	style:max-width={resolvedMaxWidth}
 	style:--panel-plaque-inset={resolvedPlaqueInset}
 >
@@ -148,6 +149,18 @@
 		position: relative;
 		width: 100%;
 		box-sizing: border-box;
+	}
+
+	.monsan-panel-frame.full-height {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		min-height: 0;
+	}
+
+	.monsan-panel-frame.full-height > .monsan-panel {
+		flex: 1 1 auto;
+		min-height: 0;
 	}
 
 	.monsan-panel-plaque-region {

@@ -253,6 +253,13 @@ assert(
 );
 
 assert(
+	panel.includes('class:full-height={fullHeight}') &&
+		panel.includes('.monsan-panel-frame.full-height') &&
+		panel.includes('.monsan-panel-frame.full-height > .monsan-panel'),
+	'Panel fullHeight must constrain its frame so nested scroll regions do not expand their parent workspace.'
+);
+
+assert(
 	panel.includes('plaque?: Snippet') &&
 		panel.includes("plaqueInset?: 'none' | 'xs' | 'sm'") &&
 		panel.includes('monsan-panel-plaque-region') &&
