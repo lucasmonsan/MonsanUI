@@ -71,6 +71,7 @@ export { default as DndMatch } from './components/DndMatch.svelte';
 export { default as Terminal } from './components/Terminal.svelte';
 export { default as PortugolEditor } from './components/PortugolEditor.svelte';
 export { default as PortugolRunner } from './components/PortugolRunner.svelte';
+export { default as PortugolConsole } from './components/PortugolConsole.svelte';
 export { default as PortugolCode } from './components/PortugolCode.svelte';
 export { default as SplitPane } from './components/SplitPane.svelte';
 export { default as Checkbox } from './components/Checkbox.svelte';
