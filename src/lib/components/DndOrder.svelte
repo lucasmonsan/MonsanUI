@@ -2,6 +2,7 @@
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import { i18n } from '../utils/i18n.svelte';
 	import { getOccurrenceKey } from '../utils/listKeys.js';
 	import GripVertical from './icons/GripVertical.svelte';
@@ -13,6 +14,12 @@
 		columns?: number;
 		formatIndex?: (index: number) => string;
 		itemLabel?: (item: string) => string;
+		item?: Snippet<[item: string, index: number]>;
+		beforeItem?: Snippet<[index: number]>;
+		itemSurfaceColor?: (item: string) => string | undefined;
+		itemSurfaceColorStrength?: 'subtle' | 'strong';
+		onReorder?: (items: string[]) => void;
+		onSelect?: (item: string) => void;
 		showNumbers?: boolean;
 	}
 
@@ -23,6 +30,12 @@
 		columns = 1,
 		formatIndex = (idx) => `${idx + 1}`,
 		itemLabel = (item) => item,
+		item: renderItem,
+		beforeItem,
+		itemSurfaceColor,
+		itemSurfaceColorStrength,
+		onReorder,
+		onSelect,
 		showNumbers = true
 	}: Props = $props();
 
@@ -35,14 +48,33 @@
 	let lastReorderTime = $state(0);
 	let prefersReducedMotion = $state(false);
 	let listEl = $state<HTMLDivElement>();
+	let originalOrder = $state<string[] | null>(null);
+	let dropTargetIndex = $state<number | null>(null);
 	const REORDER_COOLDOWN = 120;
+	const interactiveTargetSelector = 'button, a, input, select, textarea';
+
+	function isInteractiveTarget(target: EventTarget | null): boolean {
+		return target instanceof Element && Boolean(target.closest(interactiveTargetSelector));
+	}
+
+	function contrastForeground(color: string | undefined): string | undefined {
+		if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return undefined;
+		const channels = [1, 3, 5].map(
+			(index) => Number.parseInt(color.slice(index, index + 2), 16) / 255
+		);
+		const luminance = channels
+			.map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4))
+			.reduce((total, channel, index) => total + channel * [0.2126, 0.7152, 0.0722][index], 0);
+		return luminance > 0.179 ? '#171717' : '#ffffff';
+	}
 
 	function handleDragStart(e: DragEvent, index: number) {
-		if (disabled) {
+		if (disabled || isInteractiveTarget(e.target)) {
 			e.preventDefault();
 			return;
 		}
 		draggedIndex = index;
+		originalOrder = [...items];
 		lastReorderTime = 0;
 		if (e.dataTransfer) {
 			e.dataTransfer.effectAllowed = 'move';
@@ -58,6 +90,7 @@
 		}
 
 		if (draggedIndex === null || draggedIndex === index) return;
+		dropTargetIndex = index;
 
 		const now = Date.now();
 		if (now - lastReorderTime < REORDER_COOLDOWN) return;
@@ -101,17 +134,22 @@
 		if (disabled) return;
 		e.preventDefault();
 		draggedIndex = null;
+		dropTargetIndex = null;
 		lastReorderTime = 0;
 	}
 
 	function handleDragEnd() {
+		commitReorder();
 		draggedIndex = null;
+		dropTargetIndex = null;
 		lastReorderTime = 0;
 	}
 
 	function handleTouchStart(e: TouchEvent, index: number) {
 		if (disabled) return;
+		if (isInteractiveTarget(e.target)) return;
 		draggedIndex = index;
+		originalOrder = [...items];
 		lastReorderTime = 0;
 		isTouchDragging = true;
 	}
@@ -146,10 +184,24 @@
 
 	function handleTouchEnd() {
 		if (isTouchDragging) {
+			commitReorder();
 			isTouchDragging = false;
 			draggedIndex = null;
+			dropTargetIndex = null;
 			lastReorderTime = 0;
 		}
+	}
+
+	function handleItemClick(event: MouseEvent, item: string): void {
+		if (isInteractiveTarget(event.target) || isTouchDragging) return;
+		onSelect?.(item);
+	}
+
+	function commitReorder(): void {
+		if (originalOrder && originalOrder.some((item, index) => item !== items[index])) {
+			onReorder?.([...items]);
+		}
+		originalOrder = null;
 	}
 
 	let srAnnouncement = $state('');
@@ -178,6 +230,7 @@
 				const [removed] = newItems.splice(index, 1);
 				newItems.splice(index - 1, 0, removed);
 				value = [...newItems];
+				onReorder?.([...newItems]);
 
 				srAnnouncement = i18n.t('dndOrder.movedUp', {
 					item: itemLabel(itemMoved),
@@ -197,6 +250,7 @@
 				const [removed] = newItems.splice(index, 1);
 				newItems.splice(index + 1, 0, removed);
 				value = [...newItems];
+				onReorder?.([...newItems]);
 
 				srAnnouncement = i18n.t('dndOrder.movedDown', {
 					item: itemLabel(itemMoved),
@@ -226,40 +280,61 @@
 	{#each items as item, index (getOccurrenceKey(items, index))}
 		<div
 			animate:flip={{ duration: prefersReducedMotion ? 0 : 250, easing: quintOut }}
-			class="dnd-item glass-panel"
-			class:dragging={draggedIndex === index && !isTouchDragging}
-			class:touch-dragging={draggedIndex === index && isTouchDragging}
-			draggable={!disabled && !isTouchDragging}
-			data-index={index}
-			ondragstart={(e) => handleDragStart(e, index)}
-			ondragover={(e) => handleDragOver(e, index)}
-			ondrop={(e) => handleDrop(e)}
-			ondragend={handleDragEnd}
-			ontouchstart={(e) => handleTouchStart(e, index)}
-			ontouchmove={handleTouchMove}
-			ontouchend={handleTouchEnd}
-			ontouchcancel={handleTouchEnd}
-			role="option"
-			aria-selected={draggedIndex === index}
-			tabindex="0"
-			onkeydown={(e) => handleKeyDown(e, index)}
-			aria-label={i18n.t('dndOrder.itemLabel', {
-				item: itemLabel(item),
-				position: index + 1,
-				total: items.length
-			})}
+			class="dnd-entry"
 		>
-			<div class="drag-handle">
-				<GripVertical size={18} />
-			</div>
-			<div class="item-content">
-				{itemLabel(item)}
-			</div>
-			{#if showNumbers}
-				<div class="order-number">
-					{formatIndex(index)}
+			{#if beforeItem}
+				<div class="dnd-item-leading">
+					{@render beforeItem(index)}
 				</div>
 			{/if}
+			<div
+				class="dnd-item glass-panel"
+				class:has-custom-surface={Boolean(itemSurfaceColor?.(item))}
+				class:surface-subtle={itemSurfaceColorStrength === 'subtle'}
+				class:surface-strong={itemSurfaceColorStrength === 'strong'}
+				class:uses-surface-foreground={itemSurfaceColorStrength === undefined}
+				class:dragging={draggedIndex === index && !isTouchDragging}
+				class:touch-dragging={draggedIndex === index && isTouchDragging}
+				class:drop-target={dropTargetIndex === index}
+				draggable={!disabled && !isTouchDragging}
+				data-index={index}
+				style:--dnd-item-surface-color={itemSurfaceColor?.(item)}
+				style:--dnd-item-surface-foreground={contrastForeground(itemSurfaceColor?.(item))}
+				ondragstart={(e) => handleDragStart(e, index)}
+				ondragover={(e) => handleDragOver(e, index)}
+				ondrop={(e) => handleDrop(e)}
+				ondragend={handleDragEnd}
+				ontouchstart={(e) => handleTouchStart(e, index)}
+				ontouchmove={handleTouchMove}
+				ontouchend={handleTouchEnd}
+				ontouchcancel={handleTouchEnd}
+				role="option"
+				aria-selected={draggedIndex === index}
+				tabindex="0"
+				onkeydown={(e) => handleKeyDown(e, index)}
+				onclick={(event) => handleItemClick(event, item)}
+				aria-label={i18n.t('dndOrder.itemLabel', {
+					item: itemLabel(item),
+					position: index + 1,
+					total: items.length
+				})}
+			>
+				<div class="drag-handle">
+					<GripVertical size={18} />
+				</div>
+				<div class="item-content">
+					{#if renderItem}
+						{@render renderItem(item, index)}
+					{:else}
+						{itemLabel(item)}
+					{/if}
+				</div>
+				{#if showNumbers}
+					<div class="order-number">
+						{formatIndex(index)}
+					</div>
+				{/if}
+			</div>
 		</div>
 	{/each}
 </div>
@@ -293,8 +368,37 @@
 		touch-action: none;
 	}
 
+	.dnd-entry {
+		display: grid;
+		gap: var(--space-xs);
+		min-width: 0;
+	}
+
+	.dnd-item-leading {
+		min-width: 0;
+	}
+
+	.dnd-item.has-custom-surface {
+		background-color: var(--dnd-item-surface-color);
+		color: var(--dnd-item-surface-foreground);
+	}
+
+	.dnd-item.has-custom-surface.surface-subtle {
+		background-color: color-mix(in srgb, var(--dnd-item-surface-color) 10%, var(--bg-primary));
+		color: var(--text-primary);
+	}
+
+	.dnd-item.has-custom-surface.surface-strong {
+		background-color: color-mix(in srgb, var(--dnd-item-surface-color) 40%, var(--bg-primary));
+		color: var(--text-primary);
+	}
+
+	.dnd-item.uses-surface-foreground :global(.monsan-text) {
+		color: var(--dnd-item-surface-foreground) !important;
+	}
+
 	.dnd-item * {
-		pointer-events: none;
+		pointer-events: auto;
 	}
 
 	.dnd-item:active {
@@ -314,6 +418,11 @@
 		background: var(--bg-secondary);
 		z-index: 0;
 		pointer-events: none;
+	}
+
+	.dnd-item.drop-target:not(.dragging) {
+		border-color: var(--accent-primary);
+		box-shadow: 0 0 0 var(--border-width) var(--accent-primary);
 	}
 
 	.dnd-item:not(.disabled):not(.dragging):hover {
@@ -340,7 +449,7 @@
 		font-weight: bold;
 		color: var(--accent-primary);
 		font-size: var(--text-md);
-		background: rgba(46, 196, 182, 0.1);
+		background: var(--bg-secondary);
 		padding: 2px var(--space-sm);
 		border-radius: var(--radius-sm);
 		min-width: 32px;

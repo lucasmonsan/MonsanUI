@@ -24,6 +24,7 @@
 		flatInteractive?: boolean;
 		accentColor?: string;
 		surfaceColor?: string;
+		surfaceColorStrength?: 'subtle' | 'strong';
 		density?: 'default' | 'compact' | 'dense';
 		truncateTitle?: boolean;
 		selected?: boolean;
@@ -51,6 +52,7 @@
 		flatInteractive = false,
 		accentColor,
 		surfaceColor,
+		surfaceColorStrength,
 		density = 'default',
 		truncateTitle = false,
 		selected = false,
@@ -76,6 +78,7 @@
 	{flatInteractive}
 	{accentColor}
 	{surfaceColor}
+	{surfaceColorStrength}
 	{selected}
 	{muted}
 	{textSelectable}

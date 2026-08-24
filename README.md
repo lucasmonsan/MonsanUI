@@ -20,7 +20,7 @@ Consumer apps should prefer these primitives before adding any app-owned layout 
 
 - `AppShell` for every app page, with optional header, top, bottom, footer, floating-action and status regions.
 - `AppHeader` and `ContentRegion` for page structure inside the shell.
-- `ResponsiveGrid`, `ActionFooter` and `FloatingActionMenu` for repeated layouts and primary action bars.
+- `ResponsiveGrid`, `ActionFooter`, `PanelNavigator`, `FloatingActionMenu` and `FloatingActionNavigator` for repeated layouts, bounded navigation and primary actions.
 - `DataCard`, `StatusPill` and `ConsolePanel` for admin records, status indicators and logs.
 - `Background`, `ToastViewport`, `FlashOverlay` and `SkipLink` for app-level visual, feedback and accessibility layers.
 

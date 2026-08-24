@@ -37,6 +37,8 @@
 		accentColor?: string;
 		/** Optional custom surface color with an automatically contrasting foreground. */
 		surfaceColor?: string;
+		/** Blend an optional custom surface into the default surface while retaining standard text color. */
+		surfaceColorStrength?: 'subtle' | 'strong';
 		/** A semantic, non-domain selection state for interactive panels. */
 		selected?: boolean;
 		/** Reduces emphasis while a sibling item is selected. */
@@ -63,6 +65,7 @@
 		shadow = true,
 		accentColor,
 		surfaceColor,
+		surfaceColorStrength,
 		selected = false,
 		muted = false,
 		textSelectable = true
@@ -117,6 +120,9 @@
 		class:no-shadow={!shadow}
 		class:has-accent={Boolean(accentColor)}
 		class:has-custom-surface={Boolean(resolvedSurfaceForeground)}
+		class:surface-subtle={surfaceColorStrength === 'subtle'}
+		class:surface-strong={surfaceColorStrength === 'strong'}
+		class:uses-surface-foreground={surfaceColorStrength === undefined}
 		class:has-plaque={Boolean(plaque)}
 		class:selected
 		class:muted
@@ -188,7 +194,17 @@
 		color: var(--monsan-surface-foreground);
 	}
 
-	.monsan-panel.has-custom-surface :global(.monsan-text) {
+	.monsan-panel.has-custom-surface.surface-subtle {
+		background-color: color-mix(in srgb, var(--panel-surface) 10%, var(--bg-primary));
+		color: var(--text-primary);
+	}
+
+	.monsan-panel.has-custom-surface.surface-strong {
+		background-color: color-mix(in srgb, var(--panel-surface) 40%, var(--bg-primary));
+		color: var(--text-primary);
+	}
+
+	.monsan-panel.has-custom-surface.uses-surface-foreground :global(.monsan-text) {
 		color: var(--monsan-surface-foreground) !important;
 	}
 

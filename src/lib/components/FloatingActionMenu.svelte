@@ -201,8 +201,9 @@
 		left: 50%;
 		z-index: 1;
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(3, max-content);
 		align-items: end;
+		justify-content: center;
 		gap: var(--space-sm);
 		width: min(calc(100vw - var(--space-sm) * 2), 22rem);
 		transform: translateX(-50%);
