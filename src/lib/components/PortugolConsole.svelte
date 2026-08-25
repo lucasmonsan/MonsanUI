@@ -5,6 +5,8 @@
 	import Stack from './Stack.svelte';
 	import Inline from './Inline.svelte';
 	import Text from './Text.svelte';
+	import MinusIcon from './icons/Minus.svelte';
+	import PlusIcon from './icons/Plus.svelte';
 	import RotateCwIcon from './icons/RotateCw.svelte';
 	import XIcon from './icons/X.svelte';
 	import { Lexer, Parser, Interpreter, SemanticValidator } from '../utils/portugol/interpreter.js';
@@ -28,8 +30,10 @@
 	let isRunning = $state(false);
 	let errorMessage = $state('');
 	let scheduledRun = $state<ReturnType<typeof setTimeout> | null>(null);
+	let fontSize = $state(16);
 
 	const executionChunkSize = 500;
+	const fontSizeStorageKey = 'monsan-portugol-console-font-size';
 
 	$effect(() => {
 		if (pendingInputVar) {
@@ -38,8 +42,32 @@
 	});
 
 	onMount(() => {
+		const savedFontSize = Number.parseInt(localStorage.getItem(fontSizeStorageKey) || '', 10);
+		if (savedFontSize >= 12 && savedFontSize <= 24) {
+			fontSize = savedFontSize;
+		}
+
+		function handleKeyDown(event: KeyboardEvent) {
+			if (!event.ctrlKey && !event.metaKey) return;
+
+			if (event.key === '=' || event.key === '+') {
+				event.preventDefault();
+				changeFontSize(2);
+			} else if (event.key === '-') {
+				event.preventDefault();
+				changeFontSize(-2);
+			} else if (event.key === '0') {
+				event.preventDefault();
+				resetFontSize();
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown);
 		startExecution();
-		return clearScheduledRun;
+		return () => {
+			clearScheduledRun();
+			window.removeEventListener('keydown', handleKeyDown);
+		};
 	});
 
 	function clearScheduledRun() {
@@ -47,6 +75,16 @@
 			clearTimeout(scheduledRun);
 			scheduledRun = null;
 		}
+	}
+
+	function changeFontSize(delta: number) {
+		fontSize = Math.max(12, Math.min(24, fontSize + delta));
+		localStorage.setItem(fontSizeStorageKey, fontSize.toString());
+	}
+
+	function resetFontSize() {
+		fontSize = 16;
+		localStorage.setItem(fontSizeStorageKey, fontSize.toString());
 	}
 
 	function resetRuntime() {
@@ -143,6 +181,27 @@
 				<Button
 					variant="secondary"
 					size="sm"
+					square
+					onclick={() => changeFontSize(-2)}
+					title={i18n.t('portugolRunner.zoomOut')}
+					ariaLabel={i18n.t('portugolRunner.zoomOut')}
+				>
+					<MinusIcon size={16} />
+				</Button>
+				<Button
+					variant="secondary"
+					size="sm"
+					square
+					onclick={() => changeFontSize(2)}
+					title={i18n.t('portugolRunner.zoomIn')}
+					ariaLabel={i18n.t('portugolRunner.zoomIn')}
+				>
+					<PlusIcon size={16} />
+				</Button>
+				<Button
+					variant="secondary"
+					size="sm"
+					square
 					onclick={startExecution}
 					title={i18n.t('portugolRunner.reset')}
 				>
@@ -162,7 +221,7 @@
 		</Inline>
 
 		<Panel maxWidth="100%" fullHeight={true} padding="none">
-			<div class="terminal-box notranslate" translate="no">
+			<div class="terminal-box notranslate" style:font-size={`${fontSize}px`} translate="no">
 				<div class="terminal-content notranslate" translate="no" spellcheck="false">
 					{#if outputs.length > 0}
 						<div class="terminal-line">{outputs.join('')}</div>

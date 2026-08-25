@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { PaddingPreset } from '$lib/utils/layout.js';
+	import { resolvePadding } from '$lib/utils/layout.js';
 
 	interface Props {
 		children: Snippet;
@@ -11,6 +13,7 @@
 		fullHeight?: boolean;
 		growLastChild?: boolean;
 		overflow?: 'visible' | 'auto' | 'hidden';
+		padding?: PaddingPreset;
 	}
 
 	let {
@@ -22,8 +25,11 @@
 		fullWidth = false,
 		fullHeight = false,
 		growLastChild = false,
-		overflow = 'visible'
+		overflow = 'visible',
+		padding = 'none'
 	}: Props = $props();
+
+	let resolvedPadding = $derived(resolvePadding(padding));
 </script>
 
 <div
@@ -32,6 +38,7 @@
 	class:full-height={fullHeight}
 	class:grow-last-child={growLastChild}
 	style:overflow
+	style:padding={resolvedPadding}
 >
 	{@render children()}
 </div>
