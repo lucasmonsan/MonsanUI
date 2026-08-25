@@ -7,7 +7,6 @@ export { default as AppShell } from './components/AppShell.svelte';
 export { default as AppViewport } from './components/AppViewport.svelte';
 export { default as Background } from './components/Background.svelte';
 export { default as Button } from './components/Button.svelte';
-export { default as TagButton } from './components/TagButton.svelte';
 export { default as ButtonLabel } from './components/ButtonLabel.svelte';
 export { default as ChoiceCard } from './components/ChoiceCard.svelte';
 export { default as CardEditor } from './components/CardEditor.svelte';
