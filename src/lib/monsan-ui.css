@@ -286,7 +286,7 @@ button:disabled {
 }
 .markdown-content ul,
 .markdown-content ol {
-	margin-left: var(--space-sm);
+	margin-left: var(--space-xs);
 	margin-bottom: var(--space-xs);
 	color: var(--text-secondary);
 	display: flex;
