@@ -1,9 +1,23 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { floatingPortal } from '../utils/floatingPortal.js';
 
-	let { text, position = 'top' } = $props<{
+	let {
+		text,
+		position = 'top',
+		children,
+		iconOnly = false,
+		tone = 'neutral',
+		ariaLabel,
+		onactivate
+	} = $props<{
 		text: string;
 		position?: 'top' | 'bottom';
+		children?: Snippet;
+		iconOnly?: boolean;
+		tone?: 'neutral' | 'success' | 'warning' | 'error';
+		ariaLabel?: string;
+		onactivate?: () => void;
 	}>();
 
 	let triggerEl = $state<HTMLElement>();
@@ -17,8 +31,20 @@
 
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
-			open = !open;
+			if (onactivate) {
+				onactivate();
+			} else {
+				open = !open;
+			}
 		}
+	}
+
+	function handleClick() {
+		if (onactivate) {
+			onactivate();
+			return;
+		}
+		open = true;
 	}
 </script>
 
@@ -26,16 +52,24 @@
 	type="button"
 	bind:this={triggerEl}
 	class="info-trigger"
-	aria-label={text}
+	class:iconOnly
+	class:toneSuccess={tone === 'success'}
+	class:toneWarning={tone === 'warning'}
+	class:toneError={tone === 'error'}
+	aria-label={ariaLabel ?? text}
 	aria-expanded={open}
 	onmouseenter={() => (open = true)}
 	onmouseleave={() => (open = false)}
 	onfocus={() => (open = true)}
 	onblur={() => (open = false)}
-	onclick={() => (open = true)}
+	onclick={handleClick}
 	onkeydown={handleKeydown}
 >
-	?
+	{#if children}
+		{@render children()}
+	{:else}
+		?
+	{/if}
 </button>
 
 {#if open}
@@ -82,11 +116,43 @@
 		pointer-events: auto;
 	}
 
-	.info-trigger:hover,
-	.info-trigger:focus-visible {
+	.info-trigger:not(.iconOnly):hover,
+	.info-trigger:not(.iconOnly):focus-visible {
 		color: var(--text-primary);
 		border-color: var(--text-primary);
 		box-shadow: 1.5px 1.5px 0 var(--text-primary);
+		outline: none;
+	}
+
+	.info-trigger.iconOnly {
+		width: calc(var(--control-height) * 0.8);
+		height: calc(var(--control-height) * 0.8);
+		flex-basis: calc(var(--control-height) * 0.8);
+		margin: 0;
+		border-color: transparent;
+		box-shadow: none;
+		background: transparent;
+		color: var(--text-secondary);
+		cursor: pointer;
+	}
+
+	.info-trigger.iconOnly.toneSuccess {
+		color: var(--success);
+	}
+
+	.info-trigger.iconOnly.toneWarning {
+		color: var(--warning);
+	}
+
+	.info-trigger.iconOnly.toneError {
+		color: var(--error);
+	}
+
+	.info-trigger.iconOnly:hover,
+	.info-trigger.iconOnly:focus-visible {
+		border-color: transparent;
+		box-shadow: none;
+		background: color-mix(in srgb, currentColor 12%, transparent);
 		outline: none;
 	}
 
