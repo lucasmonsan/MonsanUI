@@ -29,9 +29,12 @@
 		HighlightStyle,
 		StreamLanguage,
 		StringStream,
-		foldGutter,
 		foldKeymap,
-		foldService
+		foldService,
+		foldEffect,
+		unfoldEffect,
+		foldedRanges,
+		codeFolding
 	} from '@codemirror/language';
 	import { tags as t } from '@lezer/highlight';
 	import {
@@ -107,6 +110,26 @@
 			span.style.color = 'var(--error)';
 			span.style.fontSize = '10px';
 			span.style.fontWeight = 'bold';
+			return span;
+		}
+	}
+
+	class FoldMarker extends GutterMarker {
+		private readonly folded: boolean;
+
+		constructor(folded: boolean) {
+			super();
+			this.folded = folded;
+		}
+
+		eq(other: FoldMarker) {
+			return other.folded === this.folded;
+		}
+
+		toDOM() {
+			const span = document.createElement('span');
+			span.className = 'portugol-fold-indicator';
+			span.textContent = this.folded ? '›' : '⌄';
 			return span;
 		}
 	}
@@ -188,7 +211,27 @@
 		markers(v: EditorView) {
 			return v.state.field(lineMarkersField);
 		},
-		initialSpacer: () => new ActiveLineMarker()
+		lineMarker(editorView, line) {
+			const range = getPortugolFoldRange(editorView.state, line.from);
+			return range ? new FoldMarker(isPortugolFolded(editorView.state, range)) : null;
+		},
+		lineMarkerChange(update) {
+			return foldedRanges(update.startState) !== foldedRanges(update.state);
+		},
+		initialSpacer: () => new FoldMarker(false),
+		domEventHandlers: {
+			click(editorView, line) {
+				const range = getPortugolFoldRange(editorView.state, line.from);
+				if (!range) return false;
+
+				editorView.dispatch({
+					effects: isPortugolFolded(editorView.state, range)
+						? unfoldEffect.of(range)
+						: foldEffect.of(range)
+				});
+				return true;
+			}
+		}
 	});
 
 	function getGutterExtensions() {
@@ -267,12 +310,30 @@
 				if (guide.endLine <= guide.startLine + 1) continue;
 
 				const openingLine = state.doc.line(guide.startLine);
+				const firstContentLine = state.doc.line(guide.startLine + 1);
 				const closingLine = state.doc.line(guide.endLine);
-				ranges.set(openingLine.from, { from: openingLine.to, to: closingLine.from });
+				ranges.set(openingLine.from, {
+					from: firstContentLine.from,
+					to: closingLine.from
+				});
 			}
 			portugolFoldRanges.set(state.doc, ranges);
 		}
 		return ranges.get(lineStart) ?? null;
+	}
+
+	function isPortugolFolded(state: EditorState, range: { from: number; to: number }) {
+		let folded = false;
+		foldedRanges(state).between(range.from, range.from, (from, to) => {
+			folded = from === range.from && to === range.to;
+		});
+		return folded;
+	}
+
+	function createHiddenFoldPlaceholder() {
+		const span = document.createElement('span');
+		span.className = 'portugol-fold-placeholder';
+		return span;
 	}
 
 	// Custom Portugol language syntax highlighter
@@ -502,9 +563,19 @@
 				minWidth: '16px',
 				paddingLeft: '4px'
 			},
-			'.cm-foldGutter': {
-				minWidth: '14px',
-				color: 'var(--text-secondary)'
+			'.cm-indicator-gutter .cm-gutterElement': {
+				position: 'relative',
+				width: '16px'
+			},
+			'.cm-indicator-gutter .portugol-fold-indicator': {
+				position: 'absolute',
+				left: '0',
+				color: 'var(--text-secondary)',
+				cursor: 'pointer'
+			},
+			'.cm-indicator-gutter .active-indicator, .cm-indicator-gutter .error-indicator': {
+				position: 'absolute',
+				right: '0'
 			},
 			'.cm-activeLine': {
 				backgroundColor: 'rgba(224, 123, 57, 0.06) !important'
@@ -531,7 +602,7 @@
 					syntaxHighlighting(portugolHighlightStyle),
 					portugolLanguage,
 					foldService.of((state, lineStart) => getPortugolFoldRange(state, lineStart)),
-					foldGutter(),
+					codeFolding({ placeholderDOM: createHiddenFoldPlaceholder }),
 					cmPlaceholder(placeholder),
 					lineNumbersCompartment.of(getGutterExtensions()),
 					highlightActiveLine(),
