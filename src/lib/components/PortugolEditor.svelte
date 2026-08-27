@@ -129,7 +129,19 @@
 		toDOM() {
 			const span = document.createElement('span');
 			span.className = 'portugol-fold-indicator';
-			span.textContent = this.folded ? '›' : '⌄';
+			const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			icon.setAttribute('viewBox', '0 0 12 12');
+			icon.setAttribute('aria-hidden', 'true');
+			icon.setAttribute('focusable', 'false');
+			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+			path.setAttribute('d', this.folded ? 'M 4 2 L 8 6 L 4 10' : 'M 2 4 L 6 8 L 10 4');
+			path.setAttribute('fill', 'none');
+			path.setAttribute('stroke', 'currentColor');
+			path.setAttribute('stroke-linecap', 'round');
+			path.setAttribute('stroke-linejoin', 'round');
+			path.setAttribute('stroke-width', '1.5');
+			icon.append(path);
+			span.append(icon);
 			return span;
 		}
 	}
@@ -211,9 +223,17 @@
 		markers(v: EditorView) {
 			return v.state.field(lineMarkersField);
 		},
-		lineMarker(editorView, line) {
+		lineMarker(editorView, line, markers) {
 			const range = getPortugolFoldRange(editorView.state, line.from);
-			return range ? new FoldMarker(isPortugolFolded(editorView.state, range)) : null;
+			if (
+				!range ||
+				markers.some(
+					(marker) => marker instanceof ActiveLineMarker || marker instanceof ErrorLineMarker
+				)
+			) {
+				return null;
+			}
+			return new FoldMarker(isPortugolFolded(editorView.state, range));
 		},
 		lineMarkerChange(update) {
 			return foldedRanges(update.startState) !== foldedRanges(update.state);
@@ -310,11 +330,10 @@
 				if (guide.endLine <= guide.startLine + 1) continue;
 
 				const openingLine = state.doc.line(guide.startLine);
-				const firstContentLine = state.doc.line(guide.startLine + 1);
 				const closingLine = state.doc.line(guide.endLine);
 				ranges.set(openingLine.from, {
-					from: firstContentLine.from,
-					to: closingLine.from
+					from: openingLine.to,
+					to: closingLine.from - 1
 				});
 			}
 			portugolFoldRanges.set(state.doc, ranges);
@@ -570,8 +589,17 @@
 			'.cm-indicator-gutter .portugol-fold-indicator': {
 				position: 'absolute',
 				left: '0',
+				top: 'calc((1em - 10px) / 2)',
+				width: '10px',
+				height: '10px',
 				color: 'var(--text-secondary)',
 				cursor: 'pointer'
+			},
+			'.cm-indicator-gutter .portugol-fold-indicator svg': {
+				display: 'block',
+				width: '10px',
+				height: '10px',
+				overflow: 'visible'
 			},
 			'.cm-indicator-gutter .active-indicator, .cm-indicator-gutter .error-indicator': {
 				position: 'absolute',
