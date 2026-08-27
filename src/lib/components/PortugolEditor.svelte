@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import {
 		EditorView,
 		keymap,
@@ -27,7 +28,10 @@
 		syntaxHighlighting,
 		HighlightStyle,
 		StreamLanguage,
-		StringStream
+		StringStream,
+		foldGutter,
+		foldKeymap,
+		foldService
 	} from '@codemirror/language';
 	import { tags as t } from '@lezer/highlight';
 	import {
@@ -74,6 +78,10 @@
 	const readOnlyCompartment = new Compartment();
 	const lineNumbersCompartment = new Compartment();
 	const lineWrappingCompartment = new Compartment();
+	const portugolFoldRanges = new WeakMap<
+		EditorState['doc'],
+		Map<number, { from: number; to: number }>
+	>();
 
 	// Effect to dispatch active line / error line highlights
 	const highlightEffect = StateEffect.define<{ activeLine: number; errorLine: number }>();
@@ -249,6 +257,22 @@
 			structureGuideFrame = null;
 			renderStructureGuides();
 		});
+	}
+
+	function getPortugolFoldRange(state: EditorState, lineStart: number) {
+		let ranges = portugolFoldRanges.get(state.doc);
+		if (!ranges) {
+			ranges = new SvelteMap();
+			for (const guide of getPortugolStructureGuides(state.doc.toString())) {
+				if (guide.endLine <= guide.startLine + 1) continue;
+
+				const openingLine = state.doc.line(guide.startLine);
+				const closingLine = state.doc.line(guide.endLine);
+				ranges.set(openingLine.from, { from: openingLine.to, to: closingLine.from });
+			}
+			portugolFoldRanges.set(state.doc, ranges);
+		}
+		return ranges.get(lineStart) ?? null;
 	}
 
 	// Custom Portugol language syntax highlighter
@@ -478,6 +502,10 @@
 				minWidth: '16px',
 				paddingLeft: '4px'
 			},
+			'.cm-foldGutter': {
+				minWidth: '14px',
+				color: 'var(--text-secondary)'
+			},
 			'.cm-activeLine': {
 				backgroundColor: 'rgba(224, 123, 57, 0.06) !important'
 			},
@@ -502,6 +530,8 @@
 					portugolTheme,
 					syntaxHighlighting(portugolHighlightStyle),
 					portugolLanguage,
+					foldService.of((state, lineStart) => getPortugolFoldRange(state, lineStart)),
+					foldGutter(),
 					cmPlaceholder(placeholder),
 					lineNumbersCompartment.of(getGutterExtensions()),
 					highlightActiveLine(),
@@ -574,6 +604,7 @@
 						},
 						...defaultKeymap,
 						...historyKeymap,
+						...foldKeymap,
 						indentWithTab
 					]),
 					indentUnit.of('\t'),
@@ -733,6 +764,7 @@
 
 	:global(.portugol-structure-guide-path) {
 		fill: none;
+		stroke: var(--accent-primary);
 		stroke: color-mix(in srgb, var(--accent-primary) 64%, transparent);
 		stroke-linecap: round;
 		stroke-width: 1.5;
