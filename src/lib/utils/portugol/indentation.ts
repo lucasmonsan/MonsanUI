@@ -173,6 +173,7 @@ export function getPortugolStructureGuides(source: string): PortugolStructureGui
 export function checkPortugolIndentation(code: string): PortugolIndentationCheck {
 	const lines = code.split(/\r?\n/);
 	let expected = 0;
+	const switchIndents: number[] = [];
 	let usesTabs = false;
 	let usesSpaces = false;
 	for (const line of lines) {
@@ -184,15 +185,20 @@ export function checkPortugolIndentation(code: string): PortugolIndentationCheck
 		const line = lines[index];
 		const lower = stripPortugolStringsAndComments(line);
 		if (!lower) continue;
+		const isSwitchCase = lower.startsWith('caso') || lower.startsWith('outrocaso');
+		const isSwitchCloser = lower === 'fimescolha';
 
-		if (
+		if (isSwitchCase && switchIndents.length > 0) {
+			expected = switchIndents.at(-1)! + 1;
+		} else if (isSwitchCloser && switchIndents.length > 0) {
+			expected = switchIndents.pop()!;
+		} else if (
 			lower.startsWith('fimalgoritmo') ||
 			lower === 'var' ||
 			lower === 'inicio' ||
 			lower === 'fimse' ||
 			lower === 'fimenquanto' ||
 			lower === 'fimpara' ||
-			lower === 'fimescolha' ||
 			lower === 'ate' ||
 			lower === '}' ||
 			lower.startsWith('senao') ||
@@ -224,7 +230,12 @@ export function checkPortugolIndentation(code: string): PortugolIndentationCheck
 			};
 		}
 
-		if (
+		if (lower.startsWith('escolha')) {
+			switchIndents.push(expected);
+			expected += 1;
+		} else if (isSwitchCase && switchIndents.length > 0) {
+			expected = switchIndents.at(-1)! + 2;
+		} else if (
 			lower.startsWith('algoritmo') ||
 			lower === 'var' ||
 			lower === 'inicio' ||
@@ -234,7 +245,6 @@ export function checkPortugolIndentation(code: string): PortugolIndentationCheck
 			lower.endsWith('faca') ||
 			lower.endsWith('faça') ||
 			lower === 'repita' ||
-			lower.startsWith('escolha') ||
 			lower.startsWith('senao') ||
 			lower.startsWith('senão')
 		) {

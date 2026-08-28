@@ -5,10 +5,13 @@ import {
 
 export type { PortugolStructureGuide } from './indentation.js';
 
-const BLOCK_OPENERS = [/\b(var|inicio|entao|então|faca|faça|repita|escolha|caso|outrocaso)\s*$/i];
+const BLOCK_OPENERS = [
+	/\b(var|inicio|entao|então|faca|faça|repita|outrocaso)\s*$/i,
+	/^\s*(escolha|caso)\b/i
+];
 
 const BLOCK_CLOSERS =
-	/^\s*([})]|\b(fimse|fimenquanto|fimpara|fimescolha|fimalgoritmo|senao|senão|outrocaso)\b)/i;
+	/^\s*([})]|\b(fimse|fimenquanto|fimpara|fimescolha|fimalgoritmo|senao|senão|caso|outrocaso)\b)/i;
 
 export const PORTUGOL_EDITOR_CARET_COLOR = 'var(--text-primary)';
 
@@ -82,6 +85,9 @@ export function getPortugolEditorIndentColumns(previousLineText: string, textAft
 	let columns = getPortugolIndentColumns(getPortugolLineIndent(previousLineText));
 	if (opensPortugolBlock(previousLineText)) {
 		columns += 4;
+	}
+	if (/^\s*fimescolha\b/i.test(textAfter)) {
+		return Math.max(0, columns - 8);
 	}
 	if (closesPortugolBlock(textAfter)) {
 		columns = Math.max(0, columns - 4);

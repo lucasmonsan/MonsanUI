@@ -1758,6 +1758,26 @@ console.log('Running Portugol editor behavior tests...');
 		4,
 		'CodeMirror indentation should reduce before block closer'
 	);
+	assertEquals(
+		getPortugolNextLineIndent('\t\tcaso 1'),
+		'\t\t\t',
+		'Enter after caso should enter the case body'
+	);
+	assertEquals(
+		getPortugolNextLineIndent('\tescolha opcao'),
+		'\t\t',
+		'Enter after escolha should enter the case level'
+	);
+	assertEquals(
+		getPortugolEditorIndentColumns('\t\t\tescreval("Um")', 'caso 2'),
+		8,
+		'CodeMirror indentation should return to the case level for a sibling caso'
+	);
+	assertEquals(
+		getPortugolEditorIndentColumns('\t\t\tescreval("Um")', 'fimescolha'),
+		4,
+		'CodeMirror indentation should return to the escolha level for fimescolha'
+	);
 	const indentedGuides = getPortugolStructureGuides(`algoritmo "Guias"
 var
 	nota : inteiro
@@ -1998,6 +2018,39 @@ inicio
 	x <- 10
 fimalgoritmo`;
 	assert(checkIndentation(code).ok, 'Should ignore indentation-like comment content');
+}
+
+{
+	const code = `algoritmo "EscolhaIndentada"
+var
+	opcao : inteiro
+inicio
+	escolha opcao
+		caso 1
+			escreval("Um")
+		caso 2
+			escreval("Dois")
+		outrocaso
+			escreval("Outro")
+	fimescolha
+fimalgoritmo`;
+	assert(checkIndentation(code).ok, 'Should require nested indentation for switch case bodies');
+}
+
+{
+	const code = `algoritmo "EscolhaIncorreta"
+var
+	opcao : inteiro
+inicio
+	escolha opcao
+		caso 1
+		escreval("Um")
+	fimescolha
+fimalgoritmo`;
+	const result = checkIndentation(code);
+	assert(!result.ok, 'Should reject a switch case body at the case indentation level');
+	assertEquals(result.line, 7, 'Should report the incorrectly indented switch case body');
+	assertEquals(result.expected, 3, 'Should expect one extra indentation level inside caso');
 }
 
 console.log('All Portugol core tests passed successfully.');
