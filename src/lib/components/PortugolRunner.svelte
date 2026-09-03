@@ -706,6 +706,7 @@ fimalgoritmo`),
 					<PortugolEditor
 						bind:code
 						{activeLine}
+						followActiveLine={isRunning && isStepMode}
 						{errorLine}
 						{showLineNumbers}
 						{autoCloseBrackets}

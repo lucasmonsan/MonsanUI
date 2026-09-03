@@ -48,6 +48,7 @@
 	let {
 		code = $bindable(''),
 		activeLine = 0,
+		followActiveLine = false,
 		errorLine = 0,
 		disabled = false,
 		showLineNumbers = true,
@@ -60,6 +61,7 @@
 	} = $props<{
 		code: string;
 		activeLine?: number;
+		followActiveLine?: boolean;
 		errorLine?: number;
 		disabled?: boolean;
 		showLineNumbers?: boolean;
@@ -797,8 +799,19 @@
 	// Reactive update for line indicators
 	$effect(() => {
 		if (view) {
+			const effects: Array<StateEffect<unknown>> = [highlightEffect.of({ activeLine, errorLine })];
+
+			if (followActiveLine && activeLine > 0) {
+				try {
+					const position = view.state.doc.line(activeLine).from;
+					effects.push(EditorView.scrollIntoView(position, { y: 'center' }));
+				} catch {
+					// Ignora se a linha estiver fora dos limites do documento
+				}
+			}
+
 			view.dispatch({
-				effects: highlightEffect.of({ activeLine, errorLine })
+				effects
 			});
 		}
 	});
