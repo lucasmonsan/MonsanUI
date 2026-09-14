@@ -140,6 +140,13 @@
 		text-decoration: none;
 	}
 
+	a.credits-author,
+	a.credits-tech-link {
+		color: var(--text-primary);
+		text-decoration: underline;
+		text-underline-offset: 0.15em;
+	}
+
 	a.credits-author:focus-visible,
 	a.credits-tech-link:focus-visible {
 		outline: 2px solid currentColor;

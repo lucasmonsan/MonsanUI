@@ -340,10 +340,10 @@ assert(
 
 assert(
 	credits.includes("'https://github.com/lucasmonsan'") &&
-		credits.includes('color: var(--accent-primary)') &&
-		!credits.includes('text-decoration-line: underline') &&
+		credits.includes('color: var(--text-primary)') &&
+		credits.includes('text-decoration: underline') &&
 		!credits.includes('⚡'),
-	'Credits must link the default Monsan author to its GitHub profile, use the suite accent and avoid decorative lightning or underlines.'
+	'Credits must link the default Monsan author to its GitHub profile and distinguish accessible links with persistent underlines.'
 );
 
 assert(
