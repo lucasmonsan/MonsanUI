@@ -144,7 +144,9 @@ assert(
 assert(
 	moneyInput.includes("currencyDisplay?: 'code' | 'symbol'") &&
 		moneyInput.includes("currencyDisplay = 'code'") &&
-		moneyInput.includes("currencyDisplay: 'symbol'"),
+		moneyInput.includes("currencyDisplay: 'symbol'") &&
+		moneyInput.includes('onvaliditychange?: (valid: boolean) => void') &&
+		moneyInput.includes('Never turn an invalid decimal'),
 	'MoneyInput must support an opt-in locale-aware currency symbol without changing existing code-prefix consumers.'
 );
 
