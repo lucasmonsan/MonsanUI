@@ -16,6 +16,7 @@
 		ariaDescribedby?: string;
 		ariaInvalid?: boolean | 'true' | 'false';
 		oninput?: (value: string) => void;
+		onvaliditychange?: (valid: boolean) => void;
 		onblur?: (event: FocusEvent) => void;
 	}
 
@@ -34,6 +35,7 @@
 		ariaDescribedby,
 		ariaInvalid,
 		oninput,
+		onvaliditychange,
 		onblur
 	}: Props = $props();
 
@@ -58,6 +60,17 @@
 			new Intl.NumberFormat(locale).formatToParts(1000).find((part) => part.type === 'group')
 				?.value ?? ','
 		);
+	}
+
+	function escaped(value: string): string {
+		return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
+
+	function validWhole(value: string): boolean {
+		if (/^\d*$/.test(value)) return true;
+		const group = groupSeparator();
+		if (!group || group === decimalSeparator()) return false;
+		return new RegExp(`^\\d{1,3}(?:${escaped(group)}\\d{3})+$`).test(value);
 	}
 
 	function currencyLabel(): string {
@@ -97,9 +110,13 @@
 		const fractionDigitsCount = fractionDigits();
 		const trailing = lastSeparator ? unsigned.slice((lastSeparator.index ?? 0) + 1) : '';
 		const hasDecimal = Boolean(lastSeparator) && trailing.length <= fractionDigitsCount;
-		const wholeRaw = hasDecimal
-			? unsigned.slice(0, lastSeparator?.index ?? 0).replaceAll(/[.,]/g, '')
-			: unsigned.replaceAll(/[.,]/g, '');
+		const wholeDisplay = hasDecimal ? unsigned.slice(0, lastSeparator?.index ?? 0) : unsigned;
+		// A separator with too many trailing digits is grouping only when it follows
+		// the active locale. Never turn an invalid decimal such as "1,234" in pt-BR
+		// into a different value silently.
+		if (!hasDecimal && lastSeparator && !validWhole(unsigned)) return null;
+		if (hasDecimal && !validWhole(wholeDisplay)) return null;
+		const wholeRaw = wholeDisplay.replaceAll(/[.,]/g, '');
 		const fractionRaw = hasDecimal ? trailing : '';
 		if (!/^\d*$/.test(wholeRaw) || !/^\d*$/.test(fractionRaw)) return null;
 		const digits = fractionDigits();
@@ -131,30 +148,40 @@
 
 	let displayValue = $state(formatMinorUnits(value));
 	let lastValue = $state(value);
+	let inputValid = $state(true);
 	let resolvedPlaceholder = $derived(placeholder ?? formatMinorUnits('0'));
 
 	$effect(() => {
 		if (value !== lastValue) {
 			displayValue = formatMinorUnits(value);
 			lastValue = value;
+			inputValid = true;
 		}
 	});
+
+	function setValidity(valid: boolean) {
+		if (inputValid === valid) return;
+		inputValid = valid;
+		onvaliditychange?.(valid);
+	}
 
 	function handleInput(event: Event) {
 		const nextDisplay = (event.currentTarget as HTMLInputElement).value;
 		const parsed = parseDisplay(nextDisplay);
 		if (parsed === null) {
 			displayValue = nextDisplay;
+			setValidity(false);
 			return;
 		}
 		displayValue = formatEditableDisplay(nextDisplay);
 		value = parsed;
 		lastValue = parsed;
+		setValidity(true);
 		oninput?.(parsed);
 	}
 
 	function handleBlur(event: FocusEvent) {
-		displayValue = formatMinorUnits(value);
+		if (inputValid) displayValue = formatMinorUnits(value);
 		onblur?.(event);
 	}
 </script>
@@ -174,7 +201,7 @@
 		autocomplete="off"
 		aria-label={ariaLabel}
 		aria-describedby={ariaDescribedby}
-		aria-invalid={ariaInvalid}
+		aria-invalid={inputValid ? ariaInvalid : true}
 	/>
 </div>
 

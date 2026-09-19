@@ -34,6 +34,7 @@
 	import Credits from '$lib/components/Credits.svelte';
 	import SplashScreen from '$lib/components/SplashScreen.svelte';
 	import Text from '$lib/components/Text.svelte';
+	import MoneyDisplay from '$lib/components/MoneyDisplay.svelte';
 
 	// Novos Componentes
 	import PortugolRunner from '$lib/components/PortugolRunner.svelte';
@@ -2571,6 +2572,14 @@
 					</div>
 
 					<!-- Panel Showcase -->
+					<div id="financial-surface-examples" class="component-card panel">
+						{#each ['#ffffff', '#000000', '#808080', '#ffff00', '#0000ff', '#c05c4b'] as surfaceColor (surfaceColor)}
+							<Panel {surfaceColor} interactive onclick={() => {}}>
+								<Text>{surfaceColor}</Text>
+								<MoneyDisplay minorUnits="100" currency="BRL" locale="pt-BR" label={surfaceColor} />
+							</Panel>
+						{/each}
+					</div>
 					<div class="component-card panel">
 						<div class="component-info">
 							<h3>Panel</h3>

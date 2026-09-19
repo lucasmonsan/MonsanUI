@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { MaxWidthPreset, PaddingPreset } from '$lib/utils/layout.js';
 	import { resolveMaxWidth, resolvePadding } from '$lib/utils/layout.js';
+	import { contrastForeground } from '$lib/utils/color-contrast.js';
 
 	interface Props {
 		children: Snippet;
@@ -76,17 +77,6 @@
 	let resolvedPlaqueInset = $derived(
 		plaqueInset === 'sm' ? 'var(--space-sm)' : plaqueInset === 'xs' ? 'var(--space-xxs)' : '0px'
 	);
-
-	function contrastForeground(color: string | undefined) {
-		if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return undefined;
-		const channels = [1, 3, 5].map(
-			(index) => Number.parseInt(color.slice(index, index + 2), 16) / 255
-		);
-		const luminance = channels
-			.map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4))
-			.reduce((total, channel, index) => total + channel * [0.2126, 0.7152, 0.0722][index], 0);
-		return luminance > 0.179 ? '#171717' : '#ffffff';
-	}
 
 	let resolvedSurfaceForeground = $derived(contrastForeground(surfaceColor));
 
@@ -173,6 +163,8 @@
 	}
 
 	.monsan-panel {
+		/* Each panel owns its surface context, including nested/default panels. */
+		--monsan-money-foreground: initial;
 		width: 100%;
 		max-width: 100%;
 		padding: var(--panel-padding);
@@ -219,6 +211,10 @@
 
 	.monsan-panel.has-custom-surface.uses-surface-foreground :global(.monsan-text) {
 		color: var(--monsan-surface-foreground) !important;
+	}
+
+	.monsan-panel.has-custom-surface.uses-surface-foreground {
+		--monsan-money-foreground: var(--monsan-surface-foreground);
 	}
 
 	.overflow-x {
@@ -303,7 +299,9 @@
 			var(--shadow-md);
 	}
 	.monsan-panel.muted {
-		opacity: 0.56;
+		/* Keep selectable text readable while reducing decorative emphasis. */
+		box-shadow: none;
+		border-style: dashed;
 	}
 	.monsan-panel.text-unselectable,
 	.monsan-panel.text-unselectable :global(*) {

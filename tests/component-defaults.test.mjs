@@ -144,7 +144,9 @@ assert(
 assert(
 	moneyInput.includes("currencyDisplay?: 'code' | 'symbol'") &&
 		moneyInput.includes("currencyDisplay = 'code'") &&
-		moneyInput.includes("currencyDisplay: 'symbol'"),
+		moneyInput.includes("currencyDisplay: 'symbol'") &&
+		moneyInput.includes('onvaliditychange?: (valid: boolean) => void') &&
+		moneyInput.includes('Never turn an invalid decimal'),
 	'MoneyInput must support an opt-in locale-aware currency symbol without changing existing code-prefix consumers.'
 );
 
@@ -340,10 +342,10 @@ assert(
 
 assert(
 	credits.includes("'https://github.com/lucasmonsan'") &&
-		credits.includes('color: var(--accent-primary)') &&
-		!credits.includes('text-decoration-line: underline') &&
+		credits.includes('color: var(--text-primary)') &&
+		credits.includes('text-decoration: underline') &&
 		!credits.includes('⚡'),
-	'Credits must link the default Monsan author to its GitHub profile, use the suite accent and avoid decorative lightning or underlines.'
+	'Credits must link the default Monsan author to its GitHub profile and distinguish accessible links with persistent underlines.'
 );
 
 assert(

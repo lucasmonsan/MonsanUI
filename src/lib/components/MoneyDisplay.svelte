@@ -99,7 +99,7 @@
 		text-align: end;
 	}
 	.money-label {
-		color: var(--text-secondary);
+		color: var(--monsan-money-foreground, var(--text-secondary));
 		font-size: var(--text-xs);
 		font-weight: 700;
 		min-width: 0;
@@ -119,7 +119,7 @@
 	.money-value {
 		display: inline-flex;
 		align-items: baseline;
-		color: var(--text-primary);
+		color: var(--monsan-money-foreground, var(--text-primary));
 		font-family: var(--font-display);
 		font-weight: 900;
 		line-height: 1.1;
