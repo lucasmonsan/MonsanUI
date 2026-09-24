@@ -59,6 +59,8 @@ const metricBar = await readComponent('MetricBar.svelte');
 const actionBar = await readComponent('ActionBar.svelte');
 const filterDialog = await readComponent('FilterDialog.svelte');
 const folders = await readComponent('Folders.svelte');
+const codeRunner = await readComponent('CodeRunner.svelte');
+const codeEditor = await readComponent('CodeEditor.svelte');
 const portugolRunner = await readComponent('PortugolRunner.svelte');
 const portugolEditor = await readComponent('PortugolEditor.svelte');
 const splitPane = await readComponent('SplitPane.svelte');
@@ -222,9 +224,11 @@ assert(
 );
 
 assert(
-	portugolRunner.includes('if (pendingInputVar) return;') &&
-		/disabled=\{disabled\s*\|\|\s*Boolean\(pendingInputVar\)/.test(portugolRunner),
-	'PortugolRunner must not advance step execution while a read input is pending.'
+	(codeRunner.includes('if (pendingInputVar) return;') ||
+		portugolRunner.includes('if (pendingInputVar) return;')) &&
+		(/disabled=\{disabled\s*\|\|\s*Boolean\(pendingInputVar\)/.test(codeRunner) ||
+			/disabled=\{disabled\s*\|\|\s*Boolean\(pendingInputVar\)/.test(portugolRunner)),
+	'CodeRunner must not advance step execution while a read input is pending.'
 );
 
 assert(
@@ -236,17 +240,20 @@ assert(
 );
 
 assert(
-	portugolRunner.includes('min-height: 0;') &&
-		portugolRunner.includes('flex: 1 1 auto;') &&
-		portugolRunner.includes('position: absolute;') &&
-		portugolRunner.includes('bottom: 16px;'),
-	'PortugolRunner fill mode must retain a constrained editor area and its floating controls.'
+	(codeRunner.includes('min-height: 0;') || portugolRunner.includes('min-height: 0;')) &&
+		(codeRunner.includes('flex: 1 1 auto;') || portugolRunner.includes('flex: 1 1 auto;')) &&
+		(codeRunner.includes('position: absolute;') ||
+			portugolRunner.includes('position: absolute;')) &&
+		(codeRunner.includes('bottom: 16px;') || portugolRunner.includes('bottom: 16px;')),
+	'CodeRunner fill mode must retain a constrained editor area and its floating controls.'
 );
 
 assert(
-	portugolEditor.includes("scrollbarWidth: 'none'") &&
-		portugolEditor.includes("'& .cm-scroller::-webkit-scrollbar'"),
-	'PortugolEditor must keep its code scroll area visually discreet without disabling scrolling.'
+	(codeEditor.includes("scrollbarWidth: 'none'") ||
+		portugolEditor.includes("scrollbarWidth: 'none'")) &&
+		(codeEditor.includes("'& .cm-scroller::-webkit-scrollbar'") ||
+			portugolEditor.includes("'& .cm-scroller::-webkit-scrollbar'")),
+	'CodeEditor must keep its code scroll area visually discreet without disabling scrolling.'
 );
 
 assert(
