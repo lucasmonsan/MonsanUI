@@ -37,7 +37,7 @@
 		"test:propagation": "node --check scripts/propagate-monsan-ui.mjs && node tests/propagate-monsan-ui.test.mjs",
 		"test:browser-compat": "node scripts/check-browser-compat.mjs",
 		"format": "prettier --write .",
-		"test": "pnpm lint && pnpm typecheck && pnpm run test:browser-compat && pnpm run test:standards && pnpm run test:defaults && pnpm run test:tooling && pnpm run test:propagation && pnpm build && pnpm run build:package && pnpm run lint:package && node tests/portugol.test.mjs",
+		"test": "pnpm lint && pnpm typecheck && pnpm run test:browser-compat && pnpm run test:standards && pnpm run test:defaults && pnpm run test:tooling && pnpm run test:propagation && pnpm build && pnpm run build:package && pnpm run lint:package && node tests/portugol.test.mjs && node --test tests/javascript-runner.test.mjs",
 		"test:latest": "pnpm update && pnpm test"
 	},
 	"files": [
@@ -71,6 +71,7 @@
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.10.4",
+		"@codemirror/lang-javascript": "^6.2.5",
 		"@codemirror/language": "^6.12.4",
 		"@codemirror/state": "^6.7.0",
 		"@codemirror/view": "^6.43.3",

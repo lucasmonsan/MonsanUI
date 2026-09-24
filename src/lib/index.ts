@@ -69,6 +69,8 @@ export { default as MultipleChoice } from './components/questions/MultipleChoice
 export { default as DndOrder } from './components/DndOrder.svelte';
 export { default as DndMatch } from './components/DndMatch.svelte';
 export { default as Terminal } from './components/Terminal.svelte';
+export { default as CodeEditor } from './components/CodeEditor.svelte';
+export { default as CodeRunner } from './components/CodeRunner.svelte';
 export { default as PortugolEditor } from './components/PortugolEditor.svelte';
 export { default as PortugolRunner } from './components/PortugolRunner.svelte';
 export { default as PortugolConsole } from './components/PortugolConsole.svelte';
