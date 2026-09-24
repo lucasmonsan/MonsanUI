@@ -76,7 +76,7 @@
 		lineWrapping = true,
 		onsave,
 		height = '100%'
-	} = $props<CodeEditorProps>();
+	}: CodeEditorProps = $props();
 
 	let editorContainer = $state<HTMLDivElement | null>(null);
 	let view = $state<EditorView | null>(null);
