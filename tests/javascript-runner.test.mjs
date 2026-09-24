@@ -68,3 +68,15 @@ test('formatJsExecutionError formats error messages cleanly', () => {
 	const formatted = formatJsExecutionError(err, 'const a = 1;');
 	assert.ok(formatted.message.includes('Syntax error test'));
 });
+
+test('buildWorkerScript inlines user code without new Function or eval', async () => {
+	const { buildWorkerScript } = await import('../src/lib/utils/javascript/runner.ts');
+	const userCode = 'console.log("hello world!");';
+	const { script, headerLineCount } = buildWorkerScript(userCode, 1);
+
+	assert.ok(script.includes(userCode));
+	assert.ok(!script.includes('AsyncFunction'));
+	assert.ok(!script.includes('new Function'));
+	assert.ok(!script.includes('eval('));
+	assert.ok(headerLineCount > 0);
+});
