@@ -1,6 +1,9 @@
+import { javascriptLanguage } from '@codemirror/lang-javascript';
+
 export interface JavaScriptRunOptions {
 	timeoutMs?: number;
 	onOutput?: (text: string) => void;
+	onPrompt?: (message: string, reply: (value: string) => void) => void;
 	onSuccess?: () => void;
 	onError?: (error: { message: string; line?: number }) => void;
 }
@@ -68,6 +71,63 @@ export function formatJsExecutionError(
 }
 
 /**
+ * Transforms standard synchronous `prompt(...)` and `window.prompt(...)` calls into
+ * `await __crocode_prompt(...)` so students can write standard JavaScript syntax.
+ * Also marks enclosing functions as `async` if they aren't already.
+ */
+export function transformJsForPrompt(code: string): string {
+	try {
+		const tree = javascriptLanguage.parser.parse(code);
+		const cursor = tree.cursor();
+		const replacements: Array<{ from: number; to: number; text: string }> = [];
+		const asyncFuncPositions = new Set<number>();
+
+		do {
+			if (cursor.name === 'CallExpression') {
+				const sub = cursor.node.firstChild;
+				const isPrompt =
+					sub &&
+					((sub.name === 'VariableName' && code.slice(sub.from, sub.to) === 'prompt') ||
+						(sub.name === 'MemberExpression' && code.slice(sub.from, sub.to) === 'window.prompt'));
+
+				if (isPrompt) {
+					replacements.push({ from: cursor.from, to: sub.to, text: 'await __crocode_prompt' });
+
+					// Mark enclosing non-async functions as async
+					let parent = cursor.node.parent;
+					while (parent) {
+						if (
+							parent.name === 'FunctionDeclaration' ||
+							parent.name === 'FunctionExpression' ||
+							parent.name === 'ArrowFunction'
+						) {
+							const head = code.slice(parent.from, parent.from + 6);
+							if (!head.startsWith('async')) {
+								asyncFuncPositions.add(parent.from);
+							}
+						}
+						parent = parent.parent;
+					}
+				}
+			}
+		} while (cursor.next());
+
+		for (const pos of asyncFuncPositions) {
+			replacements.push({ from: pos, to: pos, text: 'async ' });
+		}
+
+		replacements.sort((a, b) => b.from - a.from || b.to - a.to);
+		let result = code;
+		for (const rep of replacements) {
+			result = result.slice(0, rep.from) + rep.text + result.slice(rep.to);
+		}
+		return result;
+	} catch {
+		return code;
+	}
+}
+
+/**
  * Builds the Worker script content for sandboxed execution in the browser.
  * Inlining the user code inside an async IIFE eliminates calls to new Function() or eval(),
  * ensuring strict CSP compliance without triggering 'call to Function() blocked by CSP'.
@@ -76,6 +136,7 @@ export function buildWorkerScript(
 	code: string,
 	id: number
 ): { script: string; headerLineCount: number } {
+	const transformedCode = transformJsForPrompt(code);
 	const headerLines = [
 		'function formatArg(arg) {',
 		'  if (arg === null) return "null";',
@@ -97,6 +158,27 @@ export function buildWorkerScript(
 		'console.error = (...args) => { self.postMessage({ id: ' +
 			id +
 			', type: "output", text: "[ERRO] " + args.map(formatArg).join(" ") }); };',
+		'let __promptCounter = 0;',
+		'const __pendingPrompts = new Map();',
+		'self.onmessage = (e) => {',
+		'  if (e.data && e.data.type === "prompt_reply") {',
+		'    const resolver = __pendingPrompts.get(e.data.promptId);',
+		'    if (resolver) {',
+		'      __pendingPrompts.delete(e.data.promptId);',
+		'      resolver(e.data.value !== undefined ? String(e.data.value) : "");',
+		'    }',
+		'  }',
+		'};',
+		'function __crocode_prompt(msg) {',
+		'  const promptId = ++__promptCounter;',
+		'  return new Promise((resolve) => {',
+		'    __pendingPrompts.set(promptId, resolve);',
+		'    self.postMessage({ id: ' +
+			id +
+			', type: "prompt", promptId, message: msg !== undefined ? String(msg) : "" });',
+		'  });',
+		'}',
+		'const prompt = __crocode_prompt;',
 		'(async () => {'
 	];
 
@@ -123,7 +205,7 @@ export function buildWorkerScript(
 	].join('\n');
 
 	return {
-		script: headerLines.join('\n') + '\n' + code + '\n' + footer,
+		script: headerLines.join('\n') + '\n' + transformedCode + '\n' + footer,
 		headerLineCount: headerLines.length
 	};
 }
@@ -137,7 +219,6 @@ export class JavaScriptRunnerSession {
 	private timeoutTimer: ReturnType<typeof setTimeout> | null = null;
 	private activeRunId = 0;
 	private isStopped = false;
-
 	private onStopSettler: ((result: JavaScriptRunResult) => void) | null = null;
 
 	stop(): void {
@@ -186,6 +267,25 @@ export class JavaScriptRunnerSession {
 
 			this.onStopSettler = finish;
 
+			const resetTimeout = () => {
+				if (this.timeoutTimer) {
+					clearTimeout(this.timeoutTimer);
+					this.timeoutTimer = null;
+				}
+				if (timeoutMs > 0) {
+					this.timeoutTimer = setTimeout(() => {
+						if (!settled && this.activeRunId === runId) {
+							finish({
+								outputs,
+								error: {
+									message: `Tempo limite de execução excedido (${(timeoutMs / 1000).toFixed(0)}s). Possível loop infinito.`
+								}
+							});
+						}
+					}, timeoutMs);
+				}
+			};
+
 			const handleOutput = (text: string) => {
 				if (this.isStopped || settled) return;
 				outputs.push(text);
@@ -200,22 +300,37 @@ export class JavaScriptRunnerSession {
 					this.workerUrl = URL.createObjectURL(blob);
 					this.worker = new Worker(this.workerUrl);
 
-					this.timeoutTimer = setTimeout(() => {
-						if (!settled && this.activeRunId === runId) {
-							finish({
-								outputs,
-								error: {
-									message: `Tempo limite de execução excedido (${(timeoutMs / 1000).toFixed(0)}s). Possível loop infinito.`
-								}
-							});
-						}
-					}, timeoutMs);
+					resetTimeout();
 
 					this.worker.onmessage = (e: MessageEvent) => {
 						if (this.isStopped || settled || e.data.id !== runId) return;
 						const data = e.data;
 						if (data.type === 'output') {
 							handleOutput(data.text);
+						} else if (data.type === 'prompt') {
+							// Pause timeout while waiting for user interaction
+							if (this.timeoutTimer) {
+								clearTimeout(this.timeoutTimer);
+								this.timeoutTimer = null;
+							}
+							if (options.onPrompt) {
+								options.onPrompt(data.message || '', (value: string) => {
+									if (this.isStopped || settled) return;
+									resetTimeout();
+									this.worker?.postMessage({
+										type: 'prompt_reply',
+										promptId: data.promptId,
+										value
+									});
+								});
+							} else {
+								resetTimeout();
+								this.worker?.postMessage({
+									type: 'prompt_reply',
+									promptId: data.promptId,
+									value: ''
+								});
+							}
 						} else if (data.type === 'done') {
 							finish({ outputs, error: null });
 						} else if (data.type === 'error') {
@@ -290,24 +405,35 @@ export class JavaScriptRunnerSession {
 				console.info = origInfo;
 			};
 
+			resetTimeout();
+
 			try {
+				const transformed = transformJsForPrompt(code);
 				const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-				const userFn = new AsyncFunction(code);
-				Promise.race([
-					userFn(),
-					new Promise((_, reject) =>
-						setTimeout(
-							() =>
-								reject(
-									new Error(
-										`Tempo limite de execução excedido (${(timeoutMs / 1000).toFixed(0)}s). Possível loop infinito.`
-									)
-								),
-							timeoutMs
-						)
-					)
-				])
-					.then((result) => {
+				const promptFn = (msg?: unknown) => {
+					if (this.isStopped) return Promise.resolve('');
+					const message = msg !== undefined ? String(msg) : '';
+					if (this.timeoutTimer) {
+						clearTimeout(this.timeoutTimer);
+						this.timeoutTimer = null;
+					}
+					return new Promise<string>((res) => {
+						if (options.onPrompt) {
+							options.onPrompt(message, (val) => {
+								if (this.isStopped) return res('');
+								resetTimeout();
+								res(String(val));
+							});
+						} else {
+							resetTimeout();
+							res('');
+						}
+					});
+				};
+
+				const userFn = new AsyncFunction('__crocode_prompt', 'prompt', transformed);
+				userFn(promptFn, promptFn)
+					.then((result: unknown) => {
 						restoreConsole();
 						if (result !== undefined) {
 							const text = `<- ${formatArg(result)}`;
