@@ -1,11 +1,14 @@
 import { visualgReferenceItems } from './reference.js';
+import { javascriptReferenceItems } from '../javascript/reference.js';
 
-export type PortugolCodeTokenKind = 'plain' | 'keyword' | 'string' | 'number' | 'comment';
+export type CodeTokenKind = 'plain' | 'keyword' | 'string' | 'number' | 'comment';
+export type PortugolCodeTokenKind = CodeTokenKind;
 
-export interface PortugolCodeToken {
-	kind: PortugolCodeTokenKind;
+export interface CodeToken {
+	kind: CodeTokenKind;
 	text: string;
 }
+export type PortugolCodeToken = CodeToken;
 
 const extraKeywords = ['verdadeiro', 'falso', 'nao', 'não'];
 
@@ -18,7 +21,7 @@ const portugolKeywords = new Set(
 
 const tokenPattern = /\/\/.*|"(?:[^"\\]|\\.)*"|\b\d+(?:\.\d+)?\b|[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ0-9_]*/g;
 
-function classifyPortugolToken(text: string): PortugolCodeTokenKind {
+function classifyPortugolToken(text: string): CodeTokenKind {
 	if (text.startsWith('//')) return 'comment';
 	if (text.startsWith('"')) return 'string';
 	if (/^\d+(?:\.\d+)?$/.test(text)) return 'number';
@@ -26,10 +29,10 @@ function classifyPortugolToken(text: string): PortugolCodeTokenKind {
 	return 'plain';
 }
 
-export function tokenizePortugolCode(code: string): PortugolCodeToken[] {
+export function tokenizePortugolCode(code: string): CodeToken[] {
 	if (!code) return [];
 
-	const tokens: PortugolCodeToken[] = [];
+	const tokens: CodeToken[] = [];
 	let cursor = 0;
 	for (const match of code.matchAll(tokenPattern)) {
 		const index = match.index ?? 0;
@@ -43,4 +46,82 @@ export function tokenizePortugolCode(code: string): PortugolCodeToken[] {
 		tokens.push({ kind: 'plain', text: code.slice(cursor) });
 	}
 	return tokens;
+}
+
+const jsExtraKeywords = [
+	'const',
+	'let',
+	'var',
+	'function',
+	'return',
+	'if',
+	'else',
+	'switch',
+	'case',
+	'default',
+	'break',
+	'continue',
+	'for',
+	'while',
+	'do',
+	'new',
+	'typeof',
+	'async',
+	'await',
+	'true',
+	'false',
+	'null',
+	'undefined',
+	'Math',
+	'Number',
+	'String',
+	'Boolean',
+	'parseInt',
+	'parseFloat',
+	'prompt',
+	'console'
+];
+
+const jsKeywords = new Set(
+	javascriptReferenceItems
+		.flatMap((item) => [item.name, ...(item.aliases ?? [])])
+		.concat(jsExtraKeywords)
+		.map((name) => name.toLowerCase())
+);
+
+const jsTokenPattern =
+	/\/\/.*|\/\*[\s\S]*?\*\/|`(?:[^`\\]|\\.)*`|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\b\d+(?:\.\d+)?\b|[A-Za-z_$][A-Za-z0-9_$]*/g;
+
+function classifyJsToken(text: string): CodeTokenKind {
+	if (text.startsWith('//') || text.startsWith('/*')) return 'comment';
+	if (text.startsWith('"') || text.startsWith("'") || text.startsWith('`')) return 'string';
+	if (/^\d+(?:\.\d+)?$/.test(text)) return 'number';
+	if (jsKeywords.has(text.toLowerCase())) return 'keyword';
+	return 'plain';
+}
+
+export function tokenizeJsCode(code: string): CodeToken[] {
+	if (!code) return [];
+
+	const tokens: CodeToken[] = [];
+	let cursor = 0;
+	for (const match of code.matchAll(jsTokenPattern)) {
+		const index = match.index ?? 0;
+		if (index > cursor) {
+			tokens.push({ kind: 'plain', text: code.slice(cursor, index) });
+		}
+		tokens.push({ kind: classifyJsToken(match[0]), text: match[0] });
+		cursor = index + match[0].length;
+	}
+	if (cursor < code.length) {
+		tokens.push({ kind: 'plain', text: code.slice(cursor) });
+	}
+	return tokens;
+}
+
+export function tokenizeCode(
+	code: string,
+	language: 'portugol' | 'javascript' = 'portugol'
+): CodeToken[] {
+	return language === 'javascript' ? tokenizeJsCode(code) : tokenizePortugolCode(code);
 }
