@@ -240,6 +240,18 @@ fimalgoritmo`
 
 		isLoaded = true;
 		function handleKeyDown(e: KeyboardEvent) {
+			if (e.key === 'F8') {
+				e.preventDefault();
+				handleStep();
+				return;
+			}
+			if (e.key === 'F9') {
+				e.preventDefault();
+				if (isRunning) handleStop();
+				else startExecution(false);
+				return;
+			}
+
 			const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 			if (!isCtrlOrCmd) return;
 
@@ -447,13 +459,13 @@ fimalgoritmo`
 		stopRequested = false;
 
 		if (language === 'javascript') {
-			if (step) return;
 			isRunning = true;
 			isPaused = false;
 			pendingPromptResolver = null;
 
 			void jsSession.run(code, {
 				timeoutMs: 5000,
+				isStepMode: step,
 				onOutput: (text) => {
 					outputs = [...outputs, text + '\n'];
 					onOutputsChange?.(outputs);
@@ -466,13 +478,25 @@ fimalgoritmo`
 					pendingInputVar = 'prompt';
 					pendingPromptResolver = reply;
 				},
+				onStep: (line, vars) => {
+					activeLine = line;
+					variables = vars;
+					isPaused = true;
+				},
+				onVariables: (vars) => {
+					variables = vars;
+				},
 				onSuccess: () => {
 					isRunning = false;
+					isPaused = false;
+					activeLine = 0;
 					pendingPromptResolver = null;
 					onSuccess?.();
 				},
 				onError: (err) => {
 					isRunning = false;
+					isPaused = false;
+					activeLine = 0;
 					pendingPromptResolver = null;
 					errorMsg = err.message;
 					fullErrorMsg = err.message;
@@ -600,7 +624,15 @@ fimalgoritmo`
 
 	function handleStep() {
 		if (pendingInputVar) return;
-		if (language === 'javascript') return;
+		if (language === 'javascript') {
+			if (!isRunning) {
+				startExecution(true);
+			} else if (isPaused) {
+				isPaused = false;
+				jsSession.step();
+			}
+			return;
+		}
 		if (!isRunning) {
 			startExecution(true);
 		} else {
@@ -637,6 +669,8 @@ fimalgoritmo`
 		if (language === 'javascript') {
 			jsSession.stop();
 			isRunning = false;
+			isPaused = false;
+			activeLine = 0;
 			return;
 		}
 		stopRequested = true;
@@ -733,7 +767,7 @@ fimalgoritmo`
 							<td class="var-value">
 								{#if info.value === undefined}
 									{i18n.t('portugolRunner.emptyValue')}
-								{:else if ['caractere', 'caracter', 'cadeia'].includes(info.type)}
+								{:else if ['caractere', 'caracter', 'cadeia', 'string', 'texto'].includes(info.type)}
 									"{info.value}"
 								{:else}
 									{String(info.value)}
@@ -809,7 +843,7 @@ fimalgoritmo`
 								<PlayIcon size={16} />
 							{/if}
 						</Button>
-						{#if language === 'portugol'}
+						{#if language === 'portugol' || language === 'javascript'}
 							<Button
 								variant="secondary"
 								size="sm"

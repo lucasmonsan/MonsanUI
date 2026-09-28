@@ -210,3 +210,4 @@ export * from './utils/portugol/highlight.js';
 // JavaScript Runner & Reference
 export * from './utils/javascript/runner.js';
 export * from './utils/javascript/reference.js';
+export * from './utils/javascript/instrument.js';
