@@ -80,3 +80,45 @@ test('buildWorkerScript inlines user code without new Function or eval', async (
 	assert.ok(!script.includes('eval('));
 	assert.ok(headerLineCount > 0);
 });
+
+test('transformJsForPrompt rewrites prompt calls without altering strings or comments', async () => {
+	const { transformJsForPrompt } = await import('../src/lib/utils/javascript/runner.ts');
+	const code = `
+		// prompt("nao mudar comentario")
+		const msg = "prompt('nao mudar string')";
+		const nome = prompt("Digite seu nome:");
+		function pedir() {
+			return prompt("Dentro da funcao:");
+		}
+	`;
+	const transformed = transformJsForPrompt(code);
+	assert.ok(transformed.includes('// prompt("nao mudar comentario")'));
+	assert.ok(transformed.includes('"prompt(\'nao mudar string\')"'));
+	assert.ok(transformed.includes('await __crocode_prompt("Digite seu nome:")'));
+	assert.ok(transformed.includes('async function pedir()'));
+	assert.ok(transformed.includes('await __crocode_prompt("Dentro da funcao:")'));
+});
+
+test('JavaScriptRunnerSession handles prompt callback and sequential input', async () => {
+	const session = new JavaScriptRunnerSession();
+	const promptsAsked = [];
+	const inputs = ['Lucas', 'Desenvolvedor'];
+
+	const result = await session.run(
+		`
+		const nome = prompt("Qual o seu nome?");
+		const profissao = prompt("Qual a sua profissao?");
+		console.log(\`Usuario \${nome} registrado como \${profissao}\`);
+	`,
+		{
+			onPrompt: (message, reply) => {
+				promptsAsked.push(message);
+				reply(inputs.shift() || '');
+			}
+		}
+	);
+
+	assert.equal(result.error, null);
+	assert.deepEqual(promptsAsked, ['Qual o seu nome?', 'Qual a sua profissao?']);
+	assert.ok(result.outputs.some((o) => o.includes('Usuario Lucas registrado como Desenvolvedor')));
+});

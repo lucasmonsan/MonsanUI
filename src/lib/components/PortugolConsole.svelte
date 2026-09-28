@@ -167,6 +167,7 @@
 		const value = currentInputValue;
 		currentInputValue = '';
 		pendingInputVar = null;
+		outputs = [...outputs, `${value}\n`];
 		runNext(value);
 	}
 </script>

@@ -270,6 +270,7 @@ fimalgoritmo`
 	});
 
 	let pendingInputVar = $state<string | null>(null);
+	let pendingPromptResolver = $state<((value: string) => void) | null>(null);
 	let currentInputValue = $state('');
 	let terminalInputElement = $state<HTMLInputElement | null>(null);
 
@@ -449,6 +450,7 @@ fimalgoritmo`
 			if (step) return;
 			isRunning = true;
 			isPaused = false;
+			pendingPromptResolver = null;
 
 			void jsSession.run(code, {
 				timeoutMs: 5000,
@@ -456,12 +458,22 @@ fimalgoritmo`
 					outputs = [...outputs, text + '\n'];
 					onOutputsChange?.(outputs);
 				},
+				onPrompt: (message, reply) => {
+					if (message) {
+						outputs = [...outputs, message];
+						onOutputsChange?.(outputs);
+					}
+					pendingInputVar = 'prompt';
+					pendingPromptResolver = reply;
+				},
 				onSuccess: () => {
 					isRunning = false;
+					pendingPromptResolver = null;
 					onSuccess?.();
 				},
 				onError: (err) => {
 					isRunning = false;
+					pendingPromptResolver = null;
 					errorMsg = err.message;
 					fullErrorMsg = err.message;
 					errorLine = err.line || 0;
@@ -605,11 +617,23 @@ fimalgoritmo`
 		pendingInputVar = null;
 		isPaused = false;
 
+		outputs = [...outputs, `${value}\n`];
+		onOutputsChange?.(outputs);
+
+		if (pendingPromptResolver) {
+			const resolver = pendingPromptResolver;
+			pendingPromptResolver = null;
+			resolver(value);
+			return;
+		}
+
 		runNext(value);
 	}
 
 	function handleStop() {
 		hasRun = false;
+		pendingPromptResolver = null;
+		pendingInputVar = null;
 		if (language === 'javascript') {
 			jsSession.stop();
 			isRunning = false;
@@ -621,6 +645,7 @@ fimalgoritmo`
 
 	function handleReset() {
 		hasRun = false;
+		pendingPromptResolver = null;
 		if (language === 'javascript') {
 			jsSession.stop();
 		}
@@ -663,7 +688,9 @@ fimalgoritmo`
 							type="text"
 							bind:value={currentInputValue}
 							placeholder={i18n.t('portugolRunner.inputPlaceholder')}
-							aria-label={i18n.t('portugolRunner.inputLabel', { variable: pendingInputVar })}
+							aria-label={language === 'javascript'
+								? i18n.t('portugolRunner.inputPlaceholder')
+								: i18n.t('portugolRunner.inputLabel', { variable: pendingInputVar })}
 							class="terminal-text-input"
 							translate="no"
 							spellcheck="false"
