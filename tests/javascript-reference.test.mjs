@@ -39,12 +39,28 @@ test('getJavaScriptReferenceItem finds items by name and aliases case-insensitiv
 
 	const missing = getJavaScriptReferenceItem('item-que-nao-existe');
 	assert.equal(missing, undefined);
+
+	const assignItem = getJavaScriptReferenceItem('=');
+	assert.ok(assignItem);
+	assert.equal(assignItem.name, '=');
+	assert.equal(assignItem.category, 'operator');
+
+	const assignAlias = getJavaScriptReferenceItem('<-');
+	assert.ok(assignAlias);
+	assert.equal(assignAlias.name, '=');
+
+	const plusAssign = getJavaScriptReferenceItem('+=');
+	assert.ok(plusAssign);
+	assert.equal(plusAssign.name, '+=');
 });
 
 test('getSupportedJavaScriptReferenceNames returns comprehensive list', () => {
 	const names = getSupportedJavaScriptReferenceNames();
 	assert.ok(names.includes('const'));
 	assert.ok(names.includes('let'));
+	assert.ok(names.includes('='));
+	assert.ok(names.includes('+='));
+	assert.ok(names.includes('-='));
 	assert.ok(names.includes('prompt'));
 	assert.ok(names.includes('console.log'));
 	assert.ok(names.includes('Math.floor'));

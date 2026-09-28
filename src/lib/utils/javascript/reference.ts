@@ -36,11 +36,13 @@ export const javascriptReferenceItems: JavaScriptReferenceItem[] = [
 	},
 	{
 		name: 'let',
+		aliases: ['variável', 'declarar'],
 		category: 'variable',
 		status: 'supported',
-		syntax: 'let nome = valor;',
-		description: 'Declara uma variável cujo valor pode ser modificado ao longo do código.',
-		example: 'let contador = 0;\ncontador = contador + 1;',
+		syntax: 'let nome; | let nome = valor;',
+		description:
+			'Declara uma variável cujo valor pode ser atribuído no momento da criação ou modificado posteriormente ao longo do código.',
+		example: 'let idade;\nidade = 25;\nidade = idade + 1;',
 		compatibility: 'Standard JS'
 	},
 	{
@@ -169,6 +171,39 @@ export const javascriptReferenceItems: JavaScriptReferenceItem[] = [
 	},
 
 	// Operadores
+	{
+		name: '=',
+		aliases: ['atribuição', 'recebe', '<-', 'atribuir'],
+		category: 'operator',
+		status: 'supported',
+		syntax: 'variavel = valor;',
+		description:
+			'Operador de atribuição (o "<-" do Portugol): armazena o resultado da expressão da direita dentro da variável à esquerda.',
+		example: 'let saldo;\nsaldo = 500;\nsaldo = saldo - 150;',
+		compatibility: 'Standard JS'
+	},
+	{
+		name: '+=',
+		aliases: ['atribuição com soma', 'incremento'],
+		category: 'operator',
+		status: 'supported',
+		syntax: 'variavel += valor;',
+		description:
+			'Soma o valor à variável e guarda nela mesma (equivalente a variavel = variavel + valor).',
+		example: 'let pontos = 10;\npontos += 5; // pontos agora vale 15',
+		compatibility: 'Standard JS'
+	},
+	{
+		name: '-=',
+		aliases: ['atribuição com subtração', 'decremento'],
+		category: 'operator',
+		status: 'supported',
+		syntax: 'variavel -= valor;',
+		description:
+			'Subtrai o valor da variável e guarda nela mesma (equivalente a variavel = variavel - valor).',
+		example: 'let vidas = 3;\nvidas -= 1; // vidas agora vale 2',
+		compatibility: 'Standard JS'
+	},
 	{
 		name: '+',
 		aliases: ['soma', 'adição', 'concatenação'],
