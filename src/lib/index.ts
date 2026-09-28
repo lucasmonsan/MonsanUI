@@ -75,6 +75,7 @@ export { default as PortugolEditor } from './components/PortugolEditor.svelte';
 export { default as PortugolRunner } from './components/PortugolRunner.svelte';
 export { default as PortugolConsole } from './components/PortugolConsole.svelte';
 export { default as PortugolCode } from './components/PortugolCode.svelte';
+export { default as CodeSnippet } from './components/CodeSnippet.svelte';
 export { default as SplitPane } from './components/SplitPane.svelte';
 export { default as Checkbox } from './components/Checkbox.svelte';
 export { default as BadgeGroup } from './components/BadgeGroup.svelte';
@@ -205,3 +206,8 @@ export * from './utils/portugol/interpreter.js';
 export * from './utils/portugol/reference.js';
 export * from './utils/portugol/examples.js';
 export * from './utils/portugol/highlight.js';
+
+// JavaScript Runner & Reference
+export * from './utils/javascript/runner.js';
+export * from './utils/javascript/reference.js';
+export * from './utils/javascript/instrument.js';

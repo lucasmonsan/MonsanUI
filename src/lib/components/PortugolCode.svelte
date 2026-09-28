@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { tokenizePortugolCode } from '$lib/utils/portugol/highlight.js';
+	import { tokenizeCode } from '$lib/utils/portugol/highlight.js';
 
 	interface Props {
 		code: string;
+		language?: 'portugol' | 'javascript';
 		size?: 'xs' | 'sm' | 'md' | 'lg';
 		weight?: 'normal' | 'medium' | 'bold';
 	}
 
-	let { code, size = 'sm', weight = 'normal' }: Props = $props();
+	let { code, language = 'portugol', size = 'sm', weight = 'normal' }: Props = $props();
 
-	let tokens = $derived(tokenizePortugolCode(code));
+	let tokens = $derived(tokenizeCode(code, language));
 </script>
 
 <code

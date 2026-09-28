@@ -1,9 +1,13 @@
 import { javascriptLanguage } from '@codemirror/lang-javascript';
+import { instrumentJsCode } from './instrument.js';
 
 export interface JavaScriptRunOptions {
 	timeoutMs?: number;
+	isStepMode?: boolean;
 	onOutput?: (text: string) => void;
 	onPrompt?: (message: string, reply: (value: string) => void) => void;
+	onStep?: (line: number, variables: Record<string, { value: unknown; type: string }>) => void;
+	onVariables?: (variables: Record<string, { value: unknown; type: string }>) => void;
 	onSuccess?: () => void;
 	onError?: (error: { message: string; line?: number }) => void;
 }
@@ -11,6 +15,7 @@ export interface JavaScriptRunOptions {
 export interface JavaScriptRunResult {
 	outputs: string[];
 	error: { message: string; line?: number } | null;
+	variables?: Record<string, { value: unknown; type: string }>;
 	stopped?: boolean;
 }
 
@@ -29,6 +34,31 @@ function formatArg(arg: unknown): string {
 	return String(arg);
 }
 
+export function formatVar(val: unknown): { value: unknown; type: string } {
+	if (val === null) return { value: 'null', type: 'null' };
+	if (val === undefined) return { value: undefined, type: 'undefined' };
+	if (Array.isArray(val)) {
+		try {
+			return { value: JSON.stringify(val), type: 'array' };
+		} catch {
+			return { value: String(val), type: 'array' };
+		}
+	}
+	const t = typeof val;
+	if (t === 'string') return { value: val, type: 'string' };
+	if (t === 'number') return { value: val, type: 'number' };
+	if (t === 'boolean') return { value: val ? 'true' : 'false', type: 'boolean' };
+	if (t === 'function') return { value: '[Função]', type: 'function' };
+	if (t === 'object') {
+		try {
+			return { value: JSON.stringify(val), type: 'object' };
+		} catch {
+			return { value: String(val), type: 'object' };
+		}
+	}
+	return { value: String(val), type: t };
+}
+
 export function extractJsErrorLine(error: unknown, sourceCode: string): number {
 	if (!error) return 0;
 	const err = error as { stack?: string; message?: string; lineNumber?: number; line?: number };
@@ -36,12 +66,10 @@ export function extractJsErrorLine(error: unknown, sourceCode: string): number {
 	if (typeof err.line === 'number' && err.line > 0) return err.line;
 
 	if (err.stack) {
-		// Look for patterns like eval at <anonymous>:line:col or <anonymous>:line:col or blob:...:line:col
 		const matches = Array.from(err.stack.matchAll(/(?:<anonymous>|blob:[^:]+):(\d+)(?::(\d+))?/gi));
 		for (const match of matches) {
 			const rawLine = parseInt(match[1], 10);
 			if (!isNaN(rawLine) && rawLine > 0) {
-				// AsyncFunction wrapper adds 1-2 lines of header. If rawLine <= total lines in code, use it.
 				const totalLines = sourceCode.split('\n').length;
 				if (rawLine <= totalLines) {
 					return rawLine;
@@ -93,7 +121,6 @@ export function transformJsForPrompt(code: string): string {
 				if (isPrompt) {
 					replacements.push({ from: cursor.from, to: sub.to, text: 'await __crocode_prompt' });
 
-					// Mark enclosing non-async functions as async
 					let parent = cursor.node.parent;
 					while (parent) {
 						if (
@@ -101,10 +128,11 @@ export function transformJsForPrompt(code: string): string {
 							parent.name === 'FunctionExpression' ||
 							parent.name === 'ArrowFunction'
 						) {
-							const head = code.slice(parent.from, parent.from + 6);
-							if (!head.startsWith('async')) {
+							const text = code.slice(parent.from, parent.to);
+							if (!text.startsWith('async')) {
 								asyncFuncPositions.add(parent.from);
 							}
+							break;
 						}
 						parent = parent.parent;
 					}
@@ -116,11 +144,13 @@ export function transformJsForPrompt(code: string): string {
 			replacements.push({ from: pos, to: pos, text: 'async ' });
 		}
 
-		replacements.sort((a, b) => b.from - a.from || b.to - a.to);
+		replacements.sort((a, b) => b.from - a.from);
+
 		let result = code;
 		for (const rep of replacements) {
 			result = result.slice(0, rep.from) + rep.text + result.slice(rep.to);
 		}
+
 		return result;
 	} catch {
 		return code;
@@ -134,9 +164,10 @@ export function transformJsForPrompt(code: string): string {
  */
 export function buildWorkerScript(
 	code: string,
-	id: number
+	id: number,
+	isStepMode = false
 ): { script: string; headerLineCount: number } {
-	const transformedCode = transformJsForPrompt(code);
+	const transformedCode = instrumentJsCode(code);
 	const headerLines = [
 		'function formatArg(arg) {',
 		'  if (arg === null) return "null";',
@@ -145,6 +176,24 @@ export function buildWorkerScript(
 		'    try { return JSON.stringify(arg, null, 2); } catch { return String(arg); }',
 		'  }',
 		'  return String(arg);',
+		'}',
+		'function formatVar(val) {',
+		'  if (val === null) return { value: "null", type: "null" };',
+		'  if (val === undefined) return { value: undefined, type: "undefined" };',
+		'  if (Array.isArray(val)) {',
+		'    try { return { value: JSON.stringify(val), type: "array" }; }',
+		'    catch { return { value: String(val), type: "array" }; }',
+		'  }',
+		'  const t = typeof val;',
+		'  if (t === "string") return { value: val, type: "string" };',
+		'  if (t === "number") return { value: val, type: "number" };',
+		'  if (t === "boolean") return { value: val ? "true" : "false", type: "boolean" };',
+		'  if (t === "function") return { value: "[Função]", type: "function" };',
+		'  if (t === "object") {',
+		'    try { return { value: JSON.stringify(val), type: "object" }; }',
+		'    catch { return { value: String(val), type: "object" }; }',
+		'  }',
+		'  return { value: String(val), type: t };',
 		'}',
 		'console.log = (...args) => { self.postMessage({ id: ' +
 			id +
@@ -160,12 +209,28 @@ export function buildWorkerScript(
 			', type: "output", text: "[ERRO] " + args.map(formatArg).join(" ") }); };',
 		'let __promptCounter = 0;',
 		'const __pendingPrompts = new Map();',
+		'let __stepResolver = null;',
+		'let __isStepMode = ' + (isStepMode ? 'true' : 'false') + ';',
+		'let __latestVariables = {};',
 		'self.onmessage = (e) => {',
 		'  if (e.data && e.data.type === "prompt_reply") {',
 		'    const resolver = __pendingPrompts.get(e.data.promptId);',
 		'    if (resolver) {',
 		'      __pendingPrompts.delete(e.data.promptId);',
 		'      resolver(e.data.value !== undefined ? String(e.data.value) : "");',
+		'    }',
+		'  } else if (e.data && e.data.type === "step_next") {',
+		'    if (__stepResolver) {',
+		'      const r = __stepResolver;',
+		'      __stepResolver = null;',
+		'      r();',
+		'    }',
+		'  } else if (e.data && e.data.type === "step_continue") {',
+		'    __isStepMode = false;',
+		'    if (__stepResolver) {',
+		'      const r = __stepResolver;',
+		'      __stepResolver = null;',
+		'      r();',
 		'    }',
 		'  }',
 		'};',
@@ -179,6 +244,26 @@ export function buildWorkerScript(
 		'  });',
 		'}',
 		'const prompt = __crocode_prompt;',
+		'async function __crocode_step(line, rawVars) {',
+		'  const formatted = {};',
+		'  for (const k of Object.keys(rawVars)) {',
+		'    formatted[k] = formatVar(rawVars[k]);',
+		'  }',
+		'  __latestVariables = formatted;',
+		'  if (__isStepMode && line > 0) {',
+		'    self.postMessage({ id: ' + id + ', type: "step", line, variables: formatted });',
+		'    await new Promise((resolve) => {',
+		'      __stepResolver = resolve;',
+		'    });',
+		'  } else if (line === 0) {',
+		'    self.postMessage({ id: ' + id + ', type: "variables", variables: formatted });',
+		'  }',
+		'}',
+		'function __crocode_record_vars(rawVars) {',
+		'  for (const k of Object.keys(rawVars)) {',
+		'    __latestVariables[k] = formatVar(rawVars[k]);',
+		'  }',
+		'}',
 		'(async () => {'
 	];
 
@@ -187,7 +272,7 @@ export function buildWorkerScript(
 		'  if (result !== undefined) {',
 		'    self.postMessage({ id: ' + id + ', type: "output", text: "<- " + formatArg(result) });',
 		'  }',
-		'  self.postMessage({ id: ' + id + ', type: "done" });',
+		'  self.postMessage({ id: ' + id + ', type: "done", variables: __latestVariables });',
 		'}).catch((err) => {',
 		'  const message = err instanceof Error ? err.message : String(err);',
 		'  let line = 0;',
@@ -220,6 +305,31 @@ export class JavaScriptRunnerSession {
 	private activeRunId = 0;
 	private isStopped = false;
 	private onStopSettler: ((result: JavaScriptRunResult) => void) | null = null;
+	private nodeStepResolver: (() => void) | null = null;
+	private nodeIsStepMode = false;
+
+	step(): void {
+		if (this.worker) {
+			this.worker.postMessage({ type: 'step_next' });
+		} else if (this.nodeStepResolver) {
+			const r = this.nodeStepResolver;
+			this.nodeStepResolver = null;
+			r();
+		}
+	}
+
+	continue(): void {
+		if (this.worker) {
+			this.worker.postMessage({ type: 'step_continue' });
+		} else {
+			this.nodeIsStepMode = false;
+			if (this.nodeStepResolver) {
+				const r = this.nodeStepResolver;
+				this.nodeStepResolver = null;
+				r();
+			}
+		}
+	}
 
 	stop(): void {
 		this.isStopped = true;
@@ -235,6 +345,11 @@ export class JavaScriptRunnerSession {
 			URL.revokeObjectURL(this.workerUrl);
 			this.workerUrl = null;
 		}
+		if (this.nodeStepResolver) {
+			const r = this.nodeStepResolver;
+			this.nodeStepResolver = null;
+			r();
+		}
 		if (this.onStopSettler) {
 			const settler = this.onStopSettler;
 			this.onStopSettler = null;
@@ -247,6 +362,7 @@ export class JavaScriptRunnerSession {
 		this.isStopped = false;
 		const runId = ++this.activeRunId;
 		const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+		const isStepMode = options.isStepMode ?? false;
 		const outputs: string[] = [];
 
 		return new Promise<JavaScriptRunResult>((resolve) => {
@@ -255,11 +371,23 @@ export class JavaScriptRunnerSession {
 			const finish = (result: JavaScriptRunResult) => {
 				if (settled) return;
 				settled = true;
-				this.onStopSettler = null;
-				this.stop();
+				if (this.timeoutTimer) {
+					clearTimeout(this.timeoutTimer);
+					this.timeoutTimer = null;
+				}
+				if (this.activeRunId === runId) {
+					if (this.worker) {
+						this.worker.terminate();
+						this.worker = null;
+					}
+					if (this.workerUrl) {
+						URL.revokeObjectURL(this.workerUrl);
+						this.workerUrl = null;
+					}
+				}
 				if (result.error) {
 					options.onError?.(result.error);
-				} else if (!result.stopped) {
+				} else {
 					options.onSuccess?.();
 				}
 				resolve(result);
@@ -295,7 +423,7 @@ export class JavaScriptRunnerSession {
 			// Handle browser Web Worker execution
 			if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
 				try {
-					const { script, headerLineCount } = buildWorkerScript(code, runId);
+					const { script, headerLineCount } = buildWorkerScript(code, runId, isStepMode);
 					const blob = new Blob([script], { type: 'application/javascript' });
 					this.workerUrl = URL.createObjectURL(blob);
 					this.worker = new Worker(this.workerUrl);
@@ -307,8 +435,15 @@ export class JavaScriptRunnerSession {
 						const data = e.data;
 						if (data.type === 'output') {
 							handleOutput(data.text);
+						} else if (data.type === 'step') {
+							if (this.timeoutTimer) {
+								clearTimeout(this.timeoutTimer);
+								this.timeoutTimer = null;
+							}
+							options.onStep?.(data.line, data.variables || {});
+						} else if (data.type === 'variables') {
+							options.onVariables?.(data.variables || {});
 						} else if (data.type === 'prompt') {
-							// Pause timeout while waiting for user interaction
 							if (this.timeoutTimer) {
 								clearTimeout(this.timeoutTimer);
 								this.timeoutTimer = null;
@@ -332,7 +467,10 @@ export class JavaScriptRunnerSession {
 								});
 							}
 						} else if (data.type === 'done') {
-							finish({ outputs, error: null });
+							if (data.variables) {
+								options.onVariables?.(data.variables);
+							}
+							finish({ outputs, error: null, variables: data.variables });
 						} else if (data.type === 'error') {
 							const formatted = formatJsExecutionError(data.message, code);
 							if (data.line && data.line > 0) {
@@ -408,7 +546,7 @@ export class JavaScriptRunnerSession {
 			resetTimeout();
 
 			try {
-				const transformed = transformJsForPrompt(code);
+				const transformed = instrumentJsCode(code);
 				const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 				const promptFn = (msg?: unknown) => {
 					if (this.isStopped) return Promise.resolve('');
@@ -431,15 +569,53 @@ export class JavaScriptRunnerSession {
 					});
 				};
 
-				const userFn = new AsyncFunction('__crocode_prompt', 'prompt', transformed);
-				userFn(promptFn, promptFn)
+				this.nodeIsStepMode = isStepMode;
+				let nodeLatestVariables: Record<string, { value: unknown; type: string }> = {};
+
+				const stepFn = async (line: number, rawVars: Record<string, unknown>) => {
+					if (this.isStopped) return;
+					const formatted: Record<string, { value: unknown; type: string }> = {};
+					for (const k of Object.keys(rawVars)) {
+						formatted[k] = formatVar(rawVars[k]);
+					}
+					nodeLatestVariables = formatted;
+					if (this.nodeIsStepMode && line > 0) {
+						if (this.timeoutTimer) {
+							clearTimeout(this.timeoutTimer);
+							this.timeoutTimer = null;
+						}
+						options.onStep?.(line, formatted);
+						await new Promise<void>((res) => {
+							this.nodeStepResolver = res;
+						});
+						resetTimeout();
+					} else if (line === 0) {
+						options.onVariables?.(formatted);
+					}
+				};
+
+				const recordFn = (rawVars: Record<string, unknown>) => {
+					for (const k of Object.keys(rawVars)) {
+						nodeLatestVariables[k] = formatVar(rawVars[k]);
+					}
+				};
+
+				const userFn = new AsyncFunction(
+					'__crocode_prompt',
+					'prompt',
+					'__crocode_step',
+					'__crocode_record_vars',
+					transformed
+				);
+				userFn(promptFn, promptFn, stepFn, recordFn)
 					.then((result: unknown) => {
 						restoreConsole();
 						if (result !== undefined) {
 							const text = `<- ${formatArg(result)}`;
 							handleOutput(text);
 						}
-						finish({ outputs: capturedOutputs, error: null });
+						options.onVariables?.(nodeLatestVariables);
+						finish({ outputs: capturedOutputs, error: null, variables: nodeLatestVariables });
 					})
 					.catch((err: unknown) => {
 						restoreConsole();

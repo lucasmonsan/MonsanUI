@@ -37,7 +37,7 @@
 		"test:propagation": "node --check scripts/propagate-monsan-ui.mjs && node tests/propagate-monsan-ui.test.mjs",
 		"test:browser-compat": "node scripts/check-browser-compat.mjs",
 		"format": "prettier --write .",
-		"test": "pnpm lint && pnpm typecheck && pnpm run test:browser-compat && pnpm run test:standards && pnpm run test:defaults && pnpm run test:tooling && pnpm run test:propagation && pnpm build && pnpm run build:package && pnpm run lint:package && node tests/portugol.test.mjs && node --test tests/javascript-runner.test.mjs",
+		"test": "pnpm lint && pnpm typecheck && pnpm run test:browser-compat && pnpm run test:standards && pnpm run test:defaults && pnpm run test:tooling && pnpm run test:propagation && pnpm build && pnpm run build:package && pnpm run lint:package && node tests/portugol.test.mjs && node --test tests/javascript-runner.test.mjs && node --test tests/javascript-reference.test.mjs",
 		"test:latest": "pnpm update && pnpm test"
 	},
 	"files": [
