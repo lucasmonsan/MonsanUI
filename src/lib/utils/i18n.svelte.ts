@@ -230,6 +230,12 @@ class I18n {
 				videoTitle: 'Vídeo',
 				title: 'Visualização de Mídia',
 				notSupportedMessage: 'Tipo de mídia não suportado'
+			},
+			pullToRefresh: {
+				pull: 'Puxe para atualizar',
+				release: 'Solte para atualizar',
+				refreshing: 'Atualizando...',
+				upToDate: 'Tudo atualizado'
 			}
 		},
 		en: {
@@ -460,6 +466,12 @@ class I18n {
 				videoTitle: 'Video',
 				title: 'Media Preview',
 				notSupportedMessage: 'Media type not supported'
+			},
+			pullToRefresh: {
+				pull: 'Pull to refresh',
+				release: 'Release to refresh',
+				refreshing: 'Refreshing...',
+				upToDate: 'Up to date'
 			}
 		},
 		es: {
@@ -691,6 +703,12 @@ class I18n {
 				videoTitle: 'Video',
 				title: 'Vista previa de medios',
 				notSupportedMessage: 'Tipo de medio no soportado'
+			},
+			pullToRefresh: {
+				pull: 'Desliza para actualizar',
+				release: 'Suelta para actualizar',
+				refreshing: 'Actualizando...',
+				upToDate: 'Todo actualizado'
 			}
 		}
 	});

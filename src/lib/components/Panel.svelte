@@ -186,12 +186,14 @@
 
 	.monsan-panel.has-accent {
 		box-shadow:
-			inset 5px 0 0 var(--panel-accent),
+			inset 4px 0 0 var(--panel-accent),
 			var(--shadow-sm);
+		padding-left: calc(var(--panel-padding) + 2px);
 	}
 
 	.monsan-panel.has-accent.no-shadow {
-		box-shadow: inset 5px 0 0 var(--panel-accent);
+		box-shadow: inset 4px 0 0 var(--panel-accent);
+		padding-left: calc(var(--panel-padding) + 2px);
 	}
 
 	.monsan-panel.has-custom-surface {
