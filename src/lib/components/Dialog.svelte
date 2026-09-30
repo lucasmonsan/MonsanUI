@@ -381,8 +381,23 @@
 	}
 
 	@media (max-width: 640px) {
+		.dialog-wrapper {
+			align-items: flex-end;
+			justify-content: center;
+			padding: var(--space-sm);
+			padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom, 0px));
+		}
+
 		.modal-container {
 			width: calc(100% - var(--space-sm) * 2);
+			margin: 0;
+			max-height: min(92dvh, calc(var(--dialog-visual-height, 100dvh) - var(--space-sm) * 2));
+		}
+
+		.modal-content {
+			-webkit-overflow-scrolling: touch;
+			overscroll-behavior: contain;
+			scroll-padding-bottom: var(--space-xl, 32px);
 		}
 	}
 
@@ -594,12 +609,6 @@
 		.modal-container.anim-fade.closing,
 		.modal-container.anim-scale.closing {
 			animation-duration: 0.01ms;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.dialog-wrapper {
-			padding: var(--space-md);
 		}
 	}
 </style>
