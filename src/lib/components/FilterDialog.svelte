@@ -189,6 +189,11 @@
 		flex-wrap: nowrap;
 	}
 
+	.filter-dialog-primary-actions {
+		justify-content: flex-end;
+		margin-left: auto;
+	}
+
 	@media (max-width: 480px) {
 		.monsan-filter-dialog-trigger {
 			align-items: flex-start;
@@ -200,9 +205,15 @@
 			flex-direction: column;
 		}
 
-		.filter-dialog-primary-actions {
+		.filter-dialog-footer:not(.compact-actions) .filter-dialog-primary-actions {
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
+			width: 100%;
+			margin-left: 0;
+		}
+
+		.filter-dialog-footer:not(.compact-actions) .filter-dialog-primary-actions:has(> :only-child) {
+			grid-template-columns: 1fr;
 		}
 	}
 
