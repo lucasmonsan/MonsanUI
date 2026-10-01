@@ -381,7 +381,7 @@
 		width: 20px;
 		height: 20px;
 		border: 2px solid var(--border-color);
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		flex-shrink: 0;
 	}
 
