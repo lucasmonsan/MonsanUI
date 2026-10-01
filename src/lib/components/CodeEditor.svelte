@@ -633,7 +633,7 @@
 		if (placeholder) return placeholder;
 		return language === 'javascript'
 			? '// Escreva seu código JavaScript aqui...'
-			: 'Escreva seu código Portugol aqui...';
+			: 'Escreva seu código Portugol / VisuAlg aqui...';
 	}
 
 	const codeEditorTheme = EditorView.theme(
