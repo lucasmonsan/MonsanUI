@@ -1,4 +1,6 @@
 :root {
+	color-scheme: only light;
+
 	/* Fluid Base */
 	--base: clamp(0.875rem, 1vw + 0.5rem, 1.125rem);
 	--control-height: calc(var(--base) * 2.25 + 2 * var(--border-width));
@@ -78,8 +80,14 @@
 	--ease-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Explicit Light Mode */
+:root[data-theme='light'] {
+	color-scheme: only light;
+}
+
 /* Dark Mode (Soft Premium Brown) */
 :root[data-theme='dark'] {
+	color-scheme: only dark;
 	--bg-primary: #2a2423;
 	--bg-secondary: #352e2d;
 	--text-primary: #fdfbf7;
