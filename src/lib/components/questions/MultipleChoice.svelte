@@ -122,7 +122,7 @@
 		box-shadow: var(--shadow-sm);
 		transition:
 			transform 0.2s ease,
-			box-shadow 0.2s ease,
+			filter 0.2s ease,
 			background-color 0.2s ease,
 			border-color 0.2s ease,
 			color 0.2s ease;
@@ -133,8 +133,10 @@
 	.option-btn:hover:not(.selected):not(:disabled) {
 		background: var(--bg-secondary);
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
+	}
+
+	.option-btn:active:not(:disabled) {
+		transform: scale(0.98);
 	}
 
 	.option-btn.selected {
@@ -144,8 +146,7 @@
 	}
 
 	.option-btn.selected:hover:not(:disabled) {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--text-primary);
+		filter: brightness(1.06);
 	}
 
 	.checkbox-square {

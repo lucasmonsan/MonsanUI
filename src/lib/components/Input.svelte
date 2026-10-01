@@ -207,10 +207,7 @@
 		width: 100%;
 		max-width: 100%;
 		box-shadow: var(--shadow-sm);
-		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
-			border-color 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 	}
 
 	.monsan-input.size-sm {
@@ -222,13 +219,10 @@
 	.monsan-input:focus:not(.variant-unstyled) {
 		outline: none;
 		border-color: var(--accent-primary);
-		box-shadow: 3px 3px 0px var(--accent-primary);
-		transform: translate(-1px, -1px);
 	}
 
 	.monsan-input[aria-invalid='true']:not(.variant-unstyled) {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.monsan-input.variant-title {

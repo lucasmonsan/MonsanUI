@@ -273,27 +273,19 @@
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
-		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
-			border-color 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 	}
 
 	.searchbar-wrapper:hover:not(.disabled) {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.searchbar-wrapper.focused:not(.disabled) {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.searchbar-wrapper.invalid {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.searchbar-wrapper.disabled {

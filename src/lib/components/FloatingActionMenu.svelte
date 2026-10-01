@@ -168,6 +168,7 @@
 		transition:
 			transform 0.2s var(--ease-out),
 			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			background-color 0.1s var(--ease-out);
 	}
 
@@ -176,11 +177,15 @@
 	}
 
 	.floating-action-trigger:hover:not(:disabled) {
-		box-shadow: 3px 3px 0 var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.floating-action-trigger:active:not(:disabled) {
-		box-shadow: none;
+		transform: scale(0.95);
+	}
+
+	.is-open .floating-action-trigger:active:not(:disabled) {
+		transform: rotate(45deg) scale(0.95);
 	}
 
 	.floating-action-trigger:focus-visible,
@@ -237,6 +242,7 @@
 		transition:
 			transform 0.14s var(--ease-out),
 			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			background-color 0.1s var(--ease-out);
 	}
 
@@ -282,13 +288,11 @@
 	}
 
 	.floating-action-item:hover:not(:disabled) {
-		transform: translate(-1px, calc(var(--item-offset-y) - 1px));
-		box-shadow: 3px 3px 0 var(--text-primary);
+		filter: brightness(1.06);
 	}
 
 	.floating-action-item:active:not(:disabled) {
-		transform: translate(2px, calc(var(--item-offset-y) + 2px));
-		box-shadow: none;
+		transform: translateY(var(--item-offset-y)) scale(0.96);
 	}
 
 	.is-closing .floating-action-item {

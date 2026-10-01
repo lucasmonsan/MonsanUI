@@ -77,7 +77,7 @@
 		box-shadow: var(--shadow-sm);
 		transition:
 			transform var(--duration-fast) var(--ease-out),
-			box-shadow var(--duration-fast) var(--ease-out);
+			filter var(--duration-fast) var(--ease-out);
 		box-sizing: border-box;
 		text-decoration: none;
 		white-space: nowrap;
@@ -168,13 +168,11 @@
 	}
 
 	.is-interactive:hover:not(:disabled) {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0 var(--text-primary);
+		filter: brightness(1.06);
 	}
 
 	.is-interactive:active:not(:disabled) {
-		transform: translate(2px, 2px);
-		box-shadow: none;
+		transform: scale(0.98);
 	}
 
 	.is-interactive:focus-visible {

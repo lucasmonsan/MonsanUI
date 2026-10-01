@@ -75,6 +75,7 @@
 			box-shadow 0.1s var(--ease-out),
 			background-color 0.1s var(--ease-out),
 			border-color 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			color 0.1s var(--ease-out);
 	}
 
@@ -161,13 +162,11 @@
 	}
 
 	.monsan-icon-button:hover:not(:disabled) {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0 var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.monsan-icon-button:active:not(:disabled) {
-		transform: translate(2px, 2px);
-		box-shadow: none;
+		transform: scale(0.96);
 	}
 
 	.monsan-icon-button:focus-visible {
@@ -189,16 +188,13 @@
 	.size-sm {
 		width: calc(var(--control-height) * 0.8);
 		height: calc(var(--control-height) * 0.8);
-		box-shadow: 2px 2px 0 var(--text-primary);
 	}
 
 	.size-sm:hover:not(:disabled) {
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0 var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.size-sm:active:not(:disabled) {
-		transform: translate(1px, 1px);
-		box-shadow: none;
+		transform: scale(0.96);
 	}
 </style>

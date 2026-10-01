@@ -372,6 +372,7 @@
 		transition:
 			transform 0.1s var(--ease-out),
 			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			background-color 0.15s var(--ease-out);
 		box-shadow: var(--shadow-sm);
 		display: inline-flex;
@@ -401,13 +402,11 @@
 	}
 
 	.monsan-tab-item:hover:not(.active) {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--text-primary);
+		filter: brightness(1.06);
 	}
 
 	.monsan-tab-item:active:not(.active) {
-		transform: translate(2px, 2px);
-		box-shadow: none;
+		transform: scale(0.98);
 	}
 
 	.monsan-tab-item:focus-visible {
@@ -512,13 +511,10 @@
 
 	.monsan-tabs-nav-btn:hover {
 		background-color: var(--accent-hover);
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--text-primary);
 	}
 
 	.monsan-tabs-nav-btn:active {
-		transform: translate(1px, 1px);
-		box-shadow: none;
+		transform: scale(0.95);
 	}
 
 	.monsan-tabs-nav-btn.is-right :global(svg) {

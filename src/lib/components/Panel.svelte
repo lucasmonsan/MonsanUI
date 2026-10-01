@@ -174,6 +174,7 @@
 		box-sizing: border-box;
 		transition:
 			transform 0.2s var(--ease-out),
+			filter 0.2s var(--ease-out),
 			box-shadow 0.2s var(--ease-out),
 			background-color 0.2s var(--ease-out);
 	}
@@ -283,12 +284,10 @@
 		cursor: pointer;
 	}
 	.is-interactive:not(.flat-interactive):hover {
-		transform: translate(-3px, -3px);
-		box-shadow: var(--shadow-md);
+		filter: brightness(1.03);
 	}
 	.is-interactive:not(.flat-interactive):active {
-		transform: translate(1px, 1px);
-		box-shadow: var(--shadow-xs);
+		transform: scale(0.99);
 	}
 	.monsan-panel.no-shadow {
 		box-shadow: none !important;
@@ -296,9 +295,7 @@
 	.monsan-panel.selected {
 		outline: 3px solid var(--text-primary);
 		outline-offset: 2px;
-		box-shadow:
-			inset 0 0 0 3px var(--bg-primary),
-			var(--shadow-md);
+		box-shadow: inset 0 0 0 3px var(--bg-primary);
 	}
 	.monsan-panel.muted {
 		/* Keep selectable text readable while reducing decorative emphasis. */

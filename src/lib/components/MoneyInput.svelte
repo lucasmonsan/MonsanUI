@@ -214,14 +214,11 @@
 		border-radius: var(--radius-md);
 		background: var(--bg-primary);
 		box-shadow: var(--shadow-sm);
-		transition:
-			border-color 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 	}
 
 	.money-input:focus-within {
 		border-color: var(--accent-primary);
-		box-shadow: 3px 3px 0 var(--accent-primary);
 	}
 
 	.currency {
