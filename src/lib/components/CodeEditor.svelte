@@ -725,51 +725,65 @@
 		{ dark: false }
 	);
 
+	function getStructureGuidePath(
+		x: number,
+		startY: number,
+		endY: number,
+		connectStart: boolean,
+		connectEnd: boolean
+	) {
+		const connectorLength = 5;
+		const segments = [`M ${x} ${startY}`, `L ${x} ${endY}`];
+		if (connectStart) segments.push(`M ${x} ${startY} L ${x + connectorLength} ${startY}`);
+		if (connectEnd) segments.push(`M ${x} ${endY} L ${x + connectorLength} ${endY}`);
+		return segments.join(' ');
+	}
+
 	function renderStructureGuides() {
-		if (!view || language !== 'portugol') {
+		if (!view || !editorContainer || language !== 'portugol') {
 			structureGuidePaths = [];
 			return;
 		}
 
-		const scroller = view.scrollDOM;
-		const scrollerRect = scroller.getBoundingClientRect();
-		structureGuideOverlaySize = {
-			width: Math.max(scroller.scrollWidth, scroller.clientWidth),
-			height: Math.max(scroller.scrollHeight, scroller.clientHeight)
-		};
-
-		const guides = getPortugolStructureGuides(view.state.doc.toString());
+		const document = view.state.doc;
+		const viewportStart = document.lineAt(view.viewport.from).number;
+		const viewportEnd = document.lineAt(view.viewport.to).number;
+		const containerRect = editorContainer.getBoundingClientRect();
+		const contentRect = view.contentDOM.getBoundingClientRect();
 		const nextPaths: Array<{ key: string; d: string }> = [];
 
-		for (const guide of guides) {
-			try {
-				const startLine = view.state.doc.line(guide.startLine);
-				const endLine = view.state.doc.line(guide.endLine);
-				const startCoords = view.coordsAtPos(startLine.from);
-				const endCoords = view.coordsAtPos(endLine.from);
-				if (!startCoords || !endCoords) continue;
+		for (const guide of getPortugolStructureGuides(document.toString())) {
+			if (guide.endLine < viewportStart || guide.startLine > viewportEnd) continue;
 
-				const charWidth = 8.4;
-				const indentX =
-					startCoords.left -
-					scrollerRect.left +
-					scroller.scrollLeft +
-					guide.indentColumns * charWidth +
-					4;
-				const startY = startCoords.bottom - scrollerRect.top + scroller.scrollTop;
-				const endY = endCoords.top - scrollerRect.top + scroller.scrollTop;
+			const visibleStart = Math.max(guide.startLine, viewportStart);
+			const visibleEnd = Math.min(guide.endLine, viewportEnd);
+			const startRect = view.coordsAtPos(document.line(visibleStart).from);
+			const endRect = view.coordsAtPos(document.line(visibleEnd).from);
+			if (!startRect || !endRect) continue;
 
-				if (endY > startY + 4) {
-					nextPaths.push({
-						key: `${guide.startLine}:${guide.endLine}:${guide.indentColumns}`,
-						d: `M ${indentX} ${startY} L ${indentX} ${endY}`
-					});
-				}
-			} catch {
-				// Ignore coordinates error during rapid editing
+			const x =
+				contentRect.left -
+				containerRect.left +
+				guide.indentColumns * view.defaultCharacterWidth -
+				2;
+			const startY = (startRect.top + startRect.bottom) / 2 - containerRect.top;
+			const endY = (endRect.top + endRect.bottom) / 2 - containerRect.top;
+
+			if (endY > startY + 4) {
+				nextPaths.push({
+					key: `${guide.type}-${guide.startLine}-${guide.endLine}`,
+					d: getStructureGuidePath(
+						x,
+						startY,
+						endY,
+						visibleStart === guide.startLine,
+						visibleEnd === guide.endLine
+					)
+				});
 			}
 		}
 
+		structureGuideOverlaySize = { width: containerRect.width, height: containerRect.height };
 		structureGuidePaths = nextPaths;
 	}
 
@@ -929,6 +943,7 @@
 				effects: highlightEffect.of({ activeLine, errorLine })
 			});
 			view.scrollDOM.addEventListener('scroll', queueStructureGuideRender);
+			window.addEventListener('resize', queueStructureGuideRender);
 			queueStructureGuideRender();
 		}
 	});
@@ -938,6 +953,9 @@
 			window.cancelAnimationFrame(structureGuideFrame);
 		}
 		view?.scrollDOM.removeEventListener('scroll', queueStructureGuideRender);
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('resize', queueStructureGuideRender);
+		}
 		if (view) {
 			view.destroy();
 		}
