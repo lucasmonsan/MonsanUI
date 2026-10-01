@@ -8,6 +8,7 @@
 		gutter,
 		GutterMarker,
 		Decoration,
+		ViewPlugin,
 		placeholder as cmPlaceholder,
 		ViewUpdate,
 		highlightActiveLine
@@ -34,7 +35,8 @@
 		foldEffect,
 		unfoldEffect,
 		foldedRanges,
-		codeFolding
+		codeFolding,
+		syntaxTree
 	} from '@codemirror/language';
 	import { javascript } from '@codemirror/lang-javascript';
 	import { tags as t } from '@lezer/highlight';
@@ -535,9 +537,91 @@
 		return false;
 	}
 
+	const jsBuiltinKeywordDeco = Decoration.mark({ class: 'cm-js-builtin-keyword' });
+	const jsBuiltinMethodDeco = Decoration.mark({ class: 'cm-js-builtin-method' });
+
+	const jsBuiltinKeywords = new Set([
+		'console',
+		'prompt',
+		'alert',
+		'confirm',
+		'Math',
+		'Number',
+		'String',
+		'Boolean',
+		'parseInt',
+		'parseFloat',
+		'Array',
+		'Object',
+		'NaN',
+		'Infinity'
+	]);
+
+	const jsBuiltinMethods = new Set([
+		'log',
+		'warn',
+		'error',
+		'info',
+		'clear',
+		'floor',
+		'round',
+		'ceil',
+		'abs',
+		'random',
+		'sqrt',
+		'pow',
+		'min',
+		'max',
+		'trunc'
+	]);
+
+	function buildJsBuiltinsDecorations(view: EditorView): RangeSet<Decoration> {
+		const builder = new RangeSetBuilder<Decoration>();
+		const tree = syntaxTree(view.state);
+		const ranges =
+			view.visibleRanges.length > 0 ? view.visibleRanges : [{ from: 0, to: view.state.doc.length }];
+		for (const { from, to } of ranges) {
+			tree.iterate({
+				from,
+				to,
+				enter: (node) => {
+					if (node.name === 'VariableName') {
+						const text = view.state.sliceDoc(node.from, node.to);
+						if (jsBuiltinKeywords.has(text)) {
+							builder.add(node.from, node.to, jsBuiltinKeywordDeco);
+						}
+					} else if (node.name === 'PropertyName') {
+						const text = view.state.sliceDoc(node.from, node.to);
+						if (jsBuiltinMethods.has(text)) {
+							builder.add(node.from, node.to, jsBuiltinMethodDeco);
+						}
+					}
+				}
+			});
+		}
+		return builder.finish();
+	}
+
+	const jsBuiltinsHighlighter = ViewPlugin.fromClass(
+		class {
+			decorations: RangeSet<Decoration>;
+			constructor(view: EditorView) {
+				this.decorations = buildJsBuiltinsDecorations(view);
+			}
+			update(update: ViewUpdate) {
+				if (update.docChanged || update.viewportChanged) {
+					this.decorations = buildJsBuiltinsDecorations(update.view);
+				}
+			}
+		},
+		{
+			decorations: (v) => v.decorations
+		}
+	);
+
 	function getLanguageExtension(lang: 'portugol' | 'javascript') {
 		if (lang === 'javascript') {
-			return [javascript()];
+			return [javascript(), jsBuiltinsHighlighter];
 		}
 		return [
 			portugolLanguage,
@@ -628,6 +712,14 @@
 			},
 			'.cm-cursor, .cm-dropCursor, .cm-content .cm-cursor, &.cm-focused .cm-cursor': {
 				borderLeftColor: `${PORTUGOL_EDITOR_CARET_COLOR} !important`
+			},
+			'.cm-js-builtin-keyword': {
+				color: 'var(--accent-primary)',
+				fontWeight: 'bold'
+			},
+			'.cm-js-builtin-method': {
+				color: 'var(--accent-primary)',
+				fontWeight: '600'
 			}
 		},
 		{ dark: false }
