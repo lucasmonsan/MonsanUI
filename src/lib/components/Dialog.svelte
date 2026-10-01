@@ -388,6 +388,11 @@
 			padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom, 0px));
 		}
 
+		.dialog-wrapper:has(input:focus, textarea:focus, select:focus, [contenteditable]:focus) {
+			align-items: flex-start;
+			padding-top: max(var(--space-md), env(safe-area-inset-top, 0px));
+		}
+
 		.modal-container {
 			width: calc(100% - var(--space-sm) * 2);
 			margin: 0;
