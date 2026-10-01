@@ -46,8 +46,8 @@
 	.pattern-grid {
 		background-size: 40px 40px;
 		background-image:
-			linear-gradient(to right, var(--grid-color) 1.5px, transparent 1.5px),
-			linear-gradient(to bottom, var(--grid-color) 1.5px, transparent 1.5px);
+			linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
 	}
 
 	.pattern-dots {
@@ -76,12 +76,12 @@
 
 	.pattern-lines {
 		background-size: 40px 40px;
-		background-image: linear-gradient(to right, var(--grid-color) 1.5px, transparent 1.5px);
+		background-image: linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
 	}
 
 	.pattern-horizontal {
 		background-size: 40px 40px;
-		background-image: linear-gradient(to bottom, var(--grid-color) 1.5px, transparent 1.5px);
+		background-image: linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
 	}
 
 	/* Animation toggling and directions mapping */
