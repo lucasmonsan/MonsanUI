@@ -69,12 +69,12 @@
 	--radius-full: 9999px;
 	--border-width: 2px;
 	--border-color: var(--text-primary);
-	--grid-color: rgba(45, 36, 34, 0.18);
+	--grid-color: transparent;
 
-	/* Hard Shadows */
-	--shadow-sm: 2px 2px 0px var(--text-primary);
-	--shadow-md: 4px 4px 0px var(--text-primary);
-	--shadow-lg: 6px 6px 0px var(--text-primary);
+	/* Flat Aesthetic (Clean Shadows) */
+	--shadow-sm: none;
+	--shadow-md: none;
+	--shadow-lg: none;
 
 	/* Transitions */
 	--ease-out: cubic-bezier(0.4, 0, 0.2, 1);
@@ -107,7 +107,7 @@
 	--folder-orange: #ff9e00;
 	--folder-red: #ff6b6b;
 	--border-color: var(--text-primary);
-	--grid-color: rgba(253, 251, 247, 0.15);
+	--grid-color: transparent;
 
 	/* Heatmap Rust Scale for Dark Mode */
 	--heatmap-0: #352e2d;
