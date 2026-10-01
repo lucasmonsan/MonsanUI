@@ -124,7 +124,7 @@
 	.monsan-checkbox-wrapper.size-sm .checkbox-box {
 		width: 18px;
 		height: 18px;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 	}
 
 	.check-icon {

@@ -150,7 +150,7 @@
 	}
 
 	.checkbox-square {
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		border: 3px solid var(--text-secondary);
 		display: flex;
 		align-items: center;
@@ -204,7 +204,7 @@
 	.options-list.size-sm .checkbox-square {
 		width: 16px;
 		height: 16px;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 	}
 	.options-list.size-sm .check-icon {
 		width: 10px;

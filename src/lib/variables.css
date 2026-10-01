@@ -63,9 +63,9 @@
 
 	/* Brutalist Structure */
 	--container-max-width: 1536px;
-	--radius-sm: 4px;
-	--radius-md: 6px;
-	--radius-lg: 8px;
+	--radius-sm: 2px;
+	--radius-md: 3px;
+	--radius-lg: 4px;
 	--radius-full: 9999px;
 	--border-width: 2px;
 	--border-color: rgba(45, 36, 34, 0.25);
