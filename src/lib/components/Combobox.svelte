@@ -197,7 +197,6 @@
 	}
 	.combobox-control.focused {
 		border-color: var(--accent-primary);
-		box-shadow: 3px 3px 0 var(--accent-primary);
 	}
 	.combobox-control.disabled {
 		opacity: 0.55;

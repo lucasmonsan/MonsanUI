@@ -115,10 +115,7 @@
 		width: 100%;
 		max-width: 100%;
 		box-shadow: var(--shadow-sm);
-		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
-			border-color 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 		resize: vertical;
 		box-sizing: border-box;
 		min-height: calc(var(--rows, 2) * 1.5em + var(--space-md) * 2 + (var(--border-width) * 2));
@@ -133,13 +130,10 @@
 	.monsan-textarea:focus {
 		outline: none;
 		border-color: var(--accent-primary);
-		box-shadow: 3px 3px 0px var(--accent-primary);
-		transform: translate(-1px, -1px);
 	}
 
 	.monsan-textarea[aria-invalid='true'] {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

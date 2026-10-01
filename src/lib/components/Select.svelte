@@ -240,9 +240,7 @@
 		font-family: inherit;
 		font-size: var(--text-sm);
 		box-shadow: var(--shadow-sm);
-		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 		cursor: pointer;
 		position: relative;
 		user-select: none;
@@ -253,8 +251,6 @@
 	.monsan-select-trigger:focus-visible:not(:disabled) {
 		outline: none;
 		border-color: var(--accent-primary);
-		box-shadow: 3px 3px 0px var(--accent-primary);
-		transform: translate(-1px, -1px);
 	}
 
 	.monsan-select-trigger:disabled {

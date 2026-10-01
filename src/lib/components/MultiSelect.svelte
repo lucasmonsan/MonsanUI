@@ -379,8 +379,6 @@
 	.monsan-multiselect-trigger:focus-visible:not(:disabled) {
 		outline: none;
 		border-color: var(--accent-primary);
-		box-shadow: 3px 3px 0px var(--accent-primary);
-		transform: translate(-1px, -1px);
 	}
 
 	.monsan-multiselect-trigger:disabled {

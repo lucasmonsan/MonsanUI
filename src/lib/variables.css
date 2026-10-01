@@ -63,18 +63,19 @@
 
 	/* Brutalist Structure */
 	--container-max-width: 1536px;
-	--radius-sm: 1px;
-	--radius-md: 2px;
-	--radius-lg: 4px;
+	--radius-sm: 4px;
+	--radius-md: 6px;
+	--radius-lg: 8px;
 	--radius-full: 9999px;
 	--border-width: 2px;
 	--border-color: rgba(45, 36, 34, 0.25);
 	--grid-color: transparent;
 
 	/* Flat Aesthetic (Clean Shadows) */
-	--shadow-sm: none;
-	--shadow-md: none;
-	--shadow-lg: none;
+	--shadow-xs: 0 0 0 0 transparent;
+	--shadow-sm: 0 0 0 0 transparent;
+	--shadow-md: 0 0 0 0 transparent;
+	--shadow-lg: 0 0 0 0 transparent;
 
 	/* Transitions */
 	--ease-out: cubic-bezier(0.4, 0, 0.2, 1);
