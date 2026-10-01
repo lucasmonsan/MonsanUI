@@ -160,7 +160,7 @@
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
 		background: var(--accent-primary);
-		color: var(--bg-primary);
+		color: #ffffff;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
