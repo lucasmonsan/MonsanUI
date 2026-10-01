@@ -194,7 +194,7 @@
 	}
 
 	.monsan-menu-item-actions :global(.monsan-button.size-sm.square:hover:not(:disabled)) {
-		box-shadow: 2px 2px 0 var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.align-left {

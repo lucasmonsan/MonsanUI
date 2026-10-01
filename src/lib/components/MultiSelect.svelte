@@ -476,7 +476,6 @@
 	.multiselect-search:focus-visible {
 		outline: none;
 		border-color: var(--accent-primary);
-		box-shadow: 2px 2px 0 var(--accent-primary);
 	}
 
 	.multiselect-empty {
@@ -495,7 +494,6 @@
 	.multiselect-option:focus-visible {
 		outline: none;
 		border-color: var(--accent-primary);
-		box-shadow: 2px 2px 0px var(--accent-primary);
 	}
 
 	.multiselect-option.selected {

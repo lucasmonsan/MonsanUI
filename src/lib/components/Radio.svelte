@@ -95,10 +95,7 @@
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
-		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
-			border-color 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 	}
 
 	.radio-inner-dot {
@@ -132,8 +129,6 @@
 
 	.monsan-radio-wrapper:hover:not(.disabled) .radio-circle {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.radio-circle.checked {
@@ -142,7 +137,6 @@
 
 	.monsan-radio-wrapper:hover:not(.disabled) .radio-circle.checked {
 		border-color: var(--border-color);
-		box-shadow: 3px 3px 0px var(--border-color);
 	}
 
 	input:focus-visible + .radio-circle {
@@ -152,7 +146,6 @@
 
 	.monsan-radio-wrapper.invalid .radio-circle {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.radio-label {

@@ -114,9 +114,7 @@
 		background: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
-		box-shadow:
-			2px 2px 0px var(--border-color),
-			0px 8px 24px rgba(0, 0, 0, 0.2);
+		box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
 		min-width: 280px;
 		max-width: 90vw;
 		pointer-events: auto;

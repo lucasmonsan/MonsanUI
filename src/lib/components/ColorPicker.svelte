@@ -366,13 +366,10 @@
 
 	.color-picker-trigger:hover:not(:disabled) {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.color-picker-trigger.invalid {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.color-picker-trigger:disabled {
@@ -456,18 +453,17 @@
 		box-shadow: var(--shadow-sm);
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			border-color 0.2s ease;
 	}
 
 	.preset-btn:hover {
-		transform: scale(1.08) translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--border-color);
+		transform: scale(1.08);
+		filter: brightness(1.1);
 	}
 
 	.preset-btn.active {
 		transform: scale(1.08);
-		box-shadow: 2px 2px 0px var(--accent-primary);
 		border-color: var(--accent-primary);
 	}
 
@@ -482,14 +478,18 @@
 		cursor: pointer;
 		text-align: center;
 		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out);
+			transform 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
+			background-color 0.2s var(--ease-out);
 	}
 
 	.custom-color-btn:hover {
 		background-color: var(--bg-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--border-color);
+		filter: brightness(1.08);
+	}
+
+	.custom-color-btn:active {
+		transform: scale(0.96);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

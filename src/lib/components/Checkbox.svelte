@@ -154,7 +154,6 @@
 
 	input[aria-invalid='true'] + .checkbox-box {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.checkbox-label {

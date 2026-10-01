@@ -72,15 +72,17 @@
 		text-align: left;
 		cursor: pointer;
 		transition:
-			transform 0.15s ease,
-			box-shadow 0.15s ease,
+			transform 0.15s var(--ease-out),
+			filter 0.15s var(--ease-out),
 			background-color 0.15s ease;
 	}
 
-	.monsan-choice-card:hover:not(:disabled),
-	.monsan-choice-card:focus-visible {
-		transform: translate(-2px, -2px);
-		box-shadow: var(--shadow-md);
+	.monsan-choice-card:hover:not(:disabled) {
+		filter: brightness(1.05);
+	}
+
+	.monsan-choice-card:active:not(:disabled) {
+		transform: scale(0.98);
 	}
 
 	.monsan-choice-card:focus-visible {

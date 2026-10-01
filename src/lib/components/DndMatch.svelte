@@ -623,7 +623,6 @@
 	.dnd-chip.selected {
 		outline: 3px solid var(--accent-primary);
 		outline-offset: 2px;
-		transform: translate(-1px, -1px);
 	}
 
 	.bucket-chip {

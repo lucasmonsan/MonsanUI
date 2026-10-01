@@ -116,18 +116,16 @@
 		cursor: pointer;
 		font: inherit;
 		transition:
-			transform 0.1s ease,
-			box-shadow 0.1s ease;
+			transform 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out);
 	}
 
 	button.monsan-avatar:hover:not(:disabled) {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0 var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	button.monsan-avatar:active:not(:disabled) {
-		transform: translate(2px, 2px);
-		box-shadow: none;
+		transform: scale(0.96);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

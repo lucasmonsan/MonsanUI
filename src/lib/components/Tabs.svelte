@@ -417,8 +417,6 @@
 	.monsan-tab-item.active {
 		background-color: var(--accent-primary);
 		color: var(--bg-primary);
-		transform: translate(2px, 2px);
-		box-shadow: none;
 	}
 
 	:global([data-theme='dark']) .monsan-tab-item.active {

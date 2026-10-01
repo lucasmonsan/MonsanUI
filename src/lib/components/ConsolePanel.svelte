@@ -184,7 +184,7 @@
 		width: 14px;
 		height: 14px;
 		border: var(--border-width) solid var(--border-color);
-		box-shadow: 1px 1px 0 var(--text-primary);
+		box-shadow: var(--shadow-sm);
 		background: var(--neutral);
 	}
 

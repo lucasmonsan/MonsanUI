@@ -283,21 +283,15 @@
 		box-shadow: var(--shadow-sm);
 		cursor: pointer;
 		color: var(--text-primary);
-		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
-			border-color 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 	}
 
 	.time-picker-trigger:hover:not(:disabled) {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.time-picker-trigger.invalid {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.time-picker-trigger:disabled {
@@ -412,13 +406,16 @@
 		text-align: center;
 		box-shadow: var(--shadow-sm);
 		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out);
+			transform 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out);
 	}
 
 	.confirm-time-btn:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--border-color);
+		filter: brightness(1.08);
+	}
+
+	.confirm-time-btn:active {
+		transform: scale(0.96);
 	}
 
 	.scrollbar-custom .column-list {

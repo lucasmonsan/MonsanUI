@@ -350,7 +350,6 @@
 	.select-option:focus-visible {
 		outline: none;
 		border-color: var(--accent-primary);
-		box-shadow: 2px 2px 0px var(--accent-primary);
 	}
 
 	.select-option.selected {

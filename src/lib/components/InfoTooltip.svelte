@@ -100,7 +100,7 @@
 		flex: 0 0 18px;
 		padding: 0;
 		border: var(--border-width) solid var(--border-color);
-		box-shadow: 1px 1px 0 var(--text-primary);
+		box-shadow: var(--shadow-sm);
 		background: var(--bg-secondary);
 		border-radius: var(--radius-sm);
 		font-size: 11px;
@@ -120,7 +120,7 @@
 	.info-trigger:not(.iconOnly):focus-visible {
 		color: var(--text-primary);
 		border-color: var(--text-primary);
-		box-shadow: 1.5px 1.5px 0 var(--text-primary);
+		filter: brightness(1.08);
 		outline: none;
 	}
 

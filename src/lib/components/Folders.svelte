@@ -489,21 +489,18 @@
 		box-shadow: var(--shadow-sm);
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			background-color 0.2s var(--ease-out);
 		color: var(--text-primary);
 	}
 
 	.folder-chip-all:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--text-primary);
+		filter: brightness(1.06);
 	}
 
 	.folder-chip-all.active {
 		background: var(--accent-primary);
 		color: var(--bg-primary);
-		box-shadow: none;
-		transform: translate(2px, 2px);
 	}
 
 	.folder-chip {
@@ -522,15 +519,14 @@
 		box-shadow: var(--shadow-sm);
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			background-color 0.2s var(--ease-out);
 		color: var(--text-primary);
 		position: relative;
 	}
 
 	.folder-chip:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--text-primary);
+		filter: brightness(1.06);
 	}
 
 	.folder-chip-text {
@@ -569,8 +565,6 @@
 	.folder-chip.active {
 		background: var(--accent-primary);
 		color: var(--bg-primary);
-		box-shadow: none;
-		transform: translate(2px, 2px);
 	}
 
 	.folder-chip.has-custom-color {
@@ -611,19 +605,18 @@
 		transition:
 			transform 0.1s var(--ease-out),
 			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			border-style 0.2s var(--ease-out);
 	}
 
 	.add-folder-chip:hover {
 		border-style: solid;
 		background: var(--bg-secondary);
-		box-shadow: 2px 2px 0px var(--text-primary);
-		transform: translate(-1px, -1px);
+		filter: brightness(1.06);
 	}
 
 	.add-folder-chip:active {
-		transform: translate(2px, 2px);
-		box-shadow: none;
+		transform: scale(0.96);
 	}
 
 	.folder-form {
@@ -663,21 +656,18 @@
 		opacity: 0.5;
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			opacity 0.2s ease;
 		box-shadow: var(--shadow-sm);
 	}
 
 	.color-btn:hover {
 		opacity: 0.8;
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.color-btn.selected {
 		opacity: 1;
-		box-shadow: none;
-		transform: translate(2px, 2px);
 		border-width: 3px;
 	}
 
