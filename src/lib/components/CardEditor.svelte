@@ -461,19 +461,17 @@
 		color: var(--text-primary);
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out);
+			filter 0.1s var(--ease-out);
 		box-shadow: var(--shadow-sm);
 		padding: 0;
 	}
 
 	.btn-icon:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.btn-icon:active {
-		transform: translate(1px, 1px);
-		box-shadow: none;
+		transform: scale(0.96);
 	}
 
 	.btn-icon.btn-delete {
@@ -483,7 +481,7 @@
 	.btn-icon.btn-delete:hover {
 		background: color-mix(in srgb, var(--error) 10%, var(--bg-primary));
 		border-color: var(--error);
-		box-shadow: 2px 2px 0px var(--error);
+		filter: brightness(1.08);
 	}
 
 	.inputs-stack {
@@ -538,19 +536,17 @@
 		color: var(--text-primary);
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out);
+			filter 0.1s var(--ease-out);
 		box-shadow: var(--shadow-sm);
 		padding: 0;
 	}
 
 	.btn-toggle-hint-icon:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.btn-toggle-hint-icon:active {
-		transform: translate(1px, 1px);
-		box-shadow: none;
+		transform: scale(0.96);
 	}
 
 	.hint-input-wrapper {

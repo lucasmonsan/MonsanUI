@@ -128,7 +128,6 @@
 	.monsan-icon-button.on-surface {
 		background: color-mix(in srgb, var(--monsan-surface-foreground) 12%, transparent);
 		border-color: var(--monsan-surface-foreground);
-		box-shadow: 2px 2px 0 var(--monsan-surface-foreground);
 		color: var(--monsan-surface-foreground);
 	}
 

@@ -6552,13 +6552,12 @@
 		font-size: var(--text-xs);
 		cursor: pointer;
 		font-weight: bold;
-		box-shadow: 1px 1px 0px var(--border-color);
-		transition: all 0.1s;
+		box-shadow: var(--shadow-sm);
+		transition: all 0.1s var(--ease-out);
 	}
 
 	.code-header button:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--border-color);
+		filter: brightness(1.08);
 	}
 
 	.code-container pre {
@@ -6670,15 +6669,12 @@
 
 	.filter-select-btn:hover {
 		background: var(--bg-secondary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--border-color);
+		filter: brightness(1.06);
 	}
 
 	.filter-select-btn.active {
 		background: var(--accent-primary);
 		color: var(--bg-primary);
-		transform: translate(1px, 1px);
-		box-shadow: 1px 1px 0px var(--border-color);
 	}
 
 	.card-content-front,
@@ -6709,21 +6705,17 @@
 	}
 
 	.icon-showcase-btn:hover {
-		transform: translate(-2px, -2px);
-		box-shadow: 3px 3px 0 var(--border-color);
+		filter: brightness(1.06);
 		background: var(--bg-secondary);
 	}
 
 	.icon-showcase-btn.active {
 		border-color: var(--accent-primary);
 		background: var(--bg-secondary);
-		box-shadow: 2px 2px 0 var(--accent-primary);
-		transform: translate(-1px, -1px);
 	}
 
 	.icon-showcase-btn.active:hover {
-		box-shadow: 3px 3px 0 var(--accent-primary);
-		transform: translate(-2px, -2px);
+		filter: brightness(1.06);
 	}
 
 	.icon-showcase-icon {

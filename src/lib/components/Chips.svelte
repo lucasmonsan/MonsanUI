@@ -156,28 +156,20 @@
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-sm);
 		cursor: text;
-		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
-			border-color 0.2s var(--ease-out);
+		transition: border-color 0.2s var(--ease-out);
 		font-family: var(--font-body);
 	}
 
 	.monsan-chips-input-container:hover:not(.disabled) {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.monsan-chips-input-container.focused:not(.disabled) {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.monsan-chips-input-container.invalid {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.monsan-chips-input-container.disabled {
@@ -207,15 +199,12 @@
 		font-size: var(--text-sm);
 		font-weight: bold;
 		color: var(--text-primary);
-		box-shadow: 1px 1px 0px var(--border-color);
-		transition:
-			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out);
+		box-shadow: var(--shadow-sm);
+		transition: filter 0.1s var(--ease-out);
 	}
 
 	.chip-item:hover {
-		transform: translate(-0.5px, -0.5px);
-		box-shadow: 1.5px 1.5px 0px var(--border-color);
+		filter: brightness(1.05);
 	}
 
 	.chip-text {

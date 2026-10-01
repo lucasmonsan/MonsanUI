@@ -234,11 +234,17 @@
 		background: var(--bg-primary);
 		color: var(--text-primary);
 		cursor: pointer;
+		transition:
+			transform 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out);
 	}
 
 	.carousel-control:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: var(--shadow-md);
+		filter: brightness(1.08);
+	}
+
+	.carousel-control:active {
+		transform: scale(0.96);
 	}
 
 	.carousel-control.next :global(svg) {

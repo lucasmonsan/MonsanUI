@@ -213,8 +213,6 @@
 		cursor: pointer;
 		color: var(--text-secondary);
 		transition:
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
 			border-color 0.2s var(--ease-out),
 			color 0.2s ease;
 	}
@@ -227,13 +225,10 @@
 	.datepicker-trigger:hover:not(:disabled) {
 		border-color: var(--accent-primary);
 		color: var(--text-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.datepicker-trigger.invalid {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.datepicker-trigger:disabled {

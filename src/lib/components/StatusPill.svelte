@@ -58,7 +58,7 @@
 		border-radius: var(--radius-sm);
 		background: color-mix(in srgb, var(--status-color) 12%, var(--bg-primary));
 		color: var(--text-primary);
-		box-shadow: 1px 1px 0 var(--text-primary);
+		box-shadow: var(--shadow-sm);
 		font-family: var(--font-display);
 		font-size: var(--text-xs);
 		font-weight: 800;

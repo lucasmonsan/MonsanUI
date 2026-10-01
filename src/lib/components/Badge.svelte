@@ -49,7 +49,7 @@
 		font-size: calc(var(--base) * 0.7);
 		font-weight: 800;
 		border: var(--border-width) solid var(--border-color);
-		box-shadow: 1px 1px 0px var(--text-primary);
+		box-shadow: var(--shadow-sm);
 		line-height: 1.1;
 		width: fit-content;
 		min-width: 0;
@@ -143,7 +143,7 @@
 	.monsan-badge.on-surface {
 		background: color-mix(in srgb, var(--monsan-surface-foreground) 16%, transparent);
 		border-color: var(--monsan-surface-foreground);
-		box-shadow: 1px 1px 0 var(--monsan-surface-foreground);
+		box-shadow: var(--shadow-sm);
 		color: var(--monsan-surface-foreground);
 	}
 </style>

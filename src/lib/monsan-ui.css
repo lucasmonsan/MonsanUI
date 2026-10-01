@@ -118,7 +118,7 @@ h1.hero-title {
 	text-transform: uppercase;
 }
 
-/* Neubrutalist Button Transitions & Defaults */
+/* Button Transitions & Defaults */
 button {
 	font-family: var(--font-body);
 	font-weight: 700;
@@ -128,14 +128,13 @@ button {
 	outline: none;
 	transition:
 		transform 0.1s var(--ease-out),
-		box-shadow 0.2s var(--ease-out),
+		filter 0.1s var(--ease-out),
 		background-color 0.2s var(--ease-out),
 		color 0.2s var(--ease-out);
 }
 
 button:active {
-	transform: translate(1px, 1px);
-	box-shadow: 0px 0px 0px var(--border-color);
+	transform: scale(0.98);
 }
 
 button:disabled {

@@ -402,28 +402,22 @@
 		padding: var(--space-lg);
 		transition:
 			transform 0.2s var(--ease-out),
-			box-shadow 0.2s var(--ease-out),
 			border-color 0.2s var(--ease-out),
 			background-color 0.2s var(--ease-out);
 	}
 
 	.monsan-file-dropzone:hover:not(.disabled) {
 		border-color: var(--accent-primary);
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 	}
 
 	.monsan-file-dropzone.dragover:not(.disabled) {
 		background-color: var(--bg-secondary);
 		border-style: solid;
 		border-color: var(--accent-primary);
-		transform: translate(-2px, -2px);
-		box-shadow: 4px 4px 0px var(--accent-primary);
 	}
 
 	.monsan-file-dropzone.invalid {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.monsan-file-dropzone.disabled {
@@ -570,15 +564,13 @@
 	}
 
 	.compact-btn:hover:not(.disabled):not(:disabled) {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 		border-color: var(--accent-primary);
 		color: var(--accent-primary);
+		filter: brightness(1.08);
 	}
 
 	.compact-btn:active:not(.disabled):not(:disabled) {
-		transform: translate(0, 0);
-		box-shadow: var(--shadow-sm);
+		transform: scale(0.96);
 	}
 
 	.compact-btn.disabled,
@@ -589,7 +581,6 @@
 
 	.monsan-file-compact.invalid .compact-btn {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.compact-file-label {
@@ -683,7 +674,6 @@
 
 	.overlay-hint.invalid {
 		border-color: var(--error);
-		box-shadow: 3px 3px 0px var(--error);
 	}
 
 	.overlay-hint-icon {
@@ -717,15 +707,13 @@
 	}
 
 	.overlay-browse-btn:hover:not(.disabled):not(:disabled) {
-		transform: translate(-1px, -1px);
-		box-shadow: 3px 3px 0px var(--accent-primary);
 		border-color: var(--accent-primary);
 		color: var(--accent-primary);
+		filter: brightness(1.08);
 	}
 
 	.overlay-browse-btn:active:not(.disabled):not(:disabled) {
-		transform: translate(0, 0);
-		box-shadow: var(--shadow-sm);
+		transform: scale(0.96);
 	}
 
 	.overlay-browse-btn.disabled,
@@ -765,7 +753,7 @@
 		background-color: var(--bg-primary);
 		border: 3px solid var(--accent-primary);
 		border-radius: var(--radius-lg);
-		box-shadow: 8px 8px 0px var(--accent-primary);
+		box-shadow: var(--shadow-lg);
 		min-width: 280px;
 		animation: overlayScaleIn 0.2s var(--ease-out);
 	}

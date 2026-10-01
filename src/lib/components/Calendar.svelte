@@ -649,8 +649,7 @@
 	.calendar-title-picker:hover .calendar-title {
 		background: var(--bg-secondary);
 		border-color: var(--border-color);
-		box-shadow: 2px 2px 0px var(--text-primary);
-		transform: translate(-1px, -1px);
+		filter: brightness(1.06);
 	}
 
 	.picker-icon {
@@ -741,13 +740,11 @@
 	}
 
 	.year-nav-btn:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.year-nav-btn:active {
-		transform: translate(1px, 1px);
-		box-shadow: none;
+		transform: scale(0.95);
 	}
 
 	.months-grid {
@@ -770,7 +767,7 @@
 		box-shadow: var(--shadow-sm);
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			background-color 0.1s var(--ease-out),
 			border-color 0.1s var(--ease-out),
 			color 0.1s var(--ease-out);
@@ -778,15 +775,12 @@
 	}
 
 	.month-btn:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--text-primary);
+		filter: brightness(1.06);
 	}
 
 	.month-btn.active {
 		background: var(--accent-primary);
 		color: var(--bg-primary);
-		box-shadow: none;
-		transform: translate(1px, 1px);
 	}
 
 	:global([data-theme='dark']) .month-btn.active {
@@ -821,13 +815,11 @@
 
 	.nav-btn:hover {
 		background: var(--bg-secondary);
-		transform: translate(-1px, -1px);
-		box-shadow: 2px 2px 0px var(--text-primary);
+		filter: brightness(1.08);
 	}
 
 	.nav-btn:active {
-		transform: translate(1px, 1px);
-		box-shadow: none;
+		transform: scale(0.95);
 	}
 
 	.flip-x {
@@ -899,7 +891,6 @@
 		background: var(--accent-primary) !important;
 		color: var(--bg-primary) !important;
 		box-shadow: var(--shadow-sm) !important;
-		transform: translate(-2px, -2px) !important;
 		border-color: var(--border-color);
 		z-index: 5;
 	}
@@ -1039,7 +1030,7 @@
 		background: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-sm);
-		box-shadow: 1px 1px 0px var(--text-primary);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.event-item-meta {
@@ -1095,7 +1086,7 @@
 		cursor: pointer;
 		transition:
 			transform 0.1s var(--ease-out),
-			box-shadow 0.1s var(--ease-out),
+			filter 0.1s var(--ease-out),
 			background-color 0.1s var(--ease-out),
 			border-color 0.1s var(--ease-out),
 			color 0.1s var(--ease-out);
@@ -1106,14 +1097,11 @@
 	}
 
 	.list-day-item:hover {
-		transform: translate(-2px, -2px);
-		box-shadow: var(--shadow-sm);
+		filter: brightness(1.05);
 	}
 
 	.list-day-item.selected {
 		border-color: var(--accent-primary);
-		box-shadow: var(--shadow-sm);
-		transform: translate(-2px, -2px);
 	}
 
 	.list-day-header {

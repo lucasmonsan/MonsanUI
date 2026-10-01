@@ -99,8 +99,7 @@
 	}
 
 	.monsan-app-card:hover {
-		transform: translate(-1px, -1px);
-		box-shadow: var(--shadow-md);
+		filter: brightness(1.03);
 	}
 
 	.app-card-main {

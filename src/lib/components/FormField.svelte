@@ -161,7 +161,7 @@
 		font-weight: 500;
 		line-height: 1.2;
 		transition: all 0.1s var(--ease-out);
-		box-shadow: 1px 1px 0 var(--text-primary);
+		box-shadow: var(--shadow-sm);
 		vertical-align: middle;
 		margin-left: var(--space-xs);
 		text-transform: none;
@@ -170,12 +170,10 @@
 	.field-label-addon > :global(button:hover) {
 		color: var(--text-primary);
 		border-color: var(--text-primary);
-		box-shadow: 1.5px 1.5px 0 var(--text-primary);
-		transform: translate(-0.5px, -0.5px);
+		filter: brightness(1.08);
 	}
 
 	.field-label-addon > :global(button:active) {
-		transform: translate(1px, 1px);
-		box-shadow: none;
+		transform: scale(0.96);
 	}
 </style>
