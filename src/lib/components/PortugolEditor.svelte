@@ -8,7 +8,7 @@
 		errorLine = 0,
 		disabled = false,
 		showLineNumbers = true,
-		placeholder = 'Escreva seu código Portugol aqui...',
+		placeholder = 'Escreva seu código Portugol / VisuAlg aqui...',
 		autoCloseBrackets = true,
 		autoCloseQuotes = true,
 		lineWrapping = true,

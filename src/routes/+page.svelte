@@ -4934,13 +4934,13 @@
 					<!-- Portugol Showcase -->
 					<div class="component-card panel">
 						<div class="component-info">
-							<h3>Portugol IDE Runner</h3>
+							<h3>Portugol / VisuAlg IDE Runner</h3>
 							<p>
 								{i18n.locale === 'pt'
-									? 'Ambiente de desenvolvimento e execução passo a passo para a pseudo-linguagem Portugol.'
+									? 'Ambiente de desenvolvimento e execução passo a passo para a pseudo-linguagem Portugol / VisuAlg.'
 									: i18n.locale === 'en'
-										? 'Development environment and step-by-step execution for the Portugol pseudo-language.'
-										: 'Entorno de desarrollo y ejecución paso a paso para el pseudo-lenguaje Portugol.'}
+										? 'Development environment and step-by-step execution for the Portugol / VisuAlg pseudo-language.'
+										: 'Entorno de desarrollo y ejecución paso a paso para el pseudo-lenguaje Portugol / VisuAlg.'}
 							</p>
 						</div>
 						<div class="component-showcase-grid layout-vertical">
