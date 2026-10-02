@@ -83,6 +83,11 @@
 		min-width: 0;
 	}
 
+	.filter-toolbar-navigation > :global(.monsan-button) {
+		max-width: 100%;
+		overflow: hidden;
+	}
+
 	.filter-toolbar-mobile-search {
 		display: none;
 		flex: 0 0 auto;
@@ -131,6 +136,13 @@
 		.monsan-filter-toolbar {
 			align-items: center;
 			flex-direction: row;
+			gap: var(--filter-toolbar-gap, var(--space-sm));
+		}
+
+		.filter-toolbar-navigation {
+			flex: 0 1 auto;
+			max-width: 45%;
+			min-width: 0;
 		}
 
 		.filter-toolbar-filters {
@@ -141,6 +153,7 @@
 
 		.filter-toolbar-search-row {
 			flex: 1 1 auto;
+			min-width: 0;
 			width: auto;
 		}
 
