@@ -168,6 +168,7 @@
 				value={localeValue}
 				ariaLabel={localeAriaLabel}
 				onChange={handleLocaleChange}
+				mode="cycle"
 			/>
 		</div>
 	</div>
