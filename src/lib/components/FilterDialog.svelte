@@ -201,19 +201,32 @@
 		}
 
 		.filter-dialog-footer:not(.compact-actions) {
-			align-items: stretch;
-			flex-direction: column;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-direction: row;
+			flex-wrap: nowrap;
+			gap: var(--space-xs);
+			width: 100%;
+		}
+
+		.filter-dialog-footer:not(.compact-actions) > :global(.monsan-button) {
+			flex: 0 0 auto;
 		}
 
 		.filter-dialog-footer:not(.compact-actions) .filter-dialog-primary-actions {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			width: 100%;
-			margin-left: 0;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			flex: 1 1 auto;
+			gap: var(--space-xs);
+			margin-left: auto;
 		}
 
-		.filter-dialog-footer:not(.compact-actions) .filter-dialog-primary-actions:has(> :only-child) {
-			grid-template-columns: 1fr;
+		.filter-dialog-footer:not(.compact-actions)
+			.filter-dialog-primary-actions
+			> :global(.monsan-button.primary) {
+			flex: 1 1 auto;
 		}
 	}
 
