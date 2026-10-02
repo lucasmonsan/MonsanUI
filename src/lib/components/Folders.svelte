@@ -142,23 +142,6 @@
 		editingFolderId = null;
 	}
 
-	function getColorLabel(color: string) {
-		const override = labels?.colorLabel?.(color);
-		if (override) return override;
-
-		const keyByColor: Record<string, string> = {
-			default: 'folders.colorDefault',
-			blue: 'folders.colorBlue',
-			green: 'folders.colorGreen',
-			yellow: 'folders.colorYellow',
-			purple: 'folders.colorPurple',
-			orange: 'folders.colorOrange',
-			red: 'folders.colorRed'
-		};
-
-		return i18n.t(keyByColor[color] ?? 'folders.colorDefault');
-	}
-
 	function customColor(color: string | undefined): string | undefined {
 		return color && /^#[0-9a-f]{6}$/i.test(color) ? color : undefined;
 	}
@@ -347,14 +330,6 @@
 		<div class="form-group">
 			<span class="label-span">{l.folderColorLabel}</span>
 			<div class="color-options">
-				<button
-					type="button"
-					class="color-btn default"
-					class:selected={newFolderColor === 'default'}
-					onclick={() => (newFolderColor = 'default')}
-					title={getColorLabel('default')}
-					aria-label={getColorLabel('default')}
-				></button>
 				<ColorPicker
 					value={colorPickerValue(newFolderColor)}
 					variant="swatch"
@@ -645,36 +620,6 @@
 		flex-wrap: wrap;
 	}
 
-	.color-btn {
-		flex: 1;
-		min-width: calc(var(--base) * 2.3);
-		max-width: calc(var(--base) * 3.4);
-		height: calc(var(--base) * 2.3);
-		border-radius: var(--radius-md);
-		border: var(--border-width) solid var(--border-color);
-		cursor: pointer;
-		opacity: 0.5;
-		transition:
-			transform 0.1s var(--ease-out),
-			filter 0.1s var(--ease-out),
-			opacity 0.2s ease;
-		box-shadow: var(--shadow-sm);
-	}
-
-	.color-btn:hover {
-		opacity: 0.8;
-		filter: brightness(1.08);
-	}
-
-	.color-btn.selected {
-		opacity: 1;
-		border-width: 3px;
-	}
-
-	.color-btn.default {
-		background: var(--bg-secondary);
-	}
-
 	.form-actions {
 		display: flex;
 		justify-content: flex-end;
@@ -685,8 +630,7 @@
 	@media (prefers-reduced-motion: reduce) {
 		.folder-chip-all,
 		.folder-chip,
-		.add-folder-chip,
-		.color-btn {
+		.add-folder-chip {
 			transition: none;
 		}
 	}

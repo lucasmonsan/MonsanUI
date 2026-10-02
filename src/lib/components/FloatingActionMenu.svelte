@@ -109,7 +109,12 @@
 	class:is-closing={isClosing}
 >
 	{#if menuVisible && hasActions}
-		<div class="floating-action-items" role="menu" aria-label={openLabel} aria-hidden={isClosing}>
+		<div
+			class="floating-action-items count-{items.length}"
+			role="menu"
+			aria-label={openLabel}
+			aria-hidden={isClosing}
+		>
 			{#each items as item, index (item.id)}
 				{@const Icon = item.icon}
 				<button
@@ -214,6 +219,14 @@
 		transform: translateX(-50%);
 	}
 
+	.floating-action-items.count-1 {
+		grid-template-columns: max-content;
+	}
+
+	.floating-action-items.count-2 {
+		grid-template-columns: repeat(2, max-content);
+	}
+
 	.floating-action-item {
 		--item-offset-y: 0px;
 		--item-enter-x: 0px;
@@ -259,6 +272,24 @@
 	.floating-action-item.position-2 {
 		--item-offset-y: var(--space-sm);
 		--item-enter-x: calc(var(--control-height) * -1.5);
+	}
+
+	.count-1 .floating-action-item {
+		--item-offset-y: 0px;
+		--item-enter-x: 0px;
+		--item-enter-y: calc(var(--control-height) * 2);
+	}
+
+	.count-2 .floating-action-item.position-0 {
+		--item-offset-y: 0px;
+		--item-enter-x: calc(var(--control-height) * 0.8);
+		--item-enter-y: calc(var(--control-height) * 2);
+	}
+
+	.count-2 .floating-action-item.position-1 {
+		--item-offset-y: 0px;
+		--item-enter-x: calc(var(--control-height) * -0.8);
+		--item-enter-y: calc(var(--control-height) * 2);
 	}
 
 	.floating-action-item.variant-primary {

@@ -109,12 +109,20 @@
 		gap: var(--space-xs);
 		font-size: var(--text-md);
 		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.monsan-button :global(svg) {
+		flex-shrink: 0;
 	}
 
 	.monsan-button-label {
 		display: inline-flex;
 		align-items: center;
 		line-height: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.block {

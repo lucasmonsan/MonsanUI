@@ -349,3 +349,32 @@ button:disabled {
 .markdown-content td {
 	color: var(--text-secondary);
 }
+
+/* Page View Transitions */
+@media (prefers-reduced-motion: no-preference) {
+	::view-transition-old(root) {
+		animation: 90ms cubic-bezier(0.4, 0, 1, 1) both monsan-fade-out;
+	}
+
+	::view-transition-new(root) {
+		animation: 160ms cubic-bezier(0, 0, 0.2, 1) 40ms both monsan-fade-in;
+	}
+}
+
+@keyframes monsan-fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes monsan-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
