@@ -16,6 +16,7 @@
 		ariaLabel?: string;
 		title?: string;
 		display?: 'compact' | 'label';
+		mode?: 'auto' | 'cycle' | 'dropdown';
 	}
 
 	let {
@@ -28,11 +29,13 @@
 		onChange,
 		ariaLabel = 'Alternar idioma / Toggle language / Cambiar idioma',
 		title = 'Alternar idioma / Toggle language / Cambiar idioma',
-		display = 'compact'
+		display = 'compact',
+		mode = 'auto'
 	}: Props = $props();
 
 	let isOpen = $state(false);
 	let activeLocale = $derived(locales.find((locale) => locale.id === value));
+	let shouldCycle = $derived(mode === 'cycle' || (mode === 'auto' && locales.length <= 2));
 
 	function selectLocale(localeId: string) {
 		value = localeId;
@@ -42,17 +45,15 @@
 	}
 
 	function handleTriggerClick() {
-		if (locales.length <= 2) {
-			const currentIndex = locales.findIndex((l) => l.id === value);
-			const activeIdx = currentIndex === -1 ? 0 : currentIndex;
-			const nextIndex = (activeIdx + 1) % locales.length;
-			selectLocale(locales[nextIndex].id);
-		}
+		const currentIndex = locales.findIndex((l) => l.id === value);
+		const activeIdx = currentIndex === -1 ? 0 : currentIndex;
+		const nextIndex = (activeIdx + 1) % locales.length;
+		selectLocale(locales[nextIndex].id);
 	}
 </script>
 
 <div class="locale-dropdown-wrapper">
-	{#if locales.length <= 2}
+	{#if shouldCycle}
 		<Button
 			variant="secondary"
 			square={display === 'compact'}
