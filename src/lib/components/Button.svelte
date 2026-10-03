@@ -72,6 +72,7 @@
 	class:block
 	class:square
 	class:truncate
+	class:has-icon-and-label={Boolean(children && label)}
 >
 	{@render children?.()}
 	{#if label}
@@ -139,6 +140,13 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		vertical-align: middle;
+	}
+
+	.monsan-button.has-icon-and-label:not(.square),
+	.monsan-button:not(.square):has(:global(svg)):has(.monsan-button-label) {
+		padding-left: var(--space-sm);
+		padding-right: var(--space-sm);
+		gap: var(--space-xs);
 	}
 
 	.block {
@@ -250,10 +258,10 @@
 
 	@media (max-width: 600px) {
 		.icon-only-sm {
-			width: var(--control-height);
-			height: var(--control-height);
-			min-height: var(--control-height);
-			padding: 0;
+			width: var(--control-height) !important;
+			height: var(--control-height) !important;
+			min-height: var(--control-height) !important;
+			padding: 0 !important;
 		}
 
 		.icon-only-sm :global(.monsan-button-label) {
@@ -263,10 +271,10 @@
 
 	@media (max-width: 900px) {
 		.icon-only-md {
-			width: var(--control-height);
-			height: var(--control-height);
-			min-height: var(--control-height);
-			padding: 0;
+			width: var(--control-height) !important;
+			height: var(--control-height) !important;
+			min-height: var(--control-height) !important;
+			padding: 0 !important;
 		}
 
 		.icon-only-md :global(.monsan-button-label) {

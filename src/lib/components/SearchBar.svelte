@@ -266,9 +266,9 @@
 	.searchbar-wrapper {
 		display: flex;
 		align-items: center;
-		gap: var(--space-sm);
+		gap: var(--space-xs);
 		height: var(--control-height);
-		padding: 0 var(--space-md);
+		padding: 0 var(--space-sm);
 		background-color: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);

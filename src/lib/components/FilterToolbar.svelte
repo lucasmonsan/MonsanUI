@@ -79,7 +79,7 @@
 	}
 
 	.filter-toolbar-navigation {
-		flex: 0 1 auto;
+		flex: 0 0 auto;
 		min-width: 0;
 	}
 
@@ -149,7 +149,7 @@
 		}
 
 		.filter-toolbar-navigation {
-			flex: 0 1 auto;
+			flex: 0 0 auto;
 			max-width: 40%;
 			min-width: 0;
 		}
@@ -161,7 +161,7 @@
 		}
 
 		.filter-toolbar-search-row {
-			flex: 1 1 auto;
+			flex: 1 1 0;
 			min-width: 0;
 			width: auto;
 		}
