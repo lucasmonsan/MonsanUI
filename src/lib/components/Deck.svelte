@@ -123,7 +123,7 @@
 	class:surface-subtle={surfaceColorStrength === 'subtle'}
 	class:surface-strong={surfaceColorStrength === 'strong'}
 	class:selected-for-play={isPopoverOpen || isMenuOpen}
-	data-theme={folderColor}
+	data-theme={surfaceColor ? undefined : folderColor}
 	role="button"
 	tabindex="0"
 	onclick={() => {

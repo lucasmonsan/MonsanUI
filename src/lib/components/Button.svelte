@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { contrastForeground } from '$lib/utils/color-contrast.js';
 
 	interface Props {
 		children?: Snippet;
@@ -25,6 +26,8 @@
 		casing?: 'uppercase' | 'none';
 		minWidth?: string;
 		truncate?: boolean;
+		surfaceColor?: string;
+		surfaceColorStrength?: 'subtle' | 'strong';
 	}
 
 	let {
@@ -50,10 +53,13 @@
 		deckTheme,
 		casing = 'uppercase',
 		minWidth,
-		truncate = false
+		truncate = false,
+		surfaceColor,
+		surfaceColorStrength
 	}: Props = $props();
 
 	const responsiveIconClass = $derived(iconOnlyBelow ? `icon-only-${iconOnlyBelow}` : '');
+	let resolvedSurfaceForeground = $derived(contrastForeground(surfaceColor));
 </script>
 
 <button
@@ -68,11 +74,16 @@
 	aria-controls={ariaControls}
 	data-deck-theme={deckTheme}
 	style:min-width={minWidth}
+	style:--button-surface={surfaceColor}
+	style:--monsan-surface-foreground={resolvedSurfaceForeground}
 	class="monsan-button {variant} size-{size} shape-{shape} casing-{casing} {responsiveIconClass}"
 	class:block
 	class:square
 	class:truncate
 	class:has-icon-and-label={Boolean(children && label)}
+	class:has-custom-surface={Boolean(surfaceColor)}
+	class:surface-subtle={surfaceColorStrength === 'subtle'}
+	class:surface-strong={surfaceColorStrength === 'strong'}
 >
 	{@render children?.()}
 	{#if label}
@@ -229,6 +240,36 @@
 	}
 	:global([data-theme='dark']) .neutral {
 		background-color: color-mix(in srgb, var(--neutral) 75%, black);
+	}
+
+	/* Custom Surface Variants */
+	.monsan-button.has-custom-surface {
+		background-color: var(--button-surface);
+		color: var(--monsan-surface-foreground, var(--text-primary));
+	}
+
+	.monsan-button.has-custom-surface.surface-subtle {
+		background-color: color-mix(in srgb, var(--button-surface) 10%, var(--bg-primary));
+		color: var(--text-primary);
+		border-color: var(--border-color);
+	}
+
+	.monsan-button.has-custom-surface.surface-strong {
+		background-color: color-mix(in srgb, var(--button-surface) 40%, var(--bg-primary));
+		color: var(--text-primary);
+		border-color: var(--border-color);
+	}
+
+	:global([data-theme='dark']) .monsan-button.has-custom-surface.surface-subtle {
+		background-color: color-mix(in srgb, var(--button-surface) 10%, var(--bg-primary));
+		color: var(--text-primary);
+		border-color: var(--border-color);
+	}
+
+	:global([data-theme='dark']) .monsan-button.has-custom-surface.surface-strong {
+		background-color: color-mix(in srgb, var(--button-surface) 40%, var(--bg-primary));
+		color: var(--text-primary);
+		border-color: var(--border-color);
 	}
 
 	.monsan-button:hover:not(:disabled) {
