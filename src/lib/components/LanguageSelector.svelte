@@ -16,7 +16,7 @@
 		ariaLabel?: string;
 		title?: string;
 		display?: 'compact' | 'label';
-		mode?: 'auto' | 'cycle' | 'dropdown';
+		mode?: 'auto' | 'cycle' | 'dropdown' | 'segmented';
 	}
 
 	let {
@@ -53,7 +53,21 @@
 </script>
 
 <div class="locale-dropdown-wrapper">
-	{#if shouldCycle}
+	{#if mode === 'segmented'}
+		<div class="locale-segmented-group" role="group" aria-label={ariaLabel}>
+			{#each locales as locale (locale.id)}
+				<Button
+					size="sm"
+					variant={value === locale.id ? 'primary' : 'secondary'}
+					onclick={() => selectLocale(locale.id)}
+					ariaLabel={locale.name ?? locale.label}
+					title={locale.name ?? locale.label}
+				>
+					{locale.label}
+				</Button>
+			{/each}
+		</div>
+	{:else if shouldCycle}
 		<Button
 			variant="secondary"
 			square={display === 'compact'}
@@ -116,6 +130,12 @@
 	.locale-dropdown-wrapper {
 		position: relative;
 		display: inline-flex;
+	}
+
+	.locale-segmented-group {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xxs);
 	}
 
 	.trigger-label {

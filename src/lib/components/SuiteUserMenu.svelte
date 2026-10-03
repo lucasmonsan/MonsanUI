@@ -32,6 +32,7 @@
 		logoutLabel: string;
 		localeValue?: string;
 		localeAriaLabel?: string;
+		localeMode?: 'auto' | 'cycle' | 'dropdown' | 'segmented';
 		themeValue?: string;
 		themeStorageKey?: string;
 		themeAriaLabel?: string;
@@ -81,6 +82,7 @@
 		logoutLabel,
 		localeValue = 'en',
 		localeAriaLabel,
+		localeMode = 'segmented',
 		themeValue,
 		themeStorageKey,
 		themeAriaLabel,
@@ -168,7 +170,7 @@
 				value={localeValue}
 				ariaLabel={localeAriaLabel}
 				onChange={handleLocaleChange}
-				mode="cycle"
+				mode={localeMode}
 			/>
 		</div>
 	</div>

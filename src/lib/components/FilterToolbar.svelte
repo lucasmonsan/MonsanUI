@@ -85,7 +85,6 @@
 
 	.filter-toolbar-navigation > :global(.monsan-button) {
 		max-width: 100%;
-		overflow: hidden;
 	}
 
 	.filter-toolbar-mobile-search {

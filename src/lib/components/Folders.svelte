@@ -9,6 +9,7 @@
 	import DotsThreeVertical from './icons/DotsThreeVertical.svelte';
 	import IconButton from './IconButton.svelte';
 	import ColorPicker from './ColorPicker.svelte';
+	import Inline from './Inline.svelte';
 	import { i18n } from '../utils/i18n.svelte';
 	import type { Snippet } from 'svelte';
 
@@ -318,25 +319,22 @@
 	<div class="folder-form">
 		<div class="form-group">
 			<label for="folder-name">{l.folderNameLabel}</label>
-			<Input
-				bind:this={folderNameInput}
-				id="folder-name"
-				type="text"
-				bind:value={newFolderName}
-				placeholder={l.folderNamePlaceholder}
-				maxlength={maxNameLength}
-			/>
-		</div>
-		<div class="form-group">
-			<span class="label-span">{l.folderColorLabel}</span>
-			<div class="color-options">
+			<Inline gap="sm" align="center" fullWidth growFirstChild>
+				<Input
+					bind:this={folderNameInput}
+					id="folder-name"
+					type="text"
+					bind:value={newFolderName}
+					placeholder={l.folderNamePlaceholder}
+					maxlength={maxNameLength}
+				/>
 				<ColorPicker
 					value={colorPickerValue(newFolderColor)}
 					variant="swatch"
 					ariaLabel={l.folderColorLabel}
 					onchange={(color) => (newFolderColor = color)}
 				/>
-			</div>
+			</Inline>
 		</div>
 		<div class="form-actions">
 			<Button variant="secondary" onclick={handleCloseModal}>{l.cancel}</Button>
@@ -606,18 +604,11 @@
 		gap: var(--space-xs);
 	}
 
-	.form-group label,
-	.form-group .label-span {
+	.form-group label {
 		font-family: var(--font-display);
 		font-weight: 700;
 		font-size: var(--text-sm);
 		color: var(--text-primary);
-	}
-
-	.color-options {
-		display: flex;
-		gap: var(--space-sm);
-		flex-wrap: wrap;
 	}
 
 	.form-actions {
