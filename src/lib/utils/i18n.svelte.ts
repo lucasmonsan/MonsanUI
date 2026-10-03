@@ -30,7 +30,8 @@ class I18n {
 				edit: 'Editar',
 				delete: 'Excluir',
 				moreOptions: 'Mais opções',
-				closePopover: 'Fechar popover'
+				closePopover: 'Fechar popover',
+				chooseMode: 'Modo de estudo:'
 			},
 			cardEditor: {
 				frontLabel: 'Pergunta',
@@ -267,7 +268,8 @@ class I18n {
 				edit: 'Edit',
 				delete: 'Delete',
 				moreOptions: 'More options',
-				closePopover: 'Close popover'
+				closePopover: 'Close popover',
+				chooseMode: 'Study mode:'
 			},
 			cardEditor: {
 				frontLabel: 'Question',
@@ -503,7 +505,8 @@ class I18n {
 				edit: 'Editar',
 				delete: 'Eliminar',
 				moreOptions: 'Más opciones',
-				closePopover: 'Cerrar popover'
+				closePopover: 'Cerrar popover',
+				chooseMode: 'Modo de estudio:'
 			},
 			cardEditor: {
 				frontLabel: 'Pregunta',

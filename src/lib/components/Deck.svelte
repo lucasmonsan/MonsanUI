@@ -14,10 +14,14 @@
 		item?: { id: string; title: string; subtitle?: string };
 		index?: number;
 		folderColor?: string;
+		accentColor?: string;
+		surfaceColor?: string;
+		surfaceColorStrength?: 'subtle' | 'strong';
 		isPopoverOpen?: boolean;
 		isMenuOpen?: boolean;
 		stats?: { newCount: number; dueCount: number };
-		modes?: Array<{ id: string; label: string; iconPath?: string }>;
+		modes?: Array<{ id: string; label: string; iconPath?: string; description?: string }>;
+		popoverTitle?: string;
 		labels?: {
 			cards?: string;
 			due?: string;
@@ -27,6 +31,7 @@
 			delete?: string;
 			moreOptions?: string;
 			closePopover?: string;
+			chooseMode?: string;
 		};
 		onSelect?: () => void;
 		onContextMenu?: (e: MouseEvent) => void;
@@ -47,10 +52,14 @@
 		item,
 		index = 0,
 		folderColor = 'default',
+		accentColor,
+		surfaceColor,
+		surfaceColorStrength = 'subtle',
 		isPopoverOpen = $bindable(false),
 		isMenuOpen = $bindable(false),
 		stats,
 		modes,
+		popoverTitle,
 		labels,
 		onSelect,
 		onContextMenu,
@@ -83,7 +92,8 @@
 		edit: labels?.edit ?? i18n.t('deck.edit'),
 		delete: labels?.delete ?? i18n.t('deck.delete'),
 		moreOptions: labels?.moreOptions ?? i18n.t('deck.moreOptions'),
-		closePopover: labels?.closePopover ?? i18n.t('deck.closePopover')
+		closePopover: labels?.closePopover ?? i18n.t('deck.closePopover'),
+		chooseMode: popoverTitle ?? labels?.chooseMode ?? i18n.t('deck.chooseMode')
 	});
 
 	$effect(() => {
@@ -108,6 +118,10 @@
 	bind:this={deckEl}
 	id={cardId}
 	class="deck-card panel appear-animation"
+	class:has-accent={Boolean(accentColor)}
+	class:has-custom-surface={Boolean(surfaceColor)}
+	class:surface-subtle={surfaceColorStrength === 'subtle'}
+	class:surface-strong={surfaceColorStrength === 'strong'}
 	class:selected-for-play={isPopoverOpen || isMenuOpen}
 	data-theme={folderColor}
 	role="button"
@@ -141,6 +155,8 @@
 			onSelect?.();
 		}
 	}}
+	style:--panel-accent={accentColor}
+	style:--panel-surface={surfaceColor}
 	style:--delay={`${index * 0.1}s`}
 >
 	<div class="deck-info">
@@ -266,18 +282,28 @@
 				}}
 				aria-label={l.closePopover}
 			></button>
-			<div class="popover-buttons">
-				{#each modes as mode (mode.id)}
-					<Button
-						variant="primary"
-						size="sm"
-						onclick={() => {
-							onStartSession?.(mode.id);
-						}}
-					>
-						{mode.label}
-					</Button>
-				{/each}
+			<div class="popover-inner">
+				<span class="popover-title">{l.chooseMode}</span>
+				<div class="popover-buttons">
+					{#each modes as mode (mode.id)}
+						<Button
+							variant="primary"
+							size="sm"
+							onclick={() => {
+								onStartSession?.(mode.id);
+							}}
+							title={mode.description ?? mode.label}
+							ariaLabel={mode.description ? `${mode.label} - ${mode.description}` : mode.label}
+						>
+							<span class="mode-btn-content">
+								<span class="mode-btn-label">{mode.label}</span>
+								{#if mode.description}
+									<span class="mode-btn-desc">{mode.description}</span>
+								{/if}
+							</span>
+						</Button>
+					{/each}
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -293,6 +319,27 @@
 		cursor: pointer;
 	}
 
+	.deck-card.has-accent {
+		box-shadow:
+			inset 4px 0 0 var(--panel-accent),
+			var(--shadow-sm);
+		padding-left: calc(var(--space-md) + 2px);
+	}
+
+	.deck-card.has-custom-surface {
+		background-color: var(--panel-surface);
+	}
+
+	.deck-card.has-custom-surface.surface-subtle {
+		background-color: color-mix(in srgb, var(--panel-surface) 10%, var(--bg-primary));
+		color: var(--text-primary);
+	}
+
+	.deck-card.has-custom-surface.surface-strong {
+		background-color: color-mix(in srgb, var(--panel-surface) 40%, var(--bg-primary));
+		color: var(--text-primary);
+	}
+
 	.mode-popover {
 		position: absolute;
 		top: 0;
@@ -300,16 +347,16 @@
 		width: 100%;
 		height: 100%;
 		background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-md);
+		border: none;
+		border-radius: inherit;
 		z-index: 10;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: var(--space-md);
+		padding: var(--space-xs) var(--space-sm);
 		box-sizing: border-box;
-		box-shadow: var(--shadow-sm);
+		box-shadow: none;
 		opacity: 0;
 		transform: scale(0.96) translateY(5px);
 		pointer-events: none;
@@ -340,11 +387,27 @@
 		z-index: 1;
 	}
 
-	.popover-buttons {
+	.popover-inner {
 		position: relative;
 		z-index: 2;
 		display: flex;
-		gap: var(--space-sm);
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-xs);
+		width: 100%;
+	}
+
+	.popover-title {
+		font-size: var(--text-xs);
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--text-secondary);
+	}
+
+	.popover-buttons {
+		display: flex;
+		gap: var(--space-xs);
 		width: 100%;
 		justify-content: center;
 	}
@@ -352,8 +415,31 @@
 	.popover-buttons :global(button) {
 		width: auto !important;
 		min-width: 0 !important;
-		flex: 0 1 auto !important;
-		padding: var(--space-xs) var(--space-sm) !important;
+		flex: 1 1 0 !important;
+		padding: var(--space-xxs) var(--space-xs) !important;
+	}
+
+	.mode-btn-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1px;
+		line-height: 1.1;
+		width: 100%;
+	}
+
+	.mode-btn-label {
+		font-weight: 800;
+		font-size: var(--text-sm);
+	}
+
+	.mode-btn-desc {
+		font-size: 10px;
+		font-weight: 500;
+		opacity: 0.85;
+		white-space: nowrap;
+		text-transform: none;
 	}
 
 	.selected-for-play {
