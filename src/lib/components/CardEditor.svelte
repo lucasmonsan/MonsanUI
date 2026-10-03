@@ -2,6 +2,7 @@
 	import { autoResizeAction } from '../utils/actions.js';
 	import Input from './Input.svelte';
 	import Textarea from './Textarea.svelte';
+	import Button from './Button.svelte';
 	import GripVertical from './icons/GripVertical.svelte';
 	import ChevronUp from './icons/ChevronUp.svelte';
 	import ChevronDown from './icons/ChevronDown.svelte';
@@ -41,7 +42,14 @@
 			deleteCard?: string;
 			addOptionalField?: (label: string) => string;
 			removeOptionalField?: (label: string) => string;
+			confirmDeleteQuestion?: string;
+			confirmDeleteCancel?: string;
+			confirmDeleteConfirm?: string;
 		};
+		confirmDelete?: boolean;
+		onConfirmDelete?: (index: number) => void;
+		onCancelDelete?: (index: number) => void;
+		onDeleteRequest?: (index: number) => void;
 	}
 
 	let {
@@ -57,7 +65,11 @@
 		onDragEnd,
 		dragDisabled = false,
 		fields,
-		labels
+		labels,
+		confirmDelete,
+		onConfirmDelete,
+		onCancelDelete,
+		onDeleteRequest
 	}: Props = $props();
 
 	let isTouchDragging = $state(false);
@@ -161,8 +173,37 @@
 			((label: string) => i18n.t('cardEditor.addOptionalField', { label })),
 		removeOptionalField:
 			labels?.removeOptionalField ??
-			((label: string) => i18n.t('cardEditor.removeOptionalField', { label }))
+			((label: string) => i18n.t('cardEditor.removeOptionalField', { label })),
+		confirmDeleteQuestion:
+			labels?.confirmDeleteQuestion ?? i18n.t('cardEditor.confirmDeleteQuestion'),
+		confirmDeleteCancel: labels?.confirmDeleteCancel ?? i18n.t('cardEditor.confirmDeleteCancel'),
+		confirmDeleteConfirm: labels?.confirmDeleteConfirm ?? i18n.t('cardEditor.confirmDeleteConfirm')
 	});
+
+	let localConfirmDelete = $state(false);
+	let isConfirmingDelete = $derived(confirmDelete ?? localConfirmDelete);
+
+	function requestDelete() {
+		if (onDeleteRequest) {
+			onDeleteRequest(index);
+		} else {
+			localConfirmDelete = true;
+		}
+	}
+
+	function handleConfirmDelete() {
+		localConfirmDelete = false;
+		if (onConfirmDelete) {
+			onConfirmDelete(index);
+		} else {
+			onRemove(index);
+		}
+	}
+
+	function handleCancelDelete() {
+		localConfirmDelete = false;
+		onCancelDelete?.(index);
+	}
 
 	function getVisibilityKey(field: Field) {
 		return field.id === 'hint' ? 'isHintVisible' : `is_${field.id}_visible`;
@@ -281,7 +322,7 @@
 				<button
 					type="button"
 					class="btn-icon btn-delete"
-					onclick={() => onRemove(index)}
+					onclick={requestDelete}
 					title={l.deleteCard}
 					aria-label={l.deleteCard}
 				>
@@ -369,6 +410,22 @@
 			{/if}
 		{/each}
 	</div>
+
+	{#if isConfirmingDelete}
+		<div class="card-delete-overlay" role="dialog" aria-modal="true">
+			<div class="card-delete-dialog">
+				<p class="card-delete-question">{l.confirmDeleteQuestion}</p>
+				<div class="card-delete-actions">
+					<Button variant="secondary" size="sm" onclick={handleCancelDelete}>
+						{l.confirmDeleteCancel}
+					</Button>
+					<Button variant="error" size="sm" onclick={handleConfirmDelete}>
+						{l.confirmDeleteConfirm}
+					</Button>
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -564,8 +621,55 @@
 		min-height: 0;
 	}
 
-	.hint-slide-wrapper {
-		padding-top: var(--space-xs);
+	.card-delete-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 20;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: color-mix(in srgb, var(--bg-primary) 96%, var(--bg-secondary));
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		border-radius: calc(var(--radius-md) - var(--border-width));
+		padding: var(--space-md);
+		text-align: center;
+		animation: cardDeleteFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	@keyframes cardDeleteFadeIn {
+		from {
+			opacity: 0;
+			transform: scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	.card-delete-dialog {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-md);
+		max-width: 260px;
+	}
+
+	.card-delete-question {
+		margin: 0;
+		font-family: var(--font-display, inherit);
+		font-size: var(--text-sm);
+		font-weight: 700;
+		color: var(--text-primary);
+		line-height: 1.35;
+	}
+
+	.card-delete-actions {
+		display: flex;
+		gap: var(--space-sm);
+		justify-content: center;
+		width: 100%;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

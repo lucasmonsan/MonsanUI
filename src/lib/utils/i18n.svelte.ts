@@ -46,7 +46,10 @@ class I18n {
 				duplicateCard: 'Duplicar',
 				deleteCard: 'Excluir',
 				addOptionalField: 'Adicionar {label}',
-				removeOptionalField: 'Remover {label}'
+				removeOptionalField: 'Remover {label}',
+				confirmDeleteQuestion: 'Deseja excluir este cartão?',
+				confirmDeleteCancel: 'Cancelar',
+				confirmDeleteConfirm: 'Excluir'
 			},
 			folders: {
 				allFolders: 'Todas',
@@ -284,7 +287,10 @@ class I18n {
 				duplicateCard: 'Duplicate',
 				deleteCard: 'Delete',
 				addOptionalField: 'Add {label}',
-				removeOptionalField: 'Remove {label}'
+				removeOptionalField: 'Remove {label}',
+				confirmDeleteQuestion: 'Delete this card?',
+				confirmDeleteCancel: 'Cancel',
+				confirmDeleteConfirm: 'Delete'
 			},
 			folders: {
 				allFolders: 'All',
@@ -521,7 +527,10 @@ class I18n {
 				duplicateCard: 'Duplicar',
 				deleteCard: 'Eliminar',
 				addOptionalField: 'Agregar {label}',
-				removeOptionalField: 'Eliminar {label}'
+				removeOptionalField: 'Eliminar {label}',
+				confirmDeleteQuestion: '¿Desea eliminar esta tarjeta?',
+				confirmDeleteCancel: 'Cancelar',
+				confirmDeleteConfirm: 'Eliminar'
 			},
 			folders: {
 				allFolders: 'Todas',
