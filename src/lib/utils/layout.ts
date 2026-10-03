@@ -45,7 +45,8 @@ export type PaddingPreset =
 	| 'var(--space-xl) var(--space-lg)'
 	| 'var(--space-md) var(--space-md) 0 var(--space-md)';
 
-export type HeightPreset = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '12px' | '16px' | '20px' | '256px';
+export type HeightPreset =
+	'xs' | 'sm' | 'md' | 'lg' | 'xl' | '12px' | '16px' | '20px' | '256px' | '320px';
 
 export type ActionPanelWidthPreset =
 	'dropdown' | 'compact' | 'comfortable' | 'wide' | 'max-content' | '70%' | '80%';
@@ -114,7 +115,8 @@ const heightValues: Record<HeightPreset, string> = {
 	'12px': '12px',
 	'16px': '16px',
 	'20px': '20px',
-	'256px': '256px'
+	'256px': '256px',
+	'320px': '320px'
 };
 
 const actionPanelWidthValues: Record<ActionPanelWidthPreset, string> = {
