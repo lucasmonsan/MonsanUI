@@ -85,6 +85,16 @@
 
 	.filter-toolbar-navigation > :global(.monsan-button) {
 		max-width: 100%;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	.filter-toolbar-navigation > :global(.monsan-button) :global(.monsan-button-label) {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		display: inline-block;
 	}
 
 	.filter-toolbar-mobile-search {
@@ -140,7 +150,7 @@
 
 		.filter-toolbar-navigation {
 			flex: 0 1 auto;
-			max-width: 45%;
+			max-width: 40%;
 			min-width: 0;
 		}
 

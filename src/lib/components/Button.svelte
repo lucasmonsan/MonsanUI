@@ -94,6 +94,7 @@
 	.monsan-button {
 		min-height: var(--control-height);
 		height: auto;
+		min-width: 0;
 		padding: var(--space-sm) var(--space-md);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
@@ -123,11 +124,17 @@
 		display: inline-flex;
 		align-items: center;
 		line-height: 1;
+		min-width: 0;
+	}
+
+	.monsan-button.truncate {
+		min-width: 0;
 	}
 
 	.monsan-button.truncate .monsan-button-label {
 		display: inline-block;
 		max-width: 100%;
+		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
