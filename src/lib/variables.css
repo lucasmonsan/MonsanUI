@@ -196,7 +196,8 @@
 }
 
 /* Dark Mode Deck Theme Variations */
-:root[data-theme='dark'] [data-deck-theme='blue'] {
+:root[data-theme='dark'] [data-deck-theme='blue'],
+:root[data-theme='dark'] [data-theme='blue'] {
 	--bg-primary: #1b263b;
 	--bg-secondary: #2b3a55;
 	--accent-primary: #8ecae6;
@@ -206,7 +207,8 @@
 	--border-color: #f1faee;
 }
 
-:root[data-theme='dark'] [data-deck-theme='green'] {
+:root[data-theme='dark'] [data-deck-theme='green'],
+:root[data-theme='dark'] [data-theme='green'] {
 	--bg-primary: #132a13;
 	--bg-secondary: #31572c;
 	--accent-primary: #90a955;
@@ -216,7 +218,8 @@
 	--border-color: #fdfbf7;
 }
 
-:root[data-theme='dark'] [data-deck-theme='yellow'] {
+:root[data-theme='dark'] [data-deck-theme='yellow'],
+:root[data-theme='dark'] [data-theme='yellow'] {
 	--bg-primary: #3d300c;
 	--bg-secondary: #5f4d1c;
 	--accent-primary: #f0c23a;
@@ -226,7 +229,8 @@
 	--border-color: #fffdf9;
 }
 
-:root[data-theme='dark'] [data-deck-theme='purple'] {
+:root[data-theme='dark'] [data-deck-theme='purple'],
+:root[data-theme='dark'] [data-theme='purple'] {
 	--bg-primary: #2c1a3b;
 	--bg-secondary: #3d2755;
 	--accent-primary: #b388ff;
@@ -236,7 +240,8 @@
 	--border-color: #fdfbf7;
 }
 
-:root[data-theme='dark'] [data-deck-theme='orange'] {
+:root[data-theme='dark'] [data-deck-theme='orange'],
+:root[data-theme='dark'] [data-theme='orange'] {
 	--bg-primary: #3f1d0b;
 	--bg-secondary: #5e3019;
 	--accent-primary: #ff9e00;
@@ -246,7 +251,8 @@
 	--border-color: #fffdf9;
 }
 
-:root[data-theme='dark'] [data-deck-theme='red'] {
+:root[data-theme='dark'] [data-deck-theme='red'],
+:root[data-theme='dark'] [data-theme='red'] {
 	--bg-primary: #3d0c11;
 	--bg-secondary: #5f1b22;
 	--accent-primary: #ff6b6b;
