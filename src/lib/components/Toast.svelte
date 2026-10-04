@@ -31,7 +31,7 @@
 	const colors: Record<ToastItem['type'], string> = {
 		success: 'var(--success)',
 		error: 'var(--error)',
-		warning: '#facc15',
+		warning: 'var(--warning)',
 		info: 'var(--info)'
 	};
 
@@ -187,9 +187,9 @@
 	}
 
 	.toast-item.warning {
-		border-left-color: #eab308;
+		border-left-color: var(--warning);
 	}
 	.toast-item.warning .toast-icon {
-		color: #eab308;
+		color: var(--warning);
 	}
 </style>

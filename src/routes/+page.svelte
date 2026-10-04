@@ -1542,6 +1542,97 @@
 				{#if activeCategory === 'core'}
 					<h2 class="category-title">{i18n.t('categories.core')}</h2>
 
+					<!-- Color System Showcase -->
+					<div class="component-card panel">
+						<div class="component-info">
+							<h3>Color System & Tokens</h3>
+							<p>
+								Tokens de cores oficiais da suíte MonsanUI com suporte a modo claro, escuro,
+								contraste WCAG e padrão de superfícies sutis/fortes (10% e 40%).
+							</p>
+						</div>
+						<div class="component-showcase-grid">
+							<div class="preview-box">
+								<span class="box-label">{i18n.t('common.preview')}</span>
+								<div
+									class="preview-render full-width-render"
+									style="flex-direction: column; gap: var(--space-md); width: 100%;"
+								>
+									<div
+										style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--space-xs); width: 100%;"
+									>
+										<div
+											style="background: var(--bg-primary); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--bg-primary
+										</div>
+										<div
+											style="background: var(--bg-secondary); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--bg-secondary
+										</div>
+										<div
+											style="background: var(--accent-primary); color: var(--bg-primary); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--accent-primary
+										</div>
+										<div
+											style="background: var(--success); color: var(--bg-primary); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--success
+										</div>
+										<div
+											style="background: var(--error); color: var(--bg-primary); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--error
+										</div>
+										<div
+											style="background: var(--warning); color: var(--warning-contrast); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--warning
+										</div>
+										<div
+											style="background: var(--neutral); color: var(--bg-primary); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--neutral
+										</div>
+										<div
+											style="background: var(--secondary); color: var(--bg-primary); border: var(--border-width) solid var(--border-color); padding: var(--space-xs); border-radius: var(--radius-sm); font-size: var(--text-xs); font-family: var(--font-mono); font-weight: bold;"
+										>
+											--secondary
+										</div>
+									</div>
+									<div style="display: flex; flex-wrap: wrap; gap: var(--space-xs); width: 100%;">
+										<span
+											style="background: color-mix(in srgb, var(--accent-primary) 10%, var(--bg-primary)); border: var(--border-width) solid var(--border-color); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: bold;"
+											>Mix Subtle 10%</span
+										>
+										<span
+											style="background: color-mix(in srgb, var(--accent-primary) 40%, var(--bg-primary)); border: var(--border-width) solid var(--border-color); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: bold;"
+											>Mix Strong 40%</span
+										>
+										<span
+											style="background: color-mix(in srgb, var(--folder-blue) 10%, var(--bg-primary)); border: var(--border-width) solid var(--border-color); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: bold;"
+											>Blue Subtle</span
+										>
+										<span
+											style="background: color-mix(in srgb, var(--folder-green) 10%, var(--bg-primary)); border: var(--border-width) solid var(--border-color); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: bold;"
+											>Green Subtle</span
+										>
+										<span
+											style="background: color-mix(in srgb, var(--folder-yellow) 10%, var(--bg-primary)); border: var(--border-width) solid var(--border-color); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: bold;"
+											>Yellow Subtle</span
+										>
+										<span
+											style="background: color-mix(in srgb, var(--folder-purple) 10%, var(--bg-primary)); border: var(--border-width) solid var(--border-color); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); font-size: var(--text-xs); font-weight: bold;"
+											>Purple Subtle</span
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
 					<!-- Button Showcase -->
 					<div class="component-card panel">
 						<div class="component-info">

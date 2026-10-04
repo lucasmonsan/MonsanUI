@@ -82,13 +82,12 @@
 	}
 
 	.monsan-badge.variant-secondary {
-		background: #9d4edd;
-		color: #fdfbf7;
+		background: var(--secondary);
+		color: var(--bg-primary);
 	}
 
 	:global([data-theme='dark']) .monsan-badge.variant-secondary {
-		background: #b388ff;
-		color: #2a2423;
+		color: var(--text-primary);
 	}
 
 	.monsan-badge.variant-success {
@@ -110,13 +109,12 @@
 	}
 
 	.monsan-badge.variant-new {
-		background: #3d5a80;
-		color: #fdfbf7;
+		background: var(--neutral);
+		color: var(--bg-primary);
 	}
 
 	:global([data-theme='dark']) .monsan-badge.variant-new {
-		background: #8ecae6;
-		color: #2a2423;
+		color: var(--text-primary);
 	}
 
 	.monsan-badge.variant-warning {

@@ -42,6 +42,7 @@
 	--warning-contrast: var(--text-primary);
 	--neutral: #3d5a80;
 	--info: #3d5a80;
+	--secondary: #9d4edd;
 	--folder-blue: #3d5a80;
 	--folder-green: #2d6a4f;
 	--folder-yellow: #e9c46a;
@@ -94,6 +95,7 @@
 	--bg-secondary: #352e2d;
 	--text-primary: #fdfbf7;
 	--text-secondary: #b0a6a3;
+	--brand-color: #ff8c75;
 	--brand-logo-filter: brightness(0) invert(1);
 	--accent-primary: #bf6958;
 	--accent-hover: #ff8c75;
@@ -101,7 +103,12 @@
 	--success-hover: #74c69d;
 	--error: #e63946;
 	--error-hover: #ff4d6d;
+	--warning: #f4a261;
+	--warning-hover: #ffb703;
+	--warning-contrast: #2a2423;
+	--neutral: #8ecae6;
 	--info: #8ecae6;
+	--secondary: #b388ff;
 	--folder-blue: #8ecae6;
 	--folder-green: #90a955;
 	--folder-yellow: #f0c23a;
