@@ -21,7 +21,7 @@
 	}
 
 	let {
-		value = $bindable('#c44933'),
+		value = $bindable('#b94b38'),
 		disabled = false,
 		id,
 		name,
@@ -48,18 +48,18 @@
 	let invalid = $derived(ariaInvalid === true || ariaInvalid === 'true');
 
 	const presetColors = [
-		'#c44933',
-		'#e06666',
-		'#f6b26b',
-		'#ffd966',
-		'#93c47d',
+		'#b94b38',
+		'#e63946',
+		'#f4a261',
+		'#e9c46a',
+		'#2d6a4f',
 		'#76a5af',
-		'#6fa8dc',
-		'#8e7cc3',
-		'#c27ba0',
+		'#3d5a80',
+		'#9d4edd',
 		'#ffffff',
-		'#888888',
-		'#222222'
+		'#f4efe6',
+		'#5e544f',
+		'#2d2422'
 	];
 
 	onMount(() => {
@@ -176,17 +176,27 @@
 	});
 
 	const colorNames: Record<string, Record<string, string>> = {
-		'#c44933': { pt: 'Ferrugem', en: 'Rust', es: 'Óxido' },
+		'#b94b38': { pt: 'Ferrugem', en: 'Rust', es: 'Óxido' },
+		'#c44933': { pt: 'Ferrugem clássico', en: 'Classic Rust', es: 'Óxido clásico' },
+		'#e63946': { pt: 'Vermelho', en: 'Red', es: 'Rojo' },
 		'#e06666': { pt: 'Vermelho claro', en: 'Soft Red', es: 'Rojo claro' },
-		'#f6b26b': { pt: 'Laranja', en: 'Orange', es: 'Naranja' },
-		'#ffd966': { pt: 'Amarelo', en: 'Yellow', es: 'Amarillo' },
-		'#93c47d': { pt: 'Verde', en: 'Green', es: 'Verde' },
+		'#f4a261': { pt: 'Laranja', en: 'Orange', es: 'Naranja' },
+		'#f6b26b': { pt: 'Laranja claro', en: 'Soft Orange', es: 'Naranja claro' },
+		'#e9c46a': { pt: 'Amarelo', en: 'Yellow', es: 'Amarillo' },
+		'#ffd966': { pt: 'Amarelo claro', en: 'Soft Yellow', es: 'Amarillo claro' },
+		'#2d6a4f': { pt: 'Verde', en: 'Green', es: 'Verde' },
+		'#93c47d': { pt: 'Verde claro', en: 'Soft Green', es: 'Verde claro' },
 		'#76a5af': { pt: 'Azul-petróleo', en: 'Teal', es: 'Azul verdoso' },
+		'#3d5a80': { pt: 'Azul', en: 'Blue', es: 'Azul' },
 		'#6fa8dc': { pt: 'Azul claro', en: 'Light Blue', es: 'Azul claro' },
+		'#9d4edd': { pt: 'Roxo', en: 'Purple', es: 'Púrpura' },
 		'#8e7cc3': { pt: 'Violeta / Roxo', en: 'Violet', es: 'Violeta' },
 		'#c27ba0': { pt: 'Magenta / Rosa', en: 'Magenta', es: 'Magenta' },
 		'#ffffff': { pt: 'Branco', en: 'White', es: 'Blanco' },
+		'#f4efe6': { pt: 'Creme', en: 'Cream', es: 'Crema' },
+		'#5e544f': { pt: 'Cinza terroso', en: 'Earthy Gray', es: 'Gris terroso' },
 		'#888888': { pt: 'Cinza', en: 'Gray', es: 'Gris' },
+		'#2d2422': { pt: 'Marrom escuro', en: 'Dark Brown', es: 'Marrón oscuro' },
 		'#222222': { pt: 'Preto', en: 'Black', es: 'Negro' }
 	};
 

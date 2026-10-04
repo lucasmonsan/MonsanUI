@@ -156,7 +156,7 @@
 			orange: '#f4a261',
 			red: '#e63946'
 		};
-		return customColor(color) ?? legacyColors[color] ?? '#c44933';
+		return customColor(color) ?? legacyColors[color] ?? '#b94b38';
 	}
 
 	function contrastForeground(color: string | undefined): string | undefined {
