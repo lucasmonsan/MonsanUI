@@ -4,6 +4,7 @@
 	import AvatarMenu from './AvatarMenu.svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
 	import MenuItem from './MenuItem.svelte';
+	import Separator from './Separator.svelte';
 	import ThemeSelector from './ThemeSelector.svelte';
 	import FileTextIcon from './icons/FileText.svelte';
 	import LockIcon from './icons/Lock.svelte';
@@ -82,7 +83,7 @@
 		logoutLabel,
 		localeValue = 'en',
 		localeAriaLabel,
-		localeMode = 'segmented',
+		localeMode = 'dropdown',
 		themeValue,
 		themeStorageKey,
 		themeAriaLabel,
@@ -165,6 +166,7 @@
 				onChange={handleThemeChange}
 			/>
 		</div>
+		<Separator orientation="vertical" />
 		<div class="suite-user-menu-preference" data-menu-persistent>
 			<LanguageSelector
 				value={localeValue}
