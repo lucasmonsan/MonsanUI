@@ -195,6 +195,7 @@
 			id={panelId}
 			bind:this={panelEl}
 			class="quick-actions-panel variant-{variant} align-{align} layout-{panelLayout} placement-{activePanelPlacement} surface-{surface} shadow-{panelShadow}"
+			class:has-max-height={panelMaxHeight !== 'none'}
 			style:--panel-width={resolvedWidth}
 			style:--panel-max-height={panelMaxHeight}
 			style:--quick-actions-panel-padding={`var(--space-${panelPadding})`}
@@ -256,9 +257,13 @@
 		max-width: 90vw;
 		display: flex;
 		padding: var(--quick-actions-panel-padding);
-		overflow: auto;
+		overflow: visible;
 		max-height: var(--panel-max-height);
 		scrollbar-width: none;
+	}
+
+	.quick-actions-panel.variant-dropdown.has-max-height {
+		overflow-y: auto;
 	}
 
 	.quick-actions-panel.variant-dropdown.shadow-none {
