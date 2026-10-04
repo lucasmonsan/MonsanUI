@@ -17,6 +17,7 @@
 		required?: boolean;
 		disabled?: boolean;
 		readonly?: boolean;
+		list?: string;
 		autocomplete?: HTMLInputAttributes['autocomplete'];
 		inputmode?: HTMLInputAttributes['inputmode'];
 		min?: string | number;
@@ -57,6 +58,7 @@
 		required = false,
 		disabled = false,
 		readonly = false,
+		list,
 		autocomplete,
 		inputmode,
 		min,
@@ -112,6 +114,7 @@
 		{required}
 		{disabled}
 		{readonly}
+		{list}
 		{autocomplete}
 		{inputmode}
 		{min}

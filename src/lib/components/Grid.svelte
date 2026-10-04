@@ -4,7 +4,16 @@
 	interface Props {
 		children: Snippet;
 		columns?:
-			'one' | 'two' | 'three' | '1-2' | '2-1' | '1-3' | '3-1' | 'row-actions' | 'media-fields';
+			| 'one'
+			| 'two'
+			| 'three'
+			| '1-2'
+			| '2-1'
+			| '1-3'
+			| '3-1'
+			| '1-auto'
+			| 'row-actions'
+			| 'media-fields';
 		gap?: 'sm' | 'md' | 'lg';
 		responsive?: boolean;
 		fullHeight?: boolean;
@@ -60,6 +69,9 @@
 	}
 	.columns-3-1 {
 		grid-template-columns: 3fr 1fr;
+	}
+	.columns-1-auto {
+		grid-template-columns: minmax(0, 1fr) auto;
 	}
 	.columns-row-actions {
 		grid-template-columns: 1fr calc(var(--control-height) * 2) var(--control-height);

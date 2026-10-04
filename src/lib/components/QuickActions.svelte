@@ -214,6 +214,7 @@
 	.monsan-quick-actions-wrapper {
 		position: relative;
 		display: inline-block;
+		vertical-align: middle;
 	}
 
 	.monsan-quick-actions-wrapper.is-reveal:not(.contained-reveal) {
