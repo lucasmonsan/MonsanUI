@@ -173,6 +173,7 @@ export { default as MailIcon } from './components/icons/Mail.svelte';
 export { default as MicrophoneIcon } from './components/icons/Microphone.svelte';
 export { default as UnlockIcon } from './components/icons/Unlock.svelte';
 export { default as RotateCwIcon } from './components/icons/RotateCw.svelte';
+export { default as ArrowsClockwiseIcon } from './components/icons/ArrowsClockwise.svelte';
 export { default as SaveIcon } from './components/icons/Save.svelte';
 export { default as PlayIcon } from './components/icons/Play.svelte';
 export { default as SkipForwardIcon } from './components/icons/SkipForward.svelte';
