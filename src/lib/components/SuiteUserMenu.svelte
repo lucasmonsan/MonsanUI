@@ -207,6 +207,8 @@
 
 	.suite-user-menu-preference {
 		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		flex: 0 0 auto;
 	}
 </style>
