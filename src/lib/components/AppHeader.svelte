@@ -1,11 +1,15 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import Text from './Text.svelte';
+	import ArrowsClockwiseIcon from './icons/ArrowsClockwise.svelte';
 
 	interface Props {
 		title: string;
 		tag?: 'div' | 'header';
 		subtitle?: string;
+		onSubtitleClick?: (e: MouseEvent) => void;
+		subtitleAriaLabel?: string;
+		subtitleTitle?: string;
 		logoSrc?: string;
 		logoAlt?: string;
 		logoAppearance?: 'adaptive' | 'original';
@@ -25,6 +29,9 @@
 		title,
 		tag = 'div',
 		subtitle,
+		onSubtitleClick,
+		subtitleAriaLabel,
+		subtitleTitle,
 		logoSrc,
 		logoAlt = '',
 		logoAppearance = 'adaptive',
@@ -78,9 +85,22 @@
 						{title}
 					</Text>
 					{#if subtitle}
-						<Text tag="p" size="sm" weight="semibold" variant="secondary" truncate>
-							{subtitle}
-						</Text>
+						{#if onSubtitleClick}
+							<button
+								type="button"
+								class="app-header-subtitle-action"
+								onclick={onSubtitleClick}
+								title={subtitleTitle}
+								aria-label={subtitleAriaLabel ?? subtitleTitle ?? subtitle}
+							>
+								<span class="app-header-subtitle-text">{subtitle}</span>
+								<ArrowsClockwiseIcon size={13} strokeWidth={2.5} ariaLabel={subtitleAriaLabel} />
+							</button>
+						{:else}
+							<Text tag="p" size="sm" weight="semibold" variant="secondary" truncate>
+								{subtitle}
+							</Text>
+						{/if}
 					{/if}
 				</div>
 			</div>
@@ -223,6 +243,58 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0;
+	}
+
+	.app-header-subtitle-action {
+		display: inline-flex;
+		align-items: center;
+		gap: calc(var(--space-xs) * 0.5);
+		padding: calc(var(--space-xs) * 0.25) calc(var(--space-xs) * 0.75);
+		margin-left: calc(var(--space-xs) * -0.75);
+		background: transparent;
+		border: var(--border-width) solid transparent;
+		border-radius: var(--radius-sm);
+		color: var(--text-secondary);
+		cursor: pointer;
+		font-family: inherit;
+		text-align: left;
+		transition:
+			color 0.15s var(--ease-out, ease),
+			background-color 0.15s var(--ease-out, ease),
+			border-color 0.15s var(--ease-out, ease);
+	}
+
+	.app-header-subtitle-action:hover {
+		color: var(--text-primary);
+		background-color: var(--surface-hover, rgba(125, 125, 125, 0.1));
+		border-color: var(--border-color);
+	}
+
+	.app-header-subtitle-action:focus-visible {
+		outline: 2px solid var(--accent, #6366f1);
+		outline-offset: 1px;
+	}
+
+	.app-header-subtitle-text {
+		font-size: var(--text-sm);
+		font-weight: 600;
+		line-height: 1.25;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.app-header-subtitle-action :global(svg) {
+		flex-shrink: 0;
+		opacity: 0.75;
+		transition:
+			transform 0.25s var(--ease-out, ease),
+			opacity 0.15s ease;
+	}
+
+	.app-header-subtitle-action:hover :global(svg) {
+		opacity: 1;
+		transform: rotate(180deg);
 	}
 
 	.app-header-actions {
