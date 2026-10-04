@@ -37,8 +37,33 @@
 	let activeLocale = $derived(locales.find((locale) => locale.id === value));
 	let shouldCycle = $derived(mode === 'cycle' || (mode === 'auto' && locales.length <= 2));
 
+	function getSuiteCookieDomain() {
+		if (typeof window === 'undefined') return '';
+		const hostname = window.location.hostname;
+		if (hostname === 'monsan.dev.br' || hostname.endsWith('.monsan.dev.br')) {
+			return '; Domain=.monsan.dev.br';
+		}
+		return '';
+	}
+
+	function persistLocale(localeId: string) {
+		if (typeof window === 'undefined') return;
+		try {
+			localStorage.setItem('monsan-suite-locale', localeId);
+			localStorage.setItem('PARAGLIDE_LOCALE', localeId);
+		} catch {
+			// ignore storage errors
+		}
+		const maxAge = 60 * 60 * 24 * 365;
+		const domain = getSuiteCookieDomain();
+		const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+		document.cookie = `PARAGLIDE_LOCALE=${encodeURIComponent(localeId)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${domain}${secure}`;
+		document.cookie = `monsan_locale=${encodeURIComponent(localeId)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${domain}${secure}`;
+	}
+
 	function selectLocale(localeId: string) {
 		value = localeId;
+		persistLocale(localeId);
 		onChange?.(localeId);
 		window.dispatchEvent(new CustomEvent('monsan-locale-change', { detail: { locale: localeId } }));
 		isOpen = false;

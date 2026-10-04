@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { ActionPanelWidthPreset } from '$lib/utils/layout.js';
 	import AvatarMenu from './AvatarMenu.svelte';
+	import Button from './Button.svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
 	import MenuItem from './MenuItem.svelte';
 	import Separator from './Separator.svelte';
@@ -121,6 +122,37 @@
 	const primaryHref = $derived(isAuthenticated ? undefined : loginHref);
 	const primaryAction = $derived(isAuthenticated ? onProfile : (onLogin ?? onProfile));
 	let open = $state(false);
+	let isLanguageOpen = $state(false);
+
+	const defaultLocales = [
+		{ id: 'en', label: 'EN', name: 'English' },
+		{ id: 'pt', label: 'PT', name: 'Português' },
+		{ id: 'es', label: 'ES', name: 'Español' }
+	];
+
+	function getSuiteCookieDomain() {
+		if (typeof window === 'undefined') return '';
+		const hostname = window.location.hostname;
+		if (hostname === 'monsan.dev.br' || hostname.endsWith('.monsan.dev.br')) {
+			return '; Domain=.monsan.dev.br';
+		}
+		return '';
+	}
+
+	function persistLocale(localeId: string) {
+		if (typeof window === 'undefined') return;
+		try {
+			localStorage.setItem('monsan-suite-locale', localeId);
+			localStorage.setItem('PARAGLIDE_LOCALE', localeId);
+		} catch {
+			// ignore storage access error
+		}
+		const maxAge = 60 * 60 * 24 * 365;
+		const domain = getSuiteCookieDomain();
+		const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+		document.cookie = `PARAGLIDE_LOCALE=${encodeURIComponent(localeId)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${domain}${secure}`;
+		document.cookie = `monsan_locale=${encodeURIComponent(localeId)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${domain}${secure}`;
+	}
 
 	function handleThemeChange(themeId: string): void {
 		onThemeChange?.(themeId);
@@ -128,9 +160,23 @@
 	}
 
 	function handleLocaleChange(localeId: string): void {
+		persistLocale(localeId);
 		onLocaleChange?.(localeId);
+		window.dispatchEvent(new CustomEvent('monsan-locale-change', { detail: { locale: localeId } }));
+		isLanguageOpen = false;
 		open = false;
 	}
+
+	function toggleLanguage(event?: MouseEvent) {
+		event?.stopPropagation();
+		isLanguageOpen = !isLanguageOpen;
+	}
+
+	$effect(() => {
+		if (!open) {
+			isLanguageOpen = false;
+		}
+	});
 </script>
 
 <AvatarMenu
@@ -168,14 +214,59 @@
 		</div>
 		<Separator orientation="vertical" />
 		<div class="suite-user-menu-preference" data-menu-persistent>
-			<LanguageSelector
-				value={localeValue}
-				ariaLabel={localeAriaLabel}
-				onChange={handleLocaleChange}
-				mode={localeMode}
-			/>
+			{#if localeMode === 'cycle'}
+				<LanguageSelector
+					value={localeValue}
+					ariaLabel={localeAriaLabel}
+					onChange={handleLocaleChange}
+					mode="cycle"
+				/>
+			{:else if localeMode === 'segmented'}
+				<LanguageSelector
+					value={localeValue}
+					ariaLabel={localeAriaLabel}
+					onChange={handleLocaleChange}
+					mode="segmented"
+				/>
+			{:else}
+				<Button
+					variant="secondary"
+					square
+					onclick={toggleLanguage}
+					ariaLabel={localeAriaLabel ?? 'Alternar idioma / Toggle language / Cambiar idioma'}
+					ariaExpanded={isLanguageOpen}
+					title={localeAriaLabel ?? 'Alternar idioma / Toggle language / Cambiar idioma'}
+				>
+					<span class="trigger-label">
+						{localeValue.toUpperCase()}
+					</span>
+				</Button>
+			{/if}
 		</div>
 	</div>
+	{#if isLanguageOpen && localeMode !== 'cycle' && localeMode !== 'segmented'}
+		<div
+			class="suite-user-menu-language-flyout"
+			role="menu"
+			aria-label={localeAriaLabel ?? 'Alternar idioma / Toggle language / Cambiar idioma'}
+			data-menu-persistent
+		>
+			{#each defaultLocales as locale (locale.id)}
+				<MenuItem
+					align="left"
+					checked={localeValue === locale.id}
+					onclick={() => handleLocaleChange(locale.id)}
+				>
+					<span class="locale-option">
+						<span class="item-label">{locale.label}</span>
+						{#if locale.name}
+							<span class="item-name">{locale.name}</span>
+						{/if}
+					</span>
+				</MenuItem>
+			{/each}
+		</div>
+	{/if}
 	{@render children?.()}
 	{@render userMenuExtras?.()}
 	<MenuItem href={termsHref} onclick={onTerms} align="right">
@@ -210,5 +301,60 @@
 		align-items: center;
 		justify-content: center;
 		flex: 0 0 auto;
+	}
+
+	.trigger-label {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: var(--text-md);
+		font-weight: 800;
+		font-family: inherit;
+		height: 1.2em;
+	}
+
+	.suite-user-menu-language-flyout {
+		position: absolute;
+		top: 0;
+		right: calc(100% + var(--space-xs));
+		background: var(--bg-primary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-sm);
+		width: max-content;
+		min-width: 140px;
+		display: flex;
+		flex-direction: column;
+		padding: var(--space-sm);
+		gap: var(--space-xs);
+		z-index: 140;
+	}
+
+	.locale-option {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+		font-size: var(--text-sm);
+	}
+
+	.item-label {
+		font-weight: 800;
+		min-width: 1.8em;
+	}
+
+	.item-name {
+		color: var(--text-secondary);
+	}
+
+	@media (max-width: 480px) {
+		.suite-user-menu-language-flyout {
+			position: static;
+			width: 100%;
+			box-shadow: none;
+			border: none;
+			border-top: var(--border-width) solid var(--border-color);
+			border-radius: 0;
+			padding: var(--space-xs) 0;
+		}
 	}
 </style>
