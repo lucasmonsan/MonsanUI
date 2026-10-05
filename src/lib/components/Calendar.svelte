@@ -24,7 +24,9 @@
 		weekDayLabels?: string[];
 		selectedDate?: string | null;
 		showDetails?: boolean;
+		clearable?: boolean;
 		onSelectDate?: (dateStr: string) => void;
+		onClearDate?: () => void;
 	}
 
 	let {
@@ -36,7 +38,9 @@
 		weekDayLabels,
 		selectedDate = $bindable(null),
 		showDetails = true,
-		onSelectDate
+		clearable = true,
+		onSelectDate,
+		onClearDate
 	}: Props = $props();
 
 	const today = new Date();
@@ -163,6 +167,13 @@
 		onSelectDate?.(dateStr);
 	}
 
+	function handleClearDate(e: MouseEvent) {
+		e.stopPropagation();
+		selectedDate = null;
+		onSelectDate?.('');
+		onClearDate?.();
+	}
+
 	function getDateState(dateStr: string): CalendarDateState | undefined {
 		return dateStates[dateStr];
 	}
@@ -225,27 +236,18 @@
 
 <div class="calendar-card panel">
 	<div class="calendar-top-bar">
-		<div
-			class="calendar-title-picker"
-			onclick={(e) => {
-				e.stopPropagation();
-				showMonthYearPicker = !showMonthYearPicker;
-			}}
-			role="button"
-			tabindex="0"
-			onkeydown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.stopPropagation();
-					showMonthYearPicker = !showMonthYearPicker;
-				}
-			}}
-		>
-			{#if mode === 'calendar' || mode === 'heatmap'}
-				<h3 class="calendar-title">
-					{monthNames[currentMonth]}
-					{currentYear}
+		<div class="calendar-header-left">
+			{#if clearable}
+				<button
+					type="button"
+					class="clear-date-btn"
+					class:visible={Boolean(selectedDate)}
+					disabled={!selectedDate}
+					onclick={handleClearDate}
+					aria-label={i18n.t('calendar.clearDate')}
+					title={i18n.t('calendar.clearDate')}
+				>
 					<svg
-						class="picker-icon"
 						width="14"
 						height="14"
 						viewBox="0 0 24 24"
@@ -255,117 +257,122 @@
 						stroke-linecap="round"
 						stroke-linejoin="round"
 					>
-						<rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-						<line x1="16" x2="16" y1="2" y2="6" />
-						<line x1="8" x2="8" y1="2" y2="6" />
-						<line x1="3" x2="21" y1="10" y2="10" />
+						<line x1="18" y1="6" x2="6" y2="18" />
+						<line x1="6" y1="6" x2="18" y2="18" />
 					</svg>
-				</h3>
-			{:else if mode === 'week'}
-				<h3 class="calendar-title">{i18n.t('calendar.currentWeek')}</h3>
-			{:else if mode === 'list'}
-				<h3 class="calendar-title">
-					{i18n.t('calendar.agenda')} — {monthNames[currentMonth]}
-					{currentYear}
-					<svg
-						class="picker-icon"
-						width="14"
-						height="14"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-						<line x1="16" x2="16" y1="2" y2="6" />
-						<line x1="8" x2="8" y1="2" y2="6" />
-						<line x1="3" x2="21" y1="10" y2="10" />
-					</svg>
-				</h3>
-			{:else}
-				<h3 class="calendar-title">{displayTitle}</h3>
+				</button>
 			{/if}
 
-			{#if showMonthYearPicker && (mode === 'calendar' || mode === 'list' || mode === 'heatmap')}
-				<div
-					class="month-year-popover panel"
-					transition:scale={{
-						duration: prefersReducedMotion ? 0 : 180,
-						start: prefersReducedMotion ? 1 : 0.94,
-						easing: backOut
-					}}
-					onclick={(e) => e.stopPropagation()}
-					onkeydown={(e) => e.stopPropagation()}
-					role="dialog"
-					aria-label={i18n.t('calendar.selectMonthYear')}
-					tabindex="-1"
-				>
-					<div class="popover-header">
-						<button
-							type="button"
-							class="year-nav-btn"
-							onclick={() => currentYear--}
-							aria-label={i18n.t('calendar.previousYear')}
-						>
-							<svg
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path d="m15 18-6-6 6-6" />
-							</svg>
-						</button>
-						<input
-							type="number"
-							class="year-input"
-							bind:value={currentYear}
-							min={1000}
-							max={9999}
-						/>
-						<button
-							type="button"
-							class="year-nav-btn"
-							onclick={() => currentYear++}
-							aria-label={i18n.t('calendar.nextYear')}
-						>
-							<svg
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path d="m9 18 6-6-6-6" />
-							</svg>
-						</button>
-					</div>
-					<div class="months-grid">
-						{#each monthNames as month, idx (month)}
+			<div
+				class="calendar-title-picker"
+				onclick={(e) => {
+					e.stopPropagation();
+					showMonthYearPicker = !showMonthYearPicker;
+				}}
+				role="button"
+				tabindex="0"
+				onkeydown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.stopPropagation();
+						showMonthYearPicker = !showMonthYearPicker;
+					}
+				}}
+			>
+				{#if mode === 'calendar' || mode === 'heatmap'}
+					<h3 class="calendar-title">
+						{monthNames[currentMonth]}
+						{currentYear}
+					</h3>
+				{:else if mode === 'week'}
+					<h3 class="calendar-title">{i18n.t('calendar.currentWeek')}</h3>
+				{:else if mode === 'list'}
+					<h3 class="calendar-title">
+						{i18n.t('calendar.agenda')} — {monthNames[currentMonth]}
+						{currentYear}
+					</h3>
+				{:else}
+					<h3 class="calendar-title">{displayTitle}</h3>
+				{/if}
+
+				{#if showMonthYearPicker && (mode === 'calendar' || mode === 'list' || mode === 'heatmap')}
+					<div
+						class="month-year-popover panel"
+						transition:scale={{
+							duration: prefersReducedMotion ? 0 : 180,
+							start: prefersReducedMotion ? 1 : 0.94,
+							easing: backOut
+						}}
+						onclick={(e) => e.stopPropagation()}
+						onkeydown={(e) => e.stopPropagation()}
+						role="dialog"
+						aria-label={i18n.t('calendar.selectMonthYear')}
+						tabindex="-1"
+					>
+						<div class="popover-header">
 							<button
 								type="button"
-								class="month-btn"
-								class:active={currentMonth === idx}
-								onclick={() => {
-									currentMonth = idx;
-									showMonthYearPicker = false;
-								}}
+								class="year-nav-btn"
+								onclick={() => currentYear--}
+								aria-label={i18n.t('calendar.previousYear')}
 							>
-								{month}
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="m15 18-6-6 6-6" />
+								</svg>
 							</button>
-						{/each}
+							<input
+								type="number"
+								class="year-input"
+								bind:value={currentYear}
+								min={1000}
+								max={9999}
+							/>
+							<button
+								type="button"
+								class="year-nav-btn"
+								onclick={() => currentYear++}
+								aria-label={i18n.t('calendar.nextYear')}
+							>
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="m9 18 6-6-6-6" />
+								</svg>
+							</button>
+						</div>
+						<div class="months-grid">
+							{#each monthNames as month, idx (month)}
+								<button
+									type="button"
+									class="month-btn"
+									class:active={currentMonth === idx}
+									onclick={() => {
+										currentMonth = idx;
+										showMonthYearPicker = false;
+									}}
+								>
+									{month}
+								</button>
+							{/each}
+						</div>
 					</div>
-				</div>
-			{/if}
+				{/if}
+			</div>
 		</div>
 
 		<div class="nav-buttons">
@@ -652,14 +659,49 @@
 		filter: brightness(1.06);
 	}
 
-	.picker-icon {
-		opacity: 0.6;
-		transition: opacity 0.15s var(--ease-out);
+	.calendar-header-left {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
 	}
 
-	.calendar-title-picker:hover .picker-icon {
+	.clear-date-btn {
+		background: var(--bg-primary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-sm);
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		box-shadow: var(--shadow-sm);
+		color: var(--error);
+		transition:
+			transform 0.1s var(--ease-out),
+			box-shadow 0.1s var(--ease-out),
+			background-color 0.1s var(--ease-out),
+			border-color 0.1s var(--ease-out),
+			opacity 0.15s var(--ease-out);
+		opacity: 0;
+		pointer-events: none;
+		visibility: hidden;
+	}
+
+	.clear-date-btn.visible {
 		opacity: 1;
-		color: var(--accent-primary);
+		pointer-events: auto;
+		visibility: visible;
+	}
+
+	.clear-date-btn:hover:not(:disabled) {
+		background: color-mix(in srgb, var(--error) 12%, var(--bg-primary));
+		border-color: var(--error);
+		filter: brightness(1.08);
+	}
+
+	.clear-date-btn:active:not(:disabled) {
+		transform: scale(0.95);
 	}
 
 	/* Custom Month/Year Popover */
@@ -1156,7 +1198,7 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.calendar-title,
-		.picker-icon,
+		.clear-date-btn,
 		.year-nav-btn,
 		.month-btn,
 		.nav-btn,
