@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { ActionPanelWidthPreset } from '$lib/utils/layout.js';
+	import { slideFade } from '$lib/utils/transitions.js';
 	import AvatarMenu from './AvatarMenu.svelte';
 	import Button from './Button.svelte';
 	import LanguageSelector from './LanguageSelector.svelte';
@@ -230,7 +231,7 @@
 				/>
 			{:else}
 				<Button
-					variant="secondary"
+					variant={isLanguageOpen ? 'primary' : 'secondary'}
 					square
 					onclick={toggleLanguage}
 					ariaLabel={localeAriaLabel ?? 'Alternar idioma / Toggle language / Cambiar idioma'}
@@ -246,10 +247,11 @@
 	</div>
 	{#if isLanguageOpen && localeMode !== 'cycle' && localeMode !== 'segmented'}
 		<div
-			class="suite-user-menu-language-flyout"
+			class="suite-user-menu-language-options"
 			role="menu"
 			aria-label={localeAriaLabel ?? 'Alternar idioma / Toggle language / Cambiar idioma'}
 			data-menu-persistent
+			transition:slideFade={{ duration: 180 }}
 		>
 			{#each defaultLocales as locale (locale.id)}
 				<MenuItem
@@ -313,26 +315,23 @@
 		height: 1.2em;
 	}
 
-	.suite-user-menu-language-flyout {
-		position: absolute;
-		top: 0;
-		right: calc(100% + var(--space-xs));
-		background: var(--bg-primary);
-		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-md);
-		box-shadow: var(--shadow-sm);
-		width: max-content;
-		min-width: 140px;
+	.suite-user-menu-language-options {
 		display: flex;
 		flex-direction: column;
-		padding: var(--space-sm);
-		gap: var(--space-xs);
-		z-index: 140;
+		width: 100%;
+		gap: var(--space-xxs);
+		padding: var(--space-xs) 0;
+		border-top: var(--border-width) solid var(--border-color);
+		border-bottom: var(--border-width) solid var(--border-color);
+		box-sizing: border-box;
+		overflow: hidden;
 	}
 
 	.locale-option {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
+		width: 100%;
 		gap: var(--space-xs);
 		font-size: var(--text-sm);
 	}
@@ -346,15 +345,8 @@
 		color: var(--text-secondary);
 	}
 
-	@media (max-width: 480px) {
-		.suite-user-menu-language-flyout {
-			position: static;
-			width: 100%;
-			box-shadow: none;
-			border: none;
-			border-top: var(--border-width) solid var(--border-color);
-			border-radius: 0;
-			padding: var(--space-xs) 0;
-		}
+	:global(.monsan-menu-item.selected) .item-name {
+		color: inherit;
+		opacity: 0.85;
 	}
 </style>
