@@ -140,6 +140,12 @@
 			return () => clearTimeout(timer);
 		}
 	});
+
+	function handleClearDate() {
+		selectedDateString = null;
+		value = null;
+		closePopover(true);
+	}
 </script>
 
 <div bind:this={containerEl} class="monsan-datepicker-container width-{width}">
@@ -183,7 +189,12 @@
 				start: prefersReducedMotion ? 1 : 0.95
 			}}
 		>
-			<Calendar bind:selectedDate={selectedDateString} showDetails={false} {dateStates} />
+			<Calendar
+				bind:selectedDate={selectedDateString}
+				showDetails={false}
+				{dateStates}
+				onClearDate={handleClearDate}
+			/>
 		</div>
 	{/if}
 </div>
