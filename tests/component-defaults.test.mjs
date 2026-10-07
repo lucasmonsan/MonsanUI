@@ -50,6 +50,7 @@ const colorPicker = await readComponent('ColorPicker.svelte');
 const dataTable = await readComponent('DataTable.svelte');
 const badge = await readComponent('Badge.svelte');
 const badgeGroup = await readComponent('BadgeGroup.svelte');
+const deck = await readComponent('Deck.svelte');
 const iconButton = await readComponent('IconButton.svelte');
 const toast = await readComponent('Toast.svelte');
 const toastViewport = await readComponent('ToastViewport.svelte');
@@ -531,6 +532,18 @@ assert(
 		suiteUserMenu.includes('userMenuShortcuts') &&
 		suiteUserMenu.includes('userMenuDangerActions'),
 	'Suite header preferences must live in the Avatar menu, with structured slots for app shortcuts and destructive actions.'
+);
+
+assert(
+	badge.includes('variant-new') && badge.includes('color-mix(in srgb, var(--neutral)'),
+	'Badge variant-new in dark mode must darken background with color-mix for accessible contrast.'
+);
+
+assert(
+	deck.includes('muted?: boolean') &&
+		deck.includes('class:muted') &&
+		deck.includes('.deck-card.muted'),
+	'Deck must support muted prop for dormant / completed decks.'
 );
 
 console.log('Component default tests passed.');
