@@ -114,6 +114,7 @@
 	}
 
 	:global([data-theme='dark']) .monsan-badge.variant-new {
+		background: color-mix(in srgb, var(--neutral) 45%, black);
 		color: var(--text-primary);
 	}
 

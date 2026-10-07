@@ -20,6 +20,8 @@
 		isPopoverOpen?: boolean;
 		isMenuOpen?: boolean;
 		stats?: { newCount: number; dueCount: number };
+		/** Reduces visual emphasis when deck is caught up / completed for today or dormant. */
+		muted?: boolean;
 		modes?: Array<{ id: string; label: string; iconPath?: string; description?: string }>;
 		popoverTitle?: string;
 		labels?: {
@@ -58,6 +60,7 @@
 		isPopoverOpen = $bindable(false),
 		isMenuOpen = $bindable(false),
 		stats,
+		muted = false,
 		modes,
 		popoverTitle,
 		labels,
@@ -123,6 +126,7 @@
 	class:surface-subtle={surfaceColorStrength === 'subtle'}
 	class:surface-strong={surfaceColorStrength === 'strong'}
 	class:selected-for-play={isPopoverOpen || isMenuOpen}
+	class:muted
 	data-theme={surfaceColor ? undefined : folderColor}
 	role="button"
 	tabindex="0"
@@ -317,6 +321,15 @@
 		position: relative;
 		width: 100%;
 		cursor: pointer;
+	}
+
+	.deck-card.muted {
+		opacity: 0.65;
+	}
+
+	.deck-card.muted:hover,
+	.deck-card.muted.selected-for-play {
+		opacity: 0.95;
 	}
 
 	.deck-card.has-accent {
