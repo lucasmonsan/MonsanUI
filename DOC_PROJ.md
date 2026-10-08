@@ -1,6 +1,6 @@
 # MonsanUI Project Context
 
-MonsanUI is the private Svelte 5 visual and interaction library for the Monsan suite. Koalify, Manki and Owlth must be built from MonsanUI components and tokens.
+MonsanUI is the private Svelte 5 visual and interaction library for the Monsan suite. All suite apps (Koalify, Manki, Owlth, Crocode, Rooster, Whallet, Monsan Portal, and Octomate) must be built from MonsanUI components and tokens.
 
 Use this file as compact context for another AI/chat. Use `README.md` for setup and operational commands. Use workspace root `AGENTS.md` as the canonical implementation rules.
 

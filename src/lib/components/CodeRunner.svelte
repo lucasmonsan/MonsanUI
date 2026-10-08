@@ -470,6 +470,10 @@ fimalgoritmo`
 					outputs = [...outputs, text + '\n'];
 					onOutputsChange?.(outputs);
 				},
+				onClear: () => {
+					outputs = [];
+					onOutputsChange?.(outputs);
+				},
 				onPrompt: (message, reply) => {
 					if (message) {
 						outputs = [...outputs, message];

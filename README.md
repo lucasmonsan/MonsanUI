@@ -2,7 +2,7 @@
 
 MonsanUI is the private Svelte 5 component library used by the Monsan app suite.
 
-Its job is simple: keep Koalify, Manki and Owlth visually consistent without forcing each app to redefine layout, spacing, colors, controls, dialogs or common interaction patterns.
+Its job is simple: keep all applications in the Monsan Suite (Koalify, Manki, Owlth, Crocode, Rooster, Whallet, Monsan Portal, and Octomate) visually consistent without forcing each app to redefine layout, spacing, colors, controls, dialogs or common interaction patterns.
 
 ## What It Provides
 

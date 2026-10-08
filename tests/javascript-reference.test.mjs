@@ -63,6 +63,7 @@ test('getSupportedJavaScriptReferenceNames returns comprehensive list', () => {
 	assert.ok(names.includes('-='));
 	assert.ok(names.includes('prompt'));
 	assert.ok(names.includes('console.log'));
+	assert.ok(names.includes('console.clear'));
 	assert.ok(names.includes('Math.floor'));
 	assert.ok(names.includes('if'));
 	assert.ok(names.includes('for'));

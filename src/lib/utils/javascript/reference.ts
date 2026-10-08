@@ -159,6 +159,16 @@ export const javascriptReferenceItems: JavaScriptReferenceItem[] = [
 		compatibility: 'Standard JS'
 	},
 	{
+		name: 'console.clear',
+		aliases: ['console.clear()', 'clear', 'limpartela', 'limpatela'],
+		category: 'input-output',
+		status: 'supported',
+		syntax: 'console.clear()',
+		description: 'Limpa todas as mensagens e saídas exibidas no console.',
+		example: 'console.log("Mensagem antiga");\nconsole.clear();\nconsole.log("Console limpo!");',
+		compatibility: 'Standard JS'
+	},
+	{
 		name: 'Template Strings',
 		aliases: ['interpolação', 'template literals', '`'],
 		category: 'input-output',
