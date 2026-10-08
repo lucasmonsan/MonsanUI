@@ -52,6 +52,32 @@ test('JavaScriptRunnerSession captures console.warn and console.error with prefi
 	assert.ok(result.outputs.some((o) => o.includes('[ERRO] Erro crítico')));
 });
 
+test('JavaScriptRunnerSession clears outputs and triggers onClear when console.clear is called', async () => {
+	const session = new JavaScriptRunnerSession();
+	let clearCalled = false;
+	const outputsReceived = [];
+
+	const result = await session.run(
+		`
+		console.log('Primeira linha');
+		console.clear();
+		console.log('Segunda linha');
+	`,
+		{
+			onOutput: (text) => outputsReceived.push(text),
+			onClear: () => {
+				clearCalled = true;
+				outputsReceived.length = 0;
+			}
+		}
+	);
+
+	assert.equal(result.error, null);
+	assert.equal(clearCalled, true);
+	assert.deepEqual(result.outputs, ['Segunda linha']);
+	assert.deepEqual(outputsReceived, ['Segunda linha']);
+});
+
 test('JavaScriptRunnerSession stops execution', async () => {
 	const session = new JavaScriptRunnerSession();
 	const promise = session.run(`
@@ -75,6 +101,7 @@ test('buildWorkerScript inlines user code without new Function or eval', async (
 	const { script, headerLineCount } = buildWorkerScript(userCode, 1);
 
 	assert.ok(script.includes(userCode));
+	assert.ok(script.includes('console.clear'));
 	assert.ok(!script.includes('AsyncFunction'));
 	assert.ok(!script.includes('new Function'));
 	assert.ok(!script.includes('eval('));

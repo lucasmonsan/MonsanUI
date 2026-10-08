@@ -5,6 +5,7 @@ export interface JavaScriptRunOptions {
 	timeoutMs?: number;
 	isStepMode?: boolean;
 	onOutput?: (text: string) => void;
+	onClear?: () => void;
 	onPrompt?: (message: string, reply: (value: string) => void) => void;
 	onStep?: (line: number, variables: Record<string, { value: unknown; type: string }>) => void;
 	onVariables?: (variables: Record<string, { value: unknown; type: string }>) => void;
@@ -207,6 +208,7 @@ export function buildWorkerScript(
 		'console.error = (...args) => { self.postMessage({ id: ' +
 			id +
 			', type: "output", text: "[ERRO] " + args.map(formatArg).join(" ") }); };',
+		'console.clear = () => { self.postMessage({ id: ' + id + ', type: "clear" }); };',
 		'let __promptCounter = 0;',
 		'const __pendingPrompts = new Map();',
 		'let __stepResolver = null;',
@@ -435,6 +437,9 @@ export class JavaScriptRunnerSession {
 						const data = e.data;
 						if (data.type === 'output') {
 							handleOutput(data.text);
+						} else if (data.type === 'clear') {
+							outputs.length = 0;
+							options.onClear?.();
 						} else if (data.type === 'step') {
 							if (this.timeoutTimer) {
 								clearTimeout(this.timeoutTimer);
@@ -510,6 +515,7 @@ export class JavaScriptRunnerSession {
 			const origWarn = console.warn;
 			const origError = console.error;
 			const origInfo = console.info;
+			const origClear = console.clear;
 
 			console.log = (...args: unknown[]) => {
 				if (this.isStopped) return;
@@ -535,12 +541,19 @@ export class JavaScriptRunnerSession {
 				capturedOutputs.push(text);
 				handleOutput(text);
 			};
+			console.clear = () => {
+				if (this.isStopped) return;
+				capturedOutputs.length = 0;
+				outputs.length = 0;
+				options.onClear?.();
+			};
 
 			const restoreConsole = () => {
 				console.log = origLog;
 				console.warn = origWarn;
 				console.error = origError;
 				console.info = origInfo;
+				console.clear = origClear;
 			};
 
 			resetTimeout();
