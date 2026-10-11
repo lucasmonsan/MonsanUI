@@ -1,4 +1,5 @@
 import { javascriptLanguage } from '@codemirror/lang-javascript';
+import { findJsSyntaxError } from './diagnostics.js';
 
 /**
  * Returns line number (1-indexed) for a character offset in the source string.
@@ -22,6 +23,11 @@ interface Insertion {
  */
 export function instrumentJsCode(code: string): string {
 	if (!code || !code.trim()) return code;
+
+	// If code has syntax errors, do not instrument to avoid creating confusing secondary errors
+	if (findJsSyntaxError(code)) {
+		return code;
+	}
 
 	try {
 		const tree = javascriptLanguage.parser.parse(code);

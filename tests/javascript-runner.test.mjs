@@ -244,3 +244,71 @@ test('JavaScriptRunnerSession continue() finishes execution without pausing on r
 	assert.equal(steppedLines.length, 1);
 	assert.ok(result.outputs.some((o) => o.includes('6')));
 });
+
+test('findJsSyntaxError detects unclosed string, parentheses and malformed syntax', async () => {
+	const { findJsSyntaxError } = await import('../dist/utils/javascript/diagnostics.js');
+
+	const unclosedString = findJsSyntaxError('console.log("texto sem fechar);');
+	assert.ok(unclosedString !== null);
+	assert.equal(unclosedString.line, 1);
+	assert.ok(unclosedString.message.includes('Texto entre aspas'));
+
+	const unclosedParen = findJsSyntaxError('if (x > 5 {\n  console.log(1);\n}');
+	assert.ok(unclosedParen !== null);
+	assert.equal(unclosedParen.line, 1);
+	assert.ok(unclosedParen.message.includes('parênteses'));
+
+	const malformedVar = findJsSyntaxError('const a = ;');
+	assert.ok(malformedVar !== null);
+	assert.equal(malformedVar.line, 1);
+	assert.ok(malformedVar.message.includes('Declaração de variável'));
+
+	const validCode = findJsSyntaxError('const a = 10;\nconsole.log(a);');
+	assert.equal(validCode, null);
+});
+
+test('translateJsErrorMessage maps common V8 errors to didactic explanations without giving answers', async () => {
+	const { translateJsErrorMessage } = await import('../dist/utils/javascript/diagnostics.js');
+
+	const refMsg = translateJsErrorMessage('ReferenceError: contador is not defined');
+	assert.ok(refMsg.includes("identificador 'contador'"));
+	assert.ok(refMsg.includes('não foi declarado'));
+
+	const constMsg = translateJsErrorMessage('TypeError: Assignment to constant variable.');
+	assert.ok(constMsg.includes('constante'));
+	assert.ok(constMsg.includes('reatribuir'));
+
+	const nullPropMsg = translateJsErrorMessage(
+		"TypeError: Cannot read properties of undefined (reading 'nome')"
+	);
+	assert.ok(nullPropMsg.includes("'nome'"));
+	assert.ok(nullPropMsg.includes('indefinido (undefined)'));
+
+	const notFuncMsg = translateJsErrorMessage('TypeError: minhaVariavel is not a function');
+	assert.ok(notFuncMsg.includes("'minhaVariavel'"));
+	assert.ok(notFuncMsg.includes('não é uma função'));
+
+	const stackMsg = translateJsErrorMessage('RangeError: Maximum call stack size exceeded');
+	assert.ok(stackMsg.includes('Estouro de pilha'));
+});
+
+test('JavaScriptRunnerSession handles syntax errors and runtime errors with didactic Portuguese messages', async () => {
+	const session = new JavaScriptRunnerSession();
+
+	// Syntax error caught statically
+	const syntaxResult = await session.run('const total = ;\nconsole.log(total);');
+	assert.notEqual(syntaxResult.error, null);
+	assert.equal(syntaxResult.error.line, 1);
+	assert.ok(syntaxResult.error.message.includes('Declaração de variável'));
+
+	// Runtime ReferenceError translated cleanly
+	const runtimeResult = await session.run('let a = 10;\nconsole.log(variavelInexistente);');
+	assert.notEqual(runtimeResult.error, null);
+	assert.ok(runtimeResult.error.message.includes("identificador 'variavelInexistente'"));
+	assert.ok(runtimeResult.error.message.includes('não foi declarado'));
+
+	// Runtime const reassignment translated cleanly
+	const constResult = await session.run('const x = 5;\nx = 10;');
+	assert.notEqual(constResult.error, null);
+	assert.ok(constResult.error.message.includes('constante'));
+});

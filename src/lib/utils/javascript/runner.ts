@@ -1,5 +1,13 @@
 import { javascriptLanguage } from '@codemirror/lang-javascript';
 import { instrumentJsCode } from './instrument.js';
+import {
+	findJsSyntaxError,
+	translateJsErrorMessage,
+	extractJsErrorLine,
+	formatJsExecutionError
+} from './diagnostics.js';
+
+export { findJsSyntaxError, translateJsErrorMessage, extractJsErrorLine, formatJsExecutionError };
 
 export interface JavaScriptRunOptions {
 	timeoutMs?: number;
@@ -58,45 +66,6 @@ export function formatVar(val: unknown): { value: unknown; type: string } {
 		}
 	}
 	return { value: String(val), type: t };
-}
-
-export function extractJsErrorLine(error: unknown, sourceCode: string): number {
-	if (!error) return 0;
-	const err = error as { stack?: string; message?: string; lineNumber?: number; line?: number };
-	if (typeof err.lineNumber === 'number' && err.lineNumber > 0) return err.lineNumber;
-	if (typeof err.line === 'number' && err.line > 0) return err.line;
-
-	if (err.stack) {
-		const matches = Array.from(err.stack.matchAll(/(?:<anonymous>|blob:[^:]+):(\d+)(?::(\d+))?/gi));
-		for (const match of matches) {
-			const rawLine = parseInt(match[1], 10);
-			if (!isNaN(rawLine) && rawLine > 0) {
-				const totalLines = sourceCode.split('\n').length;
-				if (rawLine <= totalLines) {
-					return rawLine;
-				}
-				if (rawLine - 2 >= 1 && rawLine - 2 <= totalLines) {
-					return rawLine - 2;
-				}
-			}
-		}
-	}
-	return 0;
-}
-
-export function formatJsExecutionError(
-	error: unknown,
-	sourceCode: string
-): { message: string; line: number } {
-	const rawMessage = error instanceof Error ? error.message : String(error);
-	const line = extractJsErrorLine(error, sourceCode);
-	const cleanMessage = rawMessage.replace(/^Error:\s*/, '').trim();
-	const displayMessage = line > 0 ? `Linha ${line}: ${cleanMessage}` : cleanMessage;
-
-	return {
-		message: displayMessage,
-		line
-	};
 }
 
 /**
@@ -362,6 +331,17 @@ export class JavaScriptRunnerSession {
 	async run(code: string, options: JavaScriptRunOptions = {}): Promise<JavaScriptRunResult> {
 		this.stop();
 		this.isStopped = false;
+
+		const syntaxError = findJsSyntaxError(code);
+		if (syntaxError) {
+			const error = {
+				message: `Linha ${syntaxError.line}: ${syntaxError.message}`,
+				line: syntaxError.line
+			};
+			options.onError?.(error);
+			return Promise.resolve({ outputs: [], error });
+		}
+
 		const runId = ++this.activeRunId;
 		const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 		const isStepMode = options.isStepMode ?? false;
@@ -480,7 +460,7 @@ export class JavaScriptRunnerSession {
 							const formatted = formatJsExecutionError(data.message, code);
 							if (data.line && data.line > 0) {
 								formatted.line = data.line;
-								formatted.message = `Linha ${data.line}: ${data.message.replace(/^Error:\s*/, '')}`;
+								formatted.message = `Linha ${data.line}: ${translateJsErrorMessage(data.message)}`;
 							}
 							finish({ outputs, error: formatted });
 						}
@@ -488,18 +468,16 @@ export class JavaScriptRunnerSession {
 
 					this.worker.onerror = (err: ErrorEvent) => {
 						if (this.isStopped || settled) return;
-						let line = 0;
-						if (typeof err.lineno === 'number' && err.lineno > headerLineCount) {
-							line = err.lineno - headerLineCount;
+						const rawMsg = err.message || 'Erro ao executar script';
+						const formatted = formatJsExecutionError(rawMsg, code);
+						if (
+							typeof err.lineno === 'number' &&
+							err.lineno > headerLineCount &&
+							formatted.line === 0
+						) {
+							formatted.line = err.lineno - headerLineCount;
+							formatted.message = `Linha ${formatted.line}: ${translateJsErrorMessage(rawMsg)}`;
 						}
-						const cleanMsg = (err.message || 'Erro ao executar script').replace(
-							/^Uncaught\s*/i,
-							''
-						);
-						const formatted = {
-							message: line > 0 ? `Linha ${line}: ${cleanMsg}` : cleanMsg,
-							line
-						};
 						finish({ outputs, error: formatted });
 					};
 
