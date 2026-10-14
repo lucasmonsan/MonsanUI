@@ -28,11 +28,13 @@
 		profileLabel: string;
 		loginLabel?: string;
 		loginHref?: string;
-		termsLabel: string;
-		termsHref: string;
-		privacyLabel: string;
-		privacyHref: string;
-		logoutLabel: string;
+		termsLabel?: string;
+		termsHref?: string;
+		privacyLabel?: string;
+		privacyHref?: string;
+		legalLabel?: string;
+		legalHref?: string;
+		logoutLabel?: string;
 		localeValue?: string;
 		localeAriaLabel?: string;
 		localeMode?: 'auto' | 'cycle' | 'dropdown' | 'segmented';
@@ -58,6 +60,7 @@
 		onLogin?: (event: MouseEvent) => void;
 		onTerms?: (event: MouseEvent) => void;
 		onPrivacy?: (event: MouseEvent) => void;
+		onLegal?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
 		/** Official extension point for custom user menu links, such as About. */
 		children?: Snippet;
@@ -78,11 +81,13 @@
 		profileLabel,
 		loginLabel,
 		loginHref,
-		termsLabel,
+		termsLabel = '',
 		termsHref,
-		privacyLabel,
+		privacyLabel = '',
 		privacyHref,
-		logoutLabel,
+		legalLabel,
+		legalHref,
+		logoutLabel = 'Log out',
 		localeValue = 'en',
 		localeAriaLabel,
 		localeMode = 'dropdown',
@@ -108,6 +113,7 @@
 		onLogin,
 		onTerms,
 		onPrivacy,
+		onLegal,
 		onLogout,
 		children,
 		userMenuExtras,
@@ -203,6 +209,53 @@
 			{primaryLabel}
 		</MenuItem>
 	{/if}
+	{@render children?.()}
+	{@render userMenuExtras?.()}
+	{#if legalHref}
+		<MenuItem href={legalHref} onclick={onLegal} align="right">
+			<FileTextIcon size={16} />
+			{legalLabel ?? 'Termos e Privacidade'}
+		</MenuItem>
+	{:else}
+		{#if termsHref}
+			<MenuItem href={termsHref} onclick={onTerms} align="right">
+				<FileTextIcon size={16} />
+				{termsLabel}
+			</MenuItem>
+		{/if}
+		{#if privacyHref}
+			<MenuItem href={privacyHref} onclick={onPrivacy} align="right">
+				<LockIcon size={16} />
+				{privacyLabel}
+			</MenuItem>
+		{/if}
+	{/if}
+	{@render userMenuDangerActions?.()}
+	{#if isLanguageOpen && localeMode !== 'cycle' && localeMode !== 'segmented'}
+		<div
+			class="suite-user-menu-language-options"
+			role="menu"
+			aria-label={localeAriaLabel ?? 'Alternar idioma / Toggle language / Cambiar idioma'}
+			data-menu-persistent
+			transition:slideFade={{ duration: 180 }}
+		>
+			{#each defaultLocales as locale (locale.id)}
+				<MenuItem
+					align="left"
+					checked={localeValue === locale.id}
+					onclick={() => handleLocaleChange(locale.id)}
+				>
+					<span class="locale-option">
+						<span class="item-label">{locale.label}</span>
+						{#if locale.name}
+							<span class="item-name">{locale.name}</span>
+						{/if}
+					</span>
+				</MenuItem>
+			{/each}
+		</div>
+	{/if}
+	<Separator orientation="horizontal" />
 	<div class="suite-user-menu-shortcuts">
 		{@render userMenuShortcuts?.()}
 		<div class="suite-user-menu-preference" data-menu-persistent>
@@ -244,48 +297,22 @@
 				</Button>
 			{/if}
 		</div>
-	</div>
-	{#if isLanguageOpen && localeMode !== 'cycle' && localeMode !== 'segmented'}
-		<div
-			class="suite-user-menu-language-options"
-			role="menu"
-			aria-label={localeAriaLabel ?? 'Alternar idioma / Toggle language / Cambiar idioma'}
-			data-menu-persistent
-			transition:slideFade={{ duration: 180 }}
-		>
-			{#each defaultLocales as locale (locale.id)}
-				<MenuItem
-					align="left"
-					checked={localeValue === locale.id}
-					onclick={() => handleLocaleChange(locale.id)}
+		{#if isAuthenticated}
+			<Separator orientation="vertical" />
+			<div class="suite-user-menu-preference">
+				<Button
+					variant="secondary"
+					square
+					disabled={logoutDisabled}
+					onclick={onLogout}
+					ariaLabel={logoutLabel}
+					title={logoutLabel}
 				>
-					<span class="locale-option">
-						<span class="item-label">{locale.label}</span>
-						{#if locale.name}
-							<span class="item-name">{locale.name}</span>
-						{/if}
-					</span>
-				</MenuItem>
-			{/each}
-		</div>
-	{/if}
-	{@render children?.()}
-	{@render userMenuExtras?.()}
-	<MenuItem href={termsHref} onclick={onTerms} align="right">
-		<FileTextIcon size={16} />
-		{termsLabel}
-	</MenuItem>
-	<MenuItem href={privacyHref} onclick={onPrivacy} align="right">
-		<LockIcon size={16} />
-		{privacyLabel}
-	</MenuItem>
-	{@render userMenuDangerActions?.()}
-	{#if isAuthenticated}
-		<MenuItem variant="error" disabled={logoutDisabled} onclick={onLogout} align="right">
-			<LogOutIcon size={16} />
-			{logoutLabel}
-		</MenuItem>
-	{/if}
+					<LogOutIcon size={16} />
+				</Button>
+			</div>
+		{/if}
+	</div>
 </AvatarMenu>
 
 <style>

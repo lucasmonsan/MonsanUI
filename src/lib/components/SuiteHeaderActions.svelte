@@ -18,11 +18,13 @@
 		profileLabel: string;
 		loginLabel?: string;
 		loginHref?: string;
-		termsLabel: string;
-		termsHref: string;
-		privacyLabel: string;
-		privacyHref: string;
-		logoutLabel: string;
+		termsLabel?: string;
+		termsHref?: string;
+		privacyLabel?: string;
+		privacyHref?: string;
+		legalLabel?: string;
+		legalHref?: string;
+		logoutLabel?: string;
 		localeValue: string;
 		localeAriaLabel?: string;
 		themeValue?: string;
@@ -40,6 +42,7 @@
 		onLogin?: (event: MouseEvent) => void;
 		onTerms?: (event: MouseEvent) => void;
 		onPrivacy?: (event: MouseEvent) => void;
+		onLegal?: (event: MouseEvent) => void;
 		onLogout?: (event: MouseEvent) => void;
 		children?: Snippet;
 		/** Official extension point forwarded to SuiteUserMenu for custom links, such as About. */
@@ -59,11 +62,13 @@
 		profileLabel,
 		loginLabel,
 		loginHref,
-		termsLabel,
+		termsLabel = '',
 		termsHref,
-		privacyLabel,
+		privacyLabel = '',
 		privacyHref,
-		logoutLabel,
+		legalLabel,
+		legalHref,
+		logoutLabel = 'Log out',
 		localeValue,
 		localeAriaLabel,
 		themeValue,
@@ -81,6 +86,7 @@
 		onLogin,
 		onTerms,
 		onPrivacy,
+		onLegal,
 		onLogout,
 		children,
 		userMenuExtras,
@@ -104,6 +110,8 @@
 		{termsHref}
 		{privacyLabel}
 		{privacyHref}
+		{legalLabel}
+		{legalHref}
 		{logoutLabel}
 		{localeValue}
 		{localeAriaLabel}
@@ -122,6 +130,7 @@
 		{onLogin}
 		{onTerms}
 		{onPrivacy}
+		{onLegal}
 		{onLogout}
 		{userMenuExtras}
 		{userMenuShortcuts}
