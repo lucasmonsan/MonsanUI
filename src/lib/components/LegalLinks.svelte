@@ -1,9 +1,11 @@
 <script lang="ts">
 	interface Props {
-		termsHref: string;
-		privacyHref: string;
-		termsLabel: string;
-		privacyLabel: string;
+		termsHref?: string;
+		privacyHref?: string;
+		termsLabel?: string;
+		privacyLabel?: string;
+		legalHref?: string;
+		legalLabel?: string;
 		note?: string;
 		variant?: 'inline' | 'auth-note';
 		align?: 'start' | 'center' | 'end';
@@ -12,14 +14,22 @@
 	let {
 		termsHref,
 		privacyHref,
-		termsLabel,
-		privacyLabel,
+		termsLabel = '',
+		privacyLabel = '',
+		legalHref,
+		legalLabel,
 		note,
 		variant = 'inline',
 		align = 'center'
 	}: Props = $props();
 
-	let resolvedAriaLabel = $derived(note ? undefined : `${termsLabel} / ${privacyLabel}`);
+	let resolvedAriaLabel = $derived(
+		note
+			? undefined
+			: legalHref
+				? (legalLabel ?? 'Termos e Privacidade')
+				: `${termsLabel} / ${privacyLabel}`
+	);
 </script>
 
 <nav class="monsan-legal-links variant-{variant} align-{align}" aria-label={resolvedAriaLabel}>
@@ -29,9 +39,19 @@
 		</p>
 	{/if}
 	<div class="legal-link-row">
-		<a class="legal-link" href={termsHref}>{termsLabel}</a>
-		<span class="legal-separator" aria-hidden="true">·</span>
-		<a class="legal-link" href={privacyHref}>{privacyLabel}</a>
+		{#if legalHref}
+			<a class="legal-link" href={legalHref}>{legalLabel ?? 'Termos e Privacidade'}</a>
+		{:else}
+			{#if termsHref}
+				<a class="legal-link" href={termsHref}>{termsLabel}</a>
+			{/if}
+			{#if termsHref && privacyHref}
+				<span class="legal-separator" aria-hidden="true">·</span>
+			{/if}
+			{#if privacyHref}
+				<a class="legal-link" href={privacyHref}>{privacyLabel}</a>
+			{/if}
+		{/if}
 	</div>
 </nav>
 
