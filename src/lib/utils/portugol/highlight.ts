@@ -119,9 +119,43 @@ export function tokenizeJsCode(code: string): CodeToken[] {
 	return tokens;
 }
 
+const htmlTokenPattern =
+	/<!--[\s\S]*?-->|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|<\/?[A-Za-z0-9-]+|(?:\/?>)|\b\d+(?:\.\d+)?(?:px|rem|em|%)?\b|[A-Za-z_][A-Za-z0-9_-]*(?==)/g;
+
+function classifyHtmlToken(text: string): CodeTokenKind {
+	if (text.startsWith('<!--')) return 'comment';
+	if (text.startsWith('"') || text.startsWith("'")) return 'string';
+	if (/^\d/.test(text)) return 'number';
+	if (text.startsWith('<') || text === '>' || text === '/>') return 'keyword';
+	if (text.endsWith('=')) return 'keyword';
+	return 'plain';
+}
+
+export function tokenizeHtmlCode(code: string): CodeToken[] {
+	if (!code) return [];
+
+	const tokens: CodeToken[] = [];
+	let cursor = 0;
+	for (const match of code.matchAll(htmlTokenPattern)) {
+		const index = match.index ?? 0;
+		if (index > cursor) {
+			tokens.push({ kind: 'plain', text: code.slice(cursor, index) });
+		}
+		tokens.push({ kind: classifyHtmlToken(match[0]), text: match[0] });
+		cursor = index + match[0].length;
+	}
+	if (cursor < code.length) {
+		tokens.push({ kind: 'plain', text: code.slice(cursor) });
+	}
+	return tokens;
+}
+
 export function tokenizeCode(
 	code: string,
-	language: 'portugol' | 'javascript' = 'portugol'
+	language: 'portugol' | 'javascript' | 'html' = 'portugol'
 ): CodeToken[] {
+	if (language === 'html') {
+		return tokenizeHtmlCode(code);
+	}
 	return language === 'javascript' ? tokenizeJsCode(code) : tokenizePortugolCode(code);
 }

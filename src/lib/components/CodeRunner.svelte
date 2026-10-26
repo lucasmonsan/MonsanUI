@@ -33,7 +33,7 @@
 
 	export interface CodeRunnerProps {
 		code?: string;
-		language?: 'portugol' | 'javascript';
+		language?: 'portugol' | 'javascript' | 'html';
 		disabled?: boolean;
 		onOutputsChange?: (outputs: string[]) => void;
 		onSuccess?: () => void;
@@ -99,12 +99,16 @@ fimalgoritmo`
 	function startFloatingResize(e: MouseEvent) {
 		e.preventDefault();
 		isFloatingDragging = true;
-		document.addEventListener('mousemove', handleFloatingResize);
-		document.addEventListener('mouseup', stopFloatingResize);
+		window.addEventListener('mousemove', handleFloatingResize);
+		window.addEventListener('mouseup', stopFloatingResize);
 	}
 
 	function handleFloatingResize(e: MouseEvent) {
 		if (!isFloatingDragging) return;
+		if (e.buttons === 0) {
+			stopFloatingResize();
+			return;
+		}
 		const runnerEl = document.querySelector('.portugol-runner');
 		if (runnerEl) {
 			const rect = runnerEl.getBoundingClientRect();
@@ -114,9 +118,16 @@ fimalgoritmo`
 	}
 
 	function stopFloatingResize() {
+		if (!isFloatingDragging) return;
 		isFloatingDragging = false;
-		document.removeEventListener('mousemove', handleFloatingResize);
-		document.removeEventListener('mouseup', stopFloatingResize);
+		window.removeEventListener('mousemove', handleFloatingResize);
+		window.removeEventListener('mouseup', stopFloatingResize);
+	}
+
+	function stopAllDragging() {
+		stopFloatingResize();
+		isDragging = false;
+		isHorizontalDragging = false;
 	}
 
 	const focusModeKey = $derived(
@@ -309,6 +320,10 @@ fimalgoritmo`
 		const initialPercent = consoleHeightPercent;
 
 		function onMouseMove(moveEvent: MouseEvent) {
+			if (moveEvent.buttons === 0) {
+				onMouseUp();
+				return;
+			}
 			const deltaY = moveEvent.clientY - startY;
 			const deltaPercent = (deltaY / totalHeight) * 100;
 			consoleHeightPercent = Math.min(Math.max(initialPercent + deltaPercent, 20), 80);
@@ -338,6 +353,10 @@ fimalgoritmo`
 		const initialPercent = editorWidthPercent;
 
 		function onMouseMove(moveEvent: MouseEvent) {
+			if (moveEvent.buttons === 0) {
+				onMouseUp();
+				return;
+			}
 			const deltaX = moveEvent.clientX - startX;
 			const deltaPercent = (deltaX / totalWidth) * 100;
 			editorWidthPercent = Math.min(Math.max(initialPercent + deltaPercent, 20), 80);
@@ -358,13 +377,116 @@ fimalgoritmo`
 	let stopRequested = false;
 	let scheduledRun: ReturnType<typeof setTimeout> | null = null;
 	const executionChunkSize = 500;
-	let resultsPanelVisible = $derived(resultsVisible && (isRunning || hasRun));
+	let resultsPanelVisible = $derived(
+		resultsVisible && (isRunning || hasRun || language === 'html')
+	);
 	let sidebarHidden = $derived(!resultsPanelVisible || isFocusMode);
 	let sidebarRows = $derived(
-		language === 'javascript'
+		language === 'javascript' || language === 'html'
 			? '100% 0px 0px'
 			: `${consoleHeightPercent}% 12px calc(${100 - consoleHeightPercent}% - 12px)`
 	);
+
+	let htmlPreviewCode = $state('');
+	let htmlActiveTab = $state<'preview' | 'console'>('preview');
+	let lastRenderedFileName = '';
+
+	function buildHtmlPreview(src: string): string {
+		const consoleBridge =
+			`<script>
+(function() {
+	function formatArg(arg) {
+		if (arg === null) return 'null';
+		if (arg === undefined) return 'undefined';
+		if (typeof arg === 'object') {
+			try { return JSON.stringify(arg); } catch (_) { return String(arg); }
+		}
+		return String(arg);
+	}
+	function send(type, args) {
+		try {
+			window.parent.postMessage({
+				type: 'crocode_html_' + type,
+				text: Array.from(args).map(formatArg).join(' ')
+			}, '*');
+		} catch (_) {}
+	}
+	var origLog = console.log;
+	var origInfo = console.info;
+	var origWarn = console.warn;
+	var origError = console.error;
+	console.log = function() { origLog.apply(console, arguments); send('output', arguments); };
+	console.info = function() { origInfo.apply(console, arguments); send('output', arguments); };
+	console.warn = function() { origWarn.apply(console, arguments); send('warn', arguments); };
+	console.error = function() { origError.apply(console, arguments); send('error', arguments); };
+	window.addEventListener('error', function(e) {
+		send('error', ['Erro: ' + (e.message || 'Desconhecido') + (e.lineno ? ' (linha ' + e.lineno + ')' : '')]);
+	});
+})();
+<` + `/script>`;
+
+		if (/<head[^>]*>/i.test(src)) {
+			return src.replace(/(<head[^>]*>)/i, `$1${consoleBridge}`);
+		}
+		if (/<html[^>]*>/i.test(src)) {
+			return src.replace(/(<html[^>]*>)/i, `$1${consoleBridge}`);
+		}
+		return consoleBridge + src;
+	}
+
+	function renderHtmlPreview() {
+		hasRun = true;
+		resultsVisible = true;
+		outputs = [];
+		onOutputsChange?.(outputs);
+		htmlPreviewCode = buildHtmlPreview(code);
+	}
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+
+		const handleMessage = (e: MessageEvent) => {
+			if (!e.data || typeof e.data.type !== 'string' || !e.data.type.startsWith('crocode_html_'))
+				return;
+			if (e.data.type === 'crocode_html_output') {
+				outputs = [...outputs, e.data.text + '\n'];
+				onOutputsChange?.(outputs);
+			} else if (e.data.type === 'crocode_html_warn') {
+				outputs = [...outputs, '[AVISO] ' + e.data.text + '\n'];
+				onOutputsChange?.(outputs);
+			} else if (e.data.type === 'crocode_html_error') {
+				outputs = [...outputs, '[ERRO] ' + e.data.text + '\n'];
+				onOutputsChange?.(outputs);
+			}
+		};
+
+		window.addEventListener('message', handleMessage);
+		return () => {
+			window.removeEventListener('message', handleMessage);
+		};
+	});
+
+	let htmlDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+	$effect(() => {
+		if (language === 'html') {
+			if (fileName !== lastRenderedFileName) {
+				lastRenderedFileName = fileName || '';
+				renderHtmlPreview();
+			} else if (code) {
+				if (htmlDebounceTimer) clearTimeout(htmlDebounceTimer);
+				htmlDebounceTimer = setTimeout(() => {
+					renderHtmlPreview();
+				}, 350);
+			}
+		} else {
+			lastRenderedFileName = '';
+			htmlPreviewCode = '';
+		}
+		return () => {
+			if (htmlDebounceTimer) clearTimeout(htmlDebounceTimer);
+		};
+	});
 
 	$effect(() => {
 		if (pendingInputVar) {
@@ -457,6 +579,14 @@ fimalgoritmo`
 		pendingInputVar = null;
 		isStepMode = step;
 		stopRequested = false;
+
+		if (language === 'html') {
+			isRunning = false;
+			isPaused = false;
+			renderHtmlPreview();
+			onSuccess?.();
+			return;
+		}
 
 		if (language === 'javascript') {
 			isRunning = true;
@@ -684,6 +814,10 @@ fimalgoritmo`
 	function handleReset() {
 		hasRun = false;
 		pendingPromptResolver = null;
+		if (language === 'html') {
+			htmlActiveTab = 'preview';
+			renderHtmlPreview();
+		}
 		if (language === 'javascript') {
 			jsSession.stop();
 		}
@@ -752,6 +886,20 @@ fimalgoritmo`
 	</div>
 {/snippet}
 
+{#snippet previewContent()}
+	<div class="html-preview-box notranslate" translate="no">
+		{#if isFloatingDragging || isDragging || isHorizontalDragging}
+			<div class="html-preview-drag-shield" role="presentation"></div>
+		{/if}
+		<iframe
+			title="Preview"
+			class="html-preview-iframe"
+			sandbox="allow-scripts"
+			srcdoc={htmlPreviewCode}
+		></iframe>
+	</div>
+{/snippet}
+
 {#snippet variablesContent()}
 	<div class="variables-box notranslate" translate="no" spellcheck="false">
 		{#if Object.keys(variables).length > 0}
@@ -787,7 +935,21 @@ fimalgoritmo`
 	</div>
 {/snippet}
 
-<div class="portugol-runner" class:fill style="--runner-font-size: {fontSize}px;" style:height>
+<div
+	class="portugol-runner"
+	class:fill
+	class:is-resizing={isDragging || isFloatingDragging || isHorizontalDragging}
+	style="--runner-font-size: {fontSize}px;"
+	style:height
+>
+	{#if isDragging || isFloatingDragging || isHorizontalDragging}
+		<div
+			class="runner-drag-shield-global"
+			class:horizontal={isHorizontalDragging}
+			onmouseup={stopAllDragging}
+			role="presentation"
+		></div>
+	{/if}
 	<Stack gap="sm" fullHeight={true}>
 		<!-- Grid Layout do Editor + Terminal/Variáveis -->
 		<div class="runner-workspace">
@@ -1037,26 +1199,78 @@ fimalgoritmo`
 							role="separator"
 						></div>
 					{/if}
-					<!-- Console/Terminal -->
+					<!-- Console/Terminal ou Prévia HTML -->
 					{#if resultsVisible}
 						<div class="terminal-card" style="grid-row: 1;">
 							{#if isFocusMode}
 								<div class="focus-panel-header">
-									<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+									{#if language === 'html'}
+										<div class="html-tab-group">
+											<button
+												type="button"
+												class="html-tab-btn"
+												class:active={htmlActiveTab === 'preview'}
+												onclick={() => (htmlActiveTab = 'preview')}
+											>
+												Visualização
+											</button>
+											<button
+												type="button"
+												class="html-tab-btn"
+												class:active={htmlActiveTab === 'console'}
+												onclick={() => (htmlActiveTab = 'console')}
+											>
+												Console{#if outputs.length > 0}
+													({outputs.length}){/if}
+											</button>
+										</div>
+									{:else}
+										<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+									{/if}
 									<button type="button" class="collapse-btn" onclick={toggleResults}>
 										{i18n.t('portugolRunner.hideResults')}
 									</button>
 								</div>
-								{@render consoleContent()}
+								{#if language === 'html' && htmlActiveTab === 'preview'}
+									{@render previewContent()}
+								{:else}
+									{@render consoleContent()}
+								{/if}
 							{:else}
 								<Panel padding="none" maxWidth="none" fullHeight={true} shadow={false}>
 									<div class="panel-header">
-										<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+										{#if language === 'html'}
+											<div class="html-tab-group">
+												<button
+													type="button"
+													class="html-tab-btn"
+													class:active={htmlActiveTab === 'preview'}
+													onclick={() => (htmlActiveTab = 'preview')}
+												>
+													Visualização
+												</button>
+												<button
+													type="button"
+													class="html-tab-btn"
+													class:active={htmlActiveTab === 'console'}
+													onclick={() => (htmlActiveTab = 'console')}
+												>
+													Console{#if outputs.length > 0}
+														({outputs.length}){/if}
+												</button>
+											</div>
+										{:else}
+											<span>{i18n.t('portugolRunner.consoleTitle')}</span>
+										{/if}
 										<button type="button" class="collapse-btn" onclick={toggleResults}>
 											{i18n.t('portugolRunner.hideResults')}
 										</button>
 									</div>
-									{@render consoleContent()}
+									{#if language === 'html' && htmlActiveTab === 'preview'}
+										{@render previewContent()}
+									{:else}
+										{@render consoleContent()}
+									{/if}
 								</Panel>
 							{/if}
 						</div>
@@ -1617,5 +1831,86 @@ fimalgoritmo`
 		text-align: center;
 		white-space: normal;
 		word-break: break-word;
+	}
+
+	.html-preview-box {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-width: 0;
+		min-height: 0;
+		height: 100%;
+		width: 100%;
+		background-color: #ffffff;
+		overflow: hidden;
+	}
+
+	.html-preview-drag-shield {
+		position: absolute;
+		inset: 0;
+		z-index: 10;
+		background: transparent;
+	}
+
+	.html-preview-iframe {
+		display: block;
+		flex: 1 1 auto;
+		min-width: 0;
+		min-height: 0;
+		width: 100%;
+		height: 100%;
+		border: none;
+		background-color: #ffffff;
+	}
+
+	.html-tab-group {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.html-tab-btn {
+		background: transparent;
+		border: 1px solid transparent;
+		color: var(--text-secondary);
+		font-family: inherit;
+		font-size: 11px;
+		cursor: pointer;
+		text-transform: uppercase;
+		font-weight: 800;
+		padding: 2px 8px;
+		border-radius: var(--radius-sm);
+		transition:
+			color 0.15s ease,
+			background-color 0.15s ease,
+			border-color 0.15s ease;
+	}
+
+	.html-tab-btn:hover {
+		color: var(--text-primary);
+		background: rgba(0, 0, 0, 0.05);
+	}
+
+	.html-tab-btn.active {
+		color: var(--text-primary);
+		background: var(--bg-primary);
+		border-color: var(--border-color);
+	}
+
+	.portugol-runner.is-resizing {
+		user-select: none;
+	}
+
+	.runner-drag-shield-global {
+		position: fixed;
+		inset: 0;
+		z-index: 99999;
+		cursor: ew-resize;
+		background: transparent;
+	}
+
+	.runner-drag-shield-global.horizontal {
+		cursor: ns-resize;
 	}
 </style>

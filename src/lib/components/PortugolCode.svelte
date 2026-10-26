@@ -3,7 +3,7 @@
 
 	interface Props {
 		code: string;
-		language?: 'portugol' | 'javascript';
+		language?: 'portugol' | 'javascript' | 'html';
 		size?: 'xs' | 'sm' | 'md' | 'lg';
 		weight?: 'normal' | 'medium' | 'bold';
 	}

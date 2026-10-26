@@ -39,6 +39,7 @@
 		syntaxTree
 	} from '@codemirror/language';
 	import { javascript } from '@codemirror/lang-javascript';
+	import { html } from '@codemirror/lang-html';
 	import { tags as t } from '@lezer/highlight';
 	import {
 		getPortugolEditorIndentColumns,
@@ -50,7 +51,7 @@
 
 	export interface CodeEditorProps {
 		code: string;
-		language?: 'portugol' | 'javascript';
+		language?: 'portugol' | 'javascript' | 'html';
 		activeLine?: number;
 		followActiveLine?: boolean;
 		errorLine?: number;
@@ -462,9 +463,19 @@
 		{ tag: t.comment, color: 'var(--text-secondary)', fontStyle: 'italic' },
 		{ tag: t.variableName, color: 'var(--text-primary)' },
 		{ tag: t.function(t.variableName), color: 'var(--accent-primary)' },
-		{ tag: t.propertyName, color: 'var(--text-primary)' },
+		{ tag: t.propertyName, color: 'var(--accent-primary)' },
 		{ tag: t.operator, color: 'var(--text-secondary)' },
-		{ tag: t.bool, color: 'var(--warning)', fontWeight: 'bold' }
+		{ tag: t.bool, color: 'var(--warning)', fontWeight: 'bold' },
+		{ tag: t.tagName, color: 'var(--accent-primary)', fontWeight: 'bold' },
+		{ tag: t.attributeName, color: 'var(--warning)' },
+		{ tag: t.attributeValue, color: 'var(--success)' },
+		{ tag: t.angleBracket, color: 'var(--text-secondary)' },
+		{ tag: t.meta, color: 'var(--text-secondary)', fontStyle: 'italic' },
+		{ tag: t.documentMeta, color: 'var(--text-secondary)', fontStyle: 'italic' },
+		{ tag: t.className, color: 'var(--accent-primary)' },
+		{ tag: t.color, color: 'var(--warning)' },
+		{ tag: t.unit, color: 'var(--warning)' },
+		{ tag: t.atom, color: 'var(--warning)' }
 	]);
 
 	function insertIndentedNewline(editorView: EditorView) {
@@ -619,7 +630,10 @@
 		}
 	);
 
-	function getLanguageExtension(lang: 'portugol' | 'javascript') {
+	function getLanguageExtension(lang: 'portugol' | 'javascript' | 'html') {
+		if (lang === 'html') {
+			return [html()];
+		}
 		if (lang === 'javascript') {
 			return [javascript(), jsBuiltinsHighlighter];
 		}
@@ -631,6 +645,7 @@
 
 	function getEffectivePlaceholder() {
 		if (placeholder) return placeholder;
+		if (language === 'html') return '<!-- Escreva seu código HTML aqui... -->';
 		return language === 'javascript'
 			? '// Escreva seu código JavaScript aqui...'
 			: 'Escreva seu código Portugol / VisuAlg aqui...';
