@@ -193,6 +193,9 @@ export { default as KoalifyIcon } from './components/icons/Koalify.svelte';
 export { default as RoosterIcon } from './components/icons/Rooster.svelte';
 export { default as WhalletIcon } from './components/icons/Whallet.svelte';
 export { default as WalletIcon } from './components/icons/Wallet.svelte';
+export { default as CornersOutIcon } from './components/icons/CornersOut.svelte';
+export { default as DesktopIcon } from './components/icons/Desktop.svelte';
+export { default as DeviceMobileIcon } from './components/icons/DeviceMobile.svelte';
 
 // Types
 export * from './types.js';
