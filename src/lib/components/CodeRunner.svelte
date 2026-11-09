@@ -104,8 +104,19 @@ fimalgoritmo`
 	let isDockDragging = $state(false);
 	let dockOffset = $state<{ x: number; y: number } | null>(null);
 	let dockEl = $state<HTMLElement | null>(null);
+	let expandedDialogEl = $state<HTMLDialogElement | null>(null);
 	let dragStartMouse = { x: 0, y: 0 };
 	let dragStartDock = { x: 0, y: 0 };
+
+	$effect(() => {
+		if (isExpandedPreview) {
+			if (expandedDialogEl && !expandedDialogEl.open) {
+				expandedDialogEl.showModal();
+			}
+		} else if (expandedDialogEl && expandedDialogEl.open) {
+			expandedDialogEl.close();
+		}
+	});
 
 	const dockStyle = $derived(
 		dockOffset
@@ -359,6 +370,9 @@ fimalgoritmo`
 	});
 
 	onDestroy(() => {
+		if (expandedDialogEl && expandedDialogEl.open) {
+			expandedDialogEl.close();
+		}
 		stopDockDrag();
 		jsSession.stop();
 		clearScheduledRun();
@@ -1443,14 +1457,17 @@ fimalgoritmo`
 		</Dialog>
 	</Stack>
 
-	{#if isExpandedPreview}
-		<div
-			class="expanded-preview-root notranslate"
-			translate="no"
-			role="dialog"
-			aria-modal="true"
-			aria-label={i18n.t('portugolRunner.previewExpand')}
-		>
+	<dialog
+		bind:this={expandedDialogEl}
+		class="expanded-preview-dialog notranslate"
+		translate="no"
+		aria-label={i18n.t('portugolRunner.previewExpand')}
+		oncancel={(e) => {
+			e.preventDefault();
+			closeExpandedPreview();
+		}}
+	>
+		{#if isExpandedPreview}
 			{#if isDockDragging}
 				<div class="expanded-drag-shield" role="presentation"></div>
 			{/if}
@@ -1492,20 +1509,22 @@ fimalgoritmo`
 						class="dock-btn"
 						class:active={previewDevice === 'desktop'}
 						aria-pressed={previewDevice === 'desktop'}
+						title={i18n.t('portugolRunner.previewDesktop')}
+						aria-label={i18n.t('portugolRunner.previewDesktop')}
 						onclick={() => (previewDevice = 'desktop')}
 					>
 						<DesktopIcon size={16} />
-						<span>{i18n.t('portugolRunner.previewDesktop')}</span>
 					</button>
 					<button
 						type="button"
 						class="dock-btn"
 						class:active={previewDevice === 'mobile'}
 						aria-pressed={previewDevice === 'mobile'}
+						title={i18n.t('portugolRunner.previewMobile')}
+						aria-label={i18n.t('portugolRunner.previewMobile')}
 						onclick={() => (previewDevice = 'mobile')}
 					>
 						<DeviceMobileIcon size={16} />
-						<span>{i18n.t('portugolRunner.previewMobile')}</span>
 					</button>
 				</div>
 
@@ -1519,11 +1538,10 @@ fimalgoritmo`
 					aria-label={i18n.t('portugolRunner.previewCollapse')}
 				>
 					<XIcon size={16} />
-					<span>{i18n.t('portugolRunner.previewCollapse')}</span>
 				</button>
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</dialog>
 </div>
 
 <style>
@@ -2124,16 +2142,23 @@ fimalgoritmo`
 		text-align: center;
 	}
 
-	.expanded-preview-root {
+	.expanded-preview-dialog {
 		position: fixed;
 		inset: 0;
-		z-index: var(--z-modal, 9999);
-		background: var(--bg-surface);
-		display: flex;
-		flex-direction: column;
 		width: 100vw;
 		height: 100vh;
+		max-width: none;
+		max-height: none;
+		margin: 0;
+		padding: 0;
+		border: none;
+		background: var(--bg-surface);
 		overflow: hidden;
+		z-index: 2147483647;
+	}
+
+	.expanded-preview-dialog::backdrop {
+		background: transparent;
 	}
 
 	.expanded-drag-shield {
@@ -2231,14 +2256,14 @@ fimalgoritmo`
 	.dock-btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
+		justify-content: center;
 		border: none;
 		background: transparent;
 		color: var(--text-secondary);
 		font-family: inherit;
 		font-size: var(--text-xs);
 		font-weight: 500;
-		padding: 6px 12px;
+		padding: 6px;
 		border-radius: var(--radius-full);
 		cursor: pointer;
 		transition:
