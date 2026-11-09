@@ -166,7 +166,8 @@ class I18n {
 				previewExpand: 'Expandir visualização',
 				previewCollapse: 'Voltar ao editor',
 				previewDesktop: 'Computador',
-				previewMobile: 'Celular'
+				previewMobile: 'Celular',
+				htmlLivePreviewLabel: 'Atualização automática'
 			},
 			timePicker: {
 				selectTime: 'Selecionar Horário',
@@ -411,7 +412,8 @@ class I18n {
 				previewExpand: 'Expand preview',
 				previewCollapse: 'Back to editor',
 				previewDesktop: 'Desktop',
-				previewMobile: 'Mobile'
+				previewMobile: 'Mobile',
+				htmlLivePreviewLabel: 'Auto-update preview'
 			},
 			timePicker: {
 				selectTime: 'Select Time',
@@ -657,7 +659,8 @@ class I18n {
 				previewExpand: 'Expandir vista previa',
 				previewCollapse: 'Volver al editor',
 				previewDesktop: 'Escritorio',
-				previewMobile: 'Móvil'
+				previewMobile: 'Móvil',
+				htmlLivePreviewLabel: 'Actualización automática'
 			},
 			timePicker: {
 				selectTime: 'Seleccionar Hora',

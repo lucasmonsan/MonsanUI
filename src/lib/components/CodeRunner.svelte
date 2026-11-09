@@ -80,6 +80,7 @@ fimalgoritmo`
 	let autoCloseBrackets = $state(true);
 	let autoCloseQuotes = $state(true);
 	let lineWrapping = $state(true);
+	let htmlLivePreview = $state(true);
 	let isRunning = $state(false);
 	let isPaused = $state(false);
 	let isStepMode = $state(false);
@@ -240,6 +241,9 @@ fimalgoritmo`
 	const lineWrappingKey = $derived(
 		userId ? 'monsan-portugol-line-wrapping:' + userId : 'monsan-portugol-line-wrapping:anonymous'
 	);
+	const htmlLivePreviewKey = $derived(
+		userId ? 'monsan-html-live-preview:' + userId : 'monsan-html-live-preview:anonymous'
+	);
 
 	$effect(() => {
 		if (isLoaded) {
@@ -262,6 +266,12 @@ fimalgoritmo`
 	$effect(() => {
 		if (isLoaded) {
 			localStorage.setItem(lineWrappingKey, lineWrapping.toString());
+		}
+	});
+
+	$effect(() => {
+		if (isLoaded) {
+			localStorage.setItem(htmlLivePreviewKey, htmlLivePreview.toString());
 		}
 	});
 
@@ -329,6 +339,11 @@ fimalgoritmo`
 		const savedWrapping = localStorage.getItem(lineWrappingKey);
 		if (savedWrapping !== null) {
 			lineWrapping = savedWrapping !== 'false';
+		}
+
+		const savedLivePreview = localStorage.getItem(htmlLivePreviewKey);
+		if (savedLivePreview !== null) {
+			htmlLivePreview = savedLivePreview !== 'false';
 		}
 
 		isLoaded = true;
@@ -520,9 +535,11 @@ fimalgoritmo`
 		return consoleBridge + src;
 	}
 
-	function renderHtmlPreview() {
+	function renderHtmlPreview(openResults = true) {
 		hasRun = true;
-		resultsVisible = true;
+		if (openResults) {
+			resultsVisible = true;
+		}
 		outputs = [];
 		onOutputsChange?.(outputs);
 		htmlPreviewCode = buildHtmlPreview(code);
@@ -558,11 +575,11 @@ fimalgoritmo`
 		if (language === 'html') {
 			if (fileName !== lastRenderedFileName) {
 				lastRenderedFileName = fileName || '';
-				renderHtmlPreview();
-			} else if (code) {
+				renderHtmlPreview(false);
+			} else if (code && htmlLivePreview) {
 				if (htmlDebounceTimer) clearTimeout(htmlDebounceTimer);
 				htmlDebounceTimer = setTimeout(() => {
-					renderHtmlPreview();
+					renderHtmlPreview(false);
 				}, 350);
 			}
 		} else {
@@ -669,7 +686,7 @@ fimalgoritmo`
 		if (language === 'html') {
 			isRunning = false;
 			isPaused = false;
-			renderHtmlPreview();
+			renderHtmlPreview(true);
 			onSuccess?.();
 			return;
 		}
@@ -902,7 +919,7 @@ fimalgoritmo`
 		pendingPromptResolver = null;
 		if (language === 'html') {
 			htmlActiveTab = 'preview';
-			renderHtmlPreview();
+			renderHtmlPreview(true);
 		}
 		if (language === 'javascript') {
 			jsSession.stop();
@@ -1213,6 +1230,24 @@ fimalgoritmo`
 									<span>{i18n.t('portugolRunner.autoCloseQuotesLabel')}</span>
 								</Inline>
 							</MenuItem>
+
+							{#if language === 'html'}
+								<MenuItem
+									checked={htmlLivePreview}
+									onclick={() => (htmlLivePreview = !htmlLivePreview)}
+									align="left"
+									data-menu-persistent
+								>
+									<Inline gap="sm" align="center">
+										{#if htmlLivePreview}
+											<CheckIcon size={14} />
+										{:else}
+											<span style="width: 14px"></span>
+										{/if}
+										<span>{i18n.t('portugolRunner.htmlLivePreviewLabel')}</span>
+									</Inline>
+								</MenuItem>
+							{/if}
 
 							<MenuItem
 								checked={lineWrapping}
