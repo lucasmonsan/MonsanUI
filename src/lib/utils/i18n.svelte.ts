@@ -162,7 +162,11 @@ class I18n {
 				zoomHint: 'Dica de zoom geral: CTRL + [ + / - / 0 ]',
 				settingsBlurLabel: 'Desfoque nas modais (Blur)',
 				settingsBgAnimLabel: 'Animar plano de fundo',
-				settingsFocusModeLabel: 'Modo Foco (Painéis Flutuantes)'
+				settingsFocusModeLabel: 'Modo Foco (Painéis Flutuantes)',
+				previewExpand: 'Expandir visualização',
+				previewCollapse: 'Voltar ao editor',
+				previewDesktop: 'Computador',
+				previewMobile: 'Celular'
 			},
 			timePicker: {
 				selectTime: 'Selecionar Horário',
@@ -403,7 +407,11 @@ class I18n {
 				zoomHint: 'General zoom hint: CTRL + [ + / - / 0 ]',
 				settingsBlurLabel: 'Modal Background Blur',
 				settingsBgAnimLabel: 'Animate Background',
-				settingsFocusModeLabel: 'Focus Mode (Floating Panels)'
+				settingsFocusModeLabel: 'Focus Mode (Floating Panels)',
+				previewExpand: 'Expand preview',
+				previewCollapse: 'Back to editor',
+				previewDesktop: 'Desktop',
+				previewMobile: 'Mobile'
 			},
 			timePicker: {
 				selectTime: 'Select Time',
@@ -645,7 +653,11 @@ class I18n {
 				zoomHint: 'Atajo de zoom general: CTRL + [ + / - / 0 ]',
 				settingsBlurLabel: 'Desfoque de fondo (Blur)',
 				settingsBgAnimLabel: 'Animar fondo',
-				settingsFocusModeLabel: 'Modo Enfoque (Paneles Flotantes)'
+				settingsFocusModeLabel: 'Modo Enfoque (Paneles Flotantes)',
+				previewExpand: 'Expandir vista previa',
+				previewCollapse: 'Volver al editor',
+				previewDesktop: 'Escritorio',
+				previewMobile: 'Móvil'
 			},
 			timePicker: {
 				selectTime: 'Seleccionar Hora',

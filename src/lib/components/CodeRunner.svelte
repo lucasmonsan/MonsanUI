@@ -18,6 +18,10 @@
 	import XIcon from './icons/X.svelte';
 	import SettingsIcon from './icons/Settings.svelte';
 	import CheckIcon from './icons/Check.svelte';
+	import CornersOutIcon from './icons/CornersOut.svelte';
+	import DesktopIcon from './icons/Desktop.svelte';
+	import DeviceMobileIcon from './icons/DeviceMobile.svelte';
+	import GripVerticalIcon from './icons/GripVertical.svelte';
 	import Range from './Range.svelte';
 	import QuickActions from './QuickActions.svelte';
 	import MenuItem from './MenuItem.svelte';
@@ -94,6 +98,72 @@ fimalgoritmo`
 	let isFloatingDragging = $state(false);
 	let isLoaded = $state(false);
 
+	// Expanded HTML Preview State
+	let isExpandedPreview = $state(false);
+	let previewDevice = $state<'desktop' | 'mobile'>('desktop');
+	let isDockDragging = $state(false);
+	let dockOffset = $state<{ x: number; y: number } | null>(null);
+	let dockEl = $state<HTMLElement | null>(null);
+	let dragStartMouse = { x: 0, y: 0 };
+	let dragStartDock = { x: 0, y: 0 };
+
+	const dockStyle = $derived(
+		dockOffset
+			? `left: ${dockOffset.x}px; top: ${dockOffset.y}px; bottom: auto; transform: none;`
+			: 'bottom: 1.5rem; left: 50%; transform: translateX(-50%);'
+	);
+
+	function startDockDrag(e: MouseEvent) {
+		if (e.button !== 0) return;
+		const target = e.target as HTMLElement | null;
+		if (target?.closest('button')) return;
+		if (!dockEl) return;
+
+		e.preventDefault();
+		const rect = dockEl.getBoundingClientRect();
+		dragStartMouse = { x: e.clientX, y: e.clientY };
+		dragStartDock = { x: rect.left, y: rect.top };
+		isDockDragging = true;
+
+		window.addEventListener('mousemove', handleDockDragMove);
+		window.addEventListener('mouseup', stopDockDrag);
+	}
+
+	function handleDockDragMove(e: MouseEvent) {
+		if (!isDockDragging) return;
+		if (e.buttons === 0) {
+			stopDockDrag();
+			return;
+		}
+		if (!dockEl) return;
+		const rect = dockEl.getBoundingClientRect();
+		const newX = dragStartDock.x + (e.clientX - dragStartMouse.x);
+		const newY = dragStartDock.y + (e.clientY - dragStartMouse.y);
+		const clampedX = Math.max(8, Math.min(window.innerWidth - rect.width - 8, newX));
+		const clampedY = Math.max(8, Math.min(window.innerHeight - rect.height - 8, newY));
+		dockOffset = { x: clampedX, y: clampedY };
+	}
+
+	function stopDockDrag() {
+		if (!isDockDragging) return;
+		isDockDragging = false;
+		window.removeEventListener('mousemove', handleDockDragMove);
+		window.removeEventListener('mouseup', stopDockDrag);
+	}
+
+	function closeExpandedPreview() {
+		isExpandedPreview = false;
+		dockOffset = null;
+		stopDockDrag();
+	}
+
+	function handleWindowKeydown(e: KeyboardEvent) {
+		if (isExpandedPreview && e.key === 'Escape') {
+			e.preventDefault();
+			closeExpandedPreview();
+		}
+	}
+
 	const jsSession = new JavaScriptRunnerSession();
 
 	function startFloatingResize(e: MouseEvent) {
@@ -126,6 +196,7 @@ fimalgoritmo`
 
 	function stopAllDragging() {
 		stopFloatingResize();
+		stopDockDrag();
 		isDragging = false;
 		isHorizontalDragging = false;
 	}
@@ -288,6 +359,7 @@ fimalgoritmo`
 	});
 
 	onDestroy(() => {
+		stopDockDrag();
 		jsSession.stop();
 		clearScheduledRun();
 	});
@@ -891,12 +963,20 @@ fimalgoritmo`
 		{#if isFloatingDragging || isDragging || isHorizontalDragging}
 			<div class="html-preview-drag-shield" role="presentation"></div>
 		{/if}
-		<iframe
-			title="Preview"
-			class="html-preview-iframe"
-			sandbox="allow-scripts"
-			srcdoc={htmlPreviewCode}
-		></iframe>
+		{#if !isExpandedPreview}
+			<iframe
+				title="Preview"
+				class="html-preview-iframe"
+				sandbox="allow-scripts"
+				srcdoc={htmlPreviewCode}
+			></iframe>
+		{:else}
+			<div class="html-preview-expanded-notice">
+				<Text size="sm" variant="secondary">
+					{i18n.t('portugolRunner.previewExpand')}
+				</Text>
+			</div>
+		{/if}
 	</div>
 {/snippet}
 
@@ -934,6 +1014,8 @@ fimalgoritmo`
 		{/if}
 	</div>
 {/snippet}
+
+<svelte:window onkeydown={handleWindowKeydown} />
 
 <div
 	class="portugol-runner"
@@ -1223,6 +1305,19 @@ fimalgoritmo`
 												Console{#if outputs.length > 0}
 													({outputs.length}){/if}
 											</button>
+											<button
+												type="button"
+												class="html-tab-btn html-expand-btn"
+												class:active={isExpandedPreview}
+												title={i18n.t('portugolRunner.previewExpand')}
+												aria-label={i18n.t('portugolRunner.previewExpand')}
+												onclick={() => {
+													htmlActiveTab = 'preview';
+													isExpandedPreview = true;
+												}}
+											>
+												<CornersOutIcon size={14} />
+											</button>
 										</div>
 									{:else}
 										<span>{i18n.t('portugolRunner.consoleTitle')}</span>
@@ -1257,6 +1352,19 @@ fimalgoritmo`
 												>
 													Console{#if outputs.length > 0}
 														({outputs.length}){/if}
+												</button>
+												<button
+													type="button"
+													class="html-tab-btn html-expand-btn"
+													class:active={isExpandedPreview}
+													title={i18n.t('portugolRunner.previewExpand')}
+													aria-label={i18n.t('portugolRunner.previewExpand')}
+													onclick={() => {
+														htmlActiveTab = 'preview';
+														isExpandedPreview = true;
+													}}
+												>
+													<CornersOutIcon size={14} />
 												</button>
 											</div>
 										{:else}
@@ -1334,6 +1442,88 @@ fimalgoritmo`
 			<Text tag="p">{fullErrorMsg}</Text>
 		</Dialog>
 	</Stack>
+
+	{#if isExpandedPreview}
+		<div
+			class="expanded-preview-root notranslate"
+			translate="no"
+			role="dialog"
+			aria-modal="true"
+			aria-label={i18n.t('portugolRunner.previewExpand')}
+		>
+			{#if isDockDragging}
+				<div class="expanded-drag-shield" role="presentation"></div>
+			{/if}
+
+			<div
+				class="expanded-preview-viewport"
+				class:is-mobile={previewDevice === 'mobile'}
+				class:is-desktop={previewDevice === 'desktop'}
+			>
+				<div class="expanded-preview-frame" class:mobile-frame={previewDevice === 'mobile'}>
+					<iframe
+						title="Preview Expandido"
+						class="expanded-preview-iframe"
+						class:dragging={isDockDragging}
+						sandbox="allow-scripts"
+						srcdoc={htmlPreviewCode}
+					></iframe>
+				</div>
+			</div>
+
+			<!-- Floating Draggable Dock -->
+			<div
+				bind:this={dockEl}
+				class="expanded-preview-dock"
+				class:dragging={isDockDragging}
+				style={dockStyle}
+				role="toolbar"
+				tabindex={0}
+				aria-label={i18n.t('portugolRunner.view')}
+				onmousedown={startDockDrag}
+			>
+				<div class="dock-drag-handle" title="Arrastar dock" aria-hidden="true">
+					<GripVerticalIcon size={14} />
+				</div>
+
+				<div class="dock-device-switcher" role="group" aria-label={i18n.t('portugolRunner.view')}>
+					<button
+						type="button"
+						class="dock-btn"
+						class:active={previewDevice === 'desktop'}
+						aria-pressed={previewDevice === 'desktop'}
+						onclick={() => (previewDevice = 'desktop')}
+					>
+						<DesktopIcon size={16} />
+						<span>{i18n.t('portugolRunner.previewDesktop')}</span>
+					</button>
+					<button
+						type="button"
+						class="dock-btn"
+						class:active={previewDevice === 'mobile'}
+						aria-pressed={previewDevice === 'mobile'}
+						onclick={() => (previewDevice = 'mobile')}
+					>
+						<DeviceMobileIcon size={16} />
+						<span>{i18n.t('portugolRunner.previewMobile')}</span>
+					</button>
+				</div>
+
+				<div class="dock-divider" role="separator" aria-orientation="vertical"></div>
+
+				<button
+					type="button"
+					class="dock-btn dock-close-btn"
+					onclick={closeExpandedPreview}
+					title={i18n.t('portugolRunner.previewCollapse')}
+					aria-label={i18n.t('portugolRunner.previewCollapse')}
+				>
+					<XIcon size={16} />
+					<span>{i18n.t('portugolRunner.previewCollapse')}</span>
+				</button>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -1912,5 +2102,175 @@ fimalgoritmo`
 
 	.runner-drag-shield-global.horizontal {
 		cursor: ns-resize;
+	}
+
+	.html-tab-btn.html-expand-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 3px 6px;
+		margin-left: 2px;
+	}
+
+	.html-preview-expanded-notice {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1 1 auto;
+		width: 100%;
+		height: 100%;
+		background: var(--bg-surface);
+		padding: var(--space-md);
+		text-align: center;
+	}
+
+	.expanded-preview-root {
+		position: fixed;
+		inset: 0;
+		z-index: var(--z-modal, 9999);
+		background: var(--bg-surface);
+		display: flex;
+		flex-direction: column;
+		width: 100vw;
+		height: 100vh;
+		overflow: hidden;
+	}
+
+	.expanded-drag-shield {
+		position: absolute;
+		inset: 0;
+		z-index: 10001;
+		background: transparent;
+		cursor: grabbing;
+	}
+
+	.expanded-preview-viewport {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--bg-secondary);
+		overflow: hidden;
+	}
+
+	.expanded-preview-viewport.is-desktop {
+		background: #ffffff;
+	}
+
+	.expanded-preview-frame {
+		width: 100%;
+		height: 100%;
+		border: none;
+		background: #ffffff;
+		transition:
+			width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+			height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+			box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+			border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.expanded-preview-frame.mobile-frame {
+		width: 375px;
+		height: 667px;
+		max-height: 90vh;
+		border-radius: var(--radius-lg, 16px);
+		box-shadow: var(--shadow-xl);
+		overflow: hidden;
+		border: 1px solid var(--border-subtle);
+	}
+
+	.expanded-preview-iframe {
+		width: 100%;
+		height: 100%;
+		border: none;
+		display: block;
+		background: #ffffff;
+	}
+
+	.expanded-preview-iframe.dragging {
+		pointer-events: none;
+	}
+
+	.expanded-preview-dock {
+		position: absolute;
+		z-index: 10002;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
+		padding: 4px 8px;
+		background: var(--bg-primary);
+		border: var(--border-width) solid var(--border-color);
+		border-radius: var(--radius-full);
+		box-shadow: var(--shadow-lg);
+		backdrop-filter: blur(8px);
+		user-select: none;
+		cursor: grab;
+	}
+
+	.expanded-preview-dock.dragging {
+		cursor: grabbing;
+	}
+
+	.dock-drag-handle {
+		display: flex;
+		align-items: center;
+		color: var(--text-tertiary);
+		padding-left: 2px;
+	}
+
+	.dock-device-switcher {
+		display: inline-flex;
+		align-items: center;
+		background: var(--bg-secondary);
+		border-radius: var(--radius-full);
+		padding: 2px;
+		gap: 2px;
+	}
+
+	.dock-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		border: none;
+		background: transparent;
+		color: var(--text-secondary);
+		font-family: inherit;
+		font-size: var(--text-xs);
+		font-weight: 500;
+		padding: 6px 12px;
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition:
+			color 0.15s ease,
+			background-color 0.15s ease,
+			box-shadow 0.15s ease;
+	}
+
+	.dock-btn:hover {
+		color: var(--text-primary);
+	}
+
+	.dock-device-switcher .dock-btn.active {
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		box-shadow: var(--shadow-xs);
+		font-weight: 600;
+	}
+
+	.dock-divider {
+		width: 1px;
+		height: 18px;
+		background: var(--border-color);
+		margin: 0 2px;
+	}
+
+	.dock-close-btn {
+		background: var(--bg-secondary);
+		color: var(--text-primary);
+	}
+
+	.dock-close-btn:hover {
+		background: var(--bg-hover, var(--border-color));
 	}
 </style>
