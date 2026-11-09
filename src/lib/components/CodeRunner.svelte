@@ -2199,7 +2199,7 @@ fimalgoritmo`
 		width: 375px;
 		height: 667px;
 		max-height: 90vh;
-		border-radius: var(--radius-lg, 16px);
+		border-radius: var(--radius-sm);
 		box-shadow: var(--shadow-xl);
 		overflow: hidden;
 		border: 1px solid var(--border-subtle);
@@ -2226,7 +2226,7 @@ fimalgoritmo`
 		padding: 4px 8px;
 		background: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
-		border-radius: var(--radius-full);
+		border-radius: var(--radius-sm);
 		box-shadow: var(--shadow-lg);
 		backdrop-filter: blur(8px);
 		user-select: none;
@@ -2248,7 +2248,7 @@ fimalgoritmo`
 		display: inline-flex;
 		align-items: center;
 		background: var(--bg-secondary);
-		border-radius: var(--radius-full);
+		border-radius: var(--radius-sm);
 		padding: 2px;
 		gap: 2px;
 	}
@@ -2264,7 +2264,7 @@ fimalgoritmo`
 		font-size: var(--text-xs);
 		font-weight: 500;
 		padding: 6px;
-		border-radius: var(--radius-full);
+		border-radius: var(--radius-sm);
 		cursor: pointer;
 		transition:
 			color 0.15s ease,
