@@ -196,6 +196,7 @@ export { default as WalletIcon } from './components/icons/Wallet.svelte';
 export { default as CornersOutIcon } from './components/icons/CornersOut.svelte';
 export { default as DesktopIcon } from './components/icons/Desktop.svelte';
 export { default as DeviceMobileIcon } from './components/icons/DeviceMobile.svelte';
+export { default as ShareNetworkIcon } from './components/icons/ShareNetwork.svelte';
 
 // Types
 export * from './types.js';
