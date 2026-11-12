@@ -105,6 +105,7 @@
 	<div class="search-container" role="search">
 		<div
 			class="search-input-row"
+			class:has-controls={Boolean(controls)}
 			class:inline-controls-on-mobile={inlineControlsOnMobile && controls}
 		>
 			<div class="search-input">
@@ -183,7 +184,40 @@
 		gap: var(--space-sm);
 	}
 
+	.search-input-row.has-controls {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		min-width: 0;
+	}
+
+	.search-input-row.has-controls .search-input {
+		display: block;
+		flex: 1 1 65%;
+		min-width: 0;
+	}
+
+	.search-input-row.has-controls .search-controls {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		flex: 0 1 35%;
+		min-width: 0;
+	}
+
+	.search-input-row.has-controls .search-controls :global(.monsan-select-container) {
+		min-width: 0;
+	}
+
 	@media (max-width: 640px) {
+		.search-input-row.has-controls:not(.inline-controls-on-mobile) {
+			display: contents;
+		}
+
+		.search-input-row.has-controls:not(.inline-controls-on-mobile) .search-input {
+			display: contents;
+		}
+
 		.search-input-row.inline-controls-on-mobile {
 			display: flex;
 			align-items: center;
