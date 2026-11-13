@@ -300,6 +300,7 @@
 				data-index={index}
 				style:--dnd-item-surface-color={itemSurfaceColor?.(item)}
 				style:--dnd-item-surface-foreground={contrastForeground(itemSurfaceColor?.(item))}
+				style:--monsan-surface-foreground={contrastForeground(itemSurfaceColor?.(item))}
 				ondragstart={(e) => handleDragStart(e, index)}
 				ondragover={(e) => handleDragOver(e, index)}
 				ondrop={(e) => handleDrop(e)}
@@ -354,7 +355,7 @@
 	.dnd-item {
 		display: flex;
 		align-items: center;
-		padding: var(--space-md);
+		padding: var(--space-sm);
 		background: var(--bg-primary);
 		border: var(--border-width) solid var(--border-color);
 		border-radius: var(--radius-md);
@@ -435,7 +436,7 @@
 		color: var(--text-secondary);
 		display: flex;
 		align-items: center;
-		margin-right: var(--space-md);
+		margin-right: var(--space-xs);
 	}
 
 	.item-content {
