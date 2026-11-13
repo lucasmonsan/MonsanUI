@@ -398,7 +398,11 @@
 							></tr
 						>
 					{/if}
-					<tr onclick={() => onRowActivate?.(row)} class:clickable={Boolean(onRowActivate)}>
+					<tr
+						onclick={() => onRowActivate?.(row)}
+						class:clickable={Boolean(onRowActivate)}
+						class:muted={row.muted}
+					>
 						<td class="selection" onclick={(event) => event.stopPropagation()}>
 							<Checkbox
 								size={selectionCheckboxSize}
@@ -605,6 +609,9 @@
 	}
 	tr.clickable:hover {
 		background: var(--bg-secondary);
+	}
+	tr.muted {
+		opacity: 0.65;
 	}
 	.row-action {
 		width: 1%;
