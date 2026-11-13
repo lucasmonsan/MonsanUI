@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount, tick, type Snippet } from 'svelte';
-	import { SvelteMap } from 'svelte/reactivity';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 	import { popBackLayer, pushBackLayer } from '../utils/dialogStack.js';
 	import Button from './Button.svelte';
 	import Checkbox from './Checkbox.svelte';
+	import ChevronDownIcon from './icons/ChevronDown.svelte';
 	import type { DataTableColumn, DataTableRow } from '$lib/types.js';
 
 	export interface DataTableMobileRowContext {
@@ -20,6 +21,7 @@
 
 	type MobileGroup = {
 		key: string;
+		group: string;
 		heading: DataTableGroupLabel;
 	};
 
@@ -49,6 +51,7 @@
 		longPressDuration?: number;
 		groupBy?: (row: DataTableRow) => string | undefined;
 		groupLabel?: (key: string, row: DataTableRow) => string | DataTableGroupLabel;
+		collapsibleGroups?: boolean;
 		hasMore?: boolean;
 		loadingMore?: boolean;
 		loadMoreLabel?: string;
@@ -84,6 +87,7 @@
 		longPressDuration = 500,
 		groupBy,
 		groupLabel,
+		collapsibleGroups = false,
 		hasMore = false,
 		loadingMore = false,
 		loadMoreLabel,
@@ -173,6 +177,25 @@
 		return Boolean(group) && (index === 0 || group !== rowGroup(rows[index - 1]!));
 	}
 
+	const collapsedGroups = new SvelteSet<string>();
+
+	function toggleGroup(key: string) {
+		if (collapsedGroups.has(key)) collapsedGroups.delete(key);
+		else collapsedGroups.add(key);
+	}
+
+	function isRowCollapsed(row: DataTableRow): boolean {
+		const group = rowGroup(row);
+		return Boolean(collapsibleGroups && group && collapsedGroups.has(group));
+	}
+
+	function handleGroupHeaderKeydown(event: KeyboardEvent, key: string) {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			toggleGroup(key);
+		}
+	}
+
 	let mobileGroupPresentation = $derived.by(() => {
 		const groups: MobileGroup[] = [];
 		const indexByRowId = new SvelteMap<string, number>();
@@ -181,7 +204,7 @@
 		for (const [index, row] of rows.entries()) {
 			const group = rowGroup(row);
 			if (group && group !== previousGroup) {
-				groups.push({ key: `${group}-${index}`, heading: groupHeading(row) });
+				groups.push({ key: `${group}-${index}`, group, heading: groupHeading(row) });
 			}
 			if (group) indexByRowId.set(row.id, groups.length - 1);
 			previousGroup = group;
@@ -344,7 +367,12 @@
 	}
 </script>
 
-{#snippet renderGroupHeading(heading: DataTableGroupLabel)}
+{#snippet renderGroupHeading(heading: DataTableGroupLabel, isCollapsed = false)}
+	{#if collapsibleGroups}
+		<span class="group-collapse-icon" class:collapsed={isCollapsed} aria-hidden="true">
+			<ChevronDownIcon size={14} />
+		</span>
+	{/if}
 	<span class="group-heading-label">
 		<span class="group-heading-outline" aria-hidden="true">{heading.leading}</span>
 		<span class="group-heading-text">{heading.leading}</span>
@@ -391,47 +419,70 @@
 			<tbody>
 				{#each rows as row, index (row.id)}
 					{#if isGroupStart(row, index)}
+						{@const group = rowGroup(row) ?? ''}
 						{@const heading = groupHeading(row)}
-						<tr class="table-group-header"
-							><th colspan={groupColumnSpan}
-								><span class="group-heading">{@render renderGroupHeading(heading)}</span></th
-							></tr
-						>
-					{/if}
-					<tr
-						onclick={() => onRowActivate?.(row)}
-						class:clickable={Boolean(onRowActivate)}
-						class:muted={row.muted}
-					>
-						<td class="selection" onclick={(event) => event.stopPropagation()}>
-							<Checkbox
-								size={selectionCheckboxSize}
-								checked={selectedIds.includes(row.id)}
-								disabled={row.selectable === false}
-								onchange={() => toggleRow(row)}
-								ariaLabel={selectRowLabel(row)}
-							/>
-						</td>
-						{#each row.cells as cell, index (columns[index]?.id)}
-							<td
-								class:align-end={columns[index]?.align === 'end'}
-								data-label={columns[index]?.label}
+						{@const isCollapsed = collapsedGroups.has(group)}
+						{#if collapsibleGroups}
+							<tr
+								class="table-group-header collapsible"
+								onclick={() => toggleGroup(group)}
+								onkeydown={(event) => handleGroupHeaderKeydown(event, group)}
+								role="button"
+								tabindex="0"
+								aria-expanded={!isCollapsed}
 							>
-								{cell ?? emptyCellLabel}
-							</td>
-						{/each}
-						{#if onRowActivate && rowActionLabel}
-							<td
-								class="row-action"
-								data-label={rowActionLabel(row)}
-								onclick={(event) => event.stopPropagation()}
-							>
-								<button type="button" onclick={() => onRowActivate?.(row)}
-									>{rowActionLabel(row)}</button
-								>
-							</td>
+								<th colspan={groupColumnSpan}>
+									<span class="group-heading"
+										>{@render renderGroupHeading(heading, isCollapsed)}</span
+									>
+								</th>
+							</tr>
+						{:else}
+							<tr class="table-group-header">
+								<th colspan={groupColumnSpan}>
+									<span class="group-heading"
+										>{@render renderGroupHeading(heading, isCollapsed)}</span
+									>
+								</th>
+							</tr>
 						{/if}
-					</tr>
+					{/if}
+					{#if !isRowCollapsed(row)}
+						<tr
+							onclick={() => onRowActivate?.(row)}
+							class:clickable={Boolean(onRowActivate)}
+							class:muted={row.muted}
+						>
+							<td class="selection" onclick={(event) => event.stopPropagation()}>
+								<Checkbox
+									size={selectionCheckboxSize}
+									checked={selectedIds.includes(row.id)}
+									disabled={row.selectable === false}
+									onchange={() => toggleRow(row)}
+									ariaLabel={selectRowLabel(row)}
+								/>
+							</td>
+							{#each row.cells as cell, index (columns[index]?.id)}
+								<td
+									class:align-end={columns[index]?.align === 'end'}
+									data-label={columns[index]?.label}
+								>
+									{cell ?? emptyCellLabel}
+								</td>
+							{/each}
+							{#if onRowActivate && rowActionLabel}
+								<td
+									class="row-action"
+									data-label={rowActionLabel(row)}
+									onclick={(event) => event.stopPropagation()}
+								>
+									<button type="button" onclick={() => onRowActivate?.(row)}
+										>{rowActionLabel(row)}</button
+									>
+								</td>
+							{/if}
+						</tr>
+					{/if}
 				{/each}
 			</tbody>
 		</table>
@@ -445,36 +496,57 @@
 								in:fade={{ duration: prefersReducedMotion ? 0 : 160 }}
 								out:fade={{ duration: prefersReducedMotion ? 0 : 120 }}
 							>
-								{@render renderGroupHeading(activeMobileGroup.heading)}
+								{@render renderGroupHeading(
+									activeMobileGroup.heading,
+									collapsedGroups.has(activeMobileGroup.group)
+								)}
 							</div>
 						{/key}
 					</div>
 				{/if}
 				{#each rows as row, index (row.id)}
 					{#if isGroupStart(row, index)}
+						{@const group = rowGroup(row) ?? ''}
 						{@const heading = groupHeading(row)}
+						{@const isCollapsed = collapsedGroups.has(group)}
+						{#if collapsibleGroups}
+							<div
+								class="mobile-group-header collapsible"
+								use:registerMobileGroupHeader={mobileGroupPresentation.indexByRowId.get(row.id)}
+								onclick={() => toggleGroup(group)}
+								onkeydown={(event) => handleGroupHeaderKeydown(event, group)}
+								role="button"
+								tabindex="0"
+								aria-expanded={!isCollapsed}
+							>
+								{@render renderGroupHeading(heading, isCollapsed)}
+							</div>
+						{:else}
+							<div
+								class="mobile-group-header"
+								use:registerMobileGroupHeader={mobileGroupPresentation.indexByRowId.get(row.id)}
+							>
+								{@render renderGroupHeading(heading, isCollapsed)}
+							</div>
+						{/if}
+					{/if}
+					{#if !isRowCollapsed(row)}
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
-							class="mobile-group-header"
-							use:registerMobileGroupHeader={mobileGroupPresentation.indexByRowId.get(row.id)}
+							class="mobile-row"
+							onpointerdown={(event) => startLongPress(event, row)}
+							onpointermove={cancelLongPress}
+							onpointerup={clearLongPress}
+							onpointercancel={clearLongPress}
+							onclickcapture={handleMobileClick}
 						>
-							{@render renderGroupHeading(heading)}
+							{@render mobileRow(row, {
+								selected: selectedIds.includes(row.id),
+								selectionMode: mobileSelectionMode,
+								toggleSelection: () => toggleRow(row)
+							})}
 						</div>
 					{/if}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
-					<div
-						class="mobile-row"
-						onpointerdown={(event) => startLongPress(event, row)}
-						onpointermove={cancelLongPress}
-						onpointerup={clearLongPress}
-						onpointercancel={clearLongPress}
-						onclickcapture={handleMobileClick}
-					>
-						{@render mobileRow(row, {
-							selected: selectedIds.includes(row.id),
-							selectionMode: mobileSelectionMode,
-							toggleSelection: () => toggleRow(row)
-						})}
-					</div>
 				{/each}
 			</div>
 		{/if}
@@ -555,6 +627,30 @@
 		font-size: var(--text-md);
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
+	}
+	.table-group-header.collapsible,
+	.mobile-group-header.collapsible {
+		cursor: pointer;
+		user-select: none;
+	}
+	.table-group-header.collapsible:focus-visible,
+	.mobile-group-header.collapsible:focus-visible {
+		outline: 2px solid var(--accent-primary);
+		outline-offset: -2px;
+	}
+	.group-collapse-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s cubic-bezier(0.2, 1, 0.3, 1);
+	}
+	.group-collapse-icon.collapsed {
+		transform: rotate(-90deg);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.group-collapse-icon {
+			transition: none;
+		}
 	}
 	.group-heading,
 	.mobile-group-header,
