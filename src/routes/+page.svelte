@@ -1470,7 +1470,7 @@
 </script>
 
 <svelte:head>
-	<title>MonsanUI - Showcase</title>
+	<title>Showcase · MonsanUI</title>
 	<meta name="description" content={i18n.t('header.description')} />
 	<meta property="og:title" content="MonsanUI - Showcase" />
 	<meta property="og:description" content={i18n.t('header.description')} />
