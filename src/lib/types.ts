@@ -62,4 +62,5 @@ export interface DataTableRow {
 	id: string;
 	cells: Array<string | number | null | undefined>;
 	selectable?: boolean;
+	muted?: boolean;
 }

@@ -301,6 +301,7 @@
 		/* Keep selectable text readable while reducing decorative emphasis. */
 		box-shadow: none;
 		border-style: dashed;
+		opacity: 0.7;
 	}
 	.monsan-panel.text-unselectable,
 	.monsan-panel.text-unselectable :global(*) {
