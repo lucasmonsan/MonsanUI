@@ -539,6 +539,9 @@
 		text-align: left;
 		vertical-align: middle;
 	}
+	td {
+		border-bottom: var(--border-width) solid var(--border-color);
+	}
 	th {
 		background: var(--bg-secondary);
 		font-size: var(--text-sm);
@@ -610,8 +613,8 @@
 	tr.clickable:hover {
 		background: var(--bg-secondary);
 	}
-	tr.muted {
-		opacity: 0.65;
+	tr.muted > td {
+		opacity: 0.6;
 	}
 	.row-action {
 		width: 1%;
