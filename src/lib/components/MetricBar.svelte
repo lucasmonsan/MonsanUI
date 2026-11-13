@@ -40,7 +40,8 @@
 	}
 	.divided > :global(:not(:first-child)) {
 		border-left: var(--border-width) solid var(--border-color);
-		padding-left: var(--space-xs);
+		padding-left: var(--space-sm);
+		padding-right: var(--space-xs);
 	}
 
 	@media (max-width: 560px) {

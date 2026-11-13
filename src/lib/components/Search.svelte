@@ -271,8 +271,12 @@
 		border-bottom: none;
 	}
 
-	.result-item.selected,
 	.result-item:hover {
+		background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+		outline: none;
+	}
+
+	.result-item.selected {
 		background: var(--accent-primary);
 		color: var(--bg-primary);
 		--text-primary: var(--bg-primary);
