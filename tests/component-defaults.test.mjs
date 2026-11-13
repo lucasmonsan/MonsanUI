@@ -181,6 +181,16 @@ assert(
 );
 
 assert(
+	dataTable.includes('collapsibleGroups?: boolean') &&
+		dataTable.includes('const collapsedGroups = new SvelteSet<string>()') &&
+		dataTable.includes('function toggleGroup(key: string)') &&
+		dataTable.includes('function isRowCollapsed(row: DataTableRow): boolean') &&
+		dataTable.includes('ChevronDownIcon') &&
+		dataTable.includes('class="group-collapse-icon" class:collapsed={isCollapsed}'),
+	'DataTable must support collapsible groups with accessible keyboard controls and animated chevron indicators.'
+);
+
+assert(
 	moneyDisplay.includes('role="img"') && moneyDisplay.includes('aria-label={ariaLabel'),
 	'MoneyDisplay must expose its labeled value through a valid accessible role.'
 );
