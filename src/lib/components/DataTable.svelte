@@ -189,13 +189,6 @@
 		return Boolean(collapsibleGroups && group && collapsedGroups.has(group));
 	}
 
-	function handleGroupHeaderKeydown(event: KeyboardEvent, key: string) {
-		if (event.key === 'Enter' || event.key === ' ') {
-			event.preventDefault();
-			toggleGroup(key);
-		}
-	}
-
 	let mobileGroupPresentation = $derived.by(() => {
 		const groups: MobileGroup[] = [];
 		const indexByRowId = new SvelteMap<string, number>();
@@ -422,30 +415,26 @@
 						{@const group = rowGroup(row) ?? ''}
 						{@const heading = groupHeading(row)}
 						{@const isCollapsed = collapsedGroups.has(group)}
-						{#if collapsibleGroups}
-							<tr
-								class="table-group-header collapsible"
-								onclick={() => toggleGroup(group)}
-								onkeydown={(event) => handleGroupHeaderKeydown(event, group)}
-								role="button"
-								tabindex="0"
-								aria-expanded={!isCollapsed}
-							>
-								<th colspan={groupColumnSpan}>
-									<span class="group-heading"
-										>{@render renderGroupHeading(heading, isCollapsed)}</span
+						<tr class="table-group-header">
+							<th colspan={groupColumnSpan}>
+								{#if collapsibleGroups}
+									<button
+										type="button"
+										class="group-heading-button"
+										onclick={() => toggleGroup(group)}
+										aria-expanded={!isCollapsed}
 									>
-								</th>
-							</tr>
-						{:else}
-							<tr class="table-group-header">
-								<th colspan={groupColumnSpan}>
-									<span class="group-heading"
-										>{@render renderGroupHeading(heading, isCollapsed)}</span
-									>
-								</th>
-							</tr>
-						{/if}
+										<span class="group-heading">
+											{@render renderGroupHeading(heading, isCollapsed)}
+										</span>
+									</button>
+								{:else}
+									<span class="group-heading">
+										{@render renderGroupHeading(heading)}
+									</span>
+								{/if}
+							</th>
+						</tr>
 					{/if}
 					{#if !isRowCollapsed(row)}
 						<tr
@@ -489,18 +478,31 @@
 		{#if mobileRow}
 			<div bind:this={mobileListElement} class="mobile-list" aria-label={caption}>
 				{#if mobileStickyVisible && activeMobileGroup}
-					<div class="mobile-group-sticky" aria-hidden="true">
+					<div class="mobile-group-sticky" aria-hidden={collapsibleGroups ? undefined : 'true'}>
 						{#key activeMobileGroup.key}
-							<div
-								class="mobile-group-heading-active"
-								in:fade={{ duration: prefersReducedMotion ? 0 : 160 }}
-								out:fade={{ duration: prefersReducedMotion ? 0 : 120 }}
-							>
-								{@render renderGroupHeading(
-									activeMobileGroup.heading,
-									collapsedGroups.has(activeMobileGroup.group)
-								)}
-							</div>
+							{#if collapsibleGroups}
+								<button
+									type="button"
+									class="group-heading-button mobile-group-heading-active"
+									onclick={() => toggleGroup(activeMobileGroup.group)}
+									aria-expanded={!collapsedGroups.has(activeMobileGroup.group)}
+									in:fade={{ duration: prefersReducedMotion ? 0 : 160 }}
+									out:fade={{ duration: prefersReducedMotion ? 0 : 120 }}
+								>
+									{@render renderGroupHeading(
+										activeMobileGroup.heading,
+										collapsedGroups.has(activeMobileGroup.group)
+									)}
+								</button>
+							{:else}
+								<div
+									class="mobile-group-heading-active"
+									in:fade={{ duration: prefersReducedMotion ? 0 : 160 }}
+									out:fade={{ duration: prefersReducedMotion ? 0 : 120 }}
+								>
+									{@render renderGroupHeading(activeMobileGroup.heading)}
+								</div>
+							{/if}
 						{/key}
 					</div>
 				{/if}
@@ -509,26 +511,25 @@
 						{@const group = rowGroup(row) ?? ''}
 						{@const heading = groupHeading(row)}
 						{@const isCollapsed = collapsedGroups.has(group)}
-						{#if collapsibleGroups}
-							<div
-								class="mobile-group-header collapsible"
-								use:registerMobileGroupHeader={mobileGroupPresentation.indexByRowId.get(row.id)}
-								onclick={() => toggleGroup(group)}
-								onkeydown={(event) => handleGroupHeaderKeydown(event, group)}
-								role="button"
-								tabindex="0"
-								aria-expanded={!isCollapsed}
-							>
-								{@render renderGroupHeading(heading, isCollapsed)}
-							</div>
-						{:else}
-							<div
-								class="mobile-group-header"
-								use:registerMobileGroupHeader={mobileGroupPresentation.indexByRowId.get(row.id)}
-							>
-								{@render renderGroupHeading(heading, isCollapsed)}
-							</div>
-						{/if}
+						<div
+							class="mobile-group-header"
+							use:registerMobileGroupHeader={mobileGroupPresentation.indexByRowId.get(row.id)}
+						>
+							{#if collapsibleGroups}
+								<button
+									type="button"
+									class="group-heading-button"
+									onclick={() => toggleGroup(group)}
+									aria-expanded={!isCollapsed}
+								>
+									<span class="group-heading">
+										{@render renderGroupHeading(heading, isCollapsed)}
+									</span>
+								</button>
+							{:else}
+								{@render renderGroupHeading(heading)}
+							{/if}
+						</div>
 					{/if}
 					{#if !isRowCollapsed(row)}
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -628,15 +629,31 @@
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 	}
-	.table-group-header.collapsible,
-	.mobile-group-header.collapsible {
+	.group-heading {
+		width: 100%;
+	}
+	.group-heading-button {
+		display: block;
+		width: 100%;
+		border: 0;
+		background: transparent;
+		padding: 0;
+		text-align: left;
+		font: inherit;
+		color: inherit;
 		cursor: pointer;
 		user-select: none;
+		-webkit-user-select: none;
 	}
-	.table-group-header.collapsible:focus-visible,
-	.mobile-group-header.collapsible:focus-visible {
+	.group-heading-button:focus-visible {
 		outline: 2px solid var(--accent-primary);
-		outline-offset: -2px;
+		outline-offset: 2px;
+	}
+	.group-heading-button.mobile-group-heading-active {
+		display: flex;
+	}
+	.mobile-group-sticky .group-heading-button {
+		pointer-events: auto;
 	}
 	.group-collapse-icon {
 		display: inline-flex;
@@ -666,6 +683,11 @@
 		height: 0;
 		border-top: var(--border-width) solid currentColor;
 		opacity: 0.5;
+	}
+	.group-heading-label,
+	.group-heading-text {
+		user-select: none;
+		-webkit-user-select: none;
 	}
 	.group-heading-label {
 		position: relative;
@@ -821,6 +843,9 @@
 			height: 0;
 			margin-bottom: calc(var(--space-sm) * -1);
 			pointer-events: none;
+		}
+		.mobile-group-sticky .group-heading-button {
+			pointer-events: auto;
 		}
 		.mobile-group-sticky::before {
 			position: absolute;
