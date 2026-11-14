@@ -186,8 +186,10 @@ assert(
 		dataTable.includes('function toggleGroup(key: string)') &&
 		dataTable.includes('function isRowCollapsed(row: DataTableRow): boolean') &&
 		dataTable.includes('ChevronDownIcon') &&
-		dataTable.includes('class="group-collapse-icon" class:collapsed={isCollapsed}'),
-	'DataTable must support collapsible groups with accessible keyboard controls and animated chevron indicators.'
+		dataTable.includes('class="group-collapse-icon" class:collapsed={isCollapsed}') &&
+		dataTable.includes('class="group-heading-button"') &&
+		dataTable.includes('pointer-events: auto'),
+	'DataTable must support collapsible groups with robust button controls and animated chevron indicators.'
 );
 
 assert(
