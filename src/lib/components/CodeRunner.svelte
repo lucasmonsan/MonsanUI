@@ -38,7 +38,7 @@
 	export interface CodeRunnerProps {
 		code?: string;
 		previewCode?: string;
-		language?: 'portugol' | 'javascript' | 'html';
+		language?: 'portugol' | 'javascript' | 'html' | 'css';
 		disabled?: boolean;
 		onOutputsChange?: (outputs: string[]) => void;
 		onSuccess?: () => void;

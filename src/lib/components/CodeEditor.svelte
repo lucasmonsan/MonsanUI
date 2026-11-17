@@ -40,6 +40,7 @@
 	} from '@codemirror/language';
 	import { javascript } from '@codemirror/lang-javascript';
 	import { html } from '@codemirror/lang-html';
+	import { css } from '@codemirror/lang-css';
 	import { tags as t } from '@lezer/highlight';
 	import {
 		getPortugolEditorIndentColumns,
@@ -51,7 +52,7 @@
 
 	export interface CodeEditorProps {
 		code: string;
-		language?: 'portugol' | 'javascript' | 'html';
+		language?: 'portugol' | 'javascript' | 'html' | 'css';
 		activeLine?: number;
 		followActiveLine?: boolean;
 		errorLine?: number;
@@ -630,7 +631,10 @@
 		}
 	);
 
-	function getLanguageExtension(lang: 'portugol' | 'javascript' | 'html') {
+	function getLanguageExtension(lang: 'portugol' | 'javascript' | 'html' | 'css') {
+		if (lang === 'css') {
+			return [css()];
+		}
 		if (lang === 'html') {
 			return [html()];
 		}
@@ -645,6 +649,7 @@
 
 	function getEffectivePlaceholder() {
 		if (placeholder) return placeholder;
+		if (language === 'css') return '/* Escreva suas regras CSS aqui... */';
 		if (language === 'html') return '<!-- Escreva seu código HTML aqui... -->';
 		return language === 'javascript'
 			? '// Escreva seu código JavaScript aqui...'

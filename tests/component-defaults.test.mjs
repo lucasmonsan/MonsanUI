@@ -277,6 +277,13 @@ assert(
 );
 
 assert(
+	codeEditor.includes("import { css } from '@codemirror/lang-css'") &&
+		codeEditor.includes("lang === 'css'") &&
+		codeRunner.includes("'portugol' | 'javascript' | 'html' | 'css'"),
+	'CodeEditor and CodeRunner must support CSS language highlighting.'
+);
+
+assert(
 	panel.includes('ariaLabel?: string') && panel.includes('aria-label={ariaLabel}'),
 	'Panel must support an accessible name when used as an interactive surface.'
 );
