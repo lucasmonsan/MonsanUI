@@ -262,6 +262,13 @@ assert(
 );
 
 assert(
+	codeRunner.includes('previewCode?: string') &&
+		codeRunner.includes('htmlPreviewCode = buildHtmlPreview(previewCode ?? code)') &&
+		portugolRunner.includes('{previewCode}'),
+	'CodeRunner and PortugolRunner must support virtual HTML preview via previewCode prop.'
+);
+
+assert(
 	(codeEditor.includes("scrollbarWidth: 'none'") ||
 		portugolEditor.includes("scrollbarWidth: 'none'")) &&
 		(codeEditor.includes("'& .cm-scroller::-webkit-scrollbar'") ||
