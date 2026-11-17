@@ -37,6 +37,7 @@
 
 	export interface CodeRunnerProps {
 		code?: string;
+		previewCode?: string;
 		language?: 'portugol' | 'javascript' | 'html';
 		disabled?: boolean;
 		onOutputsChange?: (outputs: string[]) => void;
@@ -60,6 +61,7 @@ inicio
 
 fimalgoritmo`
 		),
+		previewCode,
 		language = 'portugol',
 		disabled = false,
 		onOutputsChange,
@@ -542,7 +544,7 @@ fimalgoritmo`
 		}
 		outputs = [];
 		onOutputsChange?.(outputs);
-		htmlPreviewCode = buildHtmlPreview(code);
+		htmlPreviewCode = buildHtmlPreview(previewCode ?? code);
 	}
 
 	$effect(() => {
@@ -573,10 +575,11 @@ fimalgoritmo`
 
 	$effect(() => {
 		if (language === 'html') {
+			const targetCode = previewCode !== undefined ? previewCode : code;
 			if (fileName !== lastRenderedFileName) {
 				lastRenderedFileName = fileName || '';
 				renderHtmlPreview(false);
-			} else if (code && htmlLivePreview) {
+			} else if (targetCode && htmlLivePreview) {
 				if (htmlDebounceTimer) clearTimeout(htmlDebounceTimer);
 				htmlDebounceTimer = setTimeout(() => {
 					renderHtmlPreview(false);

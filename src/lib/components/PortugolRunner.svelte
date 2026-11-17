@@ -18,7 +18,8 @@ fimalgoritmo`),
 		fileName,
 		height = '100%',
 		fill = false,
-		defaultFocusMode = true
+		defaultFocusMode = true,
+		previewCode
 	}: CodeRunnerProps = $props();
 </script>
 
@@ -36,4 +37,5 @@ fimalgoritmo`),
 	{height}
 	{fill}
 	{defaultFocusMode}
+	{previewCode}
 />
