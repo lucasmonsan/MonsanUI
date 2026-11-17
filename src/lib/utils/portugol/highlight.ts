@@ -150,12 +150,40 @@ export function tokenizeHtmlCode(code: string): CodeToken[] {
 	return tokens;
 }
 
+const cssTokenPattern =
+	/\/\*[\s\S]*?\*\/|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|#[0-9a-fA-F]{3,8}\b|\b\d+(?:\.\d+)?(?:px|rem|em|%|vh|vw|s|ms)?\b|[A-Za-z_-][A-Za-z0-9_-]*(?=\s*:)|[:;{},]/g;
+
+function classifyCssToken(text: string): CodeTokenKind {
+	if (text.startsWith('/*')) return 'comment';
+	if (text.startsWith('"') || text.startsWith("'")) return 'string';
+	if (/^\d/.test(text) || text.startsWith('#')) return 'number';
+	if (text.endsWith(':') || text === '{' || text === '}' || text === ';') return 'keyword';
+	return 'plain';
+}
+
+export function tokenizeCssCode(code: string): CodeToken[] {
+	if (!code) return [];
+	const tokens: CodeToken[] = [];
+	let cursor = 0;
+	for (const match of code.matchAll(cssTokenPattern)) {
+		const index = match.index ?? 0;
+		if (index > cursor) {
+			tokens.push({ kind: 'plain', text: code.slice(cursor, index) });
+		}
+		tokens.push({ kind: classifyCssToken(match[0]), text: match[0] });
+		cursor = index + match[0].length;
+	}
+	if (cursor < code.length) {
+		tokens.push({ kind: 'plain', text: code.slice(cursor) });
+	}
+	return tokens;
+}
+
 export function tokenizeCode(
 	code: string,
-	language: 'portugol' | 'javascript' | 'html' = 'portugol'
+	language: 'portugol' | 'javascript' | 'html' | 'css' = 'portugol'
 ): CodeToken[] {
-	if (language === 'html') {
-		return tokenizeHtmlCode(code);
-	}
+	if (language === 'html') return tokenizeHtmlCode(code);
+	if (language === 'css') return tokenizeCssCode(code);
 	return language === 'javascript' ? tokenizeJsCode(code) : tokenizePortugolCode(code);
 }
