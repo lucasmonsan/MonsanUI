@@ -50,6 +50,7 @@
 		height?: string;
 		fill?: boolean;
 		defaultFocusMode?: boolean;
+		showSaveButton?: boolean;
 	}
 
 	let {
@@ -73,7 +74,8 @@ fimalgoritmo`
 		fileName,
 		height = '100%',
 		fill = false,
-		defaultFocusMode = true
+		defaultFocusMode = true,
+		showSaveButton = true
 	}: CodeRunnerProps = $props();
 
 	let activeLine = $state(0);
@@ -350,16 +352,18 @@ fimalgoritmo`
 
 		isLoaded = true;
 		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === 'F8') {
-				e.preventDefault();
-				handleStep();
-				return;
-			}
-			if (e.key === 'F9') {
-				e.preventDefault();
-				if (isRunning) handleStop();
-				else startExecution(false);
-				return;
+			if (language !== 'css') {
+				if (e.key === 'F8') {
+					e.preventDefault();
+					handleStep();
+					return;
+				}
+				if (e.key === 'F9') {
+					e.preventDefault();
+					if (isRunning) handleStop();
+					else startExecution(false);
+					return;
+				}
 			}
 
 			const isCtrlOrCmd = e.ctrlKey || e.metaKey;
@@ -400,7 +404,7 @@ fimalgoritmo`
 	let currentInputValue = $state('');
 	let terminalInputElement = $state<HTMLInputElement | null>(null);
 
-	let resultsVisible = $state(true);
+	let resultsVisible = $state(language !== 'html');
 	let showLineNumbers = $state(true);
 
 	let editorWidthPercent = $state(60);
@@ -592,6 +596,16 @@ fimalgoritmo`
 		return () => {
 			if (htmlDebounceTimer) clearTimeout(htmlDebounceTimer);
 		};
+	});
+
+	let prevLanguage = $state<string | undefined>(undefined);
+	$effect(() => {
+		if (prevLanguage !== undefined && prevLanguage !== language) {
+			if (language === 'html') {
+				resultsVisible = false;
+			}
+		}
+		prevLanguage = language;
 	});
 
 	$effect(() => {
@@ -1112,19 +1126,21 @@ fimalgoritmo`
 
 					<!-- Controles de Ação Flutuantes (Apenas Ícones) -->
 					<div class="runner-floating-controls">
-						<Button
-							variant={isRunning ? 'error' : 'primary'}
-							size="sm"
-							onclick={() => (isRunning ? handleStop() : startExecution(false))}
-							{disabled}
-							title={isRunning ? i18n.t('portugolRunner.stop') : i18n.t('portugolRunner.run')}
-						>
-							{#if isRunning}
-								<XIcon size={16} />
-							{:else}
-								<PlayIcon size={16} />
-							{/if}
-						</Button>
+						{#if language !== 'css'}
+							<Button
+								variant={isRunning ? 'error' : 'primary'}
+								size="sm"
+								onclick={() => (isRunning ? handleStop() : startExecution(false))}
+								{disabled}
+								title={isRunning ? i18n.t('portugolRunner.stop') : i18n.t('portugolRunner.run')}
+							>
+								{#if isRunning}
+									<XIcon size={16} />
+								{:else}
+									<PlayIcon size={16} />
+								{/if}
+							</Button>
+						{/if}
 						{#if language === 'portugol' || language === 'javascript'}
 							<Button
 								variant="secondary"
@@ -1159,7 +1175,7 @@ fimalgoritmo`
 								<TerminalIcon size={16} />
 							</Button>
 						{/if}
-						{#if onsave}
+						{#if onsave && showSaveButton !== false}
 							<Button
 								variant="secondary"
 								size="sm"

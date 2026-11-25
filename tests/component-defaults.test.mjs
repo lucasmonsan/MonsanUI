@@ -10,6 +10,7 @@ async function readComponent(path) {
 
 const appHeader = await readComponent('AppHeader.svelte');
 const actionFooter = await readComponent('ActionFooter.svelte');
+const button = await readComponent('Button.svelte');
 const appShell = await readComponent('AppShell.svelte');
 const avatarMenu = await readComponent('AvatarMenu.svelte');
 const brandHeader = await readComponent('BrandHeader.svelte');
@@ -281,6 +282,30 @@ assert(
 		codeEditor.includes("lang === 'css'") &&
 		codeRunner.includes("'portugol' | 'javascript' | 'html' | 'css'"),
 	'CodeEditor and CodeRunner must support CSS language highlighting.'
+);
+
+assert(
+	button.includes("size?: 'sm' | 'md' | 'compact' | 'xs'") &&
+		button.includes('.size-xs') &&
+		button.includes('calc(var(--control-height) * 0.65)') &&
+		button.includes('padding: 2px 8px') &&
+		button.includes('font-size: var(--text-xs)') &&
+		button.includes('border-radius: var(--radius-sm)'),
+	'Button must support size xs with consistent compact dimensions and typography.'
+);
+
+assert(
+	codeRunner.includes('showSaveButton?: boolean') &&
+		codeRunner.includes('onsave && showSaveButton !== false') &&
+		codeRunner.includes("language !== 'css'") &&
+		codeRunner.includes("let resultsVisible = $state(language !== 'html')"),
+	'CodeRunner must support optional save button, hide execution in CSS, and default HTML preview closed.'
+);
+
+assert(
+	codeEditor.includes('foldable(editorView.state, line.from, line.to)') &&
+		codeEditor.includes('getPortugolFoldRange(editorView.state, line.from)'),
+	'CodeEditor must enable universal folding using native CodeMirror foldable with Portugol fallback.'
 );
 
 assert(

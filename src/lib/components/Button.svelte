@@ -7,7 +7,7 @@
 		onclick?: (e: MouseEvent) => void;
 		type?: 'button' | 'submit' | 'reset';
 		variant?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'neutral';
-		size?: 'sm' | 'md' | 'compact';
+		size?: 'sm' | 'md' | 'compact' | 'xs';
 		shape?: 'default' | 'pill';
 		disabled?: boolean;
 		block?: boolean;
@@ -178,6 +178,15 @@
 		line-height: 1;
 	}
 
+	.size-xs {
+		height: calc(var(--control-height) * 0.65);
+		min-height: calc(var(--control-height) * 0.65);
+		padding: 2px 8px;
+		font-size: var(--text-xs);
+		border-radius: var(--radius-sm);
+		line-height: 1;
+	}
+
 	.size-compact {
 		min-height: 0;
 		padding: var(--space-sm);
@@ -189,6 +198,13 @@
 		width: calc(var(--control-height) * 0.8);
 		height: calc(var(--control-height) * 0.8);
 		min-height: calc(var(--control-height) * 0.8);
+		padding: 0;
+	}
+
+	.size-xs.square {
+		width: calc(var(--control-height) * 0.65);
+		height: calc(var(--control-height) * 0.65);
+		min-height: calc(var(--control-height) * 0.65);
 		padding: 0;
 	}
 

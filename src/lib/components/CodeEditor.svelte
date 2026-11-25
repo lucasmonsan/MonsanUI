@@ -36,7 +36,8 @@
 		unfoldEffect,
 		foldedRanges,
 		codeFolding,
-		syntaxTree
+		syntaxTree,
+		foldable
 	} from '@codemirror/language';
 	import { javascript } from '@codemirror/lang-javascript';
 	import { html } from '@codemirror/lang-html';
@@ -232,7 +233,9 @@
 			return v.state.field(lineMarkersField);
 		},
 		lineMarker(editorView, line, markers) {
-			const range = getPortugolFoldRange(editorView.state, line.from);
+			const range =
+				foldable(editorView.state, line.from, line.to) ??
+				getPortugolFoldRange(editorView.state, line.from);
 			if (
 				!range ||
 				markers.some(
@@ -249,7 +252,9 @@
 		initialSpacer: () => new FoldMarker(false),
 		domEventHandlers: {
 			click(editorView, line) {
-				const range = getPortugolFoldRange(editorView.state, line.from);
+				const range =
+					foldable(editorView.state, line.from, line.to) ??
+					getPortugolFoldRange(editorView.state, line.from);
 				if (!range) return false;
 
 				editorView.dispatch({
