@@ -233,7 +233,9 @@
 			return v.state.field(lineMarkersField);
 		},
 		lineMarker(editorView, line, markers) {
+			const existingFold = findFold(editorView.state, line.from, line.to);
 			const range =
+				existingFold ??
 				foldable(editorView.state, line.from, line.to) ??
 				getPortugolFoldRange(editorView.state, line.from);
 			if (
@@ -244,7 +246,8 @@
 			) {
 				return null;
 			}
-			return new FoldMarker(isPortugolFolded(editorView.state, range));
+			const isFolded = Boolean(existingFold) || isPortugolFolded(editorView.state, range);
+			return new FoldMarker(isFolded);
 		},
 		lineMarkerChange(update) {
 			return foldedRanges(update.startState) !== foldedRanges(update.state);
@@ -252,15 +255,16 @@
 		initialSpacer: () => new FoldMarker(false),
 		domEventHandlers: {
 			click(editorView, line) {
+				const existingFold = findFold(editorView.state, line.from, line.to);
 				const range =
+					existingFold ??
 					foldable(editorView.state, line.from, line.to) ??
 					getPortugolFoldRange(editorView.state, line.from);
 				if (!range) return false;
 
+				const isFolded = Boolean(existingFold) || isPortugolFolded(editorView.state, range);
 				editorView.dispatch({
-					effects: isPortugolFolded(editorView.state, range)
-						? unfoldEffect.of(range)
-						: foldEffect.of(range)
+					effects: isFolded ? unfoldEffect.of(range) : foldEffect.of(range)
 				});
 				return true;
 			}
@@ -345,6 +349,16 @@
 			}
 		});
 		return folded;
+	}
+
+	function findFold(state: EditorState, from: number, to: number) {
+		let found: { from: number; to: number } | null = null;
+		foldedRanges(state).between(from, to, (foldFrom, foldTo) => {
+			if (!found || found.from > foldFrom) {
+				found = { from: foldFrom, to: foldTo };
+			}
+		});
+		return found;
 	}
 
 	function createHiddenFoldPlaceholder() {
